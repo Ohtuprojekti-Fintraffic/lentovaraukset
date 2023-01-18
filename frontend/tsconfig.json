@@ -1,0 +1,7 @@
+{
+  "extends": "@lentovaraukset/shared/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "build",                                   /* Specify an output folder for all emitted files. */
+  }
+}

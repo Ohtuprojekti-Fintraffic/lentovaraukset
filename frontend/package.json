@@ -1,0 +1,11 @@
+{
+  "name": "@lentovaraukset/frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@lentovaraukset/shared": "1.0.0"
+  },
+  "scripts": {
+    "start": "echo \"Error: Nothing to start\" && exit 0"
+  }
+}
