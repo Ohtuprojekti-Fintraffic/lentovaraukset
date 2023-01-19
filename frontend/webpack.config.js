@@ -1,6 +1,7 @@
 const path = require('path')
 
 const config = (env, argv) => {
+  const HtmlWebpackPlugin = require("html-webpack-plugin");
     return {
         entry: './src/index.tsx',
         devtool: 'inline-source-map',
@@ -29,7 +30,12 @@ const config = (env, argv) => {
       },
     resolve: {
       extensions: ['.tsx', '.ts', '.js'],
-      }
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+            template: "./public/index.html"
+        }),
+    ]
     }
 }
 
