@@ -7,6 +7,7 @@
     "start": "npm run start:backend & npm run start:frontend",
     "build": "npm -ws --if-present run build",
     "build:frontend": "npm -w @lentovaraukset/frontend run build",
+    "test": "npm -ws --if-present run test",
     "start:backend": "npm -w @lentovaraukset/backend run start",
     "start:frontend": "npm -w @lentovaraukset/frontend run start"
   },
@@ -18,4 +19,5 @@
   "devDependencies": {
     "typescript": "^4.9.4"
   }
+  ]
 }
