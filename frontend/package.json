@@ -6,6 +6,7 @@
     "@lentovaraukset/shared": "1.0.0"
   },
   "scripts": {
-    "start": "echo \"Error: Nothing to start\" && exit 0"
+    "start": "echo \"Error: Nothing to start\" && exit 0",
+    "test": "echo \"No tests specified yet.\" && exit 0"
   }
 }
