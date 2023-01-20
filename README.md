@@ -29,3 +29,6 @@ You can find any errors with the following command:
 
 Or try to automatically fix them:  
 `npm run lint -- --fix`
+
+This project also uses Jest for automatic unit tests. You can run them with the following command:  
+`npm test`
