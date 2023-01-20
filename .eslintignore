@@ -1,3 +1,4 @@
 backend/build/
 frontend/dist/
 jest.config.ts
+**/coverage/
