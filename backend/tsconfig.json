@@ -1,8 +1,7 @@
 {
   "extends": "@lentovaraukset/shared/tsconfig.base.json",
   "include": [
-    "src/**/*",
-    "__tests__/**/*"
+    "src/**/*"
   ],
   "compilerOptions": {
     "rootDir": "src",
