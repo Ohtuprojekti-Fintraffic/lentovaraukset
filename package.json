@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "start": "npm run start:backend & npm run start:frontend",
-    "build": "npm -w @lentovaraukset/frontend run build",
+    "build": "npm -ws --if-present run build",
+    "build:frontend": "npm -w @lentovaraukset/frontend run build",
     "start:backend": "npm -w @lentovaraukset/backend run start",
     "start:frontend": "npm -w @lentovaraukset/frontend run start"
   },
