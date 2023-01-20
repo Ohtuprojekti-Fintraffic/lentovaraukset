@@ -19,3 +19,13 @@
 `npm run start:backend`
 
 `npm run start:frontend`
+
+### Development
+
+This project uses ESLint to maintain code quality and keep the code style consistent to the Airbnb JavaScript style guide.
+
+You can find any errors with the following command:  
+`npm run lint`
+
+Or try to automatically fix them:  
+`npm run lint -- --fix`
