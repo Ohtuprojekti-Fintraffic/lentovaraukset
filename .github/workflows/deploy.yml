@@ -1,0 +1,12 @@
+name: Deploy
+
+on:
+  push:
+    branches: main
+
+jobs:
+  test_and_lint:
+    uses: Ohtuprojekti-Fintraffic/lentovaraukset/.github/workflows/development.yml@main
+#  docker:
+#  build:
+#  release:
