@@ -13,6 +13,7 @@ const config = (env, argv) => {
         static: path.resolve(__dirname, 'dist'),
         compress: true,
         port: 3000,
+        open: true
       },
       devtool: 'source-map',
     module: {
