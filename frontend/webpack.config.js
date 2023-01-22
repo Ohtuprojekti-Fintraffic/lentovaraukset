@@ -3,40 +3,41 @@ const path = require('path')
 const config = (env, argv) => {
   const HtmlWebpackPlugin = require("html-webpack-plugin");
     return {
-        entry: './src/index.tsx',
-        devtool: 'inline-source-map',
-    output:{
+      entry: './src/index.tsx',
+      devtool: 'inline-source-map',
+      output:{
         path: path.resolve(__dirname, 'dist'),
-        filename: 'main.js'
-    },
-    devServer: {
+        filename: 'main.js',
+        publicPath: '/'
+      },
+      devServer: {
         static: path.resolve(__dirname, 'dist'),
         compress: true,
         port: 3000,
-        open: true
+        open: true,
+        historyApiFallback: true
       },
-      devtool: 'source-map',
-    module: {
+      module: {
         rules:[
-              {
-                test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
-              },
-              {
-                test: /\.tsx?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
-              },
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader'],
+          },
+          {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/,
+          },
         ]
       },
-    resolve: {
-      extensions: ['.tsx', '.ts', '.js'],
+      resolve: {
+        extensions: ['.tsx', '.ts', '.js'],
       },
       plugins: [
         new HtmlWebpackPlugin({
-            template: "./public/index.html"
+          template: "./public/index.html"
         }),
-    ]
+      ]
     }
 }
 
