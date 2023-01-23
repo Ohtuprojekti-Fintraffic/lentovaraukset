@@ -8,7 +8,8 @@
     "build": "npm -ws --if-present run build",
     "build:frontend": "npm -w @lentovaraukset/frontend run build",
     "test": "npm -ws --if-present run test",
-    "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
     "start:backend": "npm -w @lentovaraukset/backend run start",
     "start:frontend": "npm -w @lentovaraukset/frontend run start"
   },
