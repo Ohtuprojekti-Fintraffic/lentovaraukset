@@ -6,7 +6,7 @@ const App = () => {
   return(
     <>
       <Navigation/>
-      <div id="content">
+      <div id="content" className='p-6'>
         <Outlet/>
       </div>
     </>
