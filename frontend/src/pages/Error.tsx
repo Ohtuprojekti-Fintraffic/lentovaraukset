@@ -4,7 +4,6 @@ import Logo from '../../assets/logos/Horizontal-White.png';
 
 function Error() {
   const error:any = useRouteError();
-  console.error(error);
 
   return (
     <div className="h-full w-full grid place-items-center">

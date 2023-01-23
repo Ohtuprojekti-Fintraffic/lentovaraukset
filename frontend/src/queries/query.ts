@@ -3,6 +3,4 @@ const sampleQuery = async (): Promise<string> => {
   return response.text();
 };
 
-export {
-  sampleQuery,
-};
+export default sampleQuery;

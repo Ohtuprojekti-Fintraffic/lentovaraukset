@@ -2,6 +2,8 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import Logo from '../../assets/logos/Horizontal-White.png';
 
+const;
+
 function Navigation() {
   return (
     <div className="bg-black text-white p-6 flex flex-row items-center justify-between text-lg">
@@ -12,21 +14,17 @@ function Navigation() {
       <nav className="space-x-10 text-l">
         <NavLink
           to="/"
-          className={({ isActive, isPending }) => (isActive
+          className={({ isActive }) => (isActive
             ? 'active font-bold'
-            : isPending
-              ? 'pending'
-              : '')}
+            : '')}
         >
           Etusivu
         </NavLink>
         <NavLink
           to="/calendar"
-          className={({ isActive, isPending }) => (isActive
+          className={({ isActive }) => (isActive
             ? 'active font-bold'
-            : isPending
-              ? 'pending'
-              : '')}
+            : '')}
         >
           Kalenteri
         </NavLink>
