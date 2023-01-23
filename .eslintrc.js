@@ -1,6 +1,9 @@
 module.exports = {
-
   extends: ['airbnb'],
+  rules: {
+    // https://github.com/import-js/eslint-plugin-import/issues/1913
+    'import/no-extraneous-dependencies': 'off',
+  },
   overrides: [
     {
       files: ['**/*.ts', '**/*.tsx'],
