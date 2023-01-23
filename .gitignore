@@ -105,4 +105,4 @@ dist
 build
 
 # Tailwind CSS build file
-src/styles/main.css
+frontend/src/styles/main.css
