@@ -12,9 +12,10 @@
     "regenerator-runtime": "^0.13.11"
   },
   "scripts": {
-    "build": "npm run build:css && webpack --mode=production",
-    "start": "npm run build:css && webpack serve --mode=development",
-    "build:css": "postcss src/styles/tailwind.css -o src/styles/main.css"
+    "build": "webpack --mode=production & npm run build:css",
+    "start": "webpack serve --mode=development & npm run watch:css",
+    "build:css": "postcss src/styles/tailwind.css -o src/styles/main.css",
+    "watch:css": "postcss -w src/styles/tailwind.css -o src/styles/main.css"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",

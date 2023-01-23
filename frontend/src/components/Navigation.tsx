@@ -3,16 +3,16 @@ import { NavLink } from 'react-router-dom'
   
 const Navigation = () => {
   return(
-    <div className='bg-black'>
-      <nav>
+    <div className='bg-black text-white'>
+      <nav className='p-3 space-x-3'>
         <NavLink
           to={'/'}
           className={({ isActive, isPending }) =>
               isActive
-                ? "active"
+                ? 'active'
                 : isPending
-                ? "pending"
-                : ""
+                ? 'pending'
+                : ''
             }
         >
           Etusivu
@@ -21,10 +21,10 @@ const Navigation = () => {
           to={'/calendar'}
           className={({ isActive, isPending }) =>
               isActive
-                ? "active"
+                ? 'active'
                 : isPending
-                ? "pending"
-                : ""
+                ? 'pending'
+                : ''
             }
         >
           Kalenteri
