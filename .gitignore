@@ -103,3 +103,6 @@ dist
 # TernJS port file
 .tern-port
 build
+
+# Tailwind CSS build file
+src/styles/main.css
