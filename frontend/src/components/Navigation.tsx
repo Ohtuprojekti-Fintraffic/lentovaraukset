@@ -2,8 +2,6 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import Logo from '../../assets/logos/Horizontal-White.png';
 
-const;
-
 function Navigation() {
   return (
     <div className="bg-black text-white p-6 flex flex-row items-center justify-between text-lg">
