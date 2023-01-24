@@ -1,6 +1,6 @@
-const { Model, DataTypes } = require("sequelize")
+const { Model, DataTypes } = require('sequelize');
 
-const { sequelize } = require("../util/db")
+const { sequelize } = require('../util/db');
 
 class Timeslot extends Model {}
 
@@ -24,10 +24,10 @@ Timeslot.init(
     sequelize,
     underscored: true,
     timestamps: false,
-    modelName: "timeslot",
-  }
-)
+    modelName: 'timeslot',
+  },
+);
 
-module.exports = Timeslot
+module.exports = Timeslot;
 
-export {}
+export {};

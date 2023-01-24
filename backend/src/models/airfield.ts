@@ -1,6 +1,6 @@
-const { Model, DataTypes } = require("sequelize")
+const { Model, DataTypes } = require('sequelize');
 
-const { sequelize } = require("../util/db")
+const { sequelize } = require('../util/db');
 
 class Airfield extends Model {}
 
@@ -21,9 +21,9 @@ Airfield.init(
     sequelize,
     underscored: true,
     timestamps: false,
-    modelName: "airfield",
-  }
-)
+    modelName: 'airfield',
+  },
+);
 
-module.exports = Airfield
-export {}
+module.exports = Airfield;
+export {};
