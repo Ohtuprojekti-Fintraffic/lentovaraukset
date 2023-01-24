@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "start": "nodemon -e ts,js --exec ts-node src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "jest --forceExit"
   },
   "author": "",
   "license": "ISC",

@@ -969,4 +969,4 @@ module.exports = {
     'disabled',
   ],
   plugins: [],
-}
+};

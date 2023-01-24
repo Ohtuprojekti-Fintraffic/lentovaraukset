@@ -1,5 +1,5 @@
 enum QueryKeys {
-  Sample = "sampleQuery"
+  Sample = 'sampleQuery',
 }
 
-export default QueryKeys
+export default QueryKeys;
