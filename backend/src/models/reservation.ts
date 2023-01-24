@@ -1,33 +1,36 @@
-const { Model, DataTypes } = require('sequelize');
+const { Model, DataTypes } = require("sequelize")
 
-const { sequelize } = require('../util/db');
+const { sequelize } = require("../util/db")
 
 class Reservation extends Model {}
 
-Reservation.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
+Reservation.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    startTime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    endTime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    info: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
-  startTime: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  endTime: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  info: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
+  {
+    sequelize,
+    underscored: true,
+    timestamps: true,
+    modelName: "reservation",
+  }
+)
 
-}, {
-  sequelize,
-  underscored: true,
-  timestamps: true,
-  modelName: 'reservation',
-});
-
-export default Reservation;
+module.exports = Reservation
+export {}

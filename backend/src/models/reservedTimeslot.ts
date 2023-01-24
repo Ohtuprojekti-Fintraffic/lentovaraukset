@@ -2,32 +2,34 @@ const { Model, DataTypes } = require("sequelize")
 
 const { sequelize } = require("../util/db")
 
-class Timeslot extends Model {}
+class ReservedTimeslot extends Model {}
 
-Timeslot.init(
+ReservedTimeslot.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    startTime: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    maxAmount: {
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: { model: "reservations", key: "id" },
+    },
+    teamId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: "timeslots", key: "id" },
     },
   },
   {
     sequelize,
     underscored: true,
     timestamps: false,
-    modelName: "timeslot",
+    modelName: "reservedTimeslot",
   }
 )
 
-module.exports = Timeslot
+module.exports = ReservedTimeslot
 
 export {}
