@@ -32,3 +32,13 @@ Or try to automatically fix them:
 
 This project also uses Jest for automatic unit tests. You can run them with the following command:  
 `npm test`
+
+### Database
+
+Start the development database with the following command:
+
+`npm run start:database`
+
+Add the following line to the backend's .env file:
+
+`DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres`
