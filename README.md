@@ -35,9 +35,9 @@ This project also uses Jest for automatic unit tests. You can run them with the 
 
 ### Database
 
-Start the development database with the following command:
+Start the development database with the following command (sudo required):
 
-`npm run start:database`
+`docker compose -f docker-compose.dev.yml up`
 
 Add the following line to the backend's .env file:
 
