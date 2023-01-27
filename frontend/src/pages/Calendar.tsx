@@ -5,7 +5,7 @@ import QueryKeys from '../queries/queryKeys';
 
 function Calendar() {
   const date1 = new Date(1990, 4, 7);
-  const date2 = new Date(1990, 4, 7);
+  const date2 = new Date(1990, 4, 8);
 
   const { data, isLoading, isError } = useQuery(
     [
@@ -13,7 +13,7 @@ function Calendar() {
       date1,
       date2,
     ],
-    getTimeslotQuery,
+    () => getTimeslotQuery(date1, date2),
   );
 
   return (

@@ -8,8 +8,9 @@ app.get('/api', async (_req: any, res: express.Response) => {
   res.send('Hello World');
 });
 
-app.get('/api/get/timeslot', async (req: any, res: express.Response) => {
-  const { startTime, endTime } = req.body;
+app.get('/api/get/timeslot/:start/:end', async (req: express.Request, res: express.Response) => {
+  const { start: startTime, end: endTime } = req.params;
+
   res.send(`${startTime} ${endTime}`);
   console.log(`${startTime} ${endTime}`);
 });
