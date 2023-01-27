@@ -12,9 +12,11 @@ const App = () => {
   return(
     <>
       <QueryClientProvider client={queryClient}>
-        <Navigation/>
-        <div id="content" className='p-6 w-full h-full'>
-          <Outlet/>
+        <div id="content" className='w-full h-full'>
+          <Navigation/>
+          <div className='p-6'>
+            <Outlet/>
+          </div>
         </div>
       </QueryClientProvider>
     </>
