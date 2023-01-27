@@ -106,3 +106,5 @@ build
 
 # Tailwind CSS build file
 frontend/src/styles/main.css
+
+data
