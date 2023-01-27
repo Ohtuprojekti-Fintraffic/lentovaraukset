@@ -23,7 +23,7 @@ const Navigation = () => {
           Etusivu
         </NavLink>
         <NavLink
-          to={'/calendar'}
+          to={'/landing'}
           className={({ isActive, isPending }) =>
               isActive
                 ? 'active font-bold'
@@ -32,7 +32,7 @@ const Navigation = () => {
                 : ''
             }
         >
-          Kalenteri
+          Landing
         </NavLink>
       </nav>
     </div>

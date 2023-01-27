@@ -18,11 +18,11 @@ const router = createBrowserRouter([
     children: [
       {
         path:'/',
-        element: <Landing/>
+        element: <Calendar/>
       },
       {
-        path:'calendar',
-        element: <Calendar/>
+        path:'landing',
+        element: <Landing/>
       }
     ]
   },
