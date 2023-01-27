@@ -1,6 +1,6 @@
-const { Model, DataTypes } = require('sequelize');
+import { Model, DataTypes } from 'sequelize';
 
-const { sequelize } = require('../util/db');
+import { sequelize } from '../util/db';
 
 class ReservedTimeslot extends Model {}
 
@@ -30,6 +30,4 @@ ReservedTimeslot.init(
   },
 );
 
-module.exports = ReservedTimeslot;
-
-export {};
+export default ReservedTimeslot;

@@ -1,7 +1,8 @@
 import express from 'express';
+import { connectToDatabase } from './util/db';
 
 const port = process.env.PORT || 8080;
-
+connectToDatabase();
 const app = express();
 
 app.get('/api', async (_req: any, res: express.Response) => {

@@ -1,6 +1,8 @@
-const Sequelize = require('sequelize');
-const { DATABASE_URL } = require('./config');
+import { Sequelize } from 'sequelize';
+import { DATABASE_URL } from './config';
 
+// const DATABASE_URL = 'postgres://turtvaiz@localhost:5432/turtvaiz';
+// console.log('HELP', asd);
 const sequelize = new Sequelize(DATABASE_URL, {
   dialect: 'postgres',
 });
@@ -17,4 +19,4 @@ const connectToDatabase = async () => {
   return null;
 };
 
-module.exports = { connectToDatabase, sequelize };
+export { connectToDatabase, sequelize };
