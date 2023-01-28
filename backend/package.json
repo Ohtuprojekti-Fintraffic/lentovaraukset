@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "start": "nodemon -e ts,js --exec ts-node src/app.ts",
-    "test": "jest"
+    "test": "NODE_ENV=test jest"
   },
   "author": "",
   "license": "ISC",
