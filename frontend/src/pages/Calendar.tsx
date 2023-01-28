@@ -1,10 +1,13 @@
 import React from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, useMutation } from 'react-query';
 import sampleQuery from '../queries/query';
+import deleteTimeslot from '../mutations/deleteTimeslot';
 import QueryKeys from '../queries/queryKeys';
 
 function Calendar() {
   const { data, isLoading, isError } = useQuery(QueryKeys.Sample, sampleQuery);
+
+  const mutation = useMutation((timeslotId: number) => deleteTimeslot(timeslotId));
 
   return (
     <div className="flex flex-col space-y-2">
@@ -18,7 +21,25 @@ function Calendar() {
             {data}
           </p>
         )}
+      {mutation.isLoading ? (
+        'Adding todo...'
+      ) : (
+        <>
+          {(mutation.error instanceof Error) ? (
+            <div>An error occurred: {mutation.error.message}</div>
+          ) : null}
 
+          {mutation.isSuccess ? <div>Success!</div> : null}
+
+          <button
+            onClick={() => {
+              mutation.mutate(1)
+            }}
+          >
+            Create Todo
+          </button>
+        </>
+      )}
     </div>
   );
 }
