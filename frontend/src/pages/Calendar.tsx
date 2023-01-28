@@ -1,7 +1,6 @@
 import React from 'react';
-import { useQuery, useMutation } from 'react-query';
+import { useQuery } from 'react-query';
 import sampleQuery from '../queries/query';
-import deleteTimeslot from '../mutations/deleteTimeslot';
 import QueryKeys from '../queries/queryKeys';
 
 function Calendar() {
