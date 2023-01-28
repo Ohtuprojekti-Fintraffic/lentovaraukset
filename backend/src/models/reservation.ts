@@ -1,6 +1,5 @@
-const { Model, DataTypes } = require('sequelize');
-
-const { sequelize } = require('../util/db');
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../util/db';
 
 class Reservation extends Model {}
 
@@ -31,6 +30,4 @@ Reservation.init(
     modelName: 'reservation',
   },
 );
-
-module.exports = Reservation;
-export {};
+export default Reservation;

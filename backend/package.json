@@ -6,8 +6,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "start": "nodemon -e ts,js --exec ts-node src/index.ts",
-    "test": "jest --forceExit"
+    "start": "nodemon -e ts,js --exec ts-node src/app.ts",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",

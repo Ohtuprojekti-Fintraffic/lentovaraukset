@@ -1,6 +1,6 @@
-const { Model, DataTypes } = require('sequelize');
+import { Model, DataTypes } from 'sequelize';
 
-const { sequelize } = require('../util/db');
+import { sequelize } from '../util/db';
 
 class Airfield extends Model {}
 
@@ -25,5 +25,4 @@ Airfield.init(
   },
 );
 
-module.exports = Airfield;
-export {};
+export default Airfield;
