@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-22.04
+    env:
+      DATABASE_URL: postgres://username:password@address
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
