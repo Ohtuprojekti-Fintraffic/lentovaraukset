@@ -2,26 +2,24 @@ import express from 'express';
 import { Timeslot } from './models';
 
 const app = express();
-
-app.use(express.json())
+app.use(express.json());
 
 app.get('/api', async (_req: any, res: express.Response) => {
   res.send('Hello World');
 });
 
-app.post('/api/timeslots', async (req: express.Request, res: express.Response) => {
-  const { timeslotId: timeslotId } = req.body;
-  console.log(timeslotId)
-  const timeslot = await Timeslot.findByPk(timeslotId)
-  console.log(timeslot)
-  if (timeslot) {
-    timeslot.destroy()
-    console.log('success')
-    res.send('success')
-  } else {
-    console.log('fail')
-    res.send('fail')
-  }
+app.delete('/api/timeslots/:startTime', async (req: express.Request, res: express.Response) => {
+  const { startTime } = req.params;
+  await Timeslot.findOne({where: {startTime: startTime}})
+    .then((timeslot) => {
+      if (timeslot) {
+        timeslot.destroy();
+        res.send(`Timeslot ${startTime} deleted`);
+      } else {
+        res.status(404).json(`Timeslot ${startTime} not found`);
+      }
+    })
+    .catch((error) => res.status(500).json(error))
 });
 
 export default app;
