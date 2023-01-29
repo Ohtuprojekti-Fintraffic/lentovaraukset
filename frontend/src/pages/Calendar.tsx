@@ -17,6 +17,7 @@ const Calendar = () => {
       <FullCalendar
         plugins={[ TimeGridPlugin, dayGridPlugin, listPlugin ]}
         initialView="timeGridWeek"
+        height="90%"
       />
     </div>
   )
