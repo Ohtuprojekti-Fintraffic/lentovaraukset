@@ -16,12 +16,6 @@ Timeslot.belongsTo(Airfield);
 Timeslot.belongsToMany(Reservation, { through: ReservedTimeslot });
 Reservation.belongsToMany(Timeslot, { through: ReservedTimeslot });
 
-User.sync({ alter: true });
-Airfield.sync({ alter: true });
-Reservation.sync({ alter: true });
-Timeslot.sync({ alter: true });
-ReservedTimeslot.sync({ alter: true });
-
 export {
   User,
   Airfield,
