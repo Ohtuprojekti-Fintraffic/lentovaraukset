@@ -12,11 +12,11 @@ const App = () => {
   return(
     <>
       <QueryClientProvider client={queryClient}>
-        <div id="content" className='w-full h-full'>
+        <div className='flex flex-col h-full'>
           <Navigation/>
-          <div className='p-6'>
+          <main className='flex flex-row flex-grow p-10 overflow-y-auto'>
             <Outlet/>
-          </div>
+          </main>
         </div>
       </QueryClientProvider>
     </>

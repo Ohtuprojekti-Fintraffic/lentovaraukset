@@ -4,7 +4,7 @@ import Logo from '../../assets/logos/Horizontal-White.png'
   
 const Navigation = () => {
   return(
-    <div className='bg-black text-white p-6 flex flex-row items-center justify-between text-lg'>
+    <div className='bg-black text-white p-6 flex flex-row items-center justify-between text-lg h-full max-h-20 top-0'>
       <div className='flex flex-row items-center space-x-10'>
         <img src={Logo} alt="" className='h-7'/>
         <p>Koululentovaraus</p>
@@ -20,7 +20,7 @@ const Navigation = () => {
                 : ''
             }
         >
-          Etusivu
+          Kalenteri
         </NavLink>
         <NavLink
           to={'/landing'}
@@ -32,7 +32,7 @@ const Navigation = () => {
                 : ''
             }
         >
-          Landing
+          Hallinta
         </NavLink>
       </nav>
     </div>
