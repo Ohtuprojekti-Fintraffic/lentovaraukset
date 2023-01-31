@@ -26,7 +26,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+], { basename: '/lentovaraukset' });
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>

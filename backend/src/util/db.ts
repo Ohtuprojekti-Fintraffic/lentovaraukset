@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'test') {
 
 const sequelize = process.env.NODE_ENV === 'test'
   ? new Sequelize({ dialect: 'postgres', dialectModule: newDb().adapters.createPg(), logging: false })
-  : new Sequelize(DATABASE_URL as string, { dialect: 'postgres' });
+  : new Sequelize(DATABASE_URL as string, { dialect: 'postgres', logging: false });
 
 const connectToDatabase = async () => {
   try {

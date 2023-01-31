@@ -11,6 +11,8 @@ RUN npm ci
 
 WORKDIR /usr/src/app/frontend
 
+ENV BASE_PATH=/lentovaraukset
+
 RUN npm run build 
 
 
