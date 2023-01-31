@@ -1,14 +1,18 @@
 import { Sequelize } from 'sequelize';
+import { newDb } from 'pg-mem';
 import { DATABASE_URL } from './config';
 
-// const DATABASE_URL = 'postgres://turtvaiz@localhost:5432/turtvaiz';
-// console.log('HELP', asd);
-const sequelize = new Sequelize(DATABASE_URL, {
-  dialect: 'postgres',
-});
+if (process.env.NODE_ENV === 'test') {
+  console.log('creating an in-memory test database');
+}
+
+const sequelize = process.env.NODE_ENV === 'test'
+  ? new Sequelize({ dialect: 'postgres', dialectModule: newDb().adapters.createPg(), logging: false })
+  : new Sequelize(DATABASE_URL as string, { dialect: 'postgres' });
 
 const connectToDatabase = async () => {
   try {
+    await sequelize.sync({ alter: true });
     await sequelize.authenticate();
     console.log('database connected');
   } catch (err) {
