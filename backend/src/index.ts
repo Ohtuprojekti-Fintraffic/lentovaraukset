@@ -1,6 +1,6 @@
 import express from 'express';
-import { Timeslot } from './models';
 import cors from 'cors';
+import { Timeslot } from './models';
 
 const app = express();
 
