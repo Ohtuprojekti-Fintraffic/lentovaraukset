@@ -38,6 +38,10 @@ const Calendar = () => {
     console.log(`REMOVE: ${removeData.event}`)
   }
 
+  const handleEventDrop = (dropData: any) => {
+    console.log(`DROP: ${dropData.event}`)
+  }
+
   return(
     <div className='flex flex-col space-y-2 h-full w-full'>
       <h1 className='text-3xl'>Varauskalenteri</h1>
@@ -67,6 +71,7 @@ const Calendar = () => {
         eventAdd={handleEventAdd}
         eventChange={handleEventChange}
         eventRemove={handleEventRemove}
+        select={handleEventDrop}
         events={events}
       />
     </div>
