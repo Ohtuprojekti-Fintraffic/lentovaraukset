@@ -18,7 +18,6 @@ function Calendar() {
             {data}
           </p>
         )}
-
     </div>
   );
 }

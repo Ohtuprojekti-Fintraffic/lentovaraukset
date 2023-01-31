@@ -13,6 +13,7 @@ Timeslot.init(
     },
     startTime: {
       type: DataTypes.DATE,
+      unique: true,
       allowNull: false,
     },
     maxAmount: {
