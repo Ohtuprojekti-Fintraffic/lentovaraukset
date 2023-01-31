@@ -16,15 +16,6 @@ Timeslot.belongsTo(Airfield);
 Timeslot.belongsToMany(Reservation, { through: ReservedTimeslot });
 Reservation.belongsToMany(Timeslot, { through: ReservedTimeslot });
 
-// Temporary solution before test database is defined
-if (process.env.NODE_ENV !== 'test') {
-  User.sync({ alter: true });
-  Airfield.sync({ alter: true });
-  Reservation.sync({ alter: true });
-  Timeslot.sync({ alter: true });
-  ReservedTimeslot.sync({ alter: true });
-}
-
 export {
   User,
   Airfield,
