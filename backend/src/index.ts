@@ -10,7 +10,24 @@ app.get('/api', async (_req: any, res: express.Response) => {
 
 app.get('/api/get/timeslot/:start/:end', async (req: express.Request, res: express.Response) => {
   const { start: startTime, end: endTime } = req.params;
-  res.send(`${startTime} ${endTime}`);
+  // console.log(`${new Date(Number(startTime))} ${new Date(Number(endTime))}`);
+  Timeslot.findAll({
+    where: {
+      startTime: { $between: [startTime, endTime] },
+    },
+  });
+  res.send(`${new Date(Number(startTime))} ${new Date(Number(endTime))}`);
+});
+
+app.post('/api/post/newtimeslot', async (req: express.Request, res: express.Response) => {
+  try {
+    const { start: startTime } = req.body;
+    const timeslot = await Timeslot.create({ startTime, maxAmount: 1 });
+    res.json(timeslot);
+  } catch (error) {
+    console.log('creating new timeslot failed');
+    res.status(400).json(error);
+  }
 });
 
 app.delete('/api/timeslots/:id', async (req: express.Request, res: express.Response) => {

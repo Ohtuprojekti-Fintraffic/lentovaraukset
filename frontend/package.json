@@ -5,6 +5,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.7",
     "@lentovaraukset/shared": "1.0.0",
+    "axios": "^1.3.0",
     "core-js": "^3.27.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
