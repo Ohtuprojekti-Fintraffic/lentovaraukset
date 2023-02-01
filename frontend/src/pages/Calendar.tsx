@@ -1,11 +1,10 @@
 import React from 'react';
 import { useQuery } from 'react-query';
-import sampleQuery from '../queries/query';
+import { sampleQuery } from '../queries/query';
 import QueryKeys from '../queries/queryKeys';
 
 function Calendar() {
   const { data, isLoading, isError } = useQuery(QueryKeys.Sample, sampleQuery);
-
   return (
     <div className="flex flex-col space-y-2">
       <h1 className="text-3xl">Calendar</h1>

@@ -26,6 +26,15 @@ function Navigation() {
         >
           Kalenteri
         </NavLink>
+
+        <NavLink
+          to="/flight-staff"
+          className={({ isActive }) => (isActive
+            ? 'active font-bold'
+            : '')}
+        >
+          Lennonjohto
+        </NavLink>
       </nav>
     </div>
   );

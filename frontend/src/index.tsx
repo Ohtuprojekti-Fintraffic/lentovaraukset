@@ -9,6 +9,7 @@ import App from './App';
 import Calendar from './pages/Calendar';
 import Error from './pages/Error';
 import Landing from './pages/Landing';
+import Staff from './pages/Staff';
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path: 'calendar',
         element: <Calendar />,
+      },
+      {
+        path: 'flight-staff',
+        element: <Staff />,
       },
     ],
   },

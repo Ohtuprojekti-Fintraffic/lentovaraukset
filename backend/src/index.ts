@@ -36,11 +36,11 @@ app.get('/api/staff/reservation-status', async (_req: any, res: express.Response
 
     const reservedSlots = await ReservedTimeslot.findAll();
 
-    const reservationStatut = {
+    const reservationStatus = {
       availableSlots,
       reservedSlots,
     };
-    res.send(reservationStatut);
+    res.send(JSON.stringify(reservationStatus));
   } catch (error) {
     res.status(501).send();
   }
