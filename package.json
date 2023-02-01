@@ -11,7 +11,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
     "start:backend": "npm -w @lentovaraukset/backend run start",
-    "start:frontend": "npm -w @lentovaraukset/frontend run start"
+    "start:frontend": "npm -w @lentovaraukset/frontend run start",
+    "start:database": "docker compose -f docker-compose.dev.yml up"
   },
   "workspaces": [
     "frontend",

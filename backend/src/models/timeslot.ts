@@ -1,6 +1,6 @@
-const { Model, DataTypes } = require('sequelize');
+import { Model, DataTypes } from 'sequelize';
 
-const { sequelize } = require('../util/db');
+import { sequelize } from '../util/db';
 
 class Timeslot extends Model {}
 
@@ -13,6 +13,7 @@ Timeslot.init(
     },
     startTime: {
       type: DataTypes.DATE,
+      unique: true,
       allowNull: false,
     },
     maxAmount: {
@@ -28,6 +29,4 @@ Timeslot.init(
   },
 );
 
-module.exports = Timeslot;
-
-export {};
+export default Timeslot;

@@ -1,8 +1,8 @@
-const User = require('./user');
-const Airfield = require('./airfield');
-const Reservation = require('./reservation');
-const Timeslot = require('./timeslot');
-const ReservedTimeslot = require('./reservedTimeslot');
+import User from './user';
+import Airfield from './airfield';
+import Reservation from './reservation';
+import Timeslot from './timeslot';
+import ReservedTimeslot from './reservedTimeslot';
 
 User.hasMany(Reservation);
 Reservation.belongsTo(User);
@@ -16,13 +16,7 @@ Timeslot.belongsTo(Airfield);
 Timeslot.belongsToMany(Reservation, { through: ReservedTimeslot });
 Reservation.belongsToMany(Timeslot, { through: ReservedTimeslot });
 
-User.sync({ alter: true });
-Airfield.sync({ alter: true });
-Reservation.sync({ alter: true });
-Timeslot.sync({ alter: true });
-ReservedTimeslot.sync({ alter: true });
-
-module.exports = {
+export {
   User,
   Airfield,
   Reservation,
