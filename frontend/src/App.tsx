@@ -1,12 +1,12 @@
-import React from 'react'
-import { Outlet } from 'react-router-dom'
-import Navigation from './components/Navigation'
+import React from 'react';
+import { Outlet } from 'react-router-dom';
 import {
   QueryClient,
   QueryClientProvider,
-} from 'react-query'
+} from 'react-query';
+import Navigation from './components/Navigation';
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 const App = () => {
   return(
@@ -23,4 +23,4 @@ const App = () => {
   )
 }
 
-export default App
+export default App;

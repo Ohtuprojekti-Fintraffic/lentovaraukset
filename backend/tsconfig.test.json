@@ -1,0 +1,14 @@
+// this file is necessary only because to lint
+// test files, but we don't want to build the test files
+// and tsconfig doesn't have any override function
+{
+    "extends": "@lentovaraukset/shared/tsconfig.base.json",
+    "compilerOptions": {
+        //     // "noEmit": true,
+        //     // "allowJs": true
+        "rootDir": "."
+    },
+    "include": [
+        "__tests__/*.test.ts"
+    ]
+}

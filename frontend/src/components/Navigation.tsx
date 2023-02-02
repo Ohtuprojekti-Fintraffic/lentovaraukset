@@ -9,16 +9,12 @@ const Navigation = () => {
         <img src={Logo} alt="" className='h-7'/>
         <p>Koululentovaraus</p>
       </div>
-      <nav className='space-x-10 text-l'>
+      <nav className="space-x-10 text-l">
         <NavLink
-          to={'/'}
-          className={({ isActive, isPending }) =>
-              isActive
-                ? 'active font-bold'
-                : isPending
-                ? 'pending'
-                : ''
-            }
+          to="/"
+          className={({ isActive }) => (isActive
+            ? 'active font-bold'
+            : '')}
         >
           Kalenteri
         </NavLink>
@@ -27,8 +23,6 @@ const Navigation = () => {
           className={({ isActive, isPending }) =>
               isActive
                 ? 'active font-bold'
-                : isPending
-                ? 'pending'
                 : ''
             }
         >
@@ -36,7 +30,7 @@ const Navigation = () => {
         </NavLink>
       </nav>
     </div>
-  )
+  );
 }
 
-export default Navigation
+export default Navigation;

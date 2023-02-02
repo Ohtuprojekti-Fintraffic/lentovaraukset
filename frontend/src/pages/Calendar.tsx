@@ -1,6 +1,6 @@
 import React from 'react'
 import { useQuery } from 'react-query'
-import { sampleQuery } from '../queries/query'
+import sampleQuery from '../queries/query'
 import QueryKeys from '../queries/queryKeys'
 import FullCalendar from '@fullcalendar/react'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -8,11 +8,10 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import listPlugin from '@fullcalendar/list'
 
 import interactionPlugin from '@fullcalendar/interaction'
-import { useState } from 'preact/hooks'
 
 const Calendar = () => {
-
-  const {data, isLoading, isError} = useQuery(QueryKeys.Sample, sampleQuery)
+  
+  const { data, isLoading, isError } = useQuery(QueryKeys.Sample, sampleQuery);
 
   const [events, setEvents] = React.useState([
     {
@@ -75,7 +74,7 @@ const Calendar = () => {
         events={events}
       />
     </div>
-  )
+  );
 }
 
-export default Calendar
+export default Calendar;
