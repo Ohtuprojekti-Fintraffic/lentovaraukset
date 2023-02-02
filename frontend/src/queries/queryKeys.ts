@@ -1,5 +1,5 @@
 enum QueryKeys {
-  Sample = 'sampleQuery',
+  Reservations = 'reservations',
 }
 
 export default QueryKeys;

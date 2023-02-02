@@ -6,9 +6,10 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 import App from './App';
-import Calendar from './pages/Calendar';
+import ReservationCalendar from './pages/ReservationCalendar';
+import TimeSlotCalendar from './pages/TimeSlotCalendar';
 import Error from './pages/Error';
-import Landing from './pages/Landing';
+import Management from './pages/Management';
 
 const router = createBrowserRouter([
   {
@@ -17,14 +18,18 @@ const router = createBrowserRouter([
     errorElement: <Error />,
     children: [
       {
-        path:'/',
-        element: <Calendar/>
+        path: '/',
+        element: <ReservationCalendar />,
       },
       {
-        path:'landing',
-        element: <Landing/>
-      }
-    ]
+        path: 'varausikkunat',
+        element: <TimeSlotCalendar />,
+      },
+      {
+        path: 'hallinta',
+        element: <Management />,
+      },
+    ],
   },
 ]);
 
