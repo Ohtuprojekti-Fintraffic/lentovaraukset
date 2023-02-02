@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { Timeslot } from './models';
+import timeslotRouter from './routes/timeslots';
 
 const app = express();
 
@@ -11,18 +11,6 @@ app.get('/api', async (_req: any, res: express.Response) => {
   res.send('Hello World');
 });
 
-app.delete('/api/timeslots/:id', async (req: express.Request, res: express.Response) => {
-  const { id } = req.params;
-  await Timeslot.findByPk(id)
-    .then((timeslot) => {
-      if (timeslot) {
-        timeslot.destroy();
-        res.send(`Timeslot ${id} deleted`);
-      } else {
-        res.status(404).json(`Timeslot ${id} not found`);
-      }
-    })
-    .catch((error) => res.status(500).json(error));
-});
+app.use('/api/timeslots', timeslotRouter);
 
 export default app;
