@@ -22,14 +22,13 @@ router.delete('/:id', async (req: express.Request, res: express.Response) => {
 router.get('/:start/:end', async (req: express.Request, res: express.Response) => {
   const { start: startTime, end: endTime } = req.params;
   const timeslots = await timeslotService.getTimeslotsByTimerange(startTime, endTime);
-  console.log(`${timeslots} routes`);
   res.json(timeslots);
 });
 
 router.post('/', async (req: express.Request, res: express.Response) => {
   try {
-    const { start: startTime } = req.body;
-    const timeslot = timeslotService.createTimeslot(startTime);
+    const { startTime } = req.body;
+    const timeslot = await timeslotService.createTimeslot(startTime);
     res.json(timeslot);
   } catch (error) {
     console.log('creating new timeslot failed');

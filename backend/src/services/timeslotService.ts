@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { Timeslot } from '../models';
 
 const deleteById = async (id: number): Promise<boolean> => {
@@ -12,7 +13,7 @@ const deleteById = async (id: number): Promise<boolean> => {
 // any until types are defined
 // Max amount tbd (global?)
 const createTimeslot = async (startTime: string): Promise<any> => {
-  const timeslot = await Timeslot.create({ startTime, maxAmount: 1 });
+  const timeslot = await Timeslot.create({ startTime: new Date(Number(startTime)), maxAmount: 1 });
   return timeslot;
 };
 
@@ -20,7 +21,7 @@ const createTimeslot = async (startTime: string): Promise<any> => {
 const getTimeslotsByTimerange = async (startTime: string, endTime: string): Promise<any[]> => {
   const timeslots = await Timeslot.findAll({
     where: {
-      startTime: { $between: [startTime, endTime] },
+      startTime: { [Op.between]: [new Date(Number(startTime)), new Date(Number(endTime))] },
     },
   });
   return timeslots;

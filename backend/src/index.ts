@@ -6,10 +6,9 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-
+app.use('/api/timeslots', timeslotRouter);
 app.get('/api', async (_req: any, res: express.Response) => {
   res.send('Hello World');
 });
-app.use('/api/timeslots', timeslotRouter);
 
 export default app;
