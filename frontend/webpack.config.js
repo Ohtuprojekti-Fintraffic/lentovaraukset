@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require("webpack")
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const BASE_PATH = process.env.BASE_PATH || '/';
+const BASE_PATH = process.env.BASE_PATH || '';
 
 const config = (env, argv) => {
   const HtmlWebpackPlugin = require('html-webpack-plugin');
