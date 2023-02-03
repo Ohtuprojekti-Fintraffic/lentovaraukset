@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from 'react-query';
+import { QueryClient, useMutation, useQuery } from 'react-query';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -7,30 +7,38 @@ import listPlugin from '@fullcalendar/list';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
-import {reservationsListQuery} from '../queries/reservationQueries';
+import { getReservations, addReservation } from '../queries/reservationQueries';
 
 function ReservationCalendar() {
-  
-  const { data: events, isLoading, isError } = useQuery<any[]>(QueryKeys.Reservations, reservationsListQuery);
 
-  const handleEventClick = (clickData: any) => {
-    console.log('CLICK');
+  const queryClient = new QueryClient()
+
+  const { data: reservations, isLoading, isError } = useQuery<any[]>(QueryKeys.Reservations, getReservations);
+  
+  const newReservation = useMutation(addReservation, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryKeys.Reservations)
+    }
+  })
+
+  // When a reservation box is clicked
+  const handleReservationClick = (clickData: any) => {
     console.dir(clickData.event);
   };
 
-  const handleEventChange = (changeData: any) => {
-    console.log('CHANGE');
+  // When a reservation box is moved or resized
+  const handleReservationChange = (changeData: any) => {
     console.dir(changeData.event);
   };
 
-  const handleEventAdd = (addData: any) => {
-    console.log('ADD');
-    console.dir(addData.event);
-  };
-
-  const handleEventDrop = (dropData: any) => {
-    console.log('DROP');
-    console.dir(dropData.event);
+  // When a new reservation is selected (dragged) in the calendar.
+  const handleReservationDrop = (dropData: any) => {
+    console.dir(dropData);
+    newReservation.mutateAsync({
+      title: 'test',
+      start: dropData.startStr,
+      end: dropData.endStr,
+    })
   };
 
   return (
@@ -60,11 +68,10 @@ function ReservationCalendar() {
         editable
         eventColor="#000000"
         eventBackgroundColor="#000000"
-        eventClick={handleEventClick}
-        eventAdd={handleEventAdd}
-        eventChange={handleEventChange}
-        select={handleEventDrop}
-        events={events}
+        eventClick={handleReservationClick}
+        eventChange={handleReservationChange}
+        select={handleReservationDrop}
+        events={reservations}
       />
 
     </div>

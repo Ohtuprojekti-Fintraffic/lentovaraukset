@@ -5,7 +5,6 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
-import {reservationsListQuery} from '../queries/reservationQueries';
 
 function TimeSlotCalendar() {
   
