@@ -1,8 +1,6 @@
-import axios from 'axios';
-
 const sampleQuery = async (): Promise<string> => {
-  const response = await axios.get('/api');
-  return response.data;
+  const response = await fetch(`${process.env.BASE_PATH}/api`);
+  return response.text();
 };
 
 export default sampleQuery;

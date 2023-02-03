@@ -5,7 +5,7 @@ import QueryKeys from '../queries/queryKeys';
 
 function Calendar() {
   const date1 = new Date(1990, 4, 7);
-  const date2 = new Date(1990, 4, 8);
+  const date2 = new Date(2024, 4, 8);
 
   const { data, isLoading, isError } = useQuery(
     [
@@ -15,7 +15,7 @@ function Calendar() {
     ],
     () => getTimeslotQuery(date1, date2),
   );
-
+  console.log(data);
   return (
     <div className="flex flex-col space-y-2">
       <h1 className="text-3xl">Calendar</h1>
@@ -24,7 +24,7 @@ function Calendar() {
         ? <p className="text-base">fetching text</p>
         : (
           <p className="text-base">
-            fetched text:
+            muokkaus fetched text:
             {data}
           </p>
         )}

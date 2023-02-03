@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const getTimeslotQuery = async (startTime: Date, endTime: Date): Promise<string> => {
-  const response = await axios.get(`/api/get/timeslot/${startTime.getTime()}/${endTime.getTime()}`);
+  console.log('gettimeslot');
+  const response = await axios.get(`${process.env.BASE_PATH}/api/timeslots/${startTime.getTime()}/${endTime.getTime()}`);
   return response.data;
 };
 

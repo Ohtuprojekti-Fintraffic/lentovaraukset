@@ -108,3 +108,5 @@ build
 frontend/src/styles/main.css
 
 data
+
+timer.py
