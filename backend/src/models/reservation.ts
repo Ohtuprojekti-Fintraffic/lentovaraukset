@@ -1,15 +1,14 @@
-// import {
-//   DataTypes,
-// } from 'sequelize';
+/* eslint-disable import/no-cycle */
 import {
-  BelongsTo, Table, Column, Model, AutoIncrement, PrimaryKey, ForeignKey, AllowNull,
+  BelongsTo, Table, Column, Model, ForeignKey, AllowNull, BelongsToMany,
 } from 'sequelize-typescript';
-// import { sequelize } from '../util/db';
-// eslint-disable-next-line import/no-cycle
 import Airfield from './airfield';
+import User from './user';
+import Timeslot from './timeslot';
+import ReservedTimeslot from './reservedTimeslot';
 
 @Table
-class Reservation extends Model {
+export default class Reservation extends Model {
   @Column
     startTime!: Date;
 
@@ -21,37 +20,19 @@ class Reservation extends Model {
     info?: string;
 
   @ForeignKey(() => Airfield)
+  @Column
     airfieldId!: number;
 
   @BelongsTo(() => Airfield)
     airfield!: Airfield;
-}
 
-// Reservation.init(
-//   {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//     },
-//     startTime: {
-//       type: DataTypes.DATE,
-//       allowNull: false,
-//     },
-//     endTime: {
-//       type: DataTypes.DATE,
-//       allowNull: false,
-//     },
-//     info: {
-//       type: DataTypes.TEXT,
-//       allowNull: true,
-//     },
-//   },
-//   {
-//     sequelize,
-//     underscored: true,
-//     timestamps: true,
-//     modelName: 'reservation',
-//   },
-// );
-export default Reservation;
+  @ForeignKey(() => User)
+  @Column
+    userId!: number;
+
+  @BelongsTo(() => User)
+    user!: User;
+
+  @BelongsToMany(() => Timeslot, () => ReservedTimeslot)
+    timeslots!: Timeslot[];
+}

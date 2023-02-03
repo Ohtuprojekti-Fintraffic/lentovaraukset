@@ -31,7 +31,7 @@ Reservation.belongsToMany(Timeslot, { through: ReservedTimeslot });
 
 const connectToDatabase = async () => {
   try {
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
     await sequelize.authenticate();
     console.log('database connected');
   } catch (err) {

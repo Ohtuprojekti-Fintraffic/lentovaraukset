@@ -1,13 +1,19 @@
-// import { DataTypes } from 'sequelize';
-
+/* eslint-disable import/no-cycle */
 import {
-  AutoIncrement, Column, Model, PrimaryKey, Table,
+  Column, Model, ForeignKey, Table,
 } from 'sequelize-typescript';
-// import { sequelize } from '../util/db';
+import Reservation from './reservation';
+import Timeslot from './timeslot';
+
 @Table
-class ReservedTimeslot extends Model {
+export default class ReservedTimeslot extends Model {
+  @ForeignKey(() => Reservation)
+  @Column
+    reservationId!: number;
+
+  @ForeignKey(() => Timeslot)
+  @Column
+    timeslotId!: number;
 }
 
-//
-
-export default ReservedTimeslot;
+// export default ReservedTimeslot;

@@ -1,11 +1,11 @@
-// import { DataTypes } from 'sequelize';
+/* eslint-disable import/no-cycle */
 import {
-  AutoIncrement, Column, Model, PrimaryKey, Table, Unique,
+  Column, Model, Table, Unique, HasMany,
 } from 'sequelize-typescript';
-// import { sequelize } from '../util/db';
+import Reservation from './reservation';
 
 @Table
-class User extends Model {
+export default class User extends Model {
   @Unique
   @Column
     username!: string;
@@ -21,43 +21,7 @@ class User extends Model {
 
   @Column
     phone!: string;
+
+  @HasMany(() => Reservation)
+    reservations!: Reservation[];
 }
-
-// User.init(
-//   {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//     },
-//     username: {
-//       type: DataTypes.STRING,
-//       unique: true,
-//       allowNull: false,
-//     },
-//     name: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     role: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     email: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     phone: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//   },
-//   {
-//     sequelize,
-//     underscored: true,
-//     timestamps: true,
-//     modelName: 'user',
-//   },
-// );
-
-export default User;
