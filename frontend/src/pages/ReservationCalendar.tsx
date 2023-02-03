@@ -11,24 +11,29 @@ import { getReservations, addReservation } from '../queries/reservationQueries';
 
 function ReservationCalendar() {
 
+  const calendarRef: React.RefObject<FullCalendar> = React.createRef()
+
   const queryClient = new QueryClient()
 
-  const { data: reservations, isLoading, isError } = useQuery<any[]>(QueryKeys.Reservations, getReservations);
+  const { data: reservations, isLoading, isError, refetch: refetchReservations } = useQuery<any[]>(QueryKeys.Reservations, getReservations);
   
   const newReservation = useMutation(addReservation, {
     onSuccess: () => {
-      queryClient.invalidateQueries(QueryKeys.Reservations)
+      refreshCalendar()
     }
   })
 
   // When a reservation box is clicked
   const handleReservationClick = (clickData: any) => {
     console.dir(clickData.event);
+    // Open reservation info screen
+    // Refresh calendar if changes were made
   };
 
   // When a reservation box is moved or resized
   const handleReservationChange = (changeData: any) => {
     console.dir(changeData.event);
+    // Open confirmation popup
   };
 
   // When a new reservation is selected (dragged) in the calendar.
@@ -41,10 +46,18 @@ function ReservationCalendar() {
     })
   };
 
+  const refreshCalendar = () => {
+    queryClient.invalidateQueries(QueryKeys.Reservations)
+    refetchReservations()
+    const calendar = calendarRef.current?.getApi()
+    calendar?.unselect()
+  }
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <h1 className="text-3xl">Varauskalenteri</h1>
       <FullCalendar
+        ref={calendarRef}
         plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
         locale="fi"
         headerToolbar={{
