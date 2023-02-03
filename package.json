@@ -11,7 +11,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
     "start:backend": "npm -w @lentovaraukset/backend run start",
-    "start:frontend": "npm -w @lentovaraukset/frontend run start"
+    "start:frontend": "npm -w @lentovaraukset/frontend run start",
+    "start:database": "docker compose -f docker-compose.dev.yml up"
   },
   "workspaces": [
     "frontend",
@@ -37,5 +38,10 @@
     "supertest": "^6.3.3",
     "ts-jest": "^29.0.5",
     "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "pg": "^8.8.0",
+    "sequelize": "^6.28.0"
   }
 }

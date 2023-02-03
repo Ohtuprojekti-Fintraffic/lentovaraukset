@@ -31,7 +31,9 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+],
+  { basename: process.env.BASE_PATH },
+);
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>

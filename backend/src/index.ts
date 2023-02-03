@@ -1,14 +1,16 @@
 import express from 'express';
-
-const port = process.env.PORT || 8080;
+import cors from 'cors';
+import timeslotRouter from './routes/timeslots';
 
 const app = express();
+
+app.use(express.json());
+app.use(cors());
 
 app.get('/api', async (_req: any, res: express.Response) => {
   res.send('Hello World');
 });
 
-// This is why Jest needs forceExit. Should be in a wrapper and not here
-app.listen(port, () => console.log(`Server is running on port: ${port}`));
+app.use('/api/timeslots', timeslotRouter);
 
 export default app;

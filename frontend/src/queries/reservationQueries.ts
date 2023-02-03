@@ -6,6 +6,11 @@ let placehoderReservations = [
   },
 ]
 
+//const sampleQuery = async (): Promise<string> => {
+//  const response = await fetch(`${process.env.BASE_PATH}/api`);
+//  return response.text();
+//};
+
 const getReservations = async (): Promise<any[]> => {
   return(placehoderReservations);
 };
