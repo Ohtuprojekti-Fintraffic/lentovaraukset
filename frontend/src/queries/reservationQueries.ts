@@ -1,5 +1,6 @@
 let placehoderReservations = [
   {
+    id: 1,
     title: 'test',
     start: '2023-01-31T10:00:00',
     end: '2023-01-31T10:45:00',
@@ -12,13 +13,16 @@ let placehoderReservations = [
 //};
 
 const getReservations = async (): Promise<any[]> => {
-  return(placehoderReservations);
+  return (placehoderReservations);
 };
 
-const addReservation = async (newReservation: any): Promise<boolean> => {
-  placehoderReservations = placehoderReservations.concat(newReservation)
-  return true
+const addReservation = async (newReservation: any): Promise<void> => {
+  placehoderReservations = placehoderReservations.concat({ id: Date.now(), ...newReservation })
 }
 
-export { getReservations, addReservation };
+const modifyReservation = async (reservation: any): Promise<void> => {
+  placehoderReservations[placehoderReservations.findIndex((element => element.id === parseInt(reservation.id)))] = reservation
+}
+
+export { getReservations, addReservation, modifyReservation };
 

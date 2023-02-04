@@ -7,7 +7,7 @@ import listPlugin from '@fullcalendar/list';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
-import { getReservations, addReservation } from '../queries/reservationQueries';
+import { getReservations, addReservation, modifyReservation } from '../queries/reservationQueries';
 
 function ReservationCalendar() {
 
@@ -30,6 +30,13 @@ function ReservationCalendar() {
     }
   })
 
+  const changeReservation = useMutation(modifyReservation, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryKeys.Reservations)
+      refetchReservations()
+    }
+  })
+
   // When a reservation box is clicked
   const handleReservationClick = (clickData: any) => {
     // Open reservation info screen
@@ -39,9 +46,14 @@ function ReservationCalendar() {
   // When a reservation box is moved or resized
   const handleReservationChange = (changeData: any) => {
     // Open confirmation popup
-    confirm('are you sure?') ?
-    refetchReservations() :
-    refreshCalendar()
+    if (
+      confirm('are you sure?')
+    ) {
+      changeReservation.mutateAsync(changeData.event)
+      refetchReservations()
+    } else {
+      refreshCalendar()
+    }
   };
 
   // When a new reservation is selected (dragged) in the calendar.
