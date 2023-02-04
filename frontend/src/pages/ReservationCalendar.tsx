@@ -7,7 +7,7 @@ import listPlugin from '@fullcalendar/list';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
-import { getReservations, addReservation, modifyReservation } from '../queries/reservationQueries';
+import { getReservations, addReservation, modifyReservation } from '../queries/reservations';
 
 function ReservationCalendar() {
 
@@ -39,21 +39,16 @@ function ReservationCalendar() {
 
   // When a reservation box is clicked
   const handleReservationClick = (clickData: any) => {
-    // Open reservation info screen
+    console.dir(clickData.event)
+    // Open reservation info screen here
     // Refresh calendar if changes were made
   };
 
   // When a reservation box is moved or resized
   const handleReservationChange = (changeData: any) => {
-    // Open confirmation popup
-    if (
-      confirm('are you sure?')
-    ) {
-      changeReservation.mutateAsync(changeData.event)
-      refetchReservations()
-    } else {
-      refreshCalendar()
-    }
+    // Open confirmation popup here
+    changeReservation.mutateAsync(changeData.event)
+    refetchReservations()
   };
 
   // When a new reservation is selected (dragged) in the calendar.
@@ -80,6 +75,7 @@ function ReservationCalendar() {
         ref={calendarRef}
         plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
         locale="fi"
+        weekNumberCalculation='ISO'
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
@@ -101,7 +97,6 @@ function ReservationCalendar() {
         editable
         eventResizableFromStart
         eventStartEditable
-        eventColor="#000000"
         eventBackgroundColor="#000000"
         eventClick={handleReservationClick}
         eventChange={handleReservationChange}
