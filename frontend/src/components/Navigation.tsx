@@ -20,7 +20,7 @@ function Navigation() {
         </NavLink>
         <NavLink
           to="/varausikkunat"
-          className={({ isActive, isPending }) => (isActive
+          className={({ isActive }) => (isActive
             ? 'active font-bold'
             : '')}
         >
@@ -28,7 +28,7 @@ function Navigation() {
         </NavLink>
         <NavLink
           to="/hallinta"
-          className={({ isActive, isPending }) => (isActive
+          className={({ isActive }) => (isActive
             ? 'active font-bold'
             : '')}
         >

@@ -7,8 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
 
 function TimeSlotCalendar() {
-  
-  //const { data: timeSlots, isLoading, isError } = useQuery<any[]>(QueryKeys.TimeSlots, timeslotsListQuery);
+  // const { data: timeSlots, isLoading, isError } = useQuery<any[]>(QueryKeys.TimeSlots, timeslotsListQuery);
 
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
@@ -36,7 +35,7 @@ function TimeSlotCalendar() {
         selectMirror
         editable
         eventBackgroundColor="#000000"
-        //events={timeSlots}
+        // events={timeSlots}
       />
 
     </div>

@@ -4,21 +4,24 @@ let placehoderReservations = [
     title: 'test',
     start: '2023-01-31T10:00:00',
     end: '2023-01-31T10:45:00',
-    editable: true
+    editable: true,
   },
-]
+];
 
-const getReservations = async (): Promise<any[]> => {
-  return (placehoderReservations);
-};
+const getReservations = async (): Promise<any[]> => (placehoderReservations);
 
 const addReservation = async (newReservation: any): Promise<void> => {
-  placehoderReservations = placehoderReservations.concat({ id: Date.now(), editable: true, ...newReservation })
-}
+  placehoderReservations = placehoderReservations.concat(
+    { id: Date.now(), editable: true, ...newReservation },
+  );
+};
 
 const modifyReservation = async (reservation: any): Promise<void> => {
-  placehoderReservations[placehoderReservations.findIndex((element => element.id == reservation.id))] = reservation
-}
+  placehoderReservations[
+    placehoderReservations.findIndex(
+      ((element) => parseInt(element.id, 10) === parseInt(reservation.id, 10)),
+    )
+  ] = reservation;
+};
 
 export { getReservations, addReservation, modifyReservation };
-

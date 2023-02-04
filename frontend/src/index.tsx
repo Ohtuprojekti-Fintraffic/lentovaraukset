@@ -11,27 +11,28 @@ import TimeSlotCalendar from './pages/TimeSlotCalendar';
 import Error from './pages/Error';
 import Management from './pages/Management';
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <App />,
-    errorElement: <Error />,
-    children: [
-      {
-        path: '/',
-        element: <ReservationCalendar />,
-      },
-      {
-        path: 'varausikkunat',
-        element: <TimeSlotCalendar />,
-      },
-      {
-        path: 'hallinta',
-        element: <Management />,
-      },
-    ],
-  },
-],
+const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <App />,
+      errorElement: <Error />,
+      children: [
+        {
+          path: '/',
+          element: <ReservationCalendar />,
+        },
+        {
+          path: 'varausikkunat',
+          element: <TimeSlotCalendar />,
+        },
+        {
+          path: 'hallinta',
+          element: <Management />,
+        },
+      ],
+    },
+  ],
   { basename: process.env.BASE_PATH },
 );
 

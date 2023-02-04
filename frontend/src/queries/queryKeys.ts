@@ -1,6 +1,6 @@
 enum QueryKeys {
   Reservations = 'reservations',
-  TimeSlots = 'timeslots'
+  TimeSlots = 'timeslots',
 }
 
 export default QueryKeys;
