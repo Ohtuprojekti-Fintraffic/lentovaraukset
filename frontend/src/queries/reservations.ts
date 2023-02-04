@@ -1,4 +1,4 @@
-let placehoderReservations = [
+let placehoderReservations: any[] = [
   {
     id: '1',
     title: 'test',
@@ -21,7 +21,13 @@ const modifyReservation = async (reservation: any): Promise<void> => {
     placehoderReservations.findIndex(
       ((element) => parseInt(element.id, 10) === parseInt(reservation.id, 10)),
     )
-  ] = reservation;
+  ] = {
+    id: reservation.id,
+    title: reservation.title,
+    start: reservation.start,
+    end: reservation.end,
+    editable: true,
+  };
 };
 
 export { getReservations, addReservation, modifyReservation };

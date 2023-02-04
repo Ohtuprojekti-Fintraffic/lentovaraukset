@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { QueryClient, useMutation, useQuery } from 'react-query';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -30,6 +30,8 @@ function ReservationCalendar() {
     }
   }, [isRefetching]);
 
+  const [selected, setSelected] = useState();
+
   const newReservation = useMutation(addReservation, {
     onSuccess: () => {
       queryClient.invalidateQueries(QueryKeys.Reservations);
@@ -46,7 +48,7 @@ function ReservationCalendar() {
 
   // When a reservation box is clicked
   const handleReservationClick = (clickData: any) => {
-    console.dir(clickData.event);
+    setSelected(clickData.event);
     // Open reservation info screen here
     // Refresh calendar if changes were made
   };
@@ -110,7 +112,7 @@ function ReservationCalendar() {
           )
           : <p>Virhe noutaessa varauksia</p>
       }
-
+      <div>{JSON.stringify(selected)}</div>
     </div>
   );
 }
