@@ -34,15 +34,6 @@ function Navigation() {
         >
           Hallinta
         </NavLink>
-
-        <NavLink
-          to="/flight-staff"
-          className={({ isActive }) => (isActive
-            ? 'active font-bold'
-            : '')}
-        >
-          Lennonjohto
-        </NavLink>
       </nav>
     </div>
   );
