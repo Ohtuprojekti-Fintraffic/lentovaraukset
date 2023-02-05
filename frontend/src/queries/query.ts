@@ -1,10 +1,10 @@
 export const sampleQuery = async (): Promise<string> => {
-  const response = await fetch('/api');
+  const response = await fetch(`${process.env.BASE_PATH}//api`);
   return response.text();
 };
 
-export const getResrvationStatus = async (): Promise<any> => {
-  const response = await fetch('/api/flight-control/reservation-status');
+export const getReservationStatus = async (): Promise<any> => {
+  const response = await fetch(`${process.env.BASE_PATH}/api/flight-control/reservation-status`);
   const data = await response.json();
   return data;
 };

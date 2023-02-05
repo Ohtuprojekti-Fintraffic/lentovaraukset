@@ -1,11 +1,11 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React from 'react';
 import { useQuery } from 'react-query';
-import { getResrvationStatus } from '../queries/query';
+import { getReservationStatus } from '../queries/query';
 import QueryKeys from '../queries/queryKeys';
 
 function Management() {
-  const { data, isLoading, isError } = useQuery(QueryKeys.ReservationStatus, getResrvationStatus, {
+  const { data, isLoading, isError } = useQuery(QueryKeys.ReservationStatus, getReservationStatus, {
     refetchOnWindowFocus: false,
   });
   return (
