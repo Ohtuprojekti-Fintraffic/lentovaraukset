@@ -1,6 +1,6 @@
 enum QueryKeys {
-  Sample = 'sampleQuery',
-  GetTimeslotQuery = 'getTimeslotQuery',
+  Reservations = 'reservations',
+  TimeSlots = 'timeslots',
 }
 
 export default QueryKeys;
