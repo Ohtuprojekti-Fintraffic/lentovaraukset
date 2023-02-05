@@ -10,10 +10,10 @@ function Management() {
   });
   return (
     <div className="flex flex-col space-y-2">
-      <h1 className="text-3xl">Management</h1>
-      {isError && <p className="text-base">Erro while trying to fetch reservation status</p>}
+      <h1 className="text-3xl">Hallinta</h1>
+      {isError && <p className="text-base">Virhe: varaustilannetta ei pystytty hakemaan</p>}
       {isLoading
-        ? <p className="text-base">fetching reservation status</p>
+        ? <p className="text-base">Haetaan dataa palvelimelta</p>
         : (
           <div className="text-base">
             <div>
@@ -31,7 +31,7 @@ function Management() {
             <div>
               <h1>Varatut Ajat</h1>
               {data.reservedSlots.length === 0
-                ? <p> Ei Varattuja aikoja ole olemassa</p>
+                ? <p> Ei Varattuja aikoja</p>
                 : (
                   <ul>
                     {data.reservedSlots.map(

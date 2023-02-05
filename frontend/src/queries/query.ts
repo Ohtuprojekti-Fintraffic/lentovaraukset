@@ -4,7 +4,7 @@ export const sampleQuery = async (): Promise<string> => {
 };
 
 export const getResrvationStatus = async (): Promise<any> => {
-  const response = await fetch('/api/staff/reservation-status');
+  const response = await fetch('/api/flight-control/reservation-status');
   const data = await response.json();
   return data;
 };

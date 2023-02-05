@@ -1,12 +1,12 @@
 import express from 'express';
-import flightstaffService from '../services/flightstaffService';
+import flightControlService from '../services/flightControlService';
 
 const router = express.Router();
 
 router.get('/reservation-status', async (_req: any, res: express.Response) => {
   try {
-    const reservationStatus = await flightstaffService.getReservationStatus();
-    res.send(JSON.stringify(reservationStatus));
+    const reservationStatus = await flightControlService.getReservationStatus();
+    res.json(reservationStatus);
   } catch (error) {
     res.status(501).send();
   }

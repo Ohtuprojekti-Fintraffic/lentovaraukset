@@ -23,7 +23,6 @@ const getReservationStatus = async (): Promise<any> => {
     availableSlots,
     reservedSlots,
   };
-  console.log(status);
   return status;
 };
 
