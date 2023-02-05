@@ -34,7 +34,10 @@ app.get('/api/staff/reservation-status', async (_req: any, res: express.Response
       },
     });
     const availableSlots = returnedTimeSlots.map((obj) => (
-      { ...obj, freeSlotsAmount: obj.dataValues.reservations.length }));
+      {
+        ...obj,
+        freeSlotsAmount: (obj.dataValues.maxAmount - obj.dataValues.reservations.length),
+      }));
 
     const reservedSlots = await Reservation.findAll({
       include: {
