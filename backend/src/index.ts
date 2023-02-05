@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import { Timeslot, Reservation, User } from './models';
 import timeslotRouter from './routes/timeslots';
+import flightStaggRouter from './routes/flightstaff';
 
 const app = express();
 
@@ -13,36 +13,6 @@ app.get('/api', async (_req: any, res: express.Response) => {
 });
 
 app.use('/api/timeslots', timeslotRouter);
-
-app.get('/api/staff/reservation-status', async (_req: any, res: express.Response) => {
-  try {
-    const returnedTimeSlots = await Timeslot.findAll({
-      include: {
-        model: Reservation,
-        attributes: ['startTime', 'endTime', 'info'],
-      },
-    });
-    const availableSlots = returnedTimeSlots.map((obj) => (
-      {
-        ...obj.dataValues,
-        freeSlotsAmount: (obj.dataValues.maxAmount - obj.dataValues.reservations.length),
-      }));
-
-    const reservedSlots = await Reservation.findAll({
-      include: {
-        model: User,
-        attributes: ['name', 'role'],
-      },
-    });
-
-    const reservationStatus = {
-      availableSlots,
-      reservedSlots,
-    };
-    res.send(JSON.stringify(reservationStatus));
-  } catch (error) {
-    res.status(501).send();
-  }
-});
+app.use('/api/staff/', flightStaggRouter);
 
 export default app;
