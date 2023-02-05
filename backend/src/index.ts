@@ -35,7 +35,7 @@ app.get('/api/staff/reservation-status', async (_req: any, res: express.Response
     });
     const availableSlots = returnedTimeSlots.map((obj) => (
       {
-        ...obj,
+        ...obj.dataValues,
         freeSlotsAmount: (obj.dataValues.maxAmount - obj.dataValues.reservations.length),
       }));
 
