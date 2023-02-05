@@ -1,5 +1,8 @@
 const path = require('path');
+const webpack = require("webpack")
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+const BASE_PATH = process.env.BASE_PATH || '';
 
 const config = (env, argv) => {
   const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -9,7 +12,7 @@ const config = (env, argv) => {
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: 'main.js',
-      publicPath: '/',
+      publicPath: `${BASE_PATH}/`,
     },
     devServer: {
       static: path.resolve(__dirname, 'dist'),
@@ -49,6 +52,9 @@ const config = (env, argv) => {
       new HtmlWebpackPlugin({
         template: './public/index.html',
       }),
+      new webpack.DefinePlugin({
+      'process.env.BASE_PATH': JSON.stringify(BASE_PATH),
+    }),
     ],
   };
 };

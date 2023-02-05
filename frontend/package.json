@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fullcalendar/core": "^6.1.0",
+    "@fullcalendar/daygrid": "^6.1.0",
+    "@fullcalendar/interaction": "^6.1.0",
+    "@fullcalendar/list": "^6.1.0",
+    "@fullcalendar/react": "^6.1.0",
+    "@fullcalendar/timegrid": "^6.1.0",
     "@headlessui/react": "^1.7.7",
     "@lentovaraukset/shared": "1.0.0",
     "core-js": "^3.27.1",
