@@ -1,6 +1,6 @@
 enum QueryKeys {
   Sample = 'sampleQuery',
-  ReservationStatus = 'resrvationStatus',
+  ReservationStatus = 'reservationStatus',
   Reservations = 'reservations',
   TimeSlots = 'timeslots',
 }
