@@ -13,6 +13,6 @@ app.get('/api', async (_req: any, res: express.Response) => {
 });
 
 app.use('/api/timeslots', timeslotRouter);
-app.use('/api/staff/', flightStaggRouter);
+app.use('/api/staff', flightStaggRouter);
 
 export default app;

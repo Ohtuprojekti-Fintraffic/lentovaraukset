@@ -12,7 +12,6 @@ const getReservationStatus = async (): Promise<any> => {
       ...obj.dataValues,
       freeSlotsAmount: (obj.dataValues.maxAmount - obj.dataValues.reservations.length),
     }));
-
   const reservedSlots = await Reservation.findAll({
     include: {
       model: User,
@@ -20,10 +19,12 @@ const getReservationStatus = async (): Promise<any> => {
     },
   });
 
-  return {
+  const status = {
     availableSlots,
     reservedSlots,
   };
+  console.log(status);
+  return status;
 };
 
 export default {
