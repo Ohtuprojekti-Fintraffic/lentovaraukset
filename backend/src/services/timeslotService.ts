@@ -11,9 +11,9 @@ const deleteById = async (id: number): Promise<boolean> => {
 
 const updateById = async (id: number, timeslot: { starttime: Date, maxDuration: number }) => {
   await Timeslot.update(timeslot, { where: { id } });
-}
+};
 
 export default {
   deleteById,
-  updateById
+  updateById,
 };

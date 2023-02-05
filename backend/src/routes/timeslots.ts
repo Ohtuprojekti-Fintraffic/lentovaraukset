@@ -24,6 +24,6 @@ router.patch('/:id', async (req: express.Request, res: express.Response) => {
   const newTimeslot = req.body;
   await timeslotService.updateById(id, newTimeslot);
   res.status(200).json(newTimeslot);
-}) 
+});
 
 export default router;
