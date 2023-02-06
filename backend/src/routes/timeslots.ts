@@ -3,6 +3,18 @@ import timeslotService from '../services/timeslotService';
 
 const router = express.Router();
 
+router.get('/', async (req: express.Request, res: express.Response) => {
+  const { from } = req.query;
+  const { until } = req.query;
+
+  const timeslots = await timeslotService.getInTimeRange(
+    new Date(from as string),
+    new Date(until as string),
+  );
+
+  res.json(timeslots);
+});
+
 router.delete('/:id', async (req: express.Request, res: express.Response) => {
   const id = Number(req.params.id);
   try {
