@@ -1,16 +1,18 @@
 import { EventInput } from '@fullcalendar/core';
 
-let placehoderTimeSlots: any[] = [];
-
 const getTimeSlots = async (from: Date, until: Date): Promise<EventInput[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots?from=${from}&until=${until}`);
   return res.json();
 };
 
 const addTimeSlot = async (newTimeSlot: any): Promise<void> => {
-  placehoderTimeSlots = placehoderTimeSlots.concat(
-    { id: Date.now(), editable: true, ...newTimeSlot },
-  );
+  await fetch('api/timeslots/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(newTimeSlot),
+  });
 };
 
 const modifyTimeSlot = async (
@@ -28,4 +30,19 @@ const modifyTimeSlot = async (
   return res.json();
 };
 
-export { getTimeSlots, addTimeSlot, modifyTimeSlot };
+const deleteTimeslot = async (id: Number): Promise<string> => {
+  const response = await fetch(`${process.env.BASE_PATH}/api/timeslots/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.text();
+};
+
+export default deleteTimeslot;
+
+
+export {
+  getTimeSlots, addTimeSlot, modifyTimeSlot, deleteTimeslot
+};

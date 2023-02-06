@@ -38,8 +38,14 @@ const updateById = async (
   await Timeslot.update(timeslot, { where: { id } });
 };
 
+const createTimeslot = async (startTime: Date, endTime: Date) => {
+  const timeslot: any = await Timeslot.create(({ startTime, endTime, maxConcurrentFlights: 1 }));
+  return timeslot;
+};
+
 export default {
   getInTimeRange,
   deleteById,
   updateById,
+  createTimeslot,
 };

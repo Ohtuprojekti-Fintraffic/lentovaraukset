@@ -6,7 +6,6 @@ const router = express.Router();
 router.get('/', async (req: express.Request, res: express.Response) => {
   const { from } = req.query;
   const { until } = req.query;
-
   const timeslots = await timeslotService.getInTimeRange(
     new Date(from as string),
     new Date(until as string),
@@ -28,6 +27,16 @@ router.delete('/:id', async (req: express.Request, res: express.Response) => {
     if (error instanceof Error) {
       res.status(500).json(error);
     }
+  }
+});
+
+router.post('/', async (req: express.Request, res: express.Response) => {
+  try {
+    const { start, end } = req.body;
+    const timeslot = await timeslotService.createTimeslot(start, end);
+    res.json(timeslot);
+  } catch (error) {
+    res.status(400).json(error);
   }
 });
 
