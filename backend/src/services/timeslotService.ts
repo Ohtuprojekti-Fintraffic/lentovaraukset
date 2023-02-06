@@ -15,6 +15,7 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
       }],
     },
   });
+
   return timeslots.map((timeslot) => ({
     start: timeslot.dataValues.startTime,
     end: timeslot.dataValues.endTime,

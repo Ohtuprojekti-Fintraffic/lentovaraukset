@@ -1,12 +1,4 @@
-let placehoderReservations: any[] = [
-  {
-    id: '1',
-    title: 'test',
-    start: '2023-01-31T10:00:00',
-    end: '2023-01-31T10:45:00',
-    editable: true,
-  },
-];
+let placehoderReservations: any[] = [];
 
 const getReservations = async (): Promise<any[]> => (placehoderReservations);
 
@@ -19,7 +11,7 @@ const addReservation = async (newReservation: any): Promise<void> => {
 const modifyReservation = async (reservation: any): Promise<void> => {
   placehoderReservations[
     placehoderReservations.findIndex(
-      ((element) => parseInt(element.id, 10) === parseInt(reservation.id, 10)),
+      (element) => parseInt(element.id, 10) === parseInt(reservation.id, 10),
     )
   ] = {
     id: reservation.id,

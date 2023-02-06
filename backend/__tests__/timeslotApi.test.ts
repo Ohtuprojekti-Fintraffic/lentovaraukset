@@ -20,7 +20,7 @@ afterAll(async () => {
 });
 describe('Calls to api', () => {
   test('can edit a timeslot', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ startTime: '2023-01-01T12:00:00.000Z', endTime: '2023-01-01T13:00:00.000Z' });
+    const createdSlot: Timeslot = await Timeslot.create({ startTime: '2023-01-01T12:00:00.000Z', endTime: '2023-01-01T13:00:00.000Z', maxConcurrentFlights: 2 });
 
     await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
