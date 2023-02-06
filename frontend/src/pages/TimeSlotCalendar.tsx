@@ -61,7 +61,11 @@ function TimeSlotCalendar() {
   // When a timeslot box is moved or resized
   const handleTimeSlotChange = (changeData: any) => {
     // Open confirmation popup here
-    changeTimeSlot.mutateAsync(changeData.event);
+    changeTimeSlot.mutateAsync({
+      id: changeData.event.id,
+      startTime: changeData.event.start,
+      endTime: changeData.event.start
+    });
     refetchTimeSlots();
   };
 

@@ -13,17 +13,16 @@ const addTimeSlot = async (newTimeSlot: any): Promise<void> => {
   );
 };
 
-const modifyTimeSlot = async (timeSlot: any): Promise<void> => {
-  placehoderTimeSlots[
-    placehoderTimeSlots.findIndex(
-      (element) => parseInt(element.id, 10) === parseInt(timeSlot.id, 10),
-    )
-  ] = {
-    id: timeSlot.id,
-    start: timeSlot.start,
-    end: timeSlot.end,
-    editable: true,
-  };
+const modifyTimeSlot = async (timeSlot: { id: string, startTime: Date, endTime: Date }): Promise<void> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${timeSlot.id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      startTime: timeSlot.startTime,
+      endTime: timeSlot.endTime,
+      maxConcurrentFlights: 2 // Placeholder until functionality is adde for setting this in the frontend
+    })
+  });
+  return res.json();
 };
 
 export { getTimeSlots, addTimeSlot, modifyTimeSlot };
