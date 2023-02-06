@@ -11,7 +11,6 @@ const deleteById = async (id: number): Promise<boolean> => {
 };
 
 // any until types are defined
-// Max amount tbd (global?)
 const createTimeslot = async (startTime: string): Promise<any> => {
   const timeslot = await Timeslot.create({ startTime: new Date(Number(startTime)), maxAmount: 1 });
   return timeslot;
@@ -27,8 +26,13 @@ const getTimeslotsByTimerange = async (startTime: string, endTime: string): Prom
   return timeslots;
 };
 
+const updateById = async (id: number, timeslot: { starttime: Date, maxDuration: number }) => {
+  await Timeslot.update(timeslot, { where: { id } });
+};
+
 export default {
   deleteById,
   getTimeslotsByTimerange,
   createTimeslot,
+  updateById,
 };

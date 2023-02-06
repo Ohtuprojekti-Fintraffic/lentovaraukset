@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 let placehoderTimeSlots = [
   {
     id: '1',
@@ -23,10 +21,13 @@ let placehoderTimeSlots = [
 const getTimeSlots = async (): Promise<any[]> => (placehoderTimeSlots);
 
 const getTimeslotQuery = async (startTime: Date, endTime: Date): Promise<string> => {
-  console.log(`${startTime.getTime()}/${endTime.getTime()}`);
-  // console.log(process);
-  const response = await axios.get(`/api/timeslots/${startTime.getTime()}/${endTime.getTime()}`);
-  return response.data;
+  const response = await fetch(`/api/timeslots/${startTime.getTime()}/${endTime.getTime()}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.text();
 };
 
 const addTimeSlot = async (newTimeSlot: any): Promise<void> => {
@@ -46,4 +47,6 @@ const modifyTimeSlot = async (timeSlot: any): Promise<void> => {
   };
 };
 
-export { getTimeSlots, getTimeslotQuery, addTimeSlot, modifyTimeSlot };
+export {
+  getTimeSlots, getTimeslotQuery, addTimeSlot, modifyTimeSlot,
+};

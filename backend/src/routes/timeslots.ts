@@ -31,9 +31,15 @@ router.post('/', async (req: express.Request, res: express.Response) => {
     const timeslot = await timeslotService.createTimeslot(startTime);
     res.json(timeslot);
   } catch (error) {
-    console.log('creating new timeslot failed');
     res.status(400).json(error);
   }
+});
+
+router.patch('/:id', async (req: express.Request, res: express.Response) => {
+  const id = Number(req.params.id);
+  const newTimeslot = req.body;
+  await timeslotService.updateById(id, newTimeslot);
+  res.status(200).json(newTimeslot);
 });
 
 export default router;
