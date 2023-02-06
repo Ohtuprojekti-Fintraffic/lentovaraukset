@@ -7,8 +7,7 @@ import listPlugin from '@fullcalendar/list';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
-import { getTimeSlots, modifyTimeSlot } from '../queries/timeSlots';
-import addTimeSlot from '../mutations/addTimeSlot';
+import { getTimeSlots, modifyTimeSlot, addTimeSlot } from '../queries/timeSlots';
 
 function TimeSlotCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
@@ -62,7 +61,13 @@ function TimeSlotCalendar() {
   // When a timeslot box is moved or resized
   const handleTimeSlotChange = (changeData: any) => {
     // Open confirmation popup here
-    changeTimeSlot.mutateAsync(changeData.event);
+    const timeSlot = changeData.event;
+
+    changeTimeSlot.mutateAsync({
+      id: timeSlot.id,
+      startTime: timeSlot.start,
+      endTime: timeSlot.end,
+    });
     refetchTimeSlots();
   };
 

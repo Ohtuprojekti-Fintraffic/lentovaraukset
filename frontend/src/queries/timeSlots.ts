@@ -1,24 +1,50 @@
 import { EventInput } from '@fullcalendar/core';
 
-const placehoderTimeSlots: any[] = [];
-
 const getTimeSlots = async (from: Date, until: Date): Promise<EventInput[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots?from=${from}&until=${until}`);
   return res.json();
 };
-const modifyTimeSlot = async (timeSlot: any): Promise<void> => {
-  placehoderTimeSlots[
-    placehoderTimeSlots.findIndex(
-      (element) => parseInt(element.id, 10) === parseInt(timeSlot.id, 10),
-    )
-  ] = {
-    id: timeSlot.id,
-    start: timeSlot.start,
-    end: timeSlot.end,
-    editable: true,
+
+const addTimeSlot = async (newTimeSlot: any): Promise<void> => {
+  await fetch(`${process.env.BASE_PATH}/api/timeslots/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(newTimeSlot),
+  });
+};
+
+const modifyTimeSlot = async (
+  timeSlot: { id: string, startTime: Date, endTime: Date },
+): Promise<void> => {
+  const modifiedTimeSlot = {
+    startTime: timeSlot.startTime,
+    endTime: timeSlot.endTime,
+    // Placeholder until functionality is adde for setting this in the frontend
+    maxConcurrentFlights: 2,
   };
+
+  const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${timeSlot.id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(modifiedTimeSlot),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return res.json();
+};
+
+const deleteTimeslot = async (id: Number): Promise<string> => {
+  const response = await fetch(`${process.env.BASE_PATH}/api/timeslots/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.text();
 };
 
 export {
-  getTimeSlots, modifyTimeSlot,
+  getTimeSlots, addTimeSlot, modifyTimeSlot, deleteTimeslot,
 };
