@@ -59,7 +59,7 @@ function TimeSlotCalendar() {
     // Refresh calendar if changes were made
   };
 
-  // When a timeslot bojsonx is moved or resized
+  // When a timeslot box is moved or resized
   const handleTimeSlotChange = (changeData: any) => {
     // Open confirmation popup here
     changeTimeSlot.mutateAsync(changeData.event);
