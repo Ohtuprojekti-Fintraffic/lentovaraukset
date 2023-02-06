@@ -12,11 +12,16 @@ import { addTimeSlot, getTimeSlots, modifyTimeSlot } from '../queries/timeSlots'
 function TimeSlotCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
+  const [timeRange, setTimeRange] = useState({ start: new Date(), end: new Date() });
+
   const queryClient = new QueryClient();
 
   const {
     data: timeSlots, isError, isRefetching, isSuccess, refetch: refetchTimeSlots,
-  } = useQuery<any[]>(QueryKeys.TimeSlots, getTimeSlots);
+  } = useQuery<any[]>(
+    [QueryKeys.TimeSlots, timeRange],
+    () => getTimeSlots(timeRange.start, timeRange.end),
+  );
 
   const refreshCalendar = () => {
     const calendar = calendarRef.current?.getApi();
@@ -110,6 +115,9 @@ function TimeSlotCalendar() {
               eventChange={handleTimeSlotChange}
               select={handleTimeSlotDrop}
               events={timeSlots}
+              datesSet={(dateInfo) => {
+                setTimeRange({ start: dateInfo.start, end: dateInfo.end });
+              }}
             />
           )
           : <p>Virhe noutaessa varauksia</p>
