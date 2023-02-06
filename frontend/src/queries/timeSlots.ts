@@ -42,7 +42,6 @@ const deleteTimeslot = async (id: Number): Promise<string> => {
 
 export default deleteTimeslot;
 
-
 export {
-  getTimeSlots, addTimeSlot, modifyTimeSlot, deleteTimeslot
+  getTimeSlots, addTimeSlot, modifyTimeSlot, deleteTimeslot,
 };
