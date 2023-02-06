@@ -18,7 +18,7 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
 
   return timeslots.map((timeslot) => ({
     start: timeslot.dataValues.startTime,
-    end: timeslot.dataValues.endTime
+    end: timeslot.dataValues.endTime,
   }));
 };
 
@@ -31,7 +31,10 @@ const deleteById = async (id: number): Promise<boolean> => {
   return false;
 };
 
-const updateById = async (id: number, timeslot: { startTime: Date, endTime: Date, maxConcurrentFlights: number }) => {
+const updateById = async (
+  id: number,
+  timeslot: { startTime: Date, endTime: Date, maxConcurrentFlights: number },
+) => {
   await Timeslot.update(timeslot, { where: { id } });
 };
 
