@@ -3,6 +3,17 @@ import timeslotService from '../services/timeslotService';
 
 const router = express.Router();
 
+router.get('/', async (req: express.Request, res: express.Response) => {
+  const { from } = req.query;
+  const { until } = req.query;
+  const timeslots = await timeslotService.getInTimeRange(
+    new Date(from as string),
+    new Date(until as string),
+  );
+
+  res.json(timeslots);
+});
+
 router.delete('/:id', async (req: express.Request, res: express.Response) => {
   const id = Number(req.params.id);
   try {
@@ -19,16 +30,10 @@ router.delete('/:id', async (req: express.Request, res: express.Response) => {
   }
 });
 
-router.get('/:start/:end', async (req: express.Request, res: express.Response) => {
-  const { start: startTime, end: endTime } = req.params;
-  const timeslots = await timeslotService.getTimeslotsByTimerange(startTime, endTime);
-  res.json(timeslots);
-});
-
 router.post('/', async (req: express.Request, res: express.Response) => {
   try {
-    const { startTime } = req.body;
-    const timeslot = await timeslotService.createTimeslot(startTime);
+    const { start, end } = req.body;
+    const timeslot = await timeslotService.createTimeslot(start, end);
     res.json(timeslot);
   } catch (error) {
     res.status(400).json(error);

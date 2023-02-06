@@ -1,6 +1,26 @@
 import { Op } from 'sequelize';
 import { Timeslot } from '../models';
 
+const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
+  const timeslots = await Timeslot.findAll({
+    where: {
+      [Op.or]: [{
+        startTime: {
+          [Op.between]: [rangeStartTime, rangeEndTime],
+        },
+      }, {
+        endTime: {
+          [Op.between]: [rangeStartTime, rangeEndTime],
+        },
+      }],
+    },
+  });
+  return timeslots.map((timeslot) => ({
+    start: timeslot.dataValues.startTime,
+    end: timeslot.dataValues.endTime,
+  }));
+};
+
 const deleteById = async (id: number): Promise<boolean> => {
   const timeslot = await Timeslot.findByPk(id);
   if (timeslot) {
@@ -10,29 +30,21 @@ const deleteById = async (id: number): Promise<boolean> => {
   return false;
 };
 
-// any until types are defined
-const createTimeslot = async (startTime: string): Promise<any> => {
-  const timeslot = await Timeslot.create({ startTime: new Date(Number(startTime)), maxAmount: 1 });
-  return timeslot;
-};
-
-// any until types are defined
-const getTimeslotsByTimerange = async (startTime: string, endTime: string): Promise<any[]> => {
-  const timeslots = await Timeslot.findAll({
-    where: {
-      startTime: { [Op.between]: [new Date(Number(startTime)), new Date(Number(endTime))] },
-    },
-  });
-  return timeslots;
-};
-
-const updateById = async (id: number, timeslot: { starttime: Date, maxDuration: number }) => {
+const updateById = async (
+  id: number,
+  timeslot: { startTime: Date, endTime: Date, maxConcurrentFlights: number },
+) => {
   await Timeslot.update(timeslot, { where: { id } });
 };
 
+const createTimeslot = async (startTime: Date, endTime: Date) => {
+  const timeslot: any = await Timeslot.create(({ startTime, endTime, maxConcurrentFlights: 1 }));
+  return timeslot;
+};
+
 export default {
+  getInTimeRange,
   deleteById,
-  getTimeslotsByTimerange,
-  createTimeslot,
   updateById,
+  createTimeslot,
 };

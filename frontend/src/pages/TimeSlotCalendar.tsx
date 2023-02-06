@@ -7,16 +7,22 @@ import listPlugin from '@fullcalendar/list';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
-import { addTimeSlot, getTimeSlots, modifyTimeSlot } from '../queries/timeSlots';
+import { getTimeSlots, modifyTimeSlot } from '../queries/timeSlots';
+import addTimeSlot from '../mutations/addTimeSlot';
 
 function TimeSlotCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
+
+  const [timeRange, setTimeRange] = useState({ start: new Date(), end: new Date() });
 
   const queryClient = new QueryClient();
 
   const {
     data: timeSlots, isError, isRefetching, isSuccess, refetch: refetchTimeSlots,
-  } = useQuery<any[]>(QueryKeys.TimeSlots, getTimeSlots);
+  } = useQuery<any[]>(
+    [QueryKeys.TimeSlots, timeRange],
+    () => getTimeSlots(timeRange.start, timeRange.end),
+  );
 
   const refreshCalendar = () => {
     const calendar = calendarRef.current?.getApi();
@@ -53,7 +59,7 @@ function TimeSlotCalendar() {
     // Refresh calendar if changes were made
   };
 
-  // When a timeslot box is moved or resized
+  // When a timeslot bojsonx is moved or resized
   const handleTimeSlotChange = (changeData: any) => {
     // Open confirmation popup here
     changeTimeSlot.mutateAsync(changeData.event);
@@ -110,6 +116,9 @@ function TimeSlotCalendar() {
               eventChange={handleTimeSlotChange}
               select={handleTimeSlotDrop}
               events={timeSlots}
+              datesSet={(dateInfo) => {
+                setTimeRange({ start: dateInfo.start, end: dateInfo.end });
+              }}
             />
           )
           : <p>Virhe noutaessa varauksia</p>
