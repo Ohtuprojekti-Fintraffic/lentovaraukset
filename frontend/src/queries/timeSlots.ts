@@ -18,14 +18,19 @@ const addTimeSlot = async (newTimeSlot: any): Promise<void> => {
 const modifyTimeSlot = async (
   timeSlot: { id: string, startTime: Date, endTime: Date },
 ): Promise<void> => {
+  const modifiedTimeSlot = {
+    startTime: timeSlot.startTime,
+    endTime: timeSlot.endTime,
+    // Placeholder until functionality is adde for setting this in the frontend
+    maxConcurrentFlights: 2,
+  };
+
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${timeSlot.id}`, {
     method: 'PATCH',
-    body: JSON.stringify({
-      startTime: timeSlot.startTime,
-      endTime: timeSlot.endTime,
-      // Placeholder until functionality is adde for setting this in the frontend
-      maxConcurrentFlights: 2,
-    }),
+    body: JSON.stringify(modifiedTimeSlot),
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
   return res.json();
 };
