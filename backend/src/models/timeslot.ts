@@ -16,7 +16,12 @@ Timeslot.init(
       unique: true,
       allowNull: false,
     },
-    maxAmount: {
+    endTime: {
+      type: DataTypes.DATE,
+      unique: true,
+      allowNull: false,
+    },
+    maxConcurrentFlights: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
