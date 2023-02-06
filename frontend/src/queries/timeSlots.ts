@@ -6,7 +6,7 @@ const getTimeSlots = async (from: Date, until: Date): Promise<EventInput[]> => {
 };
 
 const addTimeSlot = async (newTimeSlot: any): Promise<void> => {
-  await fetch('api/timeslots/', {
+  await fetch(`${process.env.BASE_PATH}/api/timeslots/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -44,8 +44,6 @@ const deleteTimeslot = async (id: Number): Promise<string> => {
   });
   return response.text();
 };
-
-export default deleteTimeslot;
 
 export {
   getTimeSlots, addTimeSlot, modifyTimeSlot, deleteTimeslot,
