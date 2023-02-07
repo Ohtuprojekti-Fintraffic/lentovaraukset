@@ -21,10 +21,6 @@ Timeslot.init(
       unique: true,
       allowNull: false,
     },
-    maxConcurrentFlights: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
   },
   {
     sequelize,

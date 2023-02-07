@@ -32,8 +32,8 @@ router.delete('/:id', async (req: express.Request, res: express.Response) => {
 
 router.post('/', async (req: express.Request, res: express.Response) => {
   try {
-    const { start, end } = req.body;
-    const timeslot = await timeslotService.createTimeslot(start, end);
+    const newTimeSlot = req.body;
+    const timeslot = await timeslotService.createTimeslot(newTimeSlot);
     res.json(timeslot);
   } catch (error) {
     res.status(400).json(error);

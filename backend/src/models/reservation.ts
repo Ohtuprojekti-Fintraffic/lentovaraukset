@@ -18,6 +18,10 @@ Reservation.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    aircraftId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     info: {
       type: DataTypes.TEXT,
       allowNull: true,

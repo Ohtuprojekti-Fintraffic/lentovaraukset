@@ -6,11 +6,6 @@ class ReservedTimeslot extends Model {}
 
 ReservedTimeslot.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     reservationId: {
       type: DataTypes.INTEGER,
       allowNull: false,

@@ -65,6 +65,7 @@ function ReservationCalendar() {
     newReservation.mutateAsync({
       start: dropData.startStr,
       end: dropData.endStr,
+      aircraftId: '',
       info: '',
     });
     const calendar = calendarRef.current?.getApi();

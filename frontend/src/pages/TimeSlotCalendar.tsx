@@ -74,8 +74,8 @@ function TimeSlotCalendar() {
   // When a new timeslot is selected (dragged) in the calendar.
   const handleTimeSlotDrop = (dropData: any) => {
     newTimeSlot.mutateAsync({
-      start: dropData.startStr,
-      end: dropData.endStr,
+      startTime: dropData.startStr,
+      endTime: dropData.endStr,
     });
     const calendar = calendarRef.current?.getApi();
     calendar?.unselect();

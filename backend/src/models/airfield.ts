@@ -16,6 +16,10 @@ Airfield.init(
       allowNull: false,
       unique: true,
     },
+    maxConcurrentFlights: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   {
     sequelize,

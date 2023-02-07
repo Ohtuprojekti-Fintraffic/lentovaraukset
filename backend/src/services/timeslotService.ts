@@ -34,13 +34,13 @@ const deleteById = async (id: number): Promise<boolean> => {
 
 const updateById = async (
   id: number,
-  timeslot: { startTime: Date, endTime: Date, maxConcurrentFlights: number },
+  timeslot: { startTime: Date, endTime: Date },
 ) => {
   await Timeslot.update(timeslot, { where: { id } });
 };
 
-const createTimeslot = async (startTime: Date, endTime: Date) => {
-  const timeslot: any = await Timeslot.create(({ startTime, endTime, maxConcurrentFlights: 1 }));
+const createTimeslot = async (newTimeSlot: { startTime: Date, endTime: Date }) => {
+  const timeslot: any = await Timeslot.create((newTimeSlot));
   return timeslot;
 };
 

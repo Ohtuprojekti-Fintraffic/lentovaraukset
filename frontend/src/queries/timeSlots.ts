@@ -5,7 +5,7 @@ const getTimeSlots = async (from: Date, until: Date): Promise<EventInput[]> => {
   return res.json();
 };
 
-const addTimeSlot = async (newTimeSlot: any): Promise<void> => {
+const addTimeSlot = async (newTimeSlot: { startTime: Date, endTime: Date }): Promise<void> => {
   await fetch(`${process.env.BASE_PATH}/api/timeslots/`, {
     method: 'POST',
     headers: {
@@ -21,8 +21,6 @@ const modifyTimeSlot = async (
   const modifiedTimeSlot = {
     startTime: timeSlot.startTime,
     endTime: timeSlot.endTime,
-    // Placeholder until functionality is adde for setting this in the frontend
-    maxConcurrentFlights: 2,
   };
 
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${timeSlot.id}`, {
