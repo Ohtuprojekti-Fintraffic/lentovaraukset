@@ -46,13 +46,13 @@ describe('basic function tests', () => {
 
   test('Adding timeslot just to db works', async () => {
     const date = new Date();
-    await Timeslot.create({ startTime: date, endTime: date, maxConcurrentFlights: 2 });
+    await Timeslot.create({ start: date, end: date });
 
     // temporarily any. Models don't have types defined yet
     const slot: any = await Timeslot.findOne();
     expect(slot).toBeDefined();
     // TODO: TS tyypit modeleille
-    expect(slot.startTime).toStrictEqual(date);
+    expect(slot.start).toStrictEqual(date);
   });
 
   test('No timeslot exists without adding one', async () => {

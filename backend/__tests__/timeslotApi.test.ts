@@ -20,18 +20,18 @@ afterAll(async () => {
 });
 describe('Calls to api', () => {
   test('can edit a timeslot', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ startTime: '2023-01-01T12:00:00.000Z', endTime: '2023-01-01T13:00:00.000Z', maxConcurrentFlights: 2 });
+    const createdSlot: Timeslot = await Timeslot.create({ start: '2023-01-01T12:00:00.000Z', end: '2023-01-01T13:00:00.000Z' });
 
     await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
-      .send({ startTime: '2023-01-02T12:00:00.000Z', endTime: '2023-01-02T14:00:00.000Z', maxConcurrentFlights: 2 });
+      .send({ start: '2023-01-02T12:00:00.000Z', end: '2023-01-02T14:00:00.000Z' });
 
     const updatedSlot: Timeslot | null = await Timeslot.findOne(
       { where: { id: createdSlot.dataValues.id } },
     );
 
     expect(updatedSlot).toBeDefined();
-    expect(updatedSlot?.dataValues.startTime).toEqual(new Date('2023-01-02T12:00:00.000Z'));
-    expect(updatedSlot?.dataValues.endTime).toEqual(new Date('2023-01-02T14:00:00.000Z'));
+    expect(updatedSlot?.dataValues.start).toEqual(new Date('2023-01-02T12:00:00.000Z'));
+    expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-01-02T14:00:00.000Z'));
   });
 });
