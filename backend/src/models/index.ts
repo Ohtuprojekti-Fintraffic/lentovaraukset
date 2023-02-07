@@ -7,9 +7,6 @@ import ReservedTimeslot from './reservedTimeslot';
 User.hasMany(Reservation);
 Reservation.belongsTo(User);
 
-Airfield.hasMany(Reservation);
-Reservation.belongsTo(Airfield);
-
 Airfield.hasMany(Timeslot);
 Timeslot.belongsTo(Airfield);
 

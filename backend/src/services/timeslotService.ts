@@ -5,11 +5,11 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
   const timeslots = await Timeslot.findAll({
     where: {
       [Op.or]: [{
-        startTime: {
+        start: {
           [Op.between]: [rangeStartTime, rangeEndTime],
         },
       }, {
-        endTime: {
+        end: {
           [Op.between]: [rangeStartTime, rangeEndTime],
         },
       }],
@@ -18,8 +18,8 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
 
   return timeslots.map((timeslot) => ({
     id: timeslot.dataValues.id,
-    start: timeslot.dataValues.startTime,
-    end: timeslot.dataValues.endTime,
+    start: timeslot.dataValues.start,
+    end: timeslot.dataValues.end,
   }));
 };
 
@@ -34,13 +34,13 @@ const deleteById = async (id: number): Promise<boolean> => {
 
 const updateById = async (
   id: number,
-  timeslot: { startTime: Date, endTime: Date, maxConcurrentFlights: number },
+  timeslot: { start: Date, end: Date },
 ) => {
   await Timeslot.update(timeslot, { where: { id } });
 };
 
-const createTimeslot = async (startTime: Date, endTime: Date) => {
-  const timeslot: any = await Timeslot.create(({ startTime, endTime, maxConcurrentFlights: 1 }));
+const createTimeslot = async (newTimeSlot: { start: Date, end: Date }) => {
+  const timeslot: any = await Timeslot.create((newTimeSlot));
   return timeslot;
 };
 

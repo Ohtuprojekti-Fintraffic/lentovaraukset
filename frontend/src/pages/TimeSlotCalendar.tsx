@@ -65,8 +65,8 @@ function TimeSlotCalendar() {
 
     changeTimeSlot.mutateAsync({
       id: timeSlot.id,
-      startTime: timeSlot.start,
-      endTime: timeSlot.end,
+      start: timeSlot.start,
+      end: timeSlot.end,
     });
     refetchTimeSlots();
   };
