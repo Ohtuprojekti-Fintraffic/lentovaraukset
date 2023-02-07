@@ -10,11 +10,11 @@ Reservation.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    startTime: {
+    start: {
       type: DataTypes.DATE,
       allowNull: false,
     },
-    endTime: {
+    end: {
       type: DataTypes.DATE,
       allowNull: false,
     },

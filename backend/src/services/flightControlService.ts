@@ -4,7 +4,7 @@ const getReservationStatus = async (): Promise<any> => {
   const returnedTimeSlots = await Timeslot.findAll({
     include: {
       model: Reservation,
-      attributes: ['startTime', 'endTime', 'info'],
+      attributes: ['start', 'end', 'info'],
     },
   });
   const availableSlots = returnedTimeSlots.map((obj) => (

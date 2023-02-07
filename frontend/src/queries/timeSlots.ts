@@ -5,7 +5,7 @@ const getTimeSlots = async (from: Date, until: Date): Promise<EventInput[]> => {
   return res.json();
 };
 
-const addTimeSlot = async (newTimeSlot: { startTime: Date, endTime: Date }): Promise<void> => {
+const addTimeSlot = async (newTimeSlot: { start: Date, end: Date }): Promise<void> => {
   await fetch(`${process.env.BASE_PATH}/api/timeslots/`, {
     method: 'POST',
     headers: {
@@ -16,11 +16,11 @@ const addTimeSlot = async (newTimeSlot: { startTime: Date, endTime: Date }): Pro
 };
 
 const modifyTimeSlot = async (
-  timeSlot: { id: string, startTime: Date, endTime: Date },
+  timeSlot: { id: string, start: Date, end: Date },
 ): Promise<void> => {
   const modifiedTimeSlot = {
-    startTime: timeSlot.startTime,
-    endTime: timeSlot.endTime,
+    start: timeSlot.start,
+    end: timeSlot.end,
   };
 
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${timeSlot.id}`, {

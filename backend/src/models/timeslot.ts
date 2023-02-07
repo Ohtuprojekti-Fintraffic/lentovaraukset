@@ -11,12 +11,12 @@ Timeslot.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    startTime: {
+    start: {
       type: DataTypes.DATE,
       unique: true,
       allowNull: false,
     },
-    endTime: {
+    end: {
       type: DataTypes.DATE,
       unique: true,
       allowNull: false,

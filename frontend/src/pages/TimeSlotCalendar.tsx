@@ -65,8 +65,8 @@ function TimeSlotCalendar() {
 
     changeTimeSlot.mutateAsync({
       id: timeSlot.id,
-      startTime: timeSlot.start,
-      endTime: timeSlot.end,
+      start: timeSlot.start,
+      end: timeSlot.end,
     });
     refetchTimeSlots();
   };
@@ -74,8 +74,8 @@ function TimeSlotCalendar() {
   // When a new timeslot is selected (dragged) in the calendar.
   const handleTimeSlotDrop = (dropData: any) => {
     newTimeSlot.mutateAsync({
-      startTime: dropData.startStr,
-      endTime: dropData.endStr,
+      start: dropData.startStr,
+      end: dropData.endStr,
     });
     const calendar = calendarRef.current?.getApi();
     calendar?.unselect();
