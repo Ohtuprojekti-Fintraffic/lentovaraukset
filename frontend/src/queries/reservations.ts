@@ -1,11 +1,15 @@
-let placehoderReservations: any[] = [];
+const placehoderReservations: any[] = [];
 
 const getReservations = async (): Promise<any[]> => (placehoderReservations);
 
 const addReservation = async (newReservation: any): Promise<void> => {
-  placehoderReservations = placehoderReservations.concat(
-    { id: Date.now(), editable: true, ...newReservation },
-  );
+  await fetch(`${process.env.BASE_PATH}/api/reservations/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(newReservation),
+  });
 };
 
 const modifyReservation = async (reservation: any): Promise<void> => {

@@ -63,9 +63,9 @@ function ReservationCalendar() {
   // When a new reservation is selected (dragged) in the calendar.
   const handleReservationDrop = (dropData: any) => {
     newReservation.mutateAsync({
-      title: 'test',
       start: dropData.startStr,
       end: dropData.endStr,
+      info: '',
     });
     const calendar = calendarRef.current?.getApi();
     calendar?.unselect();
