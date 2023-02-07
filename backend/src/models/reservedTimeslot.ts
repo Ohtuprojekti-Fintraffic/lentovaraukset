@@ -10,11 +10,13 @@ ReservedTimeslot.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: { model: 'reservations', key: 'id' },
+      primaryKey: true,
     },
     timeslotId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: { model: 'timeslots', key: 'id' },
+      primaryKey: true,
     },
   },
   {
