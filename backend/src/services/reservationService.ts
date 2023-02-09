@@ -47,8 +47,16 @@ const createReservation = async (
   return reservation;
 };
 
+const updateById = async (
+  id: number,
+  reservation: { start: Date, end: Date },
+) => {
+  await Reservation.update(reservation, { where: { id } });
+};
+
 export default {
   createReservation,
   getInTimeRange,
   deleteById,
+  updateById,
 };

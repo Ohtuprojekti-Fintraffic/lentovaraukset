@@ -1,7 +1,5 @@
 import { EventInput } from '@fullcalendar/core';
 
-const placehoderReservations: any[] = [];
-
 const getReservations = async (from: Date, until: Date): Promise<EventInput[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/reservations?from=${from}&until=${until}`);
   return res.json();
@@ -27,18 +25,23 @@ const deleteReservation = async (id: Number): Promise<string> => {
   return response.text();
 };
 
-const modifyReservation = async (reservation: any): Promise<void> => {
-  placehoderReservations[
-    placehoderReservations.findIndex(
-      (element) => parseInt(element.id, 10) === parseInt(reservation.id, 10),
-    )
-  ] = {
-    id: reservation.id,
-    title: reservation.title,
+const modifyReservation = async (reservation:{
+  id: string,
+  start: Date,
+  end: Date,
+}): Promise<void> => {
+  const modifiedReservation = {
     start: reservation.start,
     end: reservation.end,
-    editable: true,
   };
+  const res = await fetch(`${process.env.BASE_PATH}/api/reservations/${reservation.id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(modifiedReservation),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return res.json();
 };
 
 export {

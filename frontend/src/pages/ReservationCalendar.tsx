@@ -77,7 +77,14 @@ function ReservationCalendar() {
   // When a reservation box is moved or resized
   const handleReservationChange = (changeData: any) => {
     // Open confirmation popup here
-    changeReservation.mutateAsync(changeData.event);
+    const reservation = changeData.event;
+
+    changeReservation.mutateAsync({
+      id: reservation.id,
+      start: reservation.start,
+      end: reservation.end,
+    });
+
     refetchReservations();
   };
 
