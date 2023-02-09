@@ -7,16 +7,26 @@ import listPlugin from '@fullcalendar/list';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
-import { getReservations, addReservation, modifyReservation } from '../queries/reservations';
+import {
+  getReservations,
+  addReservation,
+  modifyReservation,
+  deleteReservation,
+} from '../queries/reservations';
 
 function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
+
+  const [timeRange, setTimeRange] = useState({ start: new Date(), end: new Date() });
 
   const queryClient = new QueryClient();
 
   const {
     data: reservations, isError, isRefetching, isSuccess, refetch: refetchReservations,
-  } = useQuery<any[]>(QueryKeys.Reservations, getReservations);
+  } = useQuery<any[]>(
+    [QueryKeys.Reservations, timeRange],
+    () => getReservations(timeRange.start, timeRange.end),
+  );
 
   const refreshCalendar = () => {
     const calendar = calendarRef.current?.getApi();
@@ -29,8 +39,6 @@ function ReservationCalendar() {
       refreshCalendar();
     }
   }, [isRefetching]);
-
-  const [selected, setSelected] = useState();
 
   const newReservation = useMutation(addReservation, {
     onSuccess: () => {
@@ -46,9 +54,22 @@ function ReservationCalendar() {
     },
   });
 
+  const removeReservation = useMutation(deleteReservation, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryKeys.DeleteReservation);
+      refetchReservations();
+    },
+  });
+
   // When a reservation box is clicked
   const handleReservationClick = (clickData: any) => {
-    setSelected(clickData.event);
+    // untill better confirm
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm('Haluatko varmasti poistaa varauksen?')) {
+      removeReservation.mutateAsync(clickData.event.id);
+    }
+    refetchReservations();
+    // setSelected(clickData.event);
     // Open reservation info screen here
     // Refresh calendar if changes were made
   };
@@ -56,7 +77,14 @@ function ReservationCalendar() {
   // When a reservation box is moved or resized
   const handleReservationChange = (changeData: any) => {
     // Open confirmation popup here
-    changeReservation.mutateAsync(changeData.event);
+    const reservation = changeData.event;
+
+    changeReservation.mutateAsync({
+      id: reservation.id,
+      start: reservation.start,
+      end: reservation.end,
+    });
+
     refetchReservations();
   };
 
@@ -109,11 +137,13 @@ function ReservationCalendar() {
               eventChange={handleReservationChange}
               select={handleReservationDrop}
               events={reservations}
+              datesSet={(dateInfo) => {
+                setTimeRange({ start: dateInfo.start, end: dateInfo.end });
+              }}
             />
           )
           : <p>Virhe noutaessa varauksia</p>
       }
-      <div>{JSON.stringify(selected)}</div>
     </div>
   );
 }

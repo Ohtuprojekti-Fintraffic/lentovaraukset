@@ -1,6 +1,9 @@
-const placehoderReservations: any[] = [];
+import { EventInput } from '@fullcalendar/core';
 
-const getReservations = async (): Promise<any[]> => (placehoderReservations);
+const getReservations = async (from: Date, until: Date): Promise<EventInput[]> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/reservations?from=${from}&until=${until}`);
+  return res.json();
+};
 
 const addReservation = async (newReservation: any): Promise<void> => {
   await fetch(`${process.env.BASE_PATH}/api/reservations/`, {
@@ -12,18 +15,38 @@ const addReservation = async (newReservation: any): Promise<void> => {
   });
 };
 
-const modifyReservation = async (reservation: any): Promise<void> => {
-  placehoderReservations[
-    placehoderReservations.findIndex(
-      (element) => parseInt(element.id, 10) === parseInt(reservation.id, 10),
-    )
-  ] = {
-    id: reservation.id,
-    title: reservation.title,
-    start: reservation.start,
-    end: reservation.end,
-    editable: true,
-  };
+const deleteReservation = async (id: Number): Promise<string> => {
+  const response = await fetch(`${process.env.BASE_PATH}/api/reservations/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.text();
 };
 
-export { getReservations, addReservation, modifyReservation };
+const modifyReservation = async (reservation:{
+  id: string,
+  start: Date,
+  end: Date,
+}): Promise<void> => {
+  const modifiedReservation = {
+    start: reservation.start,
+    end: reservation.end,
+  };
+  const res = await fetch(`${process.env.BASE_PATH}/api/reservations/${reservation.id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(modifiedReservation),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return res.json();
+};
+
+export {
+  getReservations,
+  addReservation,
+  modifyReservation,
+  deleteReservation,
+};
