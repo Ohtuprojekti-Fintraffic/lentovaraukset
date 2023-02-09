@@ -56,7 +56,7 @@ function ReservationCalendar() {
 
   const removeReservation = useMutation(deleteReservation, {
     onSuccess: () => {
-      queryClient.invalidateQueries(QueryKeys.DeleteReservation);
+      queryClient.invalidateQueries(QueryKeys.Reservations);
       refetchReservations();
     },
   });
