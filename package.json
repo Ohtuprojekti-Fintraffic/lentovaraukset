@@ -16,6 +16,7 @@
     "start": "npm run start:backend & npm run start:frontend",
     "start:backend": "npm -w @lentovaraukset/backend run start",
     "start:database": "docker compose -f docker-compose.dev.yml up",
+    "start:database-dev": "docker compose -f docker-compose.dev.yml up -d && docker exec -it lentovaraukset-db-1 bash -c 'psql -U postgres'",
     "start:frontend": "npm -w @lentovaraukset/frontend run start",
     "test": "npm -ws --if-present run test"
   },

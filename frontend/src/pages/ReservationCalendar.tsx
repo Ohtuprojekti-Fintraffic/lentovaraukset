@@ -12,11 +12,16 @@ import { getReservations, addReservation, modifyReservation } from '../queries/r
 function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
+  const [timeRange, setTimeRange] = useState({ start: new Date(), end: new Date() });
+
   const queryClient = new QueryClient();
 
   const {
     data: reservations, isError, isRefetching, isSuccess, refetch: refetchReservations,
-  } = useQuery<any[]>(QueryKeys.Reservations, getReservations);
+  } = useQuery<any[]>(
+    [QueryKeys.Reservations, timeRange],
+    () => getReservations(timeRange.start, timeRange.end),
+  );
 
   const refreshCalendar = () => {
     const calendar = calendarRef.current?.getApi();
@@ -109,6 +114,9 @@ function ReservationCalendar() {
               eventChange={handleReservationChange}
               select={handleReservationDrop}
               events={reservations}
+              datesSet={(dateInfo) => {
+                setTimeRange({ start: dateInfo.start, end: dateInfo.end });
+              }}
             />
           )
           : <p>Virhe noutaessa varauksia</p>

@@ -1,4 +1,27 @@
+import { Op } from 'sequelize';
 import { Reservation } from '../models';
+
+const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
+  const reservations = await Reservation.findAll({
+    where: {
+      [Op.or]: [{
+        start: {
+          [Op.between]: [rangeStartTime, rangeEndTime],
+        },
+      }, {
+        end: {
+          [Op.between]: [rangeStartTime, rangeEndTime],
+        },
+      }],
+    },
+  });
+
+  return reservations.map((reservation) => ({
+    id: reservation.dataValues.id,
+    start: reservation.dataValues.start,
+    end: reservation.dataValues.end,
+  }));
+};
 
 const createReservation = async (
   start: Date,
@@ -17,4 +40,5 @@ const createReservation = async (
 
 export default {
   createReservation,
+  getInTimeRange,
 };

@@ -1,6 +1,11 @@
+import { EventInput } from '@fullcalendar/core';
+
 const placehoderReservations: any[] = [];
 
-const getReservations = async (): Promise<any[]> => (placehoderReservations);
+const getReservations = async (from: Date, until: Date): Promise<EventInput[]> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/reservations?from=${from}&until=${until}`);
+  return res.json();
+};
 
 const addReservation = async (newReservation: any): Promise<void> => {
   await fetch(`${process.env.BASE_PATH}/api/reservations/`, {

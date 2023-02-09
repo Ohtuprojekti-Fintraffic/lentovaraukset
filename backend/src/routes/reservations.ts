@@ -3,6 +3,17 @@ import reservationService from '../services/reservationService';
 
 const router = express.Router();
 
+router.get('/', async (req: express.Request, res: express.Response) => {
+  const { from } = req.query;
+  const { until } = req.query;
+  const reservations = await reservationService.getInTimeRange(
+    new Date(from as string),
+    new Date(until as string),
+  );
+
+  res.json(reservations);
+});
+
 router.post('/', async (req: express.Request, res: express.Response) => {
   try {
     const {
