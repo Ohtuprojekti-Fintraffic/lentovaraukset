@@ -17,6 +17,16 @@ const addReservation = async (newReservation: any): Promise<void> => {
   });
 };
 
+const deleteReservation = async (id: Number): Promise<string> => {
+  const response = await fetch(`${process.env.BASE_PATH}/api/reservations/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.text();
+};
+
 const modifyReservation = async (reservation: any): Promise<void> => {
   placehoderReservations[
     placehoderReservations.findIndex(
@@ -31,4 +41,9 @@ const modifyReservation = async (reservation: any): Promise<void> => {
   };
 };
 
-export { getReservations, addReservation, modifyReservation };
+export {
+  getReservations,
+  addReservation,
+  modifyReservation,
+  deleteReservation,
+};

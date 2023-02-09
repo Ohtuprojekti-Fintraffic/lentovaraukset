@@ -23,6 +23,15 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
   }));
 };
 
+const deleteById = async (id: number): Promise<boolean> => {
+  const reservation = await Reservation.findByPk(id);
+  if (reservation) {
+    reservation.destroy();
+    return true;
+  }
+  return false;
+};
+
 const createReservation = async (
   start: Date,
   end: Date,
@@ -41,4 +50,5 @@ const createReservation = async (
 export default {
   createReservation,
   getInTimeRange,
+  deleteById,
 };

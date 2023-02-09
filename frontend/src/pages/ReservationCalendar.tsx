@@ -7,7 +7,12 @@ import listPlugin from '@fullcalendar/list';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
-import { getReservations, addReservation, modifyReservation } from '../queries/reservations';
+import {
+  getReservations,
+  addReservation,
+  modifyReservation,
+  deleteReservation,
+} from '../queries/reservations';
 
 function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
@@ -35,8 +40,6 @@ function ReservationCalendar() {
     }
   }, [isRefetching]);
 
-  const [selected, setSelected] = useState();
-
   const newReservation = useMutation(addReservation, {
     onSuccess: () => {
       queryClient.invalidateQueries(QueryKeys.Reservations);
@@ -51,9 +54,22 @@ function ReservationCalendar() {
     },
   });
 
+  const removeReservation = useMutation(deleteReservation, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryKeys.DeleteReservation);
+      refetchReservations();
+    },
+  });
+
   // When a reservation box is clicked
   const handleReservationClick = (clickData: any) => {
-    setSelected(clickData.event);
+    // untill better confirm
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm('Haluatko varmasti poistaa varauksen?')) {
+      removeReservation.mutateAsync(clickData.event.id);
+    }
+    refetchReservations();
+    // setSelected(clickData.event);
     // Open reservation info screen here
     // Refresh calendar if changes were made
   };
@@ -121,7 +137,6 @@ function ReservationCalendar() {
           )
           : <p>Virhe noutaessa varauksia</p>
       }
-      <div>{JSON.stringify(selected)}</div>
     </div>
   );
 }
