@@ -26,5 +26,5 @@ const deleteById = async (id: number): Promise<boolean> => {
 
 export default {
   createReservation,
-  deleteById
+  deleteById,
 };

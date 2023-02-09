@@ -20,13 +20,15 @@ afterAll(async () => {
 });
 describe('Calls to api', () => {
   test('can delete a reservation', async () => {
-    const createdReservation: Reservation = await Reservation.create({start: '2023-01-02T12:00:00.000Z', end: '2023-01-02T14:00:00.000Z', aircraftId: 'OH-QAA', info: 'Training flight'})
+    const createdReservation: Reservation = await Reservation.create({
+      start: '2023-01-02T12:00:00.000Z', end: '2023-01-02T14:00:00.000Z', aircraftId: 'OH-QAA', info: 'Training flight',
+    });
 
     await api.delete(`/api/reservations/${createdReservation.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send();
 
-    const allReservations: Reservation [] = await Reservation.findAll({})
+    const allReservations: Reservation [] = await Reservation.findAll({});
 
     expect(allReservations).toEqual([]);
   });

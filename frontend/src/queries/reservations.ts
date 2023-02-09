@@ -36,4 +36,6 @@ const deleteReservation = async (id: Number): Promise<string> => {
   return response.json();
 };
 
-export { getReservations, addReservation, modifyReservation, deleteReservation };
+export {
+  getReservations, addReservation, modifyReservation, deleteReservation,
+};
