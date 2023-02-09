@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "Fetching remote"
 git fetch origin main
 
 
 if [ "$(git rev-parse HEAD)" = "$(git rev-parse @{u})" ]; then
-    echo "Already up to date. Exiting"
     exit
 fi
 
-echo "Merging new commits"
+echo "Found new commits. Merging"
 git merge --ff-only
 
 echo "Rebuilding and restarting containers"
