@@ -26,4 +26,14 @@ const modifyReservation = async (reservation: any): Promise<void> => {
   };
 };
 
-export { getReservations, addReservation, modifyReservation };
+const deleteReservation = async (id: Number): Promise<string> => {
+  const response = await fetch(`${process.env.BASE_PATH}/api/reservations/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.json();
+};
+
+export { getReservations, addReservation, modifyReservation, deleteReservation };

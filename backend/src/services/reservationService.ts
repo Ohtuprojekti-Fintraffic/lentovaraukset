@@ -15,6 +15,16 @@ const createReservation = async (
   return reservation;
 };
 
+const deleteById = async (id: number): Promise<boolean> => {
+  const reservation = await Reservation.findByPk(id);
+  if (reservation) {
+    reservation.destroy();
+    return true;
+  }
+  return false;
+};
+
 export default {
   createReservation,
+  deleteById
 };

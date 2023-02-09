@@ -18,4 +18,20 @@ router.post('/', async (req: express.Request, res: express.Response) => {
   }
 });
 
+router.delete('/:id', async (req: express.Request, res: express.Response) => {
+  const id = Number(req.params.id);
+  try {
+    const deleted = await reservationService.deleteById(id);
+    if (deleted) {
+      res.send(`Reservation ${id} deleted`);
+    } else {
+      res.status(404).json(`Reservation ${id} not found`);
+    }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).json(error);
+    }
+  }
+});
+
 export default router;
