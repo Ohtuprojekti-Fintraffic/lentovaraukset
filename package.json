@@ -11,12 +11,14 @@
   "scripts": {
     "build": "npm -ws --if-present run build",
     "build:frontend": "npm -w @lentovaraukset/frontend run build",
+    "cypress:open": "cypress open --project shared",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
     "start": "npm run start:backend & npm run start:frontend",
     "start:backend": "npm -w @lentovaraukset/backend run start",
     "start:database": "docker compose -f docker-compose.dev.yml up",
     "start:frontend": "npm -w @lentovaraukset/frontend run start",
+    "start:test": "npm -w @lentovaraukset/backend run start:test & npm -w @lentovaraukset/frontend run start",
     "test": "npm -ws --if-present run test"
   },
   "dependencies": {
@@ -26,6 +28,7 @@
     "@types/jest": "^29.2.6",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
+    "cypress": "^12.5.1",
     "eslint": "^8.32.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
