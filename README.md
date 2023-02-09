@@ -33,6 +33,8 @@ Or try to automatically fix them:
 This project also uses Jest for automatic unit tests. You can run them with the following command:  
 `npm test`
 
+docker exec -it lentovaraukset-db-1 bash
+
 ### Database
 
 Start the development database with the following command:
@@ -42,3 +44,9 @@ Start the development database with the following command:
 Add the following line to the .env file in project root:
 
 `DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres`
+
+Accessing development database is possible with commands:
+
+`docker exec -it lentovaraukset-db-1 bash`
+
+`psql -U postgres`
