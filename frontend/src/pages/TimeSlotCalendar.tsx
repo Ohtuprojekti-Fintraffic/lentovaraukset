@@ -7,7 +7,9 @@ import listPlugin from '@fullcalendar/list';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
-import { getTimeSlots, modifyTimeSlot, addTimeSlot, deleteTimeslot } from '../queries/timeSlots';
+import {
+  getTimeSlots, modifyTimeSlot, addTimeSlot, deleteTimeslot,
+} from '../queries/timeSlots';
 
 function TimeSlotCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
