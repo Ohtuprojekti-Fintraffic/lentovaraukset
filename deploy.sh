@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-git fetch origin main
+git fetch --quiet -- origin main
 
 
 if [ "$(git rev-parse HEAD)" = "$(git rev-parse @{u})" ]; then

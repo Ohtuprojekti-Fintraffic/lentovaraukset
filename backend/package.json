@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc",
     "start": "nodemon -e ts,js --exec ts-node src/app.ts",
+    "start:test": "NODE_ENV=test ts-node src/app.ts",
     "test": "NODE_ENV=test jest"
   },
   "dependencies": {

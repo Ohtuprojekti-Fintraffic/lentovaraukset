@@ -1,7 +1,10 @@
 {
   "extends": "./tsconfig.base.json",
+  "include": [
+    "./**/*"
+  ],
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "build",                                   /* Specify an output folder for all emitted files. */
+    "rootDir": ".",
+    "outDir": "build", /* Specify an output folder for all emitted files. */
   }
 }
