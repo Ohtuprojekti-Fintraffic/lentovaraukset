@@ -7,7 +7,9 @@ import listPlugin from '@fullcalendar/list';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
-import { getTimeSlots, modifyTimeSlot, addTimeSlot } from '../queries/timeSlots';
+import {
+  getTimeSlots, modifyTimeSlot, addTimeSlot, deleteTimeslot,
+} from '../queries/timeSlots';
 
 function TimeSlotCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
@@ -35,8 +37,6 @@ function TimeSlotCalendar() {
     }
   }, [isRefetching]);
 
-  const [selected, setSelected] = useState();
-
   const newTimeSlot = useMutation(addTimeSlot, {
     onSuccess: () => {
       queryClient.invalidateQueries(QueryKeys.TimeSlots);
@@ -51,9 +51,21 @@ function TimeSlotCalendar() {
     },
   });
 
+  const removeTimeslot = useMutation(deleteTimeslot, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryKeys.TimeSlots);
+      refetchTimeSlots();
+    },
+  });
+
   // When a timeslot box is clicked
   const handleTimeSlotClick = (clickData: any) => {
-    setSelected(clickData.event);
+    // until better confirm
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm('Haluatko varmasti poistaa aikaikkunan?')) {
+      removeTimeslot.mutateAsync(clickData.event.id);
+    }
+    refetchTimeSlots();
     // Open time slot info screen here
     // Refresh calendar if changes were made
   };
@@ -128,7 +140,6 @@ function TimeSlotCalendar() {
           )
           : <p>Virhe noutaessa varauksia</p>
       }
-      <div>{JSON.stringify(selected)}</div>
     </div>
   );
 }
