@@ -1,4 +1,5 @@
 import express from 'express';
+import createTimeSlotValidator from '@lentovaraukset/shared/src/validation/validation';
 import timeslotService from '../services/timeslotService';
 
 const router = express.Router();
@@ -32,7 +33,9 @@ router.delete('/:id', async (req: express.Request, res: express.Response) => {
 
 router.post('/', async (req: express.Request, res: express.Response) => {
   try {
-    const newTimeSlot = req.body;
+    // TODO: get slotGranularityMinutes from airfield
+    const newTimeSlot = createTimeSlotValidator(20).parse(req.body);
+
     const timeslot = await timeslotService.createTimeslot(newTimeSlot);
     res.json(timeslot);
   } catch (error) {
@@ -41,10 +44,16 @@ router.post('/', async (req: express.Request, res: express.Response) => {
 });
 
 router.patch('/:id', async (req: express.Request, res: express.Response) => {
-  const id = Number(req.params.id);
-  const modifiedTimeslot = req.body;
-  await timeslotService.updateById(id, modifiedTimeslot);
-  res.status(200).json(modifiedTimeslot);
+  try {
+    // TODO: get slotGranularityMinutes from airfield
+    const modifiedTimeslot = createTimeSlotValidator(20).parse(req.body);
+
+    const id = Number(req.params.id);
+    await timeslotService.updateById(id, modifiedTimeslot);
+    res.status(200).json(modifiedTimeslot);
+  } catch (error) {
+    res.status(400).json(error);
+  }
 });
 
 export default router;
