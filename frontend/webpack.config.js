@@ -4,6 +4,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const BASE_PATH = process.env.BASE_PATH || '';
 
+const commitHash = require("child_process")
+  .execSync("git rev-parse --short HEAD")
+  .toString()
+  .trim();
+
 const config = (env, argv) => {
   return {
     entry: './src/index.tsx',
@@ -52,8 +57,11 @@ const config = (env, argv) => {
         template: './public/index.html',
       }),
       new webpack.DefinePlugin({
-      'process.env.BASE_PATH': JSON.stringify(BASE_PATH),
-    }),
+        'process.env.BASE_PATH': JSON.stringify(BASE_PATH),
+      }),
+      new webpack.DefinePlugin({
+        'process.env.COMMIT_HASH': JSON.stringify(commitHash),
+      })
     ],
   };
 };
