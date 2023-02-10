@@ -12,6 +12,8 @@ import {
 } from '../queries/timeSlots';
 
 function TimeSlotCalendar() {
+  const granularity = { minutes: 20 }; // TODO: Get from airfield api
+
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const [timeRange, setTimeRange] = useState({ start: new Date(), end: new Date() });
@@ -115,7 +117,8 @@ function TimeSlotCalendar() {
               nowIndicator
               scrollTime="08:00:00"
               dayHeaderFormat={{ weekday: 'long' }}
-              slotDuration="00:10:00"
+              slotDuration={granularity}
+              snapDuration={granularity}
               slotLabelInterval={{ minutes: 30 }}
               slotLabelFormat={{
                 hour: 'numeric', minute: '2-digit', hour12: false, meridiem: false,
