@@ -1,8 +1,20 @@
-import { Model, DataTypes } from 'sequelize';
+import {
+  Model,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+} from 'sequelize';
 
 import { sequelize } from '../util/db';
 
-class ReservedTimeslot extends Model {}
+class ReservedTimeslot extends Model<
+InferAttributes<ReservedTimeslot>,
+InferCreationAttributes<ReservedTimeslot>
+> {
+  declare reservationId: number;
+
+  declare timeslotId: number;
+}
 
 ReservedTimeslot.init(
   {

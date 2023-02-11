@@ -1,8 +1,23 @@
-import { Model, DataTypes } from 'sequelize';
+import {
+  Model,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+} from 'sequelize';
 
 import { sequelize } from '../util/db';
 
-class Airfield extends Model {}
+class Airfield extends Model<
+InferAttributes<Airfield>,
+InferCreationAttributes<Airfield>
+> {
+  declare id: CreationOptional<number>;
+
+  declare name: string;
+
+  declare maxConcurrentFlights: number;
+}
 
 Airfield.init(
   {

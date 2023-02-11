@@ -1,9 +1,9 @@
 export interface ReservationEntry {
   id: number;
-  startTime: Date;
-  endTime: Date;
+  start: Date;
+  end: Date;
   user: string;
-  plateNumber: string;
+  aircraftId: string;
   phone: string;
   email?: string;
   info: string;
@@ -11,6 +11,11 @@ export interface ReservationEntry {
 
 export interface TimeFrame {
   id: number;
-  startTime: Date;
-  endTime: Date;
+  start: Date;
+  end: Date;
+}
+
+export interface ReservationStatus {
+  availableSlots: (TimeFrame & { freeSlotsAmount: number })[];
+  reservedSlots: ReservationEntry[];
 }

@@ -1,8 +1,23 @@
-import { Model, DataTypes } from 'sequelize';
+import {
+  Model,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+} from 'sequelize';
 
 import { sequelize } from '../util/db';
 
-class Timeslot extends Model {}
+class Timeslot extends Model<
+InferAttributes<Timeslot>,
+InferCreationAttributes<Timeslot>
+> {
+  declare id: CreationOptional<number>;
+
+  declare start: Date;
+
+  declare end: Date;
+}
 
 Timeslot.init(
   {
