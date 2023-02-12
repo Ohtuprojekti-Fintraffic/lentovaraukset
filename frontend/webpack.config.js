@@ -4,6 +4,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const BASE_PATH = process.env.BASE_PATH || '';
 
+const commitHash = require('child_process')
+  .execSync('git rev-parse --short HEAD')
+  .toString()
+  .trim();
+
 const config = (env, argv) => ({
   entry: './src/index.tsx',
   devtool: 'inline-source-map',
@@ -48,6 +53,9 @@ const config = (env, argv) => ({
     }),
     new webpack.DefinePlugin({
       'process.env.BASE_PATH': JSON.stringify(BASE_PATH),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.COMMIT_HASH': JSON.stringify(commitHash),
     }),
   ],
 });
