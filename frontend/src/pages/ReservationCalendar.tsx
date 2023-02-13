@@ -4,7 +4,6 @@ import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
-
 import interactionPlugin from '@fullcalendar/interaction';
 import QueryKeys from '../queries/queryKeys';
 import {
@@ -13,6 +12,7 @@ import {
   modifyReservation,
   deleteReservation,
 } from '../queries/reservations';
+import { getTimeSlots } from '../queries/timeSlots';
 
 function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
@@ -22,23 +22,42 @@ function ReservationCalendar() {
   const queryClient = new QueryClient();
 
   const {
-    data: reservations, isError, isRefetching, isSuccess, refetch: refetchReservations,
+    data: reservations,
+    isError: isErrorReservations,
+    isRefetching: isRefetchingReservations,
+    isSuccess: isSuccessReservations,
+    refetch: refetchReservations,
   } = useQuery<any[]>(
     [QueryKeys.Reservations, timeRange],
     () => getReservations(timeRange.start, timeRange.end),
+  );
+
+  const {
+    data: timeslots,
+    isError: isErrorTimeslots,
+    isRefetching: isRefetchingTimeslots,
+    isSuccess: isSuccessTimeslots,
+  } = useQuery<any[]>(
+    [QueryKeys.TimeSlots, timeRange],
+    () => getTimeSlots(timeRange.start, timeRange.end),
   );
 
   const refreshCalendar = () => {
     const calendar = calendarRef.current?.getApi();
     calendar?.removeAllEventSources();
     calendar?.addEventSource(reservations!);
+    calendar?.addEventSource({
+      events: timeslots?.map((timeslot) => ({ ...timeslot, groupId: 'timeslots' })),
+      display: 'inverse-background',
+      color: '#2C2C44',
+    });
   };
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccessReservations && isSuccessTimeslots) {
       refreshCalendar();
     }
-  }, [isRefetching]);
+  }, [isRefetchingReservations && isRefetchingTimeslots]);
 
   const newReservation = useMutation(addReservation, {
     onSuccess: () => {
@@ -104,7 +123,7 @@ function ReservationCalendar() {
     <div className="flex flex-col space-y-2 h-full w-full">
       <h1 className="text-3xl">Varauskalenteri</h1>
       {
-        !isError
+        !(isErrorReservations || isErrorTimeslots)
           ? (
             <FullCalendar
               ref={calendarRef}
@@ -136,7 +155,15 @@ function ReservationCalendar() {
               eventClick={handleReservationClick}
               eventChange={handleReservationChange}
               select={handleReservationDrop}
-              events={reservations}
+              eventSources={[
+                {
+                  events: reservations,
+                },
+                {
+                  events: timeslots?.map((timeslot) => ({ ...timeslot, groupId: 'timeslots' })),
+                  display: 'inverse-background',
+                  color: '#2C2C44',
+                }]}
               datesSet={(dateInfo) => {
                 setTimeRange({ start: dateInfo.start, end: dateInfo.end });
               }}
