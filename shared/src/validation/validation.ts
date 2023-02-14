@@ -19,4 +19,29 @@ const createTimeSlotValidator = (slotGranularityMinutes: number) => {
   return TimeSlot;
 };
 
-export default createTimeSlotValidator;
+const createReservationValidator = (slotGranularityMinutes: number) => {
+  const message = `Reservation must be multiples of ${slotGranularityMinutes} minutes`;
+  const Reservation = z.object({
+    start: z.coerce
+      .date()
+      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message }),
+    end: z.coerce
+      .date()
+      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message }),
+    aircraftId: z.string(),
+    info: z.string().optional(),
+  });
+
+  return Reservation;
+};
+
+const getTimeRangeValidator = () => {
+  const TimeRange = z.object({
+    start: z.coerce.date(),
+    end: z.coerce.date(),
+  });
+
+  return TimeRange;
+};
+
+export { createTimeSlotValidator, createReservationValidator, getTimeRangeValidator };

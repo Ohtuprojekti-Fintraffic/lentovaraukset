@@ -1,18 +1,22 @@
 import express from 'express';
-import createTimeSlotValidator from '@lentovaraukset/shared/src/validation/validation';
+import { createTimeSlotValidator, getTimeRangeValidator } from '@lentovaraukset/shared/src/validation/validation';
 import timeslotService from '../services/timeslotService';
 
 const router = express.Router();
 
 router.get('/', async (req: express.Request, res: express.Response) => {
-  const { from } = req.query;
-  const { until } = req.query;
-  const timeslots = await timeslotService.getInTimeRange(
-    new Date(from as string),
-    new Date(until as string),
-  );
-
-  res.json(timeslots);
+  try {
+    const { from } = req.query;
+    const { until } = req.query;
+    const { start, end } = getTimeRangeValidator().parse({
+      start: new Date(from as string),
+      end: new Date(until as string),
+    });
+    const timeslots = await timeslotService.getInTimeRange(start, end);
+    res.json(timeslots);
+  } catch (error) {
+    res.status(400).json(error);
+  }
 });
 
 router.delete('/:id', async (req: express.Request, res: express.Response) => {

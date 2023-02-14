@@ -32,18 +32,13 @@ const deleteById = async (id: number): Promise<boolean> => {
   return false;
 };
 
-const createReservation = async (
+const createReservation = async (newReservation: {
   start: Date,
   end: Date,
   aircraftId: String,
-  info: String,
-) => {
-  const reservation: any = await Reservation.create(({
-    start,
-    end,
-    aircraftId,
-    info,
-  }));
+  info?: String,
+}) => {
+  const reservation: any = await Reservation.create((newReservation));
   return reservation;
 };
 
