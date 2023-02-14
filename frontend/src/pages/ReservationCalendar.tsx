@@ -46,11 +46,17 @@ function ReservationCalendar() {
     const calendar = calendarRef.current?.getApi();
     calendar?.removeAllEventSources();
     calendar?.addEventSource(reservations!);
-    calendar?.addEventSource({
-      events: timeslots?.map((timeslot) => ({ ...timeslot, groupId: 'timeslots' })),
-      display: 'inverse-background',
-      color: '#2C2C44',
-    });
+    calendar?.addEventSource(timeslots?.length
+      ? {
+        events: timeslots!.map((timeslot) => ({ ...timeslot, groupId: 'timeslots' })),
+        display: 'inverse-background',
+        color: '#2C2C44',
+      }
+      : {
+        events: [{ title: 'ei varattavissa', start: timeRange.start, end: timeRange.end }],
+        display: 'background',
+        color: '#720000',
+      });
   };
 
   useEffect(() => {
@@ -159,11 +165,18 @@ function ReservationCalendar() {
                 {
                   events: reservations,
                 },
-                {
-                  events: timeslots?.map((timeslot) => ({ ...timeslot, groupId: 'timeslots' })),
-                  display: 'inverse-background',
-                  color: '#2C2C44',
-                }]}
+                timeslots?.length
+                  ? {
+                    events: timeslots?.map((timeslot) => ({ ...timeslot, groupId: 'timeslots' })),
+                    display: 'inverse-background',
+                    color: '#2C2C44',
+                  }
+                  : {
+                    events: [{ title: 'ei varattavissa', start: timeRange.start, end: timeRange.end }],
+                    display: 'background',
+                    color: '#2C2C44',
+                  },
+              ]}
               datesSet={(dateInfo) => {
                 setTimeRange({ start: dateInfo.start, end: dateInfo.end });
               }}
