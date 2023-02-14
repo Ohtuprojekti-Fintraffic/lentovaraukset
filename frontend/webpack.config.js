@@ -4,10 +4,18 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const BASE_PATH = process.env.BASE_PATH || '';
 
-const commitHash = require('child_process')
+let commitHash
+try {
+commitHash = process.env.COMMIT_HASH || require('child_process')
   .execSync('git rev-parse --short HEAD')
   .toString()
   .trim();
+} catch {
+  // the most unimportant thing to fail a build on ever
+  // so just default to empty
+  commitHash = ""
+}
+
 
 const config = (env, argv) => ({
   entry: './src/index.tsx',

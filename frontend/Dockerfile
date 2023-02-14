@@ -1,4 +1,5 @@
 FROM node:19-alpine AS build-stage
+ARG COMMIT_HASH
 
 WORKDIR /usr/src/app
 
