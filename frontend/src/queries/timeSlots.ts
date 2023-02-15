@@ -1,7 +1,7 @@
 import { EventInput } from '@fullcalendar/core';
 
 const getTimeSlots = async (from: Date, until: Date): Promise<EventInput[]> => {
-  const res = await fetch(`${process.env.BASE_PATH}/api/timeslots?from=${from}&until=${until}`);
+  const res = await fetch(`${process.env.BASE_PATH}/api/timeslots?from=${from.toISOString()}&until=${until.toISOString()}`);
   return res.json();
 };
 
