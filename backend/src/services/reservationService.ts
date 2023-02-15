@@ -7,16 +7,19 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
       [Op.or]: [{
         start: {
           [Op.between]: [rangeStartTime, rangeEndTime],
+          [Op.not]: [rangeEndTime],
         },
       }, {
         end: {
           [Op.between]: [rangeStartTime, rangeEndTime],
+          [Op.not]: [rangeStartTime],
         },
       }],
     },
   });
 
   return reservations.map((reservation) => ({
+    title: 'Varattu',
     id: reservation.dataValues.id,
     start: reservation.dataValues.start,
     end: reservation.dataValues.end,
