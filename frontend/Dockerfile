@@ -12,7 +12,7 @@ RUN npm ci
 WORKDIR /usr/src/app/frontend
 
 ENV BASE_PATH=/lentovaraukset
-ENV COMMIT_HASH=${COMMIT_HASH}
+ARG COMMIT_HASH
 
 RUN npm run build 
 
