@@ -9,13 +9,13 @@ export interface ReservationEntry {
   info: string;
 }
 
-export interface TimeFrame {
+export interface TimeslotEntry {
   id: number;
   start: Date;
   end: Date;
 }
 
 export interface ReservationStatus {
-  availableSlots: (TimeFrame & { freeSlotsAmount: number })[];
+  availableSlots: (TimeslotEntry & { freeSlotsAmount: number })[];
   reservedSlots: ReservationEntry[];
 }

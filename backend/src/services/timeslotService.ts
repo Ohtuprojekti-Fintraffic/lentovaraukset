@@ -1,19 +1,25 @@
 import { Op } from 'sequelize';
-import type { TimeFrame } from '@lentovaraukset/shared/src/index';
+import type { TimeslotEntry } from '@lentovaraukset/shared/src/index';
 import { Timeslot } from '../models';
 
-const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date): Promise<TimeFrame[]> => {
+const getInTimeRange = async (
+  rangeStartTime: Date,
+  rangeEndTime: Date,
+): Promise<TimeslotEntry[]> => {
   const timeslots: Timeslot[] = await Timeslot.findAll({
     where: {
-      [Op.or]: [{
-        start: {
-          [Op.between]: [rangeStartTime, rangeEndTime],
+      [Op.or]: [
+        {
+          start: {
+            [Op.between]: [rangeStartTime, rangeEndTime],
+          },
         },
-      }, {
-        end: {
-          [Op.between]: [rangeStartTime, rangeEndTime],
+        {
+          end: {
+            [Op.between]: [rangeStartTime, rangeEndTime],
+          },
         },
-      }],
+      ],
     },
   });
   return timeslots.map(({ id, start, end }) => ({ id, start, end }));
@@ -35,8 +41,11 @@ const updateById = async (
   await Timeslot.update(timeslot, { where: { id } });
 };
 
-const createTimeslot = async (newTimeSlot: { start: Date, end: Date }): Promise<TimeFrame> => {
-  const timeslot: TimeFrame = await Timeslot.create(newTimeSlot);
+const createTimeslot = async (newTimeSlot: {
+  start: Date;
+  end: Date;
+}): Promise<TimeslotEntry> => {
+  const timeslot: TimeslotEntry = await Timeslot.create(newTimeSlot);
   return timeslot;
 };
 
