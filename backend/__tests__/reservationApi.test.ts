@@ -5,6 +5,26 @@ import { connectToDatabase, sequelize } from '../src/util/db';
 
 const api = request(app);
 
+const reservations = [
+  {
+    start: new Date('2023-02-02T08:00:00.000Z'),
+    end: new Date('2023-02-02T10:00:00.000Z'),
+    aircraftId: 'XZ-ABC',
+    info: 'example info',
+  },
+  {
+    start: new Date('2023-02-02T14:00:00.000Z'),
+    end: new Date('2023-02-02T16:00:00.000Z'),
+    aircraftId: 'DK-ASD',
+  },
+  {
+    start: new Date('2023-02-02T16:00:00.000Z'),
+    end: new Date('2023-02-02T18:00:00.000Z'),
+    aircraftId: 'RF-SDR',
+    info: 'First time landing!',
+  },
+];
+
 beforeAll(async () => {
   await connectToDatabase();
 });
@@ -12,6 +32,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   // wipe db before each test
   await sequelize.truncate({ cascade: true });
+  await Reservation.bulkCreate(reservations);
 });
 
 afterAll(async () => {
@@ -53,4 +74,23 @@ describe('Calls to api', () => {
     expect(createdReservation?.dataValues.aircraftId).toEqual('OH-QAA');
     expect(createdReservation?.dataValues.info).toEqual(null);
   });
+
+  test('can delete a reservation', async () => {
+    const createdReservation: Reservation | null = await Reservation.findOne();
+    const id = createdReservation?.dataValues.id;
+    await api.delete(`/api/reservations/${id}`);
+
+    const deletedReservation: Reservation | null = await Reservation.findByPk(id);
+    expect(deletedReservation).toBe(null);
+
+    const numberOfReservations: Number = await Reservation.count();
+    expect(numberOfReservations).toEqual(reservations.length - 1);
+  });
+
+  test('can\'t delete a reservation when it doesn\'t exists', async () => {
+    await api.delete('/api/reservations/-1');
+    expect(await Reservation.count()).toEqual(reservations.length);
+  });
+
+
 });

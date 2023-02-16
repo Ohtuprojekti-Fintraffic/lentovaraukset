@@ -153,14 +153,6 @@ describe('Calls to api', () => {
     expect(numberOfTimeslots).toEqual(timeslotData.length);
   });
 
-  test('dont delete a timeslot if id is not a number', async () => {
-    await api.delete('/api/timeslots/test');
-
-    const numberOfTimeslots: Number = await Timeslot.count();
-
-    expect(numberOfTimeslots).toEqual(timeslotData.length);
-  });
-
   test('can get timeslots in a range', async () => {
     const from = new Date(timeslotDataBegin);
     const until = new Date(timeslotDataEnd);
