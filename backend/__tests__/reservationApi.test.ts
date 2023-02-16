@@ -25,6 +25,14 @@ const reservations = [
   },
 ];
 
+const earliestReservation = reservations.reduce(
+  (earliest, current) => (current.start < earliest.start ? current : earliest),
+);
+
+const latestReservation = reservations.reduce(
+  (earliest, current) => (current.end > earliest.end ? current : earliest),
+);
+
 beforeAll(async () => {
   await connectToDatabase();
 });
@@ -92,5 +100,42 @@ describe('Calls to api', () => {
     expect(await Reservation.count()).toEqual(reservations.length);
   });
 
+  test('can edit a reservation ', async () => {
+    const createdReservation: Reservation | null = await Reservation.findOne();
+    const id = createdReservation?.dataValues.id;
+    await api.patch(`/api/reservations/${id}`)
+      .set('Content-type', 'application/json')
+      .send({ start: '2023-01-02T02:00:00.000Z', end: '2023-01-02T16:00:00.000Z' });
 
+    const updatedReservation: Reservation | null = await Reservation.findByPk(id);
+
+    expect(updatedReservation).not.toEqual(null);
+    expect(updatedReservation?.dataValues.start).toEqual(new Date('2023-01-02T02:00:00.000Z'));
+    expect(updatedReservation?.dataValues.end).toEqual(new Date('2023-01-02T16:00:00.000Z'));
+  });
+
+  test('can get reservations in a range', async () => {
+    const from = new Date(earliestReservation.end);
+    const until = new Date(latestReservation.end);
+
+    from.setHours(from.getHours() + 1);
+    const response = await api
+      .get(`/api/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
+
+    expect(response.body.length).toEqual(2);
+    expect(response.body.includes(reservations[1]));
+    expect(response.body.includes(reservations[2]));
+  });
+
+  test('return an empty list if no reservation in range', async () => {
+    const from = new Date(earliestReservation.start);
+    const until = new Date(latestReservation.end);
+
+    from.setDate(until.getDate() + 1);
+    until.setDate(until.getDate() + 2);
+
+    const response = await api
+      .get(`/api/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
+    expect(response.body).toEqual([]);
+  });
 });

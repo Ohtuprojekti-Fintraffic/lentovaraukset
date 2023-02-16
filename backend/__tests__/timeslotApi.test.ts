@@ -13,6 +13,7 @@ const timeslotData = [
 const timeslotDataBegin = timeslotData.reduce(
   (prev, cur) => (cur.start < prev.start ? cur : prev),
 ).start;
+
 const timeslotDataEnd = timeslotData.reduce(
   (prev, cur) => (cur.end > prev.end ? cur : prev),
 ).end;
