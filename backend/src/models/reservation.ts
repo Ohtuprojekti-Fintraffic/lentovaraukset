@@ -28,8 +28,8 @@ Reservation.init(
     },
     phoneNumber: {
       type: DataTypes.STRING,
-      allowNull: true
-    }
+      allowNull: true,
+    },
   },
   {
     sequelize,
