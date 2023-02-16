@@ -26,6 +26,10 @@ Reservation.init(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
+    }
   },
   {
     sequelize,

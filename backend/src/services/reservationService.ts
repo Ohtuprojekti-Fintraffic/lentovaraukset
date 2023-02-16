@@ -40,12 +40,14 @@ const createReservation = async (
   end: Date,
   aircraftId: String,
   info: String,
+  phoneNumber: String
 ) => {
   const reservation: any = await Reservation.create(({
     start,
     end,
     aircraftId,
     info,
+    phoneNumber
   }));
   return reservation;
 };
