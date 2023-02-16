@@ -1,26 +1,28 @@
 import { Op } from 'sequelize';
+import type { TimeslotEntry } from '@lentovaraukset/shared/src/index';
 import { Timeslot } from '../models';
 
-const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
-  const timeslots = await Timeslot.findAll({
+const getInTimeRange = async (
+  rangeStartTime: Date,
+  rangeEndTime: Date,
+): Promise<TimeslotEntry[]> => {
+  const timeslots: Timeslot[] = await Timeslot.findAll({
     where: {
-      [Op.or]: [{
-        start: {
-          [Op.between]: [rangeStartTime, rangeEndTime],
+      [Op.or]: [
+        {
+          start: {
+            [Op.between]: [rangeStartTime, rangeEndTime],
+          },
         },
-      }, {
-        end: {
-          [Op.between]: [rangeStartTime, rangeEndTime],
+        {
+          end: {
+            [Op.between]: [rangeStartTime, rangeEndTime],
+          },
         },
-      }],
+      ],
     },
   });
-
-  return timeslots.map((timeslot) => ({
-    id: timeslot.dataValues.id,
-    start: timeslot.dataValues.start,
-    end: timeslot.dataValues.end,
-  }));
+  return timeslots.map(({ id, start, end }) => ({ id, start, end }));
 };
 
 const deleteById = async (id: number): Promise<boolean> => {
@@ -35,12 +37,15 @@ const deleteById = async (id: number): Promise<boolean> => {
 const updateById = async (
   id: number,
   timeslot: { start: Date, end: Date },
-) => {
+): Promise<void> => {
   await Timeslot.update(timeslot, { where: { id } });
 };
 
-const createTimeslot = async (newTimeSlot: { start: Date, end: Date }) => {
-  const timeslot: any = await Timeslot.create((newTimeSlot));
+const createTimeslot = async (newTimeSlot: {
+  start: Date;
+  end: Date;
+}): Promise<TimeslotEntry> => {
+  const timeslot: TimeslotEntry = await Timeslot.create(newTimeSlot);
   return timeslot;
 };
 
