@@ -1,7 +1,7 @@
 import { EventInput } from '@fullcalendar/core';
 
 const getReservations = async (from: Date, until: Date): Promise<EventInput[]> => {
-  const res = await fetch(`${process.env.BASE_PATH}/api/reservations?from=${from}&until=${until}`);
+  const res = await fetch(`${process.env.BASE_PATH}/api/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
   return res.json();
 };
 
@@ -11,7 +11,7 @@ const addReservation = async (newReservation: any): Promise<void> => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(newReservation),
+    body: JSON.stringify({ ...newReservation, aircraftId: '1' }),
   });
 };
 

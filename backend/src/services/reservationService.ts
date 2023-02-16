@@ -8,16 +8,18 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
       [Op.or]: [{
         start: {
           [Op.between]: [rangeStartTime, rangeEndTime],
+          [Op.not]: [rangeEndTime],
         },
       }, {
         end: {
           [Op.between]: [rangeStartTime, rangeEndTime],
+          [Op.not]: [rangeStartTime],
         },
       }],
     },
   });
 
-  return reservations.map(({ id, start, end }) => ({ id, start, end }));
+  return reservations.map(({ id, start, end }) => ({ title: 'Varattu', id, start, end }));
 };
 
 const deleteById = async (id: number): Promise<boolean> => {
