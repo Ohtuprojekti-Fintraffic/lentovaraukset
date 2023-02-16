@@ -19,7 +19,9 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
     },
   });
 
-  return reservations.map(({ id, start, end }) => ({ title: 'Varattu', id, start, end }));
+  return reservations.map(({ id, start, end }) => ({
+    title: 'Varattu', id, start, end,
+  }));
 };
 
 const deleteById = async (id: number): Promise<boolean> => {
@@ -36,11 +38,9 @@ const createReservation = async (newReservation: {
   end: Date,
   aircraftId: string,
   info: string, }): Promise<ReservationEntry> => {
-  const reservation = await Reservation.create(newReservation);
-
   const {
     id, start, end, aircraftId, info,
-  } = reservation;
+  } = await Reservation.create(newReservation);
 
   // we don't have users yet
   const user = 'NYI';
@@ -54,7 +54,7 @@ const createReservation = async (newReservation: {
 const updateById = async (
   id: number,
   reservation: { start: Date, end: Date },
-) => {
+): Promise<void> => {
   await Reservation.update(reservation, { where: { id } });
 };
 

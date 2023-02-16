@@ -16,7 +16,6 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date): Promise
       }],
     },
   });
-
   return timeslots.map(({ id, start, end }) => ({ id, start, end }));
 };
 
@@ -37,8 +36,8 @@ const updateById = async (
 };
 
 const createTimeslot = async (newTimeSlot: { start: Date, end: Date }): Promise<TimeFrame> => {
-  const { id, start, end }: TimeFrame = await Timeslot.create(newTimeSlot);
-  return { id, start, end };
+  const timeslot: TimeFrame = await Timeslot.create(newTimeSlot);
+  return timeslot;
 };
 
 export default {

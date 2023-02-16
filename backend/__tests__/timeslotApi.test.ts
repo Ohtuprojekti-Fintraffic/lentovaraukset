@@ -65,7 +65,7 @@ describe('Calls to api', () => {
   test('dont create a timeslot if granularity is wrong', async () => {
     await api.post('/api/timeslots/')
       .set('Content-type', 'application/json')
-      .send({ start: '2023-03-03T12:00:00.000Z', end: '2023-03-03T12:15:00.000Z' });
+      .send({ start: new Date('2023-03-03T12:00:00.000Z'), end: new Date('2023-03-03T12:15:00.000Z') });
 
     const createdTimeslot: Timeslot | null = await Timeslot.findOne(
       { where: { start: new Date('2023-03-03T12:00:00.000Z') } },
@@ -103,7 +103,7 @@ describe('Calls to api', () => {
   });
 
   test('dont edit a timeslot if all fields not provided', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: '2023-01-01T12:00:00.000Z', end: '2023-01-01T13:00:00.000Z' });
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-01-01T12:00:00.000Z'), end: new Date('2023-01-01T13:00:00.000Z') });
 
     await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
@@ -119,11 +119,11 @@ describe('Calls to api', () => {
   });
 
   test('dont edit a timeslot if granularity is wrong', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: '2023-01-01T12:00:00.000Z', end: '2023-01-01T13:00:00.000Z' });
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-01-01T12:00:00.000Z'), end: new Date('2023-01-01T13:00:00.000Z') });
 
     await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
-      .send({ start: '2023-01-02T12:00:00.000Z', end: '2023-01-02T13:15:00.000Z' });
+      .send({ start: new Date('2023-01-02T12:00:00.000Z'), end: new Date('2023-01-02T13:15:00.000Z') });
 
     const updatedSlot: Timeslot | null = await Timeslot.findOne(
       { where: { id: createdSlot.dataValues.id } },
