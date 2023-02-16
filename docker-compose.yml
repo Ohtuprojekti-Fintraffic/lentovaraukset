@@ -4,6 +4,8 @@ services:
 
   frontend:
     container_name: lentovaraukset_frontend
+    environment:
+      - COMMIT_HASH=${COMMIT_HASH}
     restart: always
     build: 
       context: .

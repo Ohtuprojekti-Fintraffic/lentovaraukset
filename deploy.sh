@@ -12,6 +12,6 @@ echo "Found new commits. Merging"
 git merge --ff-only
 
 echo "Rebuilding and restarting containers"
-docker-compose -f docker-compose.yml up --build -d
+COMMIT_HASH=$(git rev-parse --short HEAD) docker-compose -f docker-compose.yml up --build -d
 
 echo "Done!"
