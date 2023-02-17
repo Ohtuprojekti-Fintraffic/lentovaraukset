@@ -39,6 +39,7 @@ router.post('/', async (req: express.Request, res: express.Response) => {
     const timeslot = await timeslotService.createTimeslot(newTimeSlot);
     res.json(timeslot);
   } catch (error) {
+    console.log(error);
     res.status(400).json(error);
   }
 });
@@ -52,6 +53,7 @@ router.patch('/:id', async (req: express.Request, res: express.Response) => {
     await timeslotService.updateById(id, modifiedTimeslot);
     res.status(200).json(modifiedTimeslot);
   } catch (error) {
+    console.log(error);
     res.status(400).json(error);
   }
 });

@@ -35,6 +35,20 @@ const createReservationValidator = (slotGranularityMinutes: number) => {
   return Reservation;
 };
 
+const updateReservationValidator = (slotGranularityMinutes: number) => {
+  const message = `Reservation must be multiples of ${slotGranularityMinutes} minutes`;
+  const Reservation = z.object({
+    start: z.coerce
+      .date()
+      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message }),
+    end: z.coerce
+      .date()
+      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message }),
+  });
+
+  return Reservation;
+};
+
 const getTimeRangeValidator = () => {
   const TimeRange = z.object({
     start: z.coerce.date(),
@@ -44,4 +58,9 @@ const getTimeRangeValidator = () => {
   return TimeRange;
 };
 
-export { createTimeSlotValidator, createReservationValidator, getTimeRangeValidator };
+export {
+  createTimeSlotValidator,
+  createReservationValidator,
+  updateReservationValidator,
+  getTimeRangeValidator,
+};
