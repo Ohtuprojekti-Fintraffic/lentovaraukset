@@ -4,3 +4,4 @@ jest.config.ts
 frontend/postcss.config.js
 frontend/webpack.config.js
 **/coverage/
+build/
