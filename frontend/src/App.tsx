@@ -9,7 +9,6 @@ import Navigation from './components/Navigation';
 const queryClient = new QueryClient();
 
 function App() {
-
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-col h-full">

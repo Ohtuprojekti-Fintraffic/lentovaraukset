@@ -20,7 +20,7 @@ function ReservationCalendar() {
 
   const [timeRange, setTimeRange] = useState({ start: new Date(), end: new Date() });
   const [showInspectModal, setShowInspectModal] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState<Partial<{id: Number}>>({});
+  const [selectedReservation, setSelectedReservation] = useState<Partial<{ id: Number }>>({});
 
   const queryClient = new QueryClient();
 
@@ -67,8 +67,8 @@ function ReservationCalendar() {
   // When a reservation box is clicked
   const handleReservationClick = (clickData: any) => {
     // untill better confirm
-    setSelectedReservation(clickData.event)
-    setShowInspectModal(true)
+    setSelectedReservation(clickData.event);
+    setShowInspectModal(true);
   };
 
   // When a reservation box is moved or resized
@@ -101,8 +101,8 @@ function ReservationCalendar() {
     <div className="flex flex-col space-y-2 h-full w-full">
       <Card show={showInspectModal} handleClose={() => setShowInspectModal(false)}>
         <div>
-          <div className='bg-black p-3'>
-            <p className='text-white'>{'Varaus #' + selectedReservation.id}</p>
+          <div className="bg-black p-3">
+            <p className="text-white">{`Varaus #${selectedReservation.id}`}</p>
           </div>
           <div className="p-8">
             <p className="text-2xl pb-2">Varaus</p>
@@ -113,13 +113,17 @@ function ReservationCalendar() {
             </pre>
           </div>
         </div>
-        <button className='bg-transparent text-red-600 border-red-600 border-2 p-3 rounded-lg'
+        <button
+          className="bg-transparent text-red-600 border-red-600 border-2 p-3 rounded-lg"
           onClick={() => {
             removeReservation.mutateAsync(selectedReservation.id!);
             refetchReservations();
-            setShowInspectModal(false)
-          }}>Poista</button>
-        <button className='bg-black text-white p-3 rounded-lg' onClick={() => { setShowInspectModal(false) }}>Tallenna</button>
+            setShowInspectModal(false);
+          }}
+        >
+          Poista
+        </button>
+        <button className="bg-black text-white p-3 rounded-lg" onClick={() => { setShowInspectModal(false); }}>Tallenna</button>
       </Card>
       <h1 className="text-3xl">Varauskalenteri</h1>
       {

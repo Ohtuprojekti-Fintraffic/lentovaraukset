@@ -7,7 +7,7 @@ type Props = {
 };
 
 const Modal: React.FC<Props> = ({
-  show, handleClose, children
+  show, handleClose, children,
 }) => {
   const showClass = show ? 'flex' : 'hidden';
 
