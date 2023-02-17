@@ -19,15 +19,24 @@ type CalendarProps = {
     eventColor?: string;
     textColor?: string;
   } | undefined;
+  selectConstraint: string | undefined;
 };
 
 function Calendar({
-  eventSources, addEventFn, modifyEventFn, deleteEventFn, granularity, eventColors,
+  eventSources,
+  addEventFn,
+  modifyEventFn,
+  deleteEventFn,
+  granularity,
+  eventColors,
+  selectConstraint,
 }: CalendarProps) {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   // When a event box is clicked
   const handleEventClick = async (clickData: EventClickArg) => {
+    if (clickData.event.display.includes('background')) return;
+
     // until better confirm
     // eslint-disable-next-line no-restricted-globals
     if (confirm('Haluatko varmasti poistaa aikaikkunan?')) {
@@ -38,21 +47,21 @@ function Calendar({
     // Refresh calendar if changes were made
   };
 
-  // When a timeslot box is moved or resized
+  // When a event box is moved or resized
   const handleEventChange = async (changeData: EventChangeArg) => {
     // Open confirmation popup here
-    const timeSlot = changeData.event;
+    const { event } = changeData;
 
     await modifyEventFn({
-      id: timeSlot.id,
-      start: timeSlot.start || new Date(),
-      end: timeSlot.end || new Date(),
+      id: event.id,
+      start: event.start || new Date(),
+      end: event.end || new Date(),
     });
 
     calendarRef.current?.getApi().refetchEvents();
   };
 
-  // When a new timeslot is selected (dragged) in the calendar.
+  // When a new event is selected (dragged) in the calendar.
   const handleEventCreate = async (dropData: DateSelectArg) => {
     await addEventFn({
       start: dropData.start,
@@ -97,6 +106,7 @@ function Calendar({
       eventClick={handleEventClick}
       eventChange={handleEventChange}
       select={handleEventCreate}
+      selectConstraint={selectConstraint}
       eventSources={eventSources}
     />
   );

@@ -18,7 +18,12 @@ function ReservationCalendar() {
   ) => {
     try {
       const reservations = await getReservations(start, end);
-      successCallback(reservations);
+
+      const reservationsMapped = reservations.map((reservation) => ({
+        ...reservation, constraint: 'timeslots',
+      }));
+
+      successCallback(reservationsMapped);
     } catch (error) {
       failureCallback(error as Error);
     }
@@ -55,6 +60,7 @@ function ReservationCalendar() {
         deleteEventFn={deleteReservation}
         granularity={{ minutes: 20 }} // TODO: Get from airfield api
         eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFF' }}
+        selectConstraint="timeslots"
       />
     </div>
   );
