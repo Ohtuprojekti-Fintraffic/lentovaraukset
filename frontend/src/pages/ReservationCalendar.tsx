@@ -106,11 +106,11 @@ function ReservationCalendar() {
           </div>
           <div className="p-8">
             <p className="text-2xl pb-2">Varaus</p>
-            <p>
+            <pre>
               {
-                JSON.stringify(selectedReservation)
+                JSON.stringify(selectedReservation, null, 2)
               }
-            </p>
+            </pre>
           </div>
         </div>
         <button className='bg-transparent text-red-600 border-red-600 border-2 p-3 rounded-lg'
