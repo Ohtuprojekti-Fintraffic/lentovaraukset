@@ -2,6 +2,8 @@ import { Op } from 'sequelize';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 import { Reservation } from '../models';
 
+const numConcurrentReservations: number = 2;
+
 const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
   const reservations = await Reservation.findAll({
     where: {
@@ -24,6 +26,37 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
   }));
 };
 
+const getReservationFromRangeWithoutId = async (startTime: Date, endTime: Date, id: number) => {
+  const reservations: any = await Reservation.findAll({
+    where: {
+      id: {
+        [Op.ne]: id,
+      },
+      start: {
+        [Op.lt]: endTime,
+      },
+      end: {
+        [Op.gt]: startTime,
+      },
+    },
+  });
+  return reservations;
+};
+
+const getReservationFromRange = async (startTime: Date, endTime: Date) => {
+  const reservations: any = await Reservation.findAll({
+    where: {
+      start: {
+        [Op.lt]: endTime,
+      },
+      end: {
+        [Op.gt]: startTime,
+      },
+    },
+  });
+  return reservations;
+};
+
 const deleteById = async (id: number): Promise<boolean> => {
   const reservation = await Reservation.findByPk(id);
   if (reservation) {
@@ -38,24 +71,34 @@ const createReservation = async (newReservation: {
   end: Date,
   aircraftId: string,
   info: string, }): Promise<ReservationEntry> => {
-  const {
-    id, start, end, aircraftId, info,
-  } = await Reservation.create(newReservation);
+  if ((await getReservationFromRange(newReservation.start, newReservation.end))
+    .length >= numConcurrentReservations) {
+    throw new Error('Too many concurrent reservations');
+  } else {
+    const {
+      id, start, end, aircraftId, info,
+    } = await Reservation.create(newReservation);
 
-  // we don't have users yet
-  const user = 'NYI';
-  const phone = 'NYI';
+    // we don't have users yet
+    const user = 'NYI';
+    const phone = 'NYI';
 
-  return {
-    id, start, end, aircraftId, info, user, phone,
-  };
+    return {
+      id, start, end, aircraftId, info, user, phone,
+    };
+  }
 };
 
 const updateById = async (
   id: number,
   reservation: { start: Date, end: Date },
 ): Promise<void> => {
-  await Reservation.update(reservation, { where: { id } });
+  if ((await getReservationFromRangeWithoutId(reservation.start, reservation.end, id))
+    .length >= numConcurrentReservations) {
+    throw new Error('Too many concurrent reservations');
+  } else {
+    await Reservation.update(reservation, { where: { id } });
+  }
 };
 
 export default {

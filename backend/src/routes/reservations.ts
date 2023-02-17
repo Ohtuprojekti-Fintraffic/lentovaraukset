@@ -48,10 +48,14 @@ router.post('/', async (req: express.Request, res: express.Response) => {
 });
 
 router.patch('/:id', async (req: express.Request, res: express.Response) => {
-  const id = Number(req.params.id);
-  const modifiedReservation = req.body;
-  await reservationService.updateById(id, modifiedReservation);
-  res.status(200).json(modifiedReservation);
+  try {
+    const id = Number(req.params.id);
+    const modifiedReservation = req.body;
+    await reservationService.updateById(id, modifiedReservation);
+    res.status(200).json(modifiedReservation);
+  } catch (error) {
+    res.status(400).json(error);
+  }
 });
 
 export default router;
