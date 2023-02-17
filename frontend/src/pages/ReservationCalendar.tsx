@@ -13,11 +13,14 @@ import {
   modifyReservation,
   deleteReservation,
 } from '../queries/reservations';
+import Card from '../components/Card';
 
 function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const [timeRange, setTimeRange] = useState({ start: new Date(), end: new Date() });
+  const [showInspectModal, setShowInspectModal] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<Partial<{id: Number}>>({});
 
   const queryClient = new QueryClient();
 
@@ -64,14 +67,8 @@ function ReservationCalendar() {
   // When a reservation box is clicked
   const handleReservationClick = (clickData: any) => {
     // untill better confirm
-    // eslint-disable-next-line no-restricted-globals
-    if (confirm('Haluatko varmasti poistaa varauksen?')) {
-      removeReservation.mutateAsync(clickData.event.id);
-    }
-    refetchReservations();
-    // setSelected(clickData.event);
-    // Open reservation info screen here
-    // Refresh calendar if changes were made
+    setSelectedReservation(clickData.event)
+    setShowInspectModal(true)
   };
 
   // When a reservation box is moved or resized
@@ -102,6 +99,28 @@ function ReservationCalendar() {
 
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
+      <Card show={showInspectModal} handleClose={() => setShowInspectModal(false)}>
+        <div>
+          <div className='bg-black p-3'>
+            <p className='text-white'>{'Varaus #' + selectedReservation.id}</p>
+          </div>
+          <div className="p-8">
+            <p className="text-2xl pb-2">Varaus</p>
+            <p>
+              {
+                JSON.stringify(selectedReservation)
+              }
+            </p>
+          </div>
+        </div>
+        <button className='bg-transparent text-red-600 border-red-600 border-2 p-3 rounded-lg'
+          onClick={() => {
+            removeReservation.mutateAsync(selectedReservation.id!);
+            refetchReservations();
+            setShowInspectModal(false)
+          }}>Poista</button>
+        <button className='bg-black text-white p-3 rounded-lg' onClick={() => { setShowInspectModal(false) }}>Tallenna</button>
+      </Card>
       <h1 className="text-3xl">Varauskalenteri</h1>
       {
         !isError
