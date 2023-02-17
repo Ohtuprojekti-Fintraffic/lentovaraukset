@@ -9,7 +9,7 @@ import {
 } from '@fullcalendar/core';
 
 type CalendarProps = {
-  getEventsFn: (start: Date, end: Date) => Promise<any[]>;
+  eventSources: EventSourceInput[];
   addEventFn: (event: { start: Date; end: Date }) => Promise<void>;
   modifyEventFn: (event: { id: string; start: Date; end: Date }) => Promise<void>;
   deleteEventFn: (id: number) => Promise<string>;
@@ -22,18 +22,9 @@ type CalendarProps = {
 };
 
 function Calendar({
-  getEventsFn, addEventFn, modifyEventFn, deleteEventFn, granularity, eventColors,
+  eventSources, addEventFn, modifyEventFn, deleteEventFn, granularity, eventColors,
 }: CalendarProps) {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
-
-  const getEvents: EventSourceInput = async (info, successCallback, failureCallback) => {
-    try {
-      const timeSlots = await getEventsFn(info.start, info.end);
-      successCallback(timeSlots);
-    } catch (error) {
-      failureCallback(error as Error);
-    }
-  };
 
   // When a event box is clicked
   const handleEventClick = async (clickData: EventClickArg) => {
@@ -106,7 +97,7 @@ function Calendar({
       eventClick={handleEventClick}
       eventChange={handleEventChange}
       select={handleEventCreate}
-      events={getEvents}
+      eventSources={eventSources}
     />
   );
 }
