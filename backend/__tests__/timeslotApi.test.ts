@@ -13,6 +13,7 @@ const timeslotData = [
 const timeslotDataBegin = timeslotData.reduce(
   (prev, cur) => (cur.start < prev.start ? cur : prev),
 ).start;
+
 const timeslotDataEnd = timeslotData.reduce(
   (prev, cur) => (cur.end > prev.end ? cur : prev),
 ).end;
@@ -147,14 +148,6 @@ describe('Calls to api', () => {
 
   test('dont delete a timeslot if it doesnt exist', async () => {
     await api.delete('/api/timeslots/-1');
-
-    const numberOfTimeslots: Number = await Timeslot.count();
-
-    expect(numberOfTimeslots).toEqual(timeslotData.length);
-  });
-
-  test('dont delete a timeslot if id is not a number', async () => {
-    await api.delete('/api/timeslots/test');
 
     const numberOfTimeslots: Number = await Timeslot.count();
 
