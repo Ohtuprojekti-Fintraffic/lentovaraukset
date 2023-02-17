@@ -38,7 +38,7 @@ const createReservation = async (newReservation: {
   end: Date,
   aircraftId: string,
   info?: string,
-  phone?: string, }): Promise<ReservationEntry> => {
+  phone: string, }): Promise<ReservationEntry> => {
   const {
     id, start, end, aircraftId, info, phone,
   } = await Reservation.create(newReservation);
