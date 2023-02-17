@@ -17,7 +17,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-col h-full">
         <Navigation />
-        <Modal show={show} handleClose={setShow}></Modal>
+        <Modal show={show} handleClose={() => setShow(false)}></Modal>
         <main className="flex flex-row flex-grow p-10 overflow-y-auto">
           <Outlet />
         </main>
