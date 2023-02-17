@@ -43,6 +43,12 @@ function Calendar({
     return !(isOverlap(stillEvent, movingEvent) || isOverlap(movingEvent, stillEvent));
   };
 
+  const newEventColliding: OverlapFunc = (event: EventImpl) => {
+    if (event.groupId === 'timeslots') return true;
+    // TODO: allow overlapping reservations based on airfield maxConcurrentFlights
+    return false;
+  };
+
   // When a event box is clicked
   const handleEventClick = async (clickData: EventClickArg) => {
     // until better confirm
@@ -116,6 +122,7 @@ function Calendar({
       select={handleEventCreate}
       eventSources={eventSources}
       eventOverlap={areEventsColliding}
+      selectOverlap={newEventColliding}
     />
   );
 }
