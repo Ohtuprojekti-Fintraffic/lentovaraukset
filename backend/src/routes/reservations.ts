@@ -37,10 +37,10 @@ router.post('/', async (req: express.Request, res: express.Response) => {
       end,
       aircraftId,
       info,
-      phoneNumber,
+      phone,
     } = req.body;
     const reservation = await reservationService.createReservation({
-      start, end, aircraftId, info, phoneNumber
+      start, end, aircraftId, info, phone,
     });
     res.json(reservation);
   } catch (error) {

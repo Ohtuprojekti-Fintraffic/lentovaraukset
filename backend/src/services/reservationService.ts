@@ -38,16 +38,16 @@ const createReservation = async (newReservation: {
   end: Date,
   aircraftId: string,
   info: string,
-  phoneNumber: string, }): Promise<ReservationEntry> => {
+  phone: string, }): Promise<ReservationEntry> => {
   const {
-    id, start, end, aircraftId, info, phoneNumber,
+    id, start, end, aircraftId, info, phone,
   } = await Reservation.create(newReservation);
 
   // we don't have users yet
   const user = 'NYI';
 
   return {
-    id, start, end, aircraftId, info, user, phoneNumber,
+    id, start, end, aircraftId, info, user, phone,
   };
 };
 
