@@ -4,9 +4,14 @@ import {
   InferAttributes,
   InferCreationAttributes,
   CreationOptional,
+  HasManyAddAssociationsMixin,
+  HasManyGetAssociationsMixin,
+  HasManyRemoveAssociationsMixin
 } from 'sequelize';
 
 import { sequelize } from '../util/db';
+
+import {Timeslot} from '../models'
 
 class Reservation extends Model<
 InferAttributes<Reservation>,
@@ -21,6 +26,12 @@ InferCreationAttributes<Reservation>
   declare aircraftId: string;
 
   declare info: CreationOptional<string>;
+  
+  declare addTimeslots: HasManyAddAssociationsMixin<Timeslot, number>;
+
+  declare getTimeslots: HasManyGetAssociationsMixin<Timeslot>;
+
+  declare removeTimeslots: HasManyRemoveAssociationsMixin<Timeslot, number>;
 }
 
 Reservation.init(
