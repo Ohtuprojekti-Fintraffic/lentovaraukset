@@ -5,7 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import {
-  DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput,
+  DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput, OverlapFunc,
 } from '@fullcalendar/core';
 
 type CalendarProps = {
@@ -33,6 +33,14 @@ function Calendar({
     } catch (error) {
       failureCallback(error as Error);
     }
+  };
+
+  const canOverlap: OverlapFunc = (stillEvent, movingEvent) => {
+    if (movingEvent === null || stillEvent === null) return true;
+    if (stillEvent.groupId === 'timeslots') return true;
+    return movingEvent !== null
+      && (!(stillEvent.start! < movingEvent.start! && stillEvent.end! > movingEvent.start!)
+      && !(stillEvent.start! < movingEvent.end! && stillEvent.end! > movingEvent.end!));
   };
 
   // When a event box is clicked
@@ -107,6 +115,7 @@ function Calendar({
       eventChange={handleEventChange}
       select={handleEventCreate}
       events={getEvents}
+      eventOverlap={canOverlap}
     />
   );
 }
