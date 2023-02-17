@@ -5,8 +5,9 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import {
-  DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput,
+  DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput, OverlapFunc,
 } from '@fullcalendar/core';
+import { EventImpl } from '@fullcalendar/core/internal';
 
 type CalendarProps = {
   eventSources: EventSourceInput[];
@@ -32,6 +33,28 @@ function Calendar({
   selectConstraint,
 }: CalendarProps) {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
+
+  const isOverlap = (eventA: EventImpl, eventB: EventImpl) => {
+    if (eventA.start && eventA.end && eventB.start && eventB.end) {
+      return !(eventA.end <= eventB.start || eventB.end <= eventA.start);
+    }
+    return false;
+  };
+  const areEventsColliding: OverlapFunc = (
+    stillEvent: EventImpl,
+    movingEvent: EventImpl | null,
+  ) => {
+    if (movingEvent === null) return true;
+    if (stillEvent.groupId === 'timeslots') return true;
+    // TODO: allow overlapping reservations based on airfield maxConcurrentFlights
+    return !(isOverlap(stillEvent, movingEvent) || isOverlap(movingEvent, stillEvent));
+  };
+
+  const newEventColliding: OverlapFunc = (event: EventImpl) => {
+    if (event.groupId === 'timeslots') return true;
+    // TODO: allow overlapping reservations based on airfield maxConcurrentFlights
+    return false;
+  };
 
   // When a event box is clicked
   const handleEventClick = async (clickData: EventClickArg) => {
@@ -108,6 +131,8 @@ function Calendar({
       select={handleEventCreate}
       selectConstraint={selectConstraint}
       eventSources={eventSources}
+      eventOverlap={areEventsColliding}
+      selectOverlap={newEventColliding}
     />
   );
 }
