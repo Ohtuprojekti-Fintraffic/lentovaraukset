@@ -11,17 +11,20 @@ const reservations = [
     end: new Date('2023-02-02T10:00:00.000Z'),
     aircraftId: 'XZ-ABC',
     info: 'example info',
+    phone: '0401111111',
   },
   {
     start: new Date('2023-02-02T14:00:00.000Z'),
     end: new Date('2023-02-02T16:00:00.000Z'),
     aircraftId: 'DK-ASD',
+    phone: '0401111111',
   },
   {
     start: new Date('2023-02-02T16:00:00.000Z'),
     end: new Date('2023-02-02T18:00:00.000Z'),
     aircraftId: 'RF-SDR',
     info: 'First time landing!',
+    phone: '0401111111',
   },
 ];
 
