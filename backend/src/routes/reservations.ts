@@ -5,18 +5,14 @@ import reservationService from '../services/reservationService';
 const router = express.Router();
 
 router.get('/', async (req: express.Request, res: express.Response) => {
-  try {
-    const { from } = req.query;
-    const { until } = req.query;
-    const { start, end } = getTimeRangeValidator().parse({
-      start: new Date(from as string),
-      end: new Date(until as string),
-    });
-    const reservations = await reservationService.getInTimeRange(start, end);
-    res.json(reservations);
-  } catch (error) {
-    res.status(400).json(error);
-  }
+  const { from } = req.query;
+  const { until } = req.query;
+  const { start, end } = getTimeRangeValidator().parse({
+    start: new Date(from as string),
+    end: new Date(until as string),
+  });
+  const reservations = await reservationService.getInTimeRange(start, end);
+  res.json(reservations);
 });
 
 router.delete('/:id', async (req: express.Request, res: express.Response) => {
