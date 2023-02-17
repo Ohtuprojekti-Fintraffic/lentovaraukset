@@ -61,15 +61,9 @@ const createReservation = async (newReservation: {
   const timeslots = await getTimeslotsInReservationRange(newReservation.start, newReservation.end);
   const reservation: Reservation = await Reservation.create(newReservation);
   await reservation.addTimeslots(timeslots);
-  const {
-    id, start, end, aircraftId, info,
-  } = reservation;
   const user = 'NYI';
   const phone = 'NYI';
-
-  return {
-    id, start, end, aircraftId, info, user, phone,
-  };
+  return { ...reservation.dataValues, user, phone };
 };
 
 const updateById = async (
