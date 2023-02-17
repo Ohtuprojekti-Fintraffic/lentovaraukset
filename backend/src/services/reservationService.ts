@@ -70,7 +70,7 @@ const createReservation = async (newReservation: {
   start: Date,
   end: Date,
   aircraftId: string,
-  info: string, }): Promise<ReservationEntry> => {
+  info?: string | undefined, }): Promise<ReservationEntry> => {
   if ((await getReservationFromRange(newReservation.start, newReservation.end))
     .length >= numConcurrentReservations) {
     throw new Error('Too many concurrent reservations');
