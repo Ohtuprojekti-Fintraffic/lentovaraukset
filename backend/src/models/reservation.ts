@@ -6,12 +6,11 @@ import {
   CreationOptional,
   HasManyAddAssociationsMixin,
   HasManyGetAssociationsMixin,
-  HasManyRemoveAssociationsMixin
+  HasManyRemoveAssociationsMixin,
 } from 'sequelize';
 
+import { Timeslot } from '@lentovaraukset/backend/src/models';
 import { sequelize } from '../util/db';
-
-import {Timeslot} from '../models'
 
 class Reservation extends Model<
 InferAttributes<Reservation>,
@@ -26,7 +25,7 @@ InferCreationAttributes<Reservation>
   declare aircraftId: string;
 
   declare info: CreationOptional<string>;
-  
+
   declare addTimeslots: HasManyAddAssociationsMixin<Timeslot, number>;
 
   declare getTimeslots: HasManyGetAssociationsMixin<Timeslot>;

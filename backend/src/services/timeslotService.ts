@@ -1,6 +1,26 @@
 import { Op } from 'sequelize';
 import type { TimeslotEntry } from '@lentovaraukset/shared/src/index';
-import { Timeslot } from '../models';
+import { Reservation, Timeslot } from '../models';
+
+const getReservationsInTimeslotRange = async (start: Date, end: Date) => {
+  const reservations = await Reservation.findAll({
+    where: {
+      [Op.and]: [
+        {
+          start: {
+            [Op.gte]: start,
+          },
+        },
+        {
+          end: {
+            [Op.lte]: end,
+          },
+        },
+      ],
+    },
+  });
+  return reservations;
+};
 
 const getInTimeRange = async (
   rangeStartTime: Date,
@@ -38,6 +58,11 @@ const updateById = async (
   id: number,
   timeslot: { start: Date, end: Date },
 ): Promise<void> => {
+  const newReservations = await getReservationsInTimeslotRange(timeslot.start, timeslot.end);
+  const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
+  const oldReservations = await oldTimeslot?.getReservations();
+  await oldTimeslot?.removeReservations(oldReservations);
+  await oldTimeslot?.addReservations(newReservations);
   await Timeslot.update(timeslot, { where: { id } });
 };
 
@@ -45,7 +70,9 @@ const createTimeslot = async (newTimeSlot: {
   start: Date;
   end: Date;
 }): Promise<TimeslotEntry> => {
-  const timeslot: TimeslotEntry = await Timeslot.create(newTimeSlot);
+  const reservations = await getReservationsInTimeslotRange(newTimeSlot.start, newTimeSlot.end);
+  const timeslot: Timeslot = await Timeslot.create(newTimeSlot);
+  await timeslot.addReservations(reservations);
   return timeslot;
 };
 

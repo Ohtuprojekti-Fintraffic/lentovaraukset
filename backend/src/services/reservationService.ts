@@ -76,11 +76,11 @@ const updateById = async (
   id: number,
   reservation: { start: Date, end: Date },
 ): Promise<void> => {
-  const timeslots = await getTimeslotsInReservationRange(reservation.start, reservation.end);
+  const newTimeslots = await getTimeslotsInReservationRange(reservation.start, reservation.end);
   const oldReservation: Reservation | null = await Reservation.findByPk(id);
   const oldTimeslots = await oldReservation?.getTimeslots();
   await oldReservation?.removeTimeslots(oldTimeslots);
-  await oldReservation?.addTimeslots(timeslots);
+  await oldReservation?.addTimeslots(newTimeslots);
   await Reservation.update(reservation, { where: { id } });
 };
 
