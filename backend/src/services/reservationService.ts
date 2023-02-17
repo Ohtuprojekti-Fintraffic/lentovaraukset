@@ -1,4 +1,5 @@
 import { Op } from 'sequelize';
+import { ReservationEntry } from '@lentovaraukset/shared/src';
 import { Reservation } from '../models';
 
 const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
@@ -18,11 +19,8 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
     },
   });
 
-  return reservations.map((reservation) => ({
-    title: 'Varattu',
-    id: reservation.dataValues.id,
-    start: reservation.dataValues.start,
-    end: reservation.dataValues.end,
+  return reservations.map(({ id, start, end }) => ({
+    title: 'Varattu', id, start, end,
   }));
 };
 
@@ -35,27 +33,28 @@ const deleteById = async (id: number): Promise<boolean> => {
   return false;
 };
 
-const createReservation = async (
+const createReservation = async (newReservation: {
   start: Date,
   end: Date,
-  aircraftId: String,
-  info: String,
-  phoneNumber: String,
-) => {
-  const reservation: any = await Reservation.create(({
-    start,
-    end,
-    aircraftId,
-    info,
-    phoneNumber,
-  }));
-  return reservation;
+  aircraftId: string,
+  info: string,
+  phoneNumber: string, }): Promise<ReservationEntry> => {
+  const {
+    id, start, end, aircraftId, info, phoneNumber,
+  } = await Reservation.create(newReservation);
+
+  // we don't have users yet
+  const user = 'NYI';
+
+  return {
+    id, start, end, aircraftId, info, user, phoneNumber,
+  };
 };
 
 const updateById = async (
   id: number,
   reservation: { start: Date, end: Date },
-) => {
+): Promise<void> => {
   await Reservation.update(reservation, { where: { id } });
 };
 

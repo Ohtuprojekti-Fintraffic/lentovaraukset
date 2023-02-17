@@ -39,8 +39,9 @@ router.post('/', async (req: express.Request, res: express.Response) => {
       info,
       phoneNumber,
     } = req.body;
-    const reservation = await reservationService
-      .createReservation(start, end, aircraftId, info, phoneNumber);
+    const reservation = await reservationService.createReservation({
+      start, end, aircraftId, info, phoneNumber
+    });
     res.json(reservation);
   } catch (error) {
     res.status(400).json(error);

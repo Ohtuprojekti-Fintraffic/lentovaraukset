@@ -24,7 +24,7 @@ describe('Calls to api', () => {
     const newReservation: any = await api.post('/api/reservations/')
       .set('Content-type', 'application/json')
       .send({
-        start: '2023-01-02T12:00:00.000Z', end: '2023-01-02T14:00:00.000Z', aircraftId: 'OH-QAA', info: 'Training flight',
+        start: new Date('2023-01-02T12:00:00.000Z'), end: new Date('2023-01-02T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight',
       });
 
     const createdReservation: Reservation | null = await Reservation.findOne(
@@ -41,7 +41,7 @@ describe('Calls to api', () => {
   test('can add a reservation without info', async () => {
     const newReservation: any = await api.post('/api/reservations/')
       .set('Content-type', 'application/json')
-      .send({ start: '2023-01-02T12:00:00.000Z', end: '2023-01-02T14:00:00.000Z', aircraftId: 'OH-QAA' });
+      .send({ start: new Date('2023-01-02T12:00:00.000Z'), end: new Date('2023-01-02T14:00:00.000Z'), aircraftId: 'OH-QAA' });
 
     const createdReservation: Reservation | null = await Reservation.findOne(
       { where: { id: newReservation.body.id } },
