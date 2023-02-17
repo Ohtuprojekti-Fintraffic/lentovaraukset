@@ -1,5 +1,5 @@
 import express from 'express';
-import createTimeSlotValidator from '@lentovaraukset/shared/src/validation/validation';
+import { createTimeSlotValidator, getTimeRangeValidator } from '@lentovaraukset/shared/src/validation/validation';
 import timeslotService from '../services/timeslotService';
 
 const router = express.Router();
@@ -7,11 +7,11 @@ const router = express.Router();
 router.get('/', async (req: express.Request, res: express.Response) => {
   const { from } = req.query;
   const { until } = req.query;
-  const timeslots = await timeslotService.getInTimeRange(
-    new Date(from as string),
-    new Date(until as string),
-  );
-
+  const { start, end } = getTimeRangeValidator().parse({
+    start: new Date(from as string),
+    end: new Date(until as string),
+  });
+  const timeslots = await timeslotService.getInTimeRange(start, end);
   res.json(timeslots);
 });
 
@@ -39,6 +39,7 @@ router.post('/', async (req: express.Request, res: express.Response) => {
     const timeslot = await timeslotService.createTimeslot(newTimeSlot);
     res.json(timeslot);
   } catch (error) {
+    console.log(error);
     res.status(400).json(error);
   }
 });
@@ -52,6 +53,7 @@ router.patch('/:id', async (req: express.Request, res: express.Response) => {
     await timeslotService.updateById(id, modifiedTimeslot);
     res.status(200).json(modifiedTimeslot);
   } catch (error) {
+    console.log(error);
     res.status(400).json(error);
   }
 });

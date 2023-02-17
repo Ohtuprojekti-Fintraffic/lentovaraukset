@@ -5,19 +5,19 @@ import { Reservation, Timeslot } from '../models';
 const getTimeslotsInReservationRange = async (start: Date, end: Date) => {
   const timeslots = await Timeslot.findAll({
     where: {
-    [Op.and]: [
-      {
-        start: {
-          [Op.lte]: start,
+      [Op.and]: [
+        {
+          start: {
+            [Op.lte]: start,
+          },
         },
-      },
-      {
-        end: {
-          [Op.gte]: end,
+        {
+          end: {
+            [Op.gte]: end,
+          },
         },
-      },
-    ],
-  }
+      ],
+    },
   });
   return timeslots;
 };
@@ -57,13 +57,10 @@ const createReservation = async (newReservation: {
   start: Date,
   end: Date,
   aircraftId: string,
-  info: string, }): Promise<ReservationEntry> => {
+  info?: string, }): Promise<ReservationEntry> => {
   const timeslots = await getTimeslotsInReservationRange(newReservation.start, newReservation.end);
   const reservation: Reservation = await Reservation.create(newReservation);
-  if (timeslots) {
-    reservation.addTimeslots(timeslots);
-  };
-  // we don't have users yet
+  await reservation.addTimeslots(timeslots);
   const {
     id, start, end, aircraftId, info,
   } = reservation;
@@ -72,7 +69,7 @@ const createReservation = async (newReservation: {
 
   return {
     id, start, end, aircraftId, info, user, phone,
-  }
+  };
 };
 
 const updateById = async (
@@ -81,18 +78,11 @@ const updateById = async (
 ): Promise<void> => {
   const timeslots = await getTimeslotsInReservationRange(reservation.start, reservation.end);
   const oldReservation: Reservation | null = await Reservation.findByPk(id);
-  if (oldReservation) {
-    const oldTimeslots = await oldReservation.getTimeslots();
-    if (oldTimeslots) {
-      await oldReservation.removeTimeslots(oldTimeslots);
-    }
-  if (timeslots) {
-    console.log(timeslots);
-    await oldReservation.addTimeslots(timeslots);
-  };
+  const oldTimeslots = await oldReservation?.getTimeslots();
+  await oldReservation?.removeTimeslots(oldTimeslots);
+  await oldReservation?.addTimeslots(timeslots);
   await Reservation.update(reservation, { where: { id } });
 };
-}
 
 export default {
   createReservation,

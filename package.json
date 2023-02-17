@@ -9,7 +9,7 @@
     "shared"
   ],
   "scripts": {
-    "build": "npm -ws --if-present run build",
+    "build": "tsc --jsx react",
     "build:frontend": "npm -w @lentovaraukset/frontend run build",
     "cypress:open": "cypress open --project shared",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",

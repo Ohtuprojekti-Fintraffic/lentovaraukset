@@ -1,0 +1,6 @@
+./**/build
+./**/dist
+./**/__tests__
+./**/cypress
+./**/cypress.config.ts
+./**/jest.config.ts
