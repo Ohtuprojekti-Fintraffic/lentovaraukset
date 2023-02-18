@@ -40,6 +40,52 @@ module.exports = {
       fuchsia: colors.fuchsia,
       pink: colors.pink,
       rose: colors.rose,
+      // FINTRAFFIC COLOURS
+      // https://design.fintraffic.fi/594a251b1/p/45ec9d-colors
+      // Primary colours
+      'ft-primary-black': '#000000',
+      'ft-primary-white': '#FFFFFF',
+
+      // Text colours
+      'ft-text-1': '#FFFFFF',
+      'ft-text-300': '#9696AA',
+      'ft-text-600': '#505064',
+      'ft-text-1000': '#000000',
+
+      // Neutrals
+      'ft-neutral-400': '#2C2C44',
+      'ft-neutral-300': '#505064',
+      'ft-neutral-200': '#9696AA',
+      'ft-neutral-100': '#CDCDD7',
+      'ft-neutral-50': '#F6F6F6',
+
+      // Interactives
+      'ft-interactive-400': '#001C5B',
+      'ft-interactive-300': '#0034AC',
+      'ft-interactive-200': '#1777F8',
+      'ft-interactive-100': '#90CEFE',
+      'ft-interactive-50': '#EFF8FF',
+
+      // Dangers
+      'ft-danger-400': '#720000',
+      'ft-danger-300': '#B40000',
+      'ft-danger-200': '#E55636',
+      'ft-danger-100': '#FF9B87',
+      'ft-danger-50': '#FFF0ED',
+
+      // Warnings
+      'ft-warning-400': '#6C3E05',
+      'ft-warning-300': '#B47324',
+      'ft-warning-200': '#EEC200',
+      'ft-warning-100': '#FFE37F',
+      'ft-warning-50': '#FFFADB',
+
+      // Successes
+      'ft-success-400': '#004042',
+      'ft-success-300': '#005F61',
+      'ft-success-200': '#25A794',
+      'ft-success-100': '#82E8C3',
+      'ft-success-50': '#EAFFF8',
     }),
     columns: {
       auto: 'auto',
@@ -205,6 +251,13 @@ module.exports = {
       '2xl': '1rem',
       '3xl': '1.5rem',
       full: '9999px',
+
+      // FINTRAFFIC BORDERS
+      // https://design.fintraffic.fi/594a251b1/p/540563-radius
+      'ft-compact': '2px',
+      'ft-normal': '4px',
+      'ft-large': '8px',
+      'ft-round': '1000px',
     },
     borderSpacing: ({ theme }) => ({
       ...theme('spacing'),
@@ -404,6 +457,45 @@ module.exports = {
       '7xl': ['4.5rem', { lineHeight: '1' }],
       '8xl': ['6rem', { lineHeight: '1' }],
       '9xl': ['8rem', { lineHeight: '1' }],
+
+      // FINTRAFFIC FONT SIZES
+      // https://design.fintraffic.fi/594a251b1/p/53e733-typography
+      // Headings
+      'ft-h1': ['4rem', { lineHeight: '1.1' }],
+      'ft-h2': ['3rem', { lineHeight: '1.1' }],
+      'ft-h3': ['2.5rem', { lineHeight: '1.1' }],
+      'ft-h4': ['2rem', { lineHeight: '1.1' }],
+      'ft-h5': ['1.75rem', { lineHeight: '1.1' }],
+      'ft-h6': ['1.25rem', { lineHeight: '1.1' }],
+
+      // Small Headings
+      'ft-hs1': ['2.625rem', { lineHeight: '1.1' }],
+      'ft-hs2': ['2rem', { lineHeight: '1.1' }],
+      'ft-hs3': ['1.75rem', { lineHeight: '1.1' }],
+      'ft-hs4': ['1.5rem', { lineHeight: '1.1' }],
+      'ft-hs5': ['1.125rem', { lineHeight: '1.1' }],
+      'ft-hs6': ['1rem', { lineHeight: '1.1' }],
+
+      // Semantic
+      'ft-helper': ['0.9375rem', { lineHeight: '1' }],
+      'ft-label': ['1rem', { lineHeight: '1' }],
+      'ft-placeholder': ['1rem', { lineHeight: '1' }],
+      'ft-tag': ['1rem', { lineHeight: '1' }],
+
+      // Body
+      'ft-body-default': ['1rem', { lineHeight: '1.5' }],
+      'ft-body-large': ['1.125rem', { lineHeight: '1.5' }],
+      'ft-body-micro': ['0.75rem', { lineHeight: '1.5' }],
+      'ft-body-small': ['0.875rem', { lineHeight: '1.5' }],
+      'ft-emphasis-default': ['1rem', { lineHeight: '1.5' }],
+      'ft-emphasis-large': ['1.125rem', { lineHeight: '1.5' }],
+      'ft-emphasis-micro': ['0.75rem', { lineHeight: '1.5' }],
+      'ft-link-default': ['1rem', { lineHeight: '1.5' }],
+      'ft-link-large': ['1.125rem', { lineHeight: '1.5' }],
+      'ft-link-small': ['0.875rem', { lineHeight: '1.5' }],
+      'ft-link-micro': ['0.75rem', { lineHeight: '1.5' }],
+      // Buttons
+      'ft-button': ['16px', { lineHeight: 1.375 }],
     },
     fontWeight: {
       thin: '100',
@@ -415,6 +507,18 @@ module.exports = {
       bold: '700',
       extrabold: '800',
       black: '900',
+
+      // FINTRAFFIC FONT WEIGHTS
+      // https://design.fintraffic.fi/594a251b1/p/53e733-typography
+      'ft-heading': '700',
+      'ft-body': '400',
+      'ft-emphasis': '700',
+      'ft-link': '400',
+      'ft-helper': '400',
+      'ft-label': '500',
+      'ft-placeholder': '500',
+      'ft-button': '500',
+
     },
     gap: ({ theme }) => theme('spacing'),
     gradientColorStops: ({ theme }) => theme('colors'),
@@ -618,6 +722,7 @@ module.exports = {
       8: '2rem',
       9: '2.25rem',
       10: '2.5rem',
+      'ft-button': '1.375',
     },
     listStyleType: {
       none: 'none',
