@@ -1,25 +1,20 @@
 import { Op } from 'sequelize';
 import type { TimeslotEntry } from '@lentovaraukset/shared/src/index';
-import { Reservation, Timeslot } from '../models';
+import reservationService from '@lentovaraukset/backend/src/services/reservationService';
+import { Timeslot } from '../models';
 
-const getReservationsInTimeslotRange = async (start: Date, end: Date) => {
-  const reservations = await Reservation.findAll({
+const getTimeslotFromRange = async (startTime: Date, endTime: Date) => {
+  const timeslots: Timeslot[] = await Timeslot.findAll({
     where: {
-      [Op.and]: [
-        {
-          start: {
-            [Op.gte]: start,
-          },
-        },
-        {
-          end: {
-            [Op.lte]: end,
-          },
-        },
-      ],
+      start: {
+        [Op.lt]: endTime,
+      },
+      end: {
+        [Op.gt]: startTime,
+      },
     },
   });
-  return reservations;
+  return timeslots;
 };
 
 const getInTimeRange = async (
@@ -58,7 +53,8 @@ const updateById = async (
   id: number,
   timeslot: { start: Date, end: Date },
 ): Promise<void> => {
-  const newReservations = await getReservationsInTimeslotRange(timeslot.start, timeslot.end);
+  const newReservations = await reservationService
+    .getReservationFromRange(timeslot.start, timeslot.end);
   const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
   const oldReservations = await oldTimeslot?.getReservations();
   await oldTimeslot?.removeReservations(oldReservations);
@@ -70,10 +66,11 @@ const createTimeslot = async (newTimeSlot: {
   start: Date;
   end: Date;
 }): Promise<TimeslotEntry> => {
-  const reservations = await getReservationsInTimeslotRange(newTimeSlot.start, newTimeSlot.end);
+  const reservations = await reservationService
+    .getReservationFromRange(newTimeSlot.start, newTimeSlot.end);
   const timeslot: Timeslot = await Timeslot.create(newTimeSlot);
   await timeslot.addReservations(reservations);
-  return timeslot;
+  return timeslot.dataValues;
 };
 
 export default {
@@ -81,4 +78,5 @@ export default {
   deleteById,
   updateById,
   createTimeslot,
+  getTimeslotFromRange,
 };

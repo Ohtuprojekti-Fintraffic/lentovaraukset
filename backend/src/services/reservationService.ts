@@ -1,25 +1,20 @@
 import { Op } from 'sequelize';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
-import { Reservation, Timeslot } from '../models';
+import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
+import { Reservation } from '../models';
 
-const getTimeslotsInReservationRange = async (start: Date, end: Date) => {
-  const timeslots = await Timeslot.findAll({
+const getReservationFromRange = async (startTime: Date, endTime: Date) => {
+  const reservations: Reservation[] = await Reservation.findAll({
     where: {
-      [Op.and]: [
-        {
-          start: {
-            [Op.lte]: start,
-          },
-        },
-        {
-          end: {
-            [Op.gte]: end,
-          },
-        },
-      ],
+      start: {
+        [Op.lt]: endTime,
+      },
+      end: {
+        [Op.gt]: startTime,
+      },
     },
   });
-  return timeslots;
+  return reservations;
 };
 
 const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
@@ -59,7 +54,8 @@ const createReservation = async (newReservation: {
   aircraftId: string,
   info?: string,
   phone: string, }): Promise<ReservationEntry> => {
-  const timeslots = await getTimeslotsInReservationRange(newReservation.start, newReservation.end);
+  const timeslots = await timeslotService
+    .getTimeslotFromRange(newReservation.start, newReservation.end);
   const reservation: Reservation = await Reservation.create(newReservation);
   await reservation.addTimeslots(timeslots);
   const user = 'NYI';
@@ -70,7 +66,8 @@ const updateById = async (
   id: number,
   reservation: { start: Date, end: Date },
 ): Promise<void> => {
-  const newTimeslots = await getTimeslotsInReservationRange(reservation.start, reservation.end);
+  const newTimeslots = await timeslotService
+    .getTimeslotFromRange(reservation.start, reservation.end);
   const oldReservation: Reservation | null = await Reservation.findByPk(id);
   const oldTimeslots = await oldReservation?.getTimeslots();
   await oldReservation?.removeTimeslots(oldTimeslots);
@@ -83,4 +80,5 @@ export default {
   getInTimeRange,
   deleteById,
   updateById,
+  getReservationFromRange,
 };
