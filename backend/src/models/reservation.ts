@@ -21,6 +21,8 @@ InferCreationAttributes<Reservation>
   declare aircraftId: string;
 
   declare info: CreationOptional<string>;
+
+  declare phone: string;
 }
 
 Reservation.init(
@@ -45,6 +47,10 @@ Reservation.init(
     info: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
   },
   {

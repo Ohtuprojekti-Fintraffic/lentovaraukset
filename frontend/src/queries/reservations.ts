@@ -11,7 +11,7 @@ const addReservation = async (newReservation: any): Promise<void> => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ ...newReservation, aircraftId: '1' }),
+    body: JSON.stringify({ ...newReservation, aircraftId: '1', phone: '1' }),
   });
 };
 
