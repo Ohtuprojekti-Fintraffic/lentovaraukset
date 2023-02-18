@@ -30,6 +30,7 @@ const createReservationValidator = (slotGranularityMinutes: number) => {
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message }),
     aircraftId: z.string(),
     info: z.string().optional(),
+    phone: z.string(),
   });
 
   return Reservation;

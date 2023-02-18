@@ -57,13 +57,13 @@ const createReservation = async (newReservation: {
   start: Date,
   end: Date,
   aircraftId: string,
-  info?: string, }): Promise<ReservationEntry> => {
+  info?: string,
+  phone: string, }): Promise<ReservationEntry> => {
   const timeslots = await getTimeslotsInReservationRange(newReservation.start, newReservation.end);
   const reservation: Reservation = await Reservation.create(newReservation);
   await reservation.addTimeslots(timeslots);
   const user = 'NYI';
-  const phone = 'NYI';
-  return { ...reservation.dataValues, user, phone };
+  return { ...reservation.dataValues, user };
 };
 
 const updateById = async (

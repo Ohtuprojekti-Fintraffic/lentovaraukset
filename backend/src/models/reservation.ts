@@ -26,6 +26,8 @@ InferCreationAttributes<Reservation>
 
   declare info: CreationOptional<string>;
 
+  declare phone: string;
+
   declare addTimeslots: HasManyAddAssociationsMixin<Timeslot, number>;
 
   declare getTimeslots: HasManyGetAssociationsMixin<Timeslot>;
@@ -55,6 +57,10 @@ Reservation.init(
     info: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
   },
   {
