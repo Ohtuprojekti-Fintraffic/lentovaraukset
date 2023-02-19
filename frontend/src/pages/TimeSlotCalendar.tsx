@@ -14,7 +14,7 @@ function TimeSlotCalendar() {
   ) => {
     try {
       const timeslots = await getTimeSlots(start, end);
-      console.log(timeslots);
+
       successCallback(timeslots);
     } catch (error) {
       failureCallback(error as Error);
