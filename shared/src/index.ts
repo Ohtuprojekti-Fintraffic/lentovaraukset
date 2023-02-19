@@ -20,7 +20,7 @@ export interface ReservationStatus {
   reservedSlots: ReservationEntry[];
 }
 
-export interface CalendarEvent {
+interface CalendarEvent {
   id: number,
   title: string,
   start: Date,
@@ -28,3 +28,7 @@ export interface CalendarEvent {
   user: string,
   info: string
 }
+
+export type ReservationCalendarEvent = Partial<CalendarEvent>;
+
+export type TimeSlotsCalendarEvent = Omit<CalendarEvent, 'title' | 'user' | 'info'>;
