@@ -12,6 +12,7 @@ import {
 } from '../queries/reservations';
 import Card from '../components/Card';
 import { getTimeSlots } from '../queries/timeSlots';
+import Button from '../components/Button';
 
 function ReservationCalendar() {
   const [showInspectModal, setShowInspectModal] = useState(false);
@@ -94,23 +95,21 @@ function ReservationCalendar() {
             </pre>
           </div>
         </div>
-        <button
-          className="bg-transparent text-red-600 border-red-600 border-2 p-3 rounded-lg"
+        <Button
+          variant="danger"
           onClick={async () => {
             await deleteReservationFn.mutateAsync(Number(selectedReservation.id));
             closeReservationModalFn();
           }}
-          type="button"
         >
           Poista
-        </button>
-        <button
-          className="bg-black text-white p-3 rounded-lg"
+        </Button>
+        <Button
+          variant="primary"
           onClick={() => { setShowInspectModal(false); }}
-          type="button"
         >
           Tallenna
-        </button>
+        </Button>
       </Card>
       <h1 className="text-3xl">Varauskalenteri</h1>
       <Calendar
