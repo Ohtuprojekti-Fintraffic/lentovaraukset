@@ -33,6 +33,13 @@ Or try to automatically fix them:
 This project also uses Jest for automatic unit tests. You can run them with the following command:  
 `npm test`
 
+This project has Cypress for end-to-end testing. Running these tests requires the app to be running in the background:  
+`npm run start:test`  
+And to launch Cypress, run:  
+`npm run cypress:open`
+
+The Cypress spec files are in `shared/cypress/e2e/`.
+
 ### Database
 
 Start the development database with the following command:

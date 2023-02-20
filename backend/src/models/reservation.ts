@@ -1,7 +1,27 @@
-import { Model, DataTypes } from 'sequelize';
+import {
+  Model,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+} from 'sequelize';
+
 import { sequelize } from '../util/db';
 
-class Reservation extends Model {}
+class Reservation extends Model<
+InferAttributes<Reservation>,
+InferCreationAttributes<Reservation>
+> {
+  declare id: CreationOptional<number>;
+
+  declare start: Date;
+
+  declare end: Date;
+
+  declare aircraftId: string;
+
+  declare info: CreationOptional<string>;
+}
 
 Reservation.init(
   {

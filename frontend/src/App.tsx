@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import {
   QueryClient,
@@ -9,6 +9,10 @@ import Navigation from './components/Navigation';
 const queryClient = new QueryClient();
 
 function App() {
+  useEffect(() => {
+    document.title = `Lentovaraukset - ${process.env.COMMIT_HASH}`;
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-col h-full">
