@@ -1,7 +1,7 @@
 import React, { Children } from 'react';
 import Modal from './Modal';
 
-type Props = {
+type CardProps = {
   show: boolean,
   handleClose: any,
   cancelButton?: boolean
@@ -9,13 +9,22 @@ type Props = {
   children?: React.ReactNode
 };
 
-const Card: React.FC<Props> = ({
-  show, handleClose, children, cancelButton = true, cancelButtonText = 'Peruuta',
-}) => (
-  <Modal show={show} handleClose={handleClose}>
-    <div className=" flex flex-col w-1/2 max-w-md h-fit bg-white rounded-lg shadow-2xl overflow-hidden" onClick={(event) => event.stopPropagation()}>
-      {Children.toArray(children)[0]}
-      {(Children.count(children) > 1 || cancelButton)
+function Card({
+  show,
+  handleClose,
+  children,
+  cancelButton = true,
+  cancelButtonText = 'Peruuta',
+}: CardProps) {
+  return (
+    <Modal show={show} handleClose={handleClose}>
+      <div
+        className=" flex flex-col max-w-md h-fit bg-white rounded-lg shadow-2xl overflow-hidden"
+        role="dialog"
+        aria-modal="true"
+      >
+        {Children.toArray(children)[0]}
+        {(Children.count(children) > 1 || cancelButton)
           && (
             <div className="flex flex-row justify-between p-4 bg-gray-100 border-t border-gray-200 w-full">
               {
@@ -25,6 +34,7 @@ const Card: React.FC<Props> = ({
                     <button
                       className="bg-transparent text-black p-3 rounded-lg"
                       onClick={() => handleClose()}
+                      type="button"
                     >
                       {cancelButtonText}
                     </button>
@@ -43,8 +53,9 @@ const Card: React.FC<Props> = ({
               }
             </div>
           )}
-    </div>
-  </Modal>
-);
+      </div>
+    </Modal>
+  );
+}
 
 export default Card;

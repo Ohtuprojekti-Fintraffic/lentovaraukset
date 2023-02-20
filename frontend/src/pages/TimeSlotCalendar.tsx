@@ -21,6 +21,7 @@ function TimeSlotCalendar() {
   };
 
   const clickEventFn = async (event: { id: string }): Promise<void> => {
+    // eslint-disable-next-line no-restricted-globals
     if (confirm('Haluatko varmasti poistaa aikaikkunan?')) {
       await deleteTimeslot(Number(event.id));
     }

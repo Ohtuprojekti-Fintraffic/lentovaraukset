@@ -14,7 +14,11 @@ type CalendarProps = {
   eventSources: EventSourceInput[];
   addEventFn: (event: { start: Date; end: Date }) => Promise<void>;
   modifyEventFn: (event: { id: string; start: Date; end: Date }) => Promise<void>;
-  clickEventFn: (event: { id: string; start?: Date; end?: Date }) => Promise<void>;
+  clickEventFn: (event: {
+    id: string;
+    start?: Date;
+    end?: Date;
+    title?: string }) => Promise<void>;
   granularity: { minutes: number };
   eventColors: {
     backgroundColor?: string;
@@ -62,15 +66,15 @@ function Calendar({
 
     const { event } = clickData;
 
-    clickEventFn({
+    await clickEventFn({
       id: event.id,
       start: event.start || undefined,
       end: event.start || undefined,
+      title: event.title,
     });
 
-    calendarRef.current?.getApi().refetchEvents();
-    // Open event info screen here
     // Refresh calendar if changes were made
+    calendarRef.current?.getApi().refetchEvents();
   };
 
   // When a event box is moved or resized

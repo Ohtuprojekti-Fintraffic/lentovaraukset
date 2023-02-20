@@ -15,7 +15,11 @@ import { getTimeSlots } from '../queries/timeSlots';
 
 function ReservationCalendar() {
   const [showInspectModal, setShowInspectModal] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState<Partial<{ id: string, start: Date, end: Date }>>({});
+  const [selectedReservation, setSelectedReservation] = useState<Partial<{
+    id: string,
+    start: Date,
+    end: Date
+  }>>({});
 
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
@@ -60,7 +64,11 @@ function ReservationCalendar() {
 
   const deleteReservationFn = useMutation((id: Number) => deleteReservation(id));
 
-  const clickReservation = async (event: { id: string; start?: Date; end?: Date }): Promise<void> => {
+  const clickReservation = async (event: {
+    id: string;
+    start?: Date;
+    end?: Date
+  }): Promise<void> => {
     setSelectedReservation(event);
     setShowInspectModal(true);
   };
@@ -92,10 +100,17 @@ function ReservationCalendar() {
             await deleteReservationFn.mutateAsync(Number(selectedReservation.id));
             closeReservationModalFn();
           }}
+          type="button"
         >
           Poista
         </button>
-        <button className="bg-black text-white p-3 rounded-lg" onClick={() => { setShowInspectModal(false); }}>Tallenna</button>
+        <button
+          className="bg-black text-white p-3 rounded-lg"
+          onClick={() => { setShowInspectModal(false); }}
+          type="button"
+        >
+          Tallenna
+        </button>
       </Card>
       <h1 className="text-3xl">Varauskalenteri</h1>
       <Calendar
