@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
+import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
 import { Reservation } from '../models';
 
 const numConcurrentReservations: number = 2;
@@ -70,35 +71,27 @@ const createReservation = async (newReservation: {
   start: Date,
   end: Date,
   aircraftId: string,
-  info?: string | undefined, }): Promise<ReservationEntry> => {
-  if ((await getReservationFromRange(newReservation.start, newReservation.end))
-    .length >= numConcurrentReservations) {
-    throw new Error('Too many concurrent reservations');
-  } else {
-    const {
-      id, start, end, aircraftId, info,
-    } = await Reservation.create(newReservation);
-
-    // we don't have users yet
-    const user = 'NYI';
-    const phone = 'NYI';
-
-    return {
-      id, start, end, aircraftId, info, user, phone,
-    };
-  }
+  info?: string,
+  phone: string, }): Promise<ReservationEntry> => {
+  const timeslots = await timeslotService
+    .getTimeslotFromRange(newReservation.start, newReservation.end);
+  const reservation: Reservation = await Reservation.create(newReservation);
+  await reservation.addTimeslots(timeslots);
+  const user = 'NYI';
+  return { ...reservation.dataValues, user };
 };
 
 const updateById = async (
   id: number,
   reservation: { start: Date, end: Date },
 ): Promise<void> => {
-  if ((await getReservationFromRangeWithoutId(reservation.start, reservation.end, id))
-    .length >= numConcurrentReservations) {
-    throw new Error('Too many concurrent reservations');
-  } else {
-    await Reservation.update(reservation, { where: { id } });
-  }
+  const newTimeslots = await timeslotService
+    .getTimeslotFromRange(reservation.start, reservation.end);
+  const oldReservation: Reservation | null = await Reservation.findByPk(id);
+  const oldTimeslots = await oldReservation?.getTimeslots();
+  await oldReservation?.removeTimeslots(oldTimeslots);
+  await oldReservation?.addTimeslots(newTimeslots);
+  await Reservation.update(reservation, { where: { id } });
 };
 
 export default {
@@ -106,4 +99,5 @@ export default {
   getInTimeRange,
   deleteById,
   updateById,
+  getReservationFromRange,
 };

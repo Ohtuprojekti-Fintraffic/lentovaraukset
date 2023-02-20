@@ -11,17 +11,20 @@ const reservations = [
     end: new Date('2023-02-02T10:00:00.000Z'),
     aircraftId: 'XZ-ABC',
     info: 'example info',
+    phone: '0401111111',
   },
   {
     start: new Date('2023-02-02T14:00:00.000Z'),
     end: new Date('2023-02-02T16:00:00.000Z'),
     aircraftId: 'DK-ASD',
+    phone: '0401111111',
   },
   {
     start: new Date('2023-02-02T16:00:00.000Z'),
     end: new Date('2023-02-02T18:00:00.000Z'),
     aircraftId: 'RF-SDR',
     info: 'First time landing!',
+    phone: '0401111111',
   },
 ];
 
@@ -53,7 +56,7 @@ describe('Calls to api', () => {
     const newReservation: any = await api.post('/api/reservations/')
       .set('Content-type', 'application/json')
       .send({
-        start: new Date('2023-01-02T12:00:00.000Z'), end: new Date('2023-01-02T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight',
+        start: new Date('2023-01-02T12:00:00.000Z'), end: new Date('2023-01-02T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
       });
 
     const createdReservation: Reservation | null = await Reservation.findOne(
@@ -65,12 +68,15 @@ describe('Calls to api', () => {
     expect(createdReservation?.dataValues.end).toEqual(new Date('2023-01-02T14:00:00.000Z'));
     expect(createdReservation?.dataValues.aircraftId).toEqual('OH-QAA');
     expect(createdReservation?.dataValues.info).toEqual('Training flight');
+    expect(createdReservation?.dataValues.phone).toEqual('11104040');
   });
 
   test('can add a reservation without info', async () => {
     const newReservation: any = await api.post('/api/reservations/')
       .set('Content-type', 'application/json')
-      .send({ start: new Date('2023-01-02T12:00:00.000Z'), end: new Date('2023-01-02T14:00:00.000Z'), aircraftId: 'OH-QAA' });
+      .send({
+        start: new Date('2023-01-02T12:00:00.000Z'), end: new Date('2023-01-02T14:00:00.000Z'), aircraftId: 'OH-QAA', phone: '11104040',
+      });
 
     const createdReservation: Reservation | null = await Reservation.findOne(
       { where: { id: newReservation.body.id } },
@@ -81,6 +87,7 @@ describe('Calls to api', () => {
     expect(createdReservation?.dataValues.end).toEqual(new Date('2023-01-02T14:00:00.000Z'));
     expect(createdReservation?.dataValues.aircraftId).toEqual('OH-QAA');
     expect(createdReservation?.dataValues.info).toEqual(null);
+    expect(createdReservation?.dataValues.phone).toEqual('11104040');
   });
 
   test('can delete a reservation', async () => {

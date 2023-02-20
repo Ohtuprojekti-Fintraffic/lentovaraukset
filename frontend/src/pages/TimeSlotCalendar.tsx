@@ -20,6 +20,13 @@ function TimeSlotCalendar() {
     }
   };
 
+  const clickEventFn = async (event: { id: string }): Promise<void> => {
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm('Haluatko varmasti poistaa aikaikkunan?')) {
+      await deleteTimeslot(Number(event.id));
+    }
+  };
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <h1 className="text-3xl">Vapaat varausikkunat</h1>
@@ -27,7 +34,7 @@ function TimeSlotCalendar() {
         eventSources={[timeSlotsSourceFn]}
         addEventFn={addTimeSlot}
         modifyEventFn={modifyTimeSlot}
-        deleteEventFn={deleteTimeslot}
+        clickEventFn={clickEventFn}
         granularity={{ minutes: 20 }} // TODO: Get from airfield api
         eventColors={{ backgroundColor: '#bef264', eventColor: '#84cc16', textColor: '#000000' }}
         selectConstraint={undefined}

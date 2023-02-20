@@ -4,8 +4,12 @@ import {
   InferAttributes,
   InferCreationAttributes,
   CreationOptional,
+  HasManyAddAssociationsMixin,
+  HasManyGetAssociationsMixin,
+  HasManyRemoveAssociationsMixin,
 } from 'sequelize';
 
+import { Reservation } from '@lentovaraukset/backend/src/models';
 import { sequelize } from '../util/db';
 
 class Timeslot extends Model<
@@ -17,6 +21,12 @@ InferCreationAttributes<Timeslot>
   declare start: Date;
 
   declare end: Date;
+
+  declare addReservations: HasManyAddAssociationsMixin<Reservation, number>;
+
+  declare getReservations: HasManyGetAssociationsMixin<Reservation>;
+
+  declare removeReservations: HasManyRemoveAssociationsMixin<Reservation, number>;
 }
 
 Timeslot.init(
