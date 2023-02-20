@@ -21,7 +21,7 @@ export interface ReservationStatus {
 }
 
 interface CalendarEvent {
-  id: number,
+  id: string,
   title: string,
   start: Date,
   end: Date,
