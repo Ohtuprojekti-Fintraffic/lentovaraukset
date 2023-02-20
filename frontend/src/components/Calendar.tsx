@@ -10,10 +10,15 @@ import {
 import { EventImpl } from '@fullcalendar/core/internal';
 
 type CalendarProps = {
+  calendarRef?: React.RefObject<FullCalendar>;
   eventSources: EventSourceInput[];
   addEventFn: (event: { start: Date; end: Date }) => Promise<void>;
   modifyEventFn: (event: { id: string; start: Date; end: Date }) => Promise<void>;
-  deleteEventFn: (id: number) => Promise<string>;
+  clickEventFn: (event: {
+    id: string;
+    start?: Date;
+    end?: Date;
+    title?: string }) => Promise<void>;
   granularity: { minutes: number };
   eventColors: {
     backgroundColor?: string;
@@ -24,16 +29,15 @@ type CalendarProps = {
 };
 
 function Calendar({
+  calendarRef = React.createRef(),
   eventSources,
   addEventFn,
   modifyEventFn,
-  deleteEventFn,
+  clickEventFn,
   granularity,
   eventColors,
   selectConstraint,
 }: CalendarProps) {
-  const calendarRef: React.RefObject<FullCalendar> = React.createRef();
-
   const isOverlap = (eventA: EventImpl, eventB: EventImpl) => {
     if (eventA.start && eventA.end && eventB.start && eventB.end) {
       return !(eventA.end <= eventB.start || eventB.end <= eventA.start);
@@ -60,14 +64,17 @@ function Calendar({
   const handleEventClick = async (clickData: EventClickArg) => {
     if (clickData.event.display.includes('background')) return;
 
-    // until better confirm
-    // eslint-disable-next-line no-restricted-globals
-    if (confirm('Haluatko varmasti poistaa aikaikkunan?')) {
-      await deleteEventFn(Number(clickData.event.id));
-    }
-    calendarRef.current?.getApi().refetchEvents();
-    // Open event info screen here
+    const { event } = clickData;
+
+    await clickEventFn({
+      id: event.id,
+      start: event.start || undefined,
+      end: event.start || undefined,
+      title: event.title,
+    });
+
     // Refresh calendar if changes were made
+    calendarRef.current?.getApi().refetchEvents();
   };
 
   // When a event box is moved or resized
