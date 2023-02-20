@@ -30,6 +30,9 @@ module.exports = {
         'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
         // https://github.com/import-js/eslint-plugin-import/issues/1913
         'import/no-extraneous-dependencies': 'off',
+        'react/require-default-props': 'warn',
+        'jsx-a11y/click-events-have-key-events': 'warn',
+        'jsx-a11y/no-static-element-interactions': 'warn',
       },
     },
   ],

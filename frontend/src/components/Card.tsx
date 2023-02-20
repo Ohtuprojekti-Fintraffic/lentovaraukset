@@ -6,7 +6,7 @@ type CardProps = {
   handleClose: any,
   cancelButton?: boolean
   cancelButtonText?: string
-  children?: React.ReactNode
+  children: React.ReactNode
 };
 
 function Card({
