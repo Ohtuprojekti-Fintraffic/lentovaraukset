@@ -15,13 +15,24 @@ function Modal({
 
   return (
     <div
-      className={`${showClass} fixed left-0 top-0 w-screen h-screen z-50 flex flex-col justify-center items-center`}
+      className={`${showClass} fixed left-0 top-0 w-screen h-screen z-40 flex flex-col justify-center items-center`}
+      role="dialog"
+      aria-modal="true"
     >
+
+      { /* eslint-disable
+        jsx-a11y/click-events-have-key-events,
+        jsx-a11y/no-static-element-interactions */
+      }
       <div
         className="fixed w-full h-full bg-black bg-opacity-40"
         onClick={() => handleClose()}
       />
-      <div className="z-[60]">
+      { /* eslint-enable
+        jsx-a11y/click-events-have-key-events,
+        jsx-a11y/no-static-element-interactions */
+      }
+      <div className="z-50">
         {children}
       </div>
     </div>
