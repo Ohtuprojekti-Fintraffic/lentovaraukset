@@ -107,8 +107,11 @@ build
 # Tailwind CSS build file
 frontend/src/styles/main.css
 
-data
+# VS Code
+.vscode
 
+# Staging stuff
+data
 timer.py
 screen.sh
 screen.log
