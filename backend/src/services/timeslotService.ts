@@ -6,12 +6,16 @@ import { Timeslot } from '../models';
 const getTimeslotFromRange = async (startTime: Date, endTime: Date) => {
   const timeslots: Timeslot[] = await Timeslot.findAll({
     where: {
-      start: {
-        [Op.lt]: endTime,
-      },
-      end: {
-        [Op.gt]: startTime,
-      },
+      [Op.and]: [
+        {
+          start: {
+            [Op.gte]: startTime,
+          },
+          end: {
+            [Op.lte]: endTime,
+          },
+        },
+      ],
     },
   });
   return timeslots;
@@ -42,6 +46,10 @@ const getInTimeRange = async (
 
 const deleteById = async (id: number): Promise<boolean> => {
   const timeslot = await Timeslot.findByPk(id);
+  const reservations = await timeslot?.getReservations();
+  if (reservations?.length !== 0) {
+    throw new Error('Timeslot has reservations');
+  }
   if (timeslot) {
     timeslot.destroy();
     return true;

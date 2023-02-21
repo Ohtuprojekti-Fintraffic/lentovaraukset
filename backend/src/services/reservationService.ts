@@ -8,12 +8,16 @@ const numConcurrentReservations: number = 1;
 const getReservationFromRange = async (startTime: Date, endTime: Date) => {
   const reservations: Reservation[] = await Reservation.findAll({
     where: {
-      start: {
-        [Op.lt]: endTime,
-      },
-      end: {
-        [Op.gt]: startTime,
-      },
+      [Op.and]: [
+        {
+          start: {
+            [Op.gte]: startTime,
+          },
+          end: {
+            [Op.lte]: endTime,
+          },
+        },
+      ],
     },
   });
   return reservations;
