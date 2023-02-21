@@ -18,7 +18,7 @@ type CalendarProps = {
     id: string;
     start?: Date;
     end?: Date;
-    title?: string }) => Promise<void>;
+    title: string }) => Promise<void>;
   granularity: { minutes: number };
   eventColors: {
     backgroundColor?: string;

@@ -13,13 +13,15 @@ import {
 import Card from '../components/Card';
 import { getTimeSlots } from '../queries/timeSlots';
 import Button from '../components/Button';
+import ReservationInfoForm from '../components/forms/ReservationInfoForm';
 
 function ReservationCalendar() {
   const [showInspectModal, setShowInspectModal] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Partial<{
     id: string,
     start: Date,
-    end: Date
+    end: Date,
+    title: string
   }>>({});
 
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
@@ -68,7 +70,8 @@ function ReservationCalendar() {
   const clickReservation = async (event: {
     id: string;
     start?: Date;
-    end?: Date
+    end?: Date;
+    title: string
   }): Promise<void> => {
     setSelectedReservation(event);
     setShowInspectModal(true);
@@ -82,19 +85,9 @@ function ReservationCalendar() {
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <Card show={showInspectModal} handleClose={closeReservationModalFn}>
-        <div>
-          <div className="bg-black p-3">
-            <p className="text-white">{`Varaus #${selectedReservation.id}`}</p>
-          </div>
-          <div className="p-8">
-            <p className="text-2xl pb-2">Varaus</p>
-            <pre>
-              {
-                JSON.stringify(selectedReservation, null, 2)
-              }
-            </pre>
-          </div>
-        </div>
+        <ReservationInfoForm
+          reservation={selectedReservation}
+        />
         <Button
           variant="danger"
           onClick={async () => {
