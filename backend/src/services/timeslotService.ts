@@ -44,17 +44,16 @@ const getInTimeRange = async (
   return timeslots.map(({ id, start, end }) => ({ id, start, end }));
 };
 
-const deleteById = async (id: number): Promise<boolean> => {
+const deleteById = async (id: number) => {
   const timeslot = await Timeslot.findByPk(id);
+  if (!timeslot) {
+    throw new Error('Timeslot does not exist');
+  }
   const reservations = await timeslot?.getReservations();
   if (reservations?.length !== 0) {
     throw new Error('Timeslot has reservations');
   }
-  if (timeslot) {
-    timeslot.destroy();
-    return true;
-  }
-  return false;
+  timeslot?.destroy();
 };
 
 const updateById = async (

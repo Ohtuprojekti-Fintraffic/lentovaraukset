@@ -83,13 +83,12 @@ const allowNewReservation = async (
   return reservations.length >= numConcurrentReservations;
 };
 
-const deleteById = async (id: number): Promise<boolean> => {
+const deleteById = async (id: number) => {
   const reservation = await Reservation.findByPk(id);
-  if (reservation) {
-    reservation.destroy();
-    return true;
+  if (!reservation) {
+    throw new Error('Reservation does not exist');
   }
-  return false;
+  reservation.destroy();
 };
 
 const createReservation = async (newReservation: {
