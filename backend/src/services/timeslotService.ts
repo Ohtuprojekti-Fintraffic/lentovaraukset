@@ -9,10 +9,10 @@ const getTimeslotFromRange = async (startTime: Date, endTime: Date) => {
       [Op.and]: [
         {
           start: {
-            [Op.gte]: startTime,
+            [Op.lte]: startTime,
           },
           end: {
-            [Op.lte]: endTime,
+            [Op.gte]: endTime,
           },
         },
       ],
@@ -65,6 +65,9 @@ const updateById = async (
     .getReservationFromRange(timeslot.start, timeslot.end);
   const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
   const oldReservations = await oldTimeslot?.getReservations();
+  if (oldReservations?.length !== newReservations?.length) {
+    throw new Error('Timeslot has reservations');
+  }
   await oldTimeslot?.removeReservations(oldReservations);
   await oldTimeslot?.addReservations(newReservations);
   await Timeslot.update(timeslot, { where: { id } });
