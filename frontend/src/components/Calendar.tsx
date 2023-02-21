@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -14,11 +14,7 @@ type CalendarProps = {
   eventSources: EventSourceInput[];
   addEventFn: (event: { start: Date; end: Date }) => Promise<void>;
   modifyEventFn: (event: { id: string; start: Date; end: Date }) => Promise<void>;
-  clickEventFn: (event: {
-    id: string;
-    start?: Date;
-    end?: Date;
-    title?: string }) => Promise<void>;
+  clickEventFn: (event: EventImpl) => Promise<void>;
   granularity: { minutes: number };
   eventColors: {
     backgroundColor?: string;
@@ -63,18 +59,8 @@ function Calendar({
   // When a event box is clicked
   const handleEventClick = async (clickData: EventClickArg) => {
     if (clickData.event.display.includes('background')) return;
-
     const { event } = clickData;
-
-    await clickEventFn({
-      id: event.id,
-      start: event.start || undefined,
-      end: event.start || undefined,
-      title: event.title,
-    });
-
-    // Refresh calendar if changes were made
-    calendarRef.current?.getApi().refetchEvents();
+    await clickEventFn(event);
   };
 
   // When a event box is moved or resized
@@ -97,7 +83,6 @@ function Calendar({
       start: dropData.start,
       end: dropData.end,
     });
-
     calendarRef.current?.getApi().refetchEvents();
     calendarRef.current?.getApi().unselect();
   };
@@ -137,7 +122,7 @@ function Calendar({
       eventChange={handleEventChange}
       select={handleEventCreate}
       selectConstraint={selectConstraint}
-      eventSources={eventSources}
+      eventSources={useMemo(() => eventSources, [calendarRef])}
       eventOverlap={areEventsColliding}
       selectOverlap={newEventColliding}
     />

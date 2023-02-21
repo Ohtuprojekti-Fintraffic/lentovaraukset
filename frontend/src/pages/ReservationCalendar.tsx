@@ -1,8 +1,8 @@
 import { EventSourceFunc } from '@fullcalendar/core';
 import React, { useState } from 'react';
-
 import { useMutation } from 'react-query';
 import FullCalendar from '@fullcalendar/react';
+import { EventImpl } from '@fullcalendar/core/internal';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -13,15 +13,11 @@ import {
 import Card from '../components/Card';
 import { getTimeSlots } from '../queries/timeSlots';
 
+const calendarRef: React.RefObject<FullCalendar> = React.createRef();
+
 function ReservationCalendar() {
   const [showInspectModal, setShowInspectModal] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState<Partial<{
-    id: string,
-    start: Date,
-    end: Date
-  }>>({});
-
-  const calendarRef: React.RefObject<FullCalendar> = React.createRef();
+  const [selectedReservation, setSelectedReservation] = useState<EventImpl | null >(null);
 
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -64,18 +60,21 @@ function ReservationCalendar() {
 
   const deleteReservationFn = useMutation((id: Number) => deleteReservation(id));
 
-  const clickReservation = async (event: {
-    id: string;
-    start?: Date;
-    end?: Date
-  }): Promise<void> => {
+  const clickReservation = async (event: EventImpl): Promise<void> => {
     setSelectedReservation(event);
     setShowInspectModal(true);
   };
 
   const closeReservationModalFn = () => {
     setShowInspectModal(false);
-    calendarRef.current?.getApi().refetchEvents();
+  };
+
+  const handleRemove = async () => {
+    const res = await deleteReservationFn.mutateAsync(Number(selectedReservation?.id));
+    if (res === `Reservation ${selectedReservation?.id} deleted`) {
+      selectedReservation?.remove();
+    }
+    closeReservationModalFn();
   };
 
   return (
@@ -83,7 +82,7 @@ function ReservationCalendar() {
       <Card show={showInspectModal} handleClose={closeReservationModalFn}>
         <div>
           <div className="bg-black p-3">
-            <p className="text-white">{`Varaus #${selectedReservation.id}`}</p>
+            <p className="text-white">{`Varaus #${selectedReservation?.id}`}</p>
           </div>
           <div className="p-8">
             <p className="text-2xl pb-2">Varaus</p>
@@ -96,10 +95,7 @@ function ReservationCalendar() {
         </div>
         <button
           className="bg-transparent text-red-600 border-red-600 border-2 p-3 rounded-lg"
-          onClick={async () => {
-            await deleteReservationFn.mutateAsync(Number(selectedReservation.id));
-            closeReservationModalFn();
-          }}
+          onClick={handleRemove}
           type="button"
         >
           Poista
