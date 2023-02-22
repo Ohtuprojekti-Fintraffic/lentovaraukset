@@ -19,16 +19,3 @@ export interface ReservationStatus {
   availableSlots: (TimeslotEntry & { freeSlotsAmount: number })[];
   reservedSlots: ReservationEntry[];
 }
-
-interface CalendarEvent {
-  id: string,
-  title: string,
-  start: Date,
-  end: Date,
-  user: string,
-  info: string
-}
-
-export type ReservationCalendarEvent = Partial<CalendarEvent>;
-
-export type TimeSlotsCalendarEvent = Omit<CalendarEvent, 'title' | 'user' | 'info'>;
