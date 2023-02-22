@@ -145,4 +145,19 @@ describe('Calls to api', () => {
       .get(`/api/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
     expect(response.body).toEqual([]);
   });
+
+  test('Reservation cannot be add in past', async () => {
+    const start = new Date();
+    start.setDate(start.getDate() - 1);
+    start.setHours(start.getHours() - 2);
+    const end = new Date();
+    end.setDate(end.getDate() - 1);
+    const newReservation: any = await api.post('/api/reservations/')
+      .set('Content-type', 'application/json')
+      .send({
+        start, end, aircraftId: 'OH-QAA', phone: '11104040',
+      });
+
+    expect(newReservation).toEqual(null);
+  });
 });
