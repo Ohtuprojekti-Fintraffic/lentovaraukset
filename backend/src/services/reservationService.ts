@@ -24,21 +24,7 @@ const getReservationFromRange = async (startTime: Date, endTime: Date) => {
 };
 
 const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
-  const reservations = await Reservation.findAll({
-    where: {
-      [Op.or]: [{
-        start: {
-          [Op.between]: [rangeStartTime, rangeEndTime],
-          [Op.not]: [rangeEndTime],
-        },
-      }, {
-        end: {
-          [Op.between]: [rangeStartTime, rangeEndTime],
-          [Op.not]: [rangeStartTime],
-        },
-      }],
-    },
-  });
+  const reservations = await getReservationFromRange(rangeStartTime, rangeEndTime);
 
   return reservations.map(({ id, start, end }) => ({
     title: 'Varattu', id, start, end,

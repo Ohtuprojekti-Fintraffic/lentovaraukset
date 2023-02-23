@@ -21,7 +21,6 @@ router.delete('/:id', async (req: express.Request, res: express.Response) => {
     await timeslotService.deleteById(id);
     res.send(`Timeslot ${id} deleted`);
   } catch (error: unknown) {
-    console.log(error);
     if (error instanceof Error) {
       res.status(400).json(error.message);
     }
@@ -36,7 +35,6 @@ router.post('/', async (req: express.Request, res: express.Response) => {
     const timeslot = await timeslotService.createTimeslot(newTimeSlot);
     res.json(timeslot);
   } catch (error: unknown) {
-    console.log(error);
     if (error instanceof Error) {
       res.status(400).json(error.message);
     }
@@ -52,7 +50,6 @@ router.patch('/:id', async (req: express.Request, res: express.Response) => {
     await timeslotService.updateById(id, modifiedTimeslot);
     res.status(200).json(modifiedTimeslot);
   } catch (error: unknown) {
-    console.log(error);
     if (error instanceof Error) {
       res.status(400).json(error.message);
     }

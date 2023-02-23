@@ -22,7 +22,6 @@ router.delete('/:id', async (req: express.Request, res: express.Response) => {
     res.send(`Reservation ${id} deleted`);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.log(error);
       res.status(400).json(error.message);
     }
   }
@@ -35,7 +34,6 @@ router.post('/', async (req: express.Request, res: express.Response) => {
     res.json(reservation);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.log(error);
       res.status(400).json(error.message);
     }
   }
@@ -49,7 +47,6 @@ router.patch('/:id', async (req: express.Request, res: express.Response) => {
     res.status(200).json(modifiedReservation);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.log(error);
       res.status(400).json(error.message);
     }
   }
