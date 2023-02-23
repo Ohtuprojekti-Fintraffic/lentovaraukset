@@ -1,9 +1,10 @@
 import { Op } from 'sequelize';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
+import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
 import { Reservation } from '../models';
 
-const numConcurrentReservations: number = 1;
+const maxConcurrentReservations: number = 3;
 
 const getReservationFromRange = async (startTime: Date, endTime: Date) => {
   const reservations: Reservation[] = await Reservation.findAll({
@@ -41,42 +42,17 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
   }));
 };
 
-const allowReservationChange = async (
+const allowReservation = async (
   startTime: Date,
   endTime: Date,
-  id: number,
+  id: number | undefined,
 ): Promise<boolean> => {
-  const reservations: Reservation[] = await Reservation.findAll({
-    where: {
-      id: {
-        [Op.ne]: id,
-      },
-      start: {
-        [Op.lt]: endTime,
-      },
-      end: {
-        [Op.gt]: startTime,
-      },
-    },
-  });
-  return reservations.length >= numConcurrentReservations;
-};
+  const reservations = (await getReservationFromRange(startTime, endTime))
+    .filter((e) => e.id !== id);
 
-const allowNewReservation = async (
-  startTime: Date,
-  endTime: Date,
-): Promise<Boolean> => {
-  const reservations: Reservation[] = await Reservation.findAll({
-    where: {
-      start: {
-        [Op.lt]: endTime,
-      },
-      end: {
-        [Op.gt]: startTime,
-      },
-    },
-  });
-  return reservations.length >= numConcurrentReservations;
+  const mostConcurrentReservations = countMostConcurrent(reservations);
+
+  return mostConcurrentReservations < maxConcurrentReservations;
 };
 
 const deleteById = async (id: number): Promise<boolean> => {
@@ -94,7 +70,7 @@ const createReservation = async (newReservation: {
   aircraftId: string,
   info?: string,
   phone: string, }): Promise<ReservationEntry> => {
-  if (await allowNewReservation(newReservation.start, newReservation.end)) {
+  if (!await allowReservation(newReservation.start, newReservation.end, undefined)) {
     throw new Error('Too many concurrent reservations');
   } else {
     const timeslots = await timeslotService
@@ -110,7 +86,7 @@ const updateById = async (
   id: number,
   reservation: { start: Date, end: Date },
 ): Promise<void> => {
-  if (await allowReservationChange(reservation.start, reservation.end, id)) {
+  if (!await allowReservation(reservation.start, reservation.end, id)) {
     throw new Error('Too many concurrent reservations');
   } else {
     const newTimeslots = await timeslotService
