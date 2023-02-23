@@ -1,5 +1,4 @@
 import { ReservationCalendarEvent } from '../types';
-import {} from '@lentovaraukset/shared/src';
 
 const getReservations = async (from: Date, until: Date): Promise<ReservationCalendarEvent[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
