@@ -5,12 +5,9 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import {
-  AllowFunc,
-  DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput,
+  AllowFunc, DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput,
 } from '@fullcalendar/core';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
-
-const maxConcurrentLimit = 3; // TODO: get from airfield
 
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>;
@@ -29,6 +26,7 @@ type CalendarProps = {
     textColor?: string;
   } | undefined;
   selectConstraint: string | undefined;
+  maxConcurrentLimit?: number;
 };
 
 function Calendar({
@@ -40,6 +38,7 @@ function Calendar({
   granularity,
   eventColors,
   selectConstraint,
+  maxConcurrentLimit = 1,
 }: CalendarProps) {
   const allowEvent: AllowFunc = (span, movingEvent) => {
     const events = calendarRef.current?.getApi().getEvents().filter(
