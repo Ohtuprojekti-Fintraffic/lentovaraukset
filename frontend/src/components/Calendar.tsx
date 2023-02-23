@@ -5,8 +5,12 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import {
-  DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput, OverlapFunc,
+  AllowFunc,
+  DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput,
 } from '@fullcalendar/core';
+import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
+
+const maxConcurrentLimit = 3; // TODO: get from airfield
 
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>;
@@ -37,14 +41,16 @@ function Calendar({
   eventColors,
   selectConstraint,
 }: CalendarProps) {
-  const areEventsColliding: OverlapFunc = (
-    stillEvent,
-    movingEvent,
-  ) => {
-    if (stillEvent.display.includes('background')) return true;
-    if (!movingEvent) return false;
-    // TODO: allow overlapping reservations based on airfield maxConcurrentFlights
-    return false;
+  const allowEvent: AllowFunc = (span, movingEvent) => {
+    const events = calendarRef.current?.getApi().getEvents().filter(
+      (e) => e.id !== movingEvent?.id
+        && e.start && e.end
+        && e.groupId !== 'timeSlot'
+        && e.start < span.end && e.end > span.start,
+    );
+    return events
+      ? countMostConcurrent(events as { start: Date, end: Date }[]) <= maxConcurrentLimit
+      : true;
   };
 
   // When a event box is clicked
@@ -125,8 +131,9 @@ function Calendar({
       select={handleEventCreate}
       selectConstraint={selectConstraint}
       eventSources={eventSources}
-      eventOverlap={areEventsColliding}
-      selectOverlap={areEventsColliding}
+      slotEventOverlap={false}
+      selectAllow={allowEvent}
+      eventAllow={allowEvent}
     />
   );
 }

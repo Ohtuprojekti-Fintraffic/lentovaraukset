@@ -1,6 +1,4 @@
-import { ReservationEntry, TimeslotEntry } from '.';
-
-const countMostConcurrent = (events: ReservationEntry[] | TimeslotEntry[]) => {
+const countMostConcurrent = (events: { start: Date, end: Date }[]) => {
   let mostConcurrent = 0;
   let currentConcurrent = 0;
 
