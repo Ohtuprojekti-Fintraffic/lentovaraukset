@@ -1,11 +1,11 @@
-import { EventInput } from '@fullcalendar/core';
+import { TimeSlotsCalendarEvent } from '../types';
 
-const getTimeSlots = async (from: Date, until: Date): Promise<EventInput[]> => {
+const getTimeSlots = async (from: Date, until: Date): Promise<TimeSlotsCalendarEvent[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots?from=${from.toISOString()}&until=${until.toISOString()}`);
   return res.json();
 };
 
-const addTimeSlot = async (newTimeSlot: { start: Date, end: Date }): Promise<void> => {
+const addTimeSlot = async (newTimeSlot: Partial<TimeSlotsCalendarEvent>): Promise<void> => {
   await fetch(`${process.env.BASE_PATH}/api/timeslots/`, {
     method: 'POST',
     headers: {
@@ -16,7 +16,7 @@ const addTimeSlot = async (newTimeSlot: { start: Date, end: Date }): Promise<voi
 };
 
 const modifyTimeSlot = async (
-  timeSlot: { id: string, start: Date, end: Date },
+  timeSlot: TimeSlotsCalendarEvent,
 ): Promise<void> => {
   const modifiedTimeSlot = {
     start: timeSlot.start,

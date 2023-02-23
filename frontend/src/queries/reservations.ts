@@ -1,6 +1,7 @@
-import { EventInput } from '@fullcalendar/core';
+import { ReservationCalendarEvent } from '../types';
+import {} from '@lentovaraukset/shared/src';
 
-const getReservations = async (from: Date, until: Date): Promise<EventInput[]> => {
+const getReservations = async (from: Date, until: Date): Promise<ReservationCalendarEvent[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
   return res.json();
 };
@@ -25,11 +26,7 @@ const deleteReservation = async (id: Number): Promise<string> => {
   return response.text();
 };
 
-const modifyReservation = async (reservation:{
-  id: string,
-  start: Date,
-  end: Date,
-}): Promise<void> => {
+const modifyReservation = async (reservation: Partial<ReservationCalendarEvent>): Promise<void> => {
   const modifiedReservation = {
     start: reservation.start,
     end: reservation.end,
