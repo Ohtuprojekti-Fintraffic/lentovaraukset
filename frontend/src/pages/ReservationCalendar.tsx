@@ -14,7 +14,6 @@ import Card from '../components/Card';
 import { getTimeSlots } from '../queries/timeSlots';
 import Button from '../components/Button';
 import AlertContext from '../contexts/alertContext';
-import AlertContainer from '../components/AlertContainer';
 
 function ReservationCalendar() {
   const [showInspectModal, setShowInspectModal] = useState(false);
@@ -96,7 +95,6 @@ function ReservationCalendar() {
         help
 
       </Button>
-      <AlertContainer />
       <Card show={showInspectModal} handleClose={closeReservationModalFn}>
         <div>
           <div className="bg-black p-3">

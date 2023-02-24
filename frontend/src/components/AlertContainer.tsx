@@ -1,8 +1,10 @@
 import React, {
   useContext, useEffect, useRef,
 } from 'react';
+import { X } from 'lucide-react';
 import AlertContext from '../contexts/alertContext';
 import type { AlertContextType } from '../contexts/alertContext';
+import Button from './Button';
 
 // should be exported, but importing in alertContext
 // means a dependency cycle and we don't have an FE type folder
@@ -22,7 +24,8 @@ function Alert({
 }: AlertProps) {
   const timer = useRef<NodeJS.Timeout | null>(null);
 
-  const baseAlertClasses = 'text-white text-ft-hs3 pl-12 pr-2 py-2 border-b text-center';
+  const baseAlertClasses = 'text-white text-ft-body pl-12 pr-2 py-1 '
+                         + 'border-b flex justify-between items-center ease-linear';
 
   const alertVariantClasses = {
     danger: 'bg-ft-danger-300 border-ft-danger-400',
@@ -49,14 +52,24 @@ function Alert({
     timer.current = setTimeout(() => removeAlertById(id), removalDelayMillis);
   };
 
+  const removeButtonHandler = () => {
+    if (timer.current) { clearTimeout(timer.current); }
+    // start countdown to remove yourself again
+    removeAlertById(id);
+  };
+
   return (
     <div
       className={`${baseAlertClasses} ${alertVariantClasses[variant]}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {text}
-      {id}
+      <span className="">
+        {text}
+      </span>
+      <Button variant="glyph" className="ml-4 mr-6" onClick={removeButtonHandler}>
+        <X strokeWidth="1.5" color="white" />
+      </Button>
     </div>
   );
 }

@@ -19,6 +19,7 @@
     "@headlessui/react": "^1.7.7",
     "@lentovaraukset/shared": "1.0.0",
     "core-js": "^3.27.1",
+    "lucide-react": "^0.115.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-query": "^3.39.2",
