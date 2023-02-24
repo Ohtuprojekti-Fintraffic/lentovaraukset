@@ -35,7 +35,7 @@ function TimeSlotCalendar() {
       const reservations = await getReservations(start, end);
 
       const reservationsMapped = reservations.map((reservation) => ({
-        ...reservation, groupId: 'timeslots', display: 'background', color: '#000000',
+        ...reservation, groupId: 'reservations', display: 'background', color: '#000000',
       }));
 
       successCallback(reservationsMapped);
@@ -62,7 +62,7 @@ function TimeSlotCalendar() {
         granularity={{ minutes: 20 }} // TODO: Get from airfield api
         eventColors={{ backgroundColor: '#bef264', eventColor: '#84cc1680', textColor: '#000000' }}
         selectConstraint={undefined}
-        maxConcurrentLimit={1}
+        maxConcurrentLimit={0}
       />
     </div>
   );

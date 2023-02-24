@@ -44,7 +44,7 @@ function Calendar({
     const events = calendarRef.current?.getApi().getEvents().filter(
       (e) => e.id !== movingEvent?.id
         && e.start && e.end
-        && e.groupId !== 'timeSlot'
+        && e.groupId !== 'reservations'
         && e.start < span.end && e.end > span.start,
     );
     return events
