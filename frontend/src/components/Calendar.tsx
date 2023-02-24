@@ -44,11 +44,13 @@ function Calendar({
     const events = calendarRef.current?.getApi().getEvents().filter(
       (e) => e.id !== movingEvent?.id
         && e.start && e.end
-        && e.groupId !== 'timeSlot'
+        && !e.display.includes('background')
         && e.start < span.end && e.end > span.start,
     );
+
+    console.log(events);
     return events
-      ? countMostConcurrent(events as { start: Date, end: Date }[]) <= maxConcurrentLimit
+      ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
       : true;
   };
 
