@@ -5,9 +5,9 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import {
-  DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput, OverlapFunc,
+  AllowFunc, DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput,
 } from '@fullcalendar/core';
-import { EventImpl } from '@fullcalendar/core/internal';
+import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>;
@@ -26,7 +26,7 @@ type CalendarProps = {
     textColor?: string;
   } | undefined;
   selectConstraint: string | undefined;
-  checkOverlap: boolean;
+  maxConcurrentLimit?: number;
 };
 
 function Calendar({
@@ -38,30 +38,18 @@ function Calendar({
   granularity,
   eventColors,
   selectConstraint,
-  checkOverlap,
+  maxConcurrentLimit = 1,
 }: CalendarProps) {
-  const isOverlap = (eventA: EventImpl, eventB: EventImpl) => {
-    if (eventA.start && eventA.end && eventB.start && eventB.end) {
-      return !(eventA.end <= eventB.start || eventB.end <= eventA.start);
-    }
-    return false;
-  };
-  const areEventsColliding: OverlapFunc = (
-    stillEvent: EventImpl,
-    movingEvent: EventImpl | null,
-  ) => {
-    if (!checkOverlap) return true;
-    if (movingEvent === null) return true;
-    if (stillEvent.groupId === 'timeslots') return true;
-    // TODO: allow overlapping reservations based on airfield maxConcurrentFlights
-    return !(isOverlap(stillEvent, movingEvent) || isOverlap(movingEvent, stillEvent));
-  };
-
-  const newEventColliding: OverlapFunc = (event: EventImpl) => {
-    if (!checkOverlap) return true;
-    if (event.groupId === 'timeslots') return true;
-    // TODO: allow overlapping reservations based on airfield maxConcurrentFlights
-    return false;
+  const allowEvent: AllowFunc = (span, movingEvent) => {
+    const events = calendarRef.current?.getApi().getEvents().filter(
+      (e) => e.id !== movingEvent?.id
+        && e.start && e.end
+        && e.groupId !== 'timeSlot'
+        && e.start < span.end && e.end > span.start,
+    );
+    return events
+      ? countMostConcurrent(events as { start: Date, end: Date }[]) <= maxConcurrentLimit
+      : true;
   };
 
   // When a event box is clicked
@@ -142,8 +130,9 @@ function Calendar({
       select={handleEventCreate}
       selectConstraint={selectConstraint}
       eventSources={eventSources}
-      eventOverlap={areEventsColliding}
-      selectOverlap={newEventColliding}
+      slotEventOverlap={false}
+      selectAllow={allowEvent}
+      eventAllow={allowEvent}
     />
   );
 }
