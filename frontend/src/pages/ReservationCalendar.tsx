@@ -1,8 +1,6 @@
-import { EventSourceFunc } from '@fullcalendar/core';
-import React, { useState } from 'react';
-
-import { useMutation } from 'react-query';
-import FullCalendar from '@fullcalendar/react';
+import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
+import React, { useState, useRef } from 'react';
+import { EventImpl } from '@fullcalendar/core/internal';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -15,13 +13,7 @@ import { getTimeSlots } from '../queries/timeSlots';
 
 function ReservationCalendar() {
   const [showInspectModal, setShowInspectModal] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState<Partial<{
-    id: string,
-    start: Date,
-    end: Date
-  }>>({});
-
-  const calendarRef: React.RefObject<FullCalendar> = React.createRef();
+  const selectedReservationRef = useRef<EventImpl | null>(null);
 
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -62,20 +54,27 @@ function ReservationCalendar() {
     }
   };
 
-  const deleteReservationFn = useMutation((id: Number) => deleteReservation(id));
+  const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
 
-  const clickReservation = async (event: {
-    id: string;
-    start?: Date;
-    end?: Date
-  }): Promise<void> => {
-    setSelectedReservation(event);
+  const clickReservation = async (event:EventImpl): Promise<void> => {
+    selectedReservationRef.current = event;
     setShowInspectModal(true);
   };
 
   const closeReservationModalFn = () => {
     setShowInspectModal(false);
-    calendarRef.current?.getApi().refetchEvents();
+  };
+
+  const removeReservation = async (removeInfo: EventRemoveArg) => {
+    const { event } = removeInfo;
+    const res = await deleteReservation(Number(event.id));
+    if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
+      closeReservationModalFn();
+      selectedReservationRef.current = null;
+    } else {
+      removeInfo.revert();
+      throw new Error('Removing reservation failed');
+    }
   };
 
   return (
@@ -83,23 +82,20 @@ function ReservationCalendar() {
       <Card show={showInspectModal} handleClose={closeReservationModalFn}>
         <div>
           <div className="bg-black p-3">
-            <p className="text-white">{`Varaus #${selectedReservation.id}`}</p>
+            <p className="text-white">{`Varaus #${selectedReservationRef.current?.id}`}</p>
           </div>
           <div className="p-8">
             <p className="text-2xl pb-2">Varaus</p>
             <pre>
               {
-                JSON.stringify(selectedReservation, null, 2)
+                JSON.stringify(selectedReservationRef, null, 2)
               }
             </pre>
           </div>
         </div>
         <button
           className="bg-transparent text-red-600 border-red-600 border-2 p-3 rounded-lg"
-          onClick={async () => {
-            await deleteReservationFn.mutateAsync(Number(selectedReservation.id));
-            closeReservationModalFn();
-          }}
+          onClick={() => selectedReservationRef.current?.remove()}
           type="button"
         >
           Poista
@@ -114,11 +110,11 @@ function ReservationCalendar() {
       </Card>
       <h1 className="text-3xl">Varauskalenteri</h1>
       <Calendar
-        calendarRef={calendarRef}
-        eventSources={[reservationsSourceFn, timeSlotsSourceFn]}
+        eventSources={eventsSourceRef.current}
         addEventFn={addReservation}
         modifyEventFn={modifyReservation}
         clickEventFn={clickReservation}
+        removeEventFn={removeReservation}
         granularity={{ minutes: 20 }} // TODO: Get from airfield api
         eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFF' }}
         selectConstraint="timeslots"
