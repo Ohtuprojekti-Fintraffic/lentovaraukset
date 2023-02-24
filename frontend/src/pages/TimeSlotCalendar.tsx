@@ -62,7 +62,7 @@ function TimeSlotCalendar() {
         granularity={{ minutes: 20 }} // TODO: Get from airfield api
         eventColors={{ backgroundColor: '#bef264', eventColor: '#84cc1680', textColor: '#000000' }}
         selectConstraint={undefined}
-        maxConcurrentLimit={0}
+        maxConcurrentLimit={1}
       />
     </div>
   );
