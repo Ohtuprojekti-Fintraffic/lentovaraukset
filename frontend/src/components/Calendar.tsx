@@ -10,7 +10,6 @@ import {
 import { EventImpl } from '@fullcalendar/core/internal';
 
 type CalendarProps = {
-  calendarRef?: React.RefObject<FullCalendar>;
   eventSources: EventSourceInput[];
   addEventFn: (event: { start: Date; end: Date }) => Promise<void>;
   modifyEventFn: (event: { id: string; start: Date; end: Date }) => Promise<void>;
@@ -26,7 +25,6 @@ type CalendarProps = {
 };
 
 function Calendar({
-  calendarRef = React.createRef(),
   eventSources,
   addEventFn,
   modifyEventFn,
@@ -36,6 +34,8 @@ function Calendar({
   eventColors,
   selectConstraint,
 }: CalendarProps) {
+  const calendarRef: React.RefObject<FullCalendar> = React.createRef();
+
   const isOverlap = (eventA: EventImpl, eventB: EventImpl) => {
     if (eventA.start && eventA.end && eventB.start && eventB.end) {
       return !(eventA.end <= eventB.start || eventB.end <= eventA.start);
