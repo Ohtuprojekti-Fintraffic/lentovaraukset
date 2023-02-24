@@ -2,8 +2,8 @@ import React, {
   useContext, useEffect, useRef,
 } from 'react';
 import { X } from 'lucide-react';
-import AlertContext from '../contexts/alertContext';
-import type { AlertContextType } from '../contexts/alertContext';
+import AlertContext from '../contexts/AlertContext';
+import type { AlertContextType } from '../contexts/AlertContext';
 import Button from './Button';
 
 // should be exported, but importing in alertContext

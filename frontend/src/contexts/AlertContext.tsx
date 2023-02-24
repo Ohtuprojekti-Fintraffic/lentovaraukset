@@ -14,7 +14,7 @@ interface AlertType {
 }
 
 interface AlertFunc {
-  (text: string, variant: AlertType['variant']): void
+  (text: string, variant: AlertType['variant'], removalDelayMillis?: number): void
 }
 
 export interface AlertContextType {

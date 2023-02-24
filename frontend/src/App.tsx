@@ -5,7 +5,7 @@ import {
   QueryClientProvider,
 } from 'react-query';
 import Navigation from './components/Navigation';
-import { AlertContextProvider } from './contexts/alertContext';
+import { AlertContextProvider } from './contexts/AlertContext';
 import AlertContainer from './components/AlertContainer';
 
 const queryClient = new QueryClient();

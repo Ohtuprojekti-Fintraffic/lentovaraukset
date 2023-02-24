@@ -1,5 +1,5 @@
 import { EventSourceFunc } from '@fullcalendar/core';
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 
 import { useMutation } from 'react-query';
 import FullCalendar from '@fullcalendar/react';
@@ -12,8 +12,6 @@ import {
 } from '../queries/reservations';
 import Card from '../components/Card';
 import { getTimeSlots } from '../queries/timeSlots';
-import Button from '../components/Button';
-import AlertContext from '../contexts/alertContext';
 
 function ReservationCalendar() {
   const [showInspectModal, setShowInspectModal] = useState(false);
@@ -79,22 +77,9 @@ function ReservationCalendar() {
     setShowInspectModal(false);
     calendarRef.current?.getApi().refetchEvents();
   };
-  const { addNewAlert } = useContext(AlertContext);
 
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
-      <Button
-        variant="primary"
-        onClick={() => {
-          addNewAlert('Test', 'danger');
-          addNewAlert('Test', 'warning');
-          addNewAlert('Test', 'info');
-          addNewAlert('Test', 'success');
-        }}
-      >
-        help
-
-      </Button>
       <Card show={showInspectModal} handleClose={closeReservationModalFn}>
         <div>
           <div className="bg-black p-3">
