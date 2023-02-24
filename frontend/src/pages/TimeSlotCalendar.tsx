@@ -62,6 +62,7 @@ function TimeSlotCalendar() {
         granularity={{ minutes: 20 }} // TODO: Get from airfield api
         eventColors={{ backgroundColor: '#bef264', eventColor: '#84cc16', textColor: '#000000' }}
         selectConstraint={undefined}
+        checkOverlap={false}
       />
     </div>
   );

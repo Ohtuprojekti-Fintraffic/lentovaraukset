@@ -26,6 +26,7 @@ type CalendarProps = {
     textColor?: string;
   } | undefined;
   selectConstraint: string | undefined;
+  checkOverlap: boolean;
 };
 
 function Calendar({
@@ -37,6 +38,7 @@ function Calendar({
   granularity,
   eventColors,
   selectConstraint,
+  checkOverlap,
 }: CalendarProps) {
   const isOverlap = (eventA: EventImpl, eventB: EventImpl) => {
     if (eventA.start && eventA.end && eventB.start && eventB.end) {
@@ -48,6 +50,7 @@ function Calendar({
     stillEvent: EventImpl,
     movingEvent: EventImpl | null,
   ) => {
+    if (!checkOverlap) return true;
     if (movingEvent === null) return true;
     if (stillEvent.groupId === 'timeslots') return true;
     // TODO: allow overlapping reservations based on airfield maxConcurrentFlights
@@ -55,6 +58,7 @@ function Calendar({
   };
 
   const newEventColliding: OverlapFunc = (event: EventImpl) => {
+    if (!checkOverlap) return true;
     if (event.groupId === 'timeslots') return true;
     // TODO: allow overlapping reservations based on airfield maxConcurrentFlights
     return false;

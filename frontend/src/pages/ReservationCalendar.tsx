@@ -122,6 +122,7 @@ function ReservationCalendar() {
         granularity={{ minutes: 20 }} // TODO: Get from airfield api
         eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFF' }}
         selectConstraint="timeslots"
+        checkOverlap
       />
     </div>
   );
