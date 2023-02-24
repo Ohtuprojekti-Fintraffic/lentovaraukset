@@ -17,7 +17,10 @@ const getReservationFromRange = async (startTime: Date, endTime: Date) => {
   return reservations;
 };
 
-const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
+const getInTimeRange = async (
+  rangeStartTime: Date,
+  rangeEndTime: Date,
+): Promise<ReservationEntry[]> => {
   const reservations = await Reservation.findAll({
     where: {
       [Op.or]: [{
@@ -34,8 +37,22 @@ const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
     },
   });
 
-  return reservations.map(({ id, start, end }) => ({
-    title: 'Varattu', id, start, end,
+  return reservations.map(({
+    id,
+    start,
+    end,
+    aircraftId,
+    phone,
+    info,
+  }) => ({
+    id,
+    start,
+    end,
+    aircraftId,
+    info,
+    phone,
+    email: undefined,
+    user: 'user',
   }));
 };
 
@@ -48,12 +65,7 @@ const deleteById = async (id: number): Promise<boolean> => {
   return false;
 };
 
-const createReservation = async (newReservation: {
-  start: Date,
-  end: Date,
-  aircraftId: string,
-  info?: string,
-  phone: string, }): Promise<ReservationEntry> => {
+const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | 'user'>): Promise<ReservationEntry> => {
   const timeslots = await timeslotService
     .getTimeslotFromRange(newReservation.start, newReservation.end);
   const reservation: Reservation = await Reservation.create(newReservation);
@@ -64,7 +76,7 @@ const createReservation = async (newReservation: {
 
 const updateById = async (
   id: number,
-  reservation: { start: Date, end: Date },
+  reservation: Omit<ReservationEntry, 'id' | 'user'>,
 ): Promise<void> => {
   const newTimeslots = await timeslotService
     .getTimeslotFromRange(reservation.start, reservation.end);

@@ -45,6 +45,9 @@ const updateReservationValidator = (slotGranularityMinutes: number) => {
     end: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message }),
+    aircraftId: z.string(),
+    info: z.string().optional(),
+    phone: z.string(),
   });
 
   return Reservation;
