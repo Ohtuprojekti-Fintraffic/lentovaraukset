@@ -73,11 +73,11 @@ function ReservationCalendar() {
     const res = await deleteReservation(Number(event.id));
     if (res === `Reservation ${selectedReservation?.id} deleted`) {
       closeReservationModalFn();
+      setSelectedReservation(null);
     } else {
       removeInfo.revert();
       throw new Error('Removing reservation failed');
     }
-    setSelectedReservation(null);
   };
 
   return (
