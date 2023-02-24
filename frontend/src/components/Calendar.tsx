@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import {
-  DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput, OverlapFunc,
+  DateSelectArg, EventChangeArg, EventClickArg, EventRemoveArg, EventSourceInput, OverlapFunc,
 } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 
@@ -15,6 +15,7 @@ type CalendarProps = {
   addEventFn: (event: { start: Date; end: Date }) => Promise<void>;
   modifyEventFn: (event: { id: string; start: Date; end: Date }) => Promise<void>;
   clickEventFn: (event: EventImpl) => Promise<void>;
+  removeEventFn: (event: EventRemoveArg) => Promise<void>;
   granularity: { minutes: number };
   eventColors: {
     backgroundColor?: string;
@@ -30,6 +31,7 @@ function Calendar({
   addEventFn,
   modifyEventFn,
   clickEventFn,
+  removeEventFn,
   granularity,
   eventColors,
   selectConstraint,
@@ -87,6 +89,12 @@ function Calendar({
     calendarRef.current?.getApi().unselect();
   };
 
+  const handleEventRemove = async (removeInfo: EventRemoveArg) => {
+    await removeEventFn(removeInfo);
+    calendarRef.current?.getApi().refetchEvents();
+    calendarRef.current?.getApi().unselect();
+  };
+
   return (
     <FullCalendar
       ref={calendarRef}
@@ -120,9 +128,10 @@ function Calendar({
       eventTextColor={eventColors?.textColor || '#000000'}
       eventClick={handleEventClick}
       eventChange={handleEventChange}
+      eventRemove={handleEventRemove}
       select={handleEventCreate}
       selectConstraint={selectConstraint}
-      eventSources={useMemo(() => eventSources, [calendarRef])}
+      eventSources={eventSources}
       eventOverlap={areEventsColliding}
       selectOverlap={newEventColliding}
     />
