@@ -8,33 +8,23 @@ const numConcurrentReservations: number = 1;
 const getReservationFromRange = async (startTime: Date, endTime: Date) => {
   const reservations: Reservation[] = await Reservation.findAll({
     where: {
-      start: {
-        [Op.lt]: endTime,
-      },
-      end: {
-        [Op.gt]: startTime,
-      },
+      [Op.and]: [
+        {
+          start: {
+            [Op.gte]: startTime,
+          },
+          end: {
+            [Op.lte]: endTime,
+          },
+        },
+      ],
     },
   });
   return reservations;
 };
 
 const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
-  const reservations = await Reservation.findAll({
-    where: {
-      [Op.or]: [{
-        start: {
-          [Op.between]: [rangeStartTime, rangeEndTime],
-          [Op.not]: [rangeEndTime],
-        },
-      }, {
-        end: {
-          [Op.between]: [rangeStartTime, rangeEndTime],
-          [Op.not]: [rangeStartTime],
-        },
-      }],
-    },
-  });
+  const reservations = await getReservationFromRange(rangeStartTime, rangeEndTime);
 
   return reservations.map(({ id, start, end }) => ({
     title: 'Varattu', id, start, end,
@@ -79,13 +69,12 @@ const allowNewReservation = async (
   return reservations.length >= numConcurrentReservations;
 };
 
-const deleteById = async (id: number): Promise<boolean> => {
+const deleteById = async (id: number) => {
   const reservation = await Reservation.findByPk(id);
-  if (reservation) {
-    reservation.destroy();
-    return true;
+  if (!reservation) {
+    throw new Error('Reservation does not exist');
   }
-  return false;
+  reservation.destroy();
 };
 
 const createReservation = async (newReservation: {
