@@ -1,6 +1,6 @@
 import request from 'supertest';
 import app from '@lentovaraukset/backend/src/index';
-import { Timeslot } from '@lentovaraukset/backend/src/models';
+import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
 import { connectToDatabase, sequelize } from '../src/util/db';
 
 const api = request(app);
@@ -103,6 +103,29 @@ describe('Calls to api', () => {
     expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-01-02T14:00:00.000Z'));
   });
 
+  test('can edit a timeslot with reservation', async () => {
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-01-01T12:00:00.000Z'), end: new Date('2023-01-01T13:00:00.000Z') });
+    const newReservation: Reservation = await Reservation.create({
+      start: new Date('2023-01-01T12:00:00.000Z'),
+      end: new Date('2023-01-01T13:00:00.000Z'),
+      aircraftId: 'ESA-111',
+      phone: '0501102323',
+    });
+    createdSlot.addReservations([newReservation]);
+
+    await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
+      .set('Content-type', 'application/json')
+      .send({ start: '2023-01-01T12:00:00.000Z', end: '2023-01-01T14:00:00.000Z' });
+
+    const updatedSlot: Timeslot | null = await Timeslot.findOne(
+      { where: { id: createdSlot.dataValues.id } },
+    );
+
+    expect(updatedSlot).not.toEqual(null);
+    expect(updatedSlot?.dataValues.start).toEqual(new Date('2023-01-01T12:00:00.000Z'));
+    expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-01-01T14:00:00.000Z'));
+  });
+
   test('dont edit a timeslot if all fields not provided', async () => {
     const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-01-01T12:00:00.000Z'), end: new Date('2023-01-01T13:00:00.000Z') });
 
@@ -135,6 +158,29 @@ describe('Calls to api', () => {
     expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-01-01T13:00:00.000Z'));
   });
 
+  test('dont edit a timeslot with reservation  if it goes outside reservation range', async () => {
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-01-01T12:00:00.000Z'), end: new Date('2023-01-01T14:00:00.000Z') });
+    const newReservation: Reservation = await Reservation.create({
+      start: new Date('2023-01-01T12:00:00.000Z'),
+      end: new Date('2023-01-01T14:00:00.000Z'),
+      aircraftId: 'ESA-111',
+      phone: '0501102323',
+    });
+    createdSlot.addReservations([newReservation]);
+
+    await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
+      .set('Content-type', 'application/json')
+      .send({ start: '2023-01-01T12:00:00.000Z', end: '2023-01-01T13:00:00.000Z' });
+
+    const updatedSlot: Timeslot | null = await Timeslot.findOne(
+      { where: { id: createdSlot.dataValues.id } },
+    );
+
+    expect(updatedSlot).not.toEqual(null);
+    expect(updatedSlot?.dataValues.start).toEqual(new Date('2023-01-01T12:00:00.000Z'));
+    expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-01-01T14:00:00.000Z'));
+  });
+
   test('can delete a timeslot', async () => {
     const createdSlot: Timeslot | null = await Timeslot.findOne({});
     await api.delete(`/api/timeslots/${createdSlot?.dataValues.id}`);
@@ -151,6 +197,24 @@ describe('Calls to api', () => {
 
     const numberOfTimeslots: Number = await Timeslot.count();
 
+    expect(numberOfTimeslots).toEqual(timeslotData.length);
+  });
+
+  test('dont delete a timeslot if it has reservations', async () => {
+    const createdSlot: Timeslot | null = await Timeslot.findOne({});
+    const newReservation: Reservation = await Reservation.create({
+      start: new Date('2023-01-01T12:00:00.000Z'),
+      end: new Date('2023-01-01T13:00:00.000Z'),
+      aircraftId: 'ESA-111',
+      phone: '0501102323',
+    });
+    await createdSlot?.addReservations([newReservation]);
+
+    await api.delete(`/api/timeslots/${createdSlot?.id}`);
+
+    const deletedSlot = await Timeslot.findByPk(createdSlot?.id);
+    const numberOfTimeslots: Number = await Timeslot.count();
+    expect(deletedSlot).not.toEqual(null);
     expect(numberOfTimeslots).toEqual(timeslotData.length);
   });
 
