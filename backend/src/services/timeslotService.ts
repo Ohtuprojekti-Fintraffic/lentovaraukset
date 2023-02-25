@@ -6,12 +6,16 @@ import { Timeslot } from '../models';
 const getTimeslotFromRange = async (startTime: Date, endTime: Date) => {
   const timeslots: Timeslot[] = await Timeslot.findAll({
     where: {
-      start: {
-        [Op.lt]: endTime,
-      },
-      end: {
-        [Op.gt]: startTime,
-      },
+      [Op.and]: [
+        {
+          start: {
+            [Op.lte]: startTime,
+          },
+          end: {
+            [Op.gte]: endTime,
+          },
+        },
+      ],
     },
   });
   return timeslots;
@@ -40,13 +44,16 @@ const getInTimeRange = async (
   return timeslots.map(({ id, start, end }) => ({ id, start, end }));
 };
 
-const deleteById = async (id: number): Promise<boolean> => {
+const deleteById = async (id: number) => {
   const timeslot = await Timeslot.findByPk(id);
-  if (timeslot) {
-    timeslot.destroy();
-    return true;
+  if (!timeslot) {
+    throw new Error('Timeslot does not exist');
   }
-  return false;
+  const reservations = await timeslot?.getReservations();
+  if (reservations?.length !== 0) {
+    throw new Error('Timeslot has reservations');
+  }
+  timeslot?.destroy();
 };
 
 const updateById = async (
@@ -57,6 +64,9 @@ const updateById = async (
     .getReservationFromRange(timeslot.start, timeslot.end);
   const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
   const oldReservations = await oldTimeslot?.getReservations();
+  if (oldReservations?.length !== newReservations?.length) {
+    throw new Error('Timeslot has reservations');
+  }
   await oldTimeslot?.removeReservations(oldReservations);
   await oldTimeslot?.addReservations(newReservations);
   await Timeslot.update(timeslot, { where: { id } });
