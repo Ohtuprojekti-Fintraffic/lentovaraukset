@@ -1,18 +1,31 @@
 import type { EventInput } from '@fullcalendar/core';
 import type { ReservationEntry, TimeslotEntry } from '@lentovaraukset/shared/src/index';
 
-export type ReservationCalendarEvent = Pick<Required<EventInput>, 'id' | 'title' | 'start' | 'end'>;
+export type ReservationCalendarEvent = Pick<Required<EventInput>, 'id' | 'title' | 'start' | 'end'> & EventInput;
 
-export type TimeSlotsCalendarEvent = Pick<Required<EventInput>, 'id' | 'start' | 'end'>;
+export type TimeslotCalendarEvent = Pick<Required<EventInput>, 'id' | 'start' | 'end'> & EventInput;
 
-export function reservationEntryToCalendarEvent(re: ReservationEntry): ReservationCalendarEvent {
+export function reservationEntryToCalendarEvent(
+  reservation: ReservationEntry,
+  eventInputArgs: Partial<EventInput>,
+): ReservationCalendarEvent {
   return {
-    id: re.id.toString(), title: re.aircraftId, start: re.start, end: re.end,
+    id: reservation.id.toString(),
+    title: reservation.aircraftId,
+    start: reservation.start,
+    end: reservation.end,
+    ...eventInputArgs,
   };
 }
 
-export function timeSlotsEntryToCalendarEvent(ts: TimeslotEntry): TimeSlotsCalendarEvent {
+export function timeslotEntryToCalendarEvent(
+  timeslot: TimeslotEntry,
+  eventInputArgs: Partial<EventInput>,
+): TimeslotCalendarEvent {
   return {
-    id: ts.id.toString(), start: ts.start, end: ts.end,
+    id: timeslot.id.toString(),
+    start: timeslot.start,
+    end: timeslot.end,
+    ...eventInputArgs,
   };
 }

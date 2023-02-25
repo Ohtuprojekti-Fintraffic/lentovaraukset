@@ -1,4 +1,4 @@
-import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
+import { EventInput, EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
 import React, { useState, useRef } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import Calendar from '../components/Calendar';
@@ -10,6 +10,12 @@ import {
 } from '../queries/reservations';
 import Card from '../components/Card';
 import { getTimeSlots } from '../queries/timeSlots';
+import {
+  ReservationCalendarEvent,
+  reservationEntryToCalendarEvent,
+  TimeslotCalendarEvent,
+  timeslotEntryToCalendarEvent,
+} from '../types';
 
 function ReservationCalendar() {
   const [showInspectModal, setShowInspectModal] = useState(false);
@@ -23,9 +29,12 @@ function ReservationCalendar() {
     try {
       const reservations = await getReservations(start, end);
 
-      const reservationsMapped = reservations.map((reservation) => ({
-        ...reservation, constraint: 'timeslots',
-      }));
+      const reservationsMapped: ReservationCalendarEvent[] = reservations.map(
+        (reservation) => reservationEntryToCalendarEvent(
+          reservation,
+          { constraint: 'timeslots' },
+        ),
+      );
 
       successCallback(reservationsMapped);
     } catch (error) {
@@ -40,11 +49,13 @@ function ReservationCalendar() {
   ) => {
     try {
       const timeslots = await getTimeSlots(start, end);
-      const timeslotsMapped = timeslots.map((timeSlot) => ({
-        ...timeSlot, groupId: 'timeslots', display: 'inverse-background', color: '#2C2C44',
-      }));
+      const timeslotsMapped: TimeslotCalendarEvent[] = timeslots.map((timeslot) => (
+        timeslotEntryToCalendarEvent(
+          timeslot,
+          { groupId: 'timeslots', display: 'inverse-background', color: '#2C2C44' },
+        )));
 
-      const notReservable = [{
+      const notReservable: EventInput[] = [{
         title: 'ei varattavissa', start, end, display: 'background', color: '#2C2C44', overlap: false,
       }];
 
@@ -61,11 +72,11 @@ function ReservationCalendar() {
     setShowInspectModal(true);
   };
 
-  const closeReservationModalFn = () => {
+  const closeReservationModalFn = (): void => {
     setShowInspectModal(false);
   };
 
-  const removeReservation = async (removeInfo: EventRemoveArg) => {
+  const removeReservation = async (removeInfo: EventRemoveArg): Promise<void> => {
     const { event } = removeInfo;
     const res = await deleteReservation(Number(event.id));
     if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {

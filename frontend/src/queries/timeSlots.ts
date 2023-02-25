@@ -1,36 +1,32 @@
-import { TimeSlotsCalendarEvent } from '../types';
+import { TimeslotEntry } from '@lentovaraukset/shared/src';
+import { TimeslotCalendarEvent } from '../types';
 
-const getTimeSlots = async (from: Date, until: Date): Promise<TimeSlotsCalendarEvent[]> => {
+const getTimeSlots = async (from: Date, until: Date): Promise<TimeslotEntry[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots?from=${from.toISOString()}&until=${until.toISOString()}`);
   return res.json();
 };
 
-const addTimeSlot = async (newTimeSlot: Partial<TimeSlotsCalendarEvent>): Promise<void> => {
+const addTimeSlot = async (timeslot: Pick<TimeslotEntry, 'start' | 'end'>): Promise<void> => {
   await fetch(`${process.env.BASE_PATH}/api/timeslots/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(newTimeSlot),
+    body: JSON.stringify(timeslot),
   });
 };
 
-const modifyTimeSlot = async (
-  timeSlot: TimeSlotsCalendarEvent,
-): Promise<void> => {
+const modifyTimeSlot = async ({ start, end, id }: Pick<TimeslotCalendarEvent, 'start' | 'end' | 'id'>): Promise<void> => {
   const modifiedTimeSlot = {
-    start: timeSlot.start,
-    end: timeSlot.end,
+    start, end,
   };
-
-  const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${timeSlot.id}`, {
+  await fetch(`${process.env.BASE_PATH}/api/timeslots/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(modifiedTimeSlot),
     headers: {
       'Content-Type': 'application/json',
     },
   });
-  return res.json();
 };
 
 const deleteTimeslot = async (id: Number): Promise<string> => {
