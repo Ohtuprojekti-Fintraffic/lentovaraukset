@@ -15,6 +15,15 @@ router.get('/', async (req: express.Request, res: express.Response) => {
   res.json(reservations);
 });
 
+router.get('/status', async (req: express.Request, res: express.Response) => {
+  try {
+    const reservationStatus = await reservationService.getReservationStatus();
+    res.json(reservationStatus);
+  } catch (error) {
+    res.status(501).send();
+  }
+});
+
 router.delete('/:id', async (req: express.Request, res: express.Response) => {
   const id = Number(req.params.id);
   try {

@@ -1,11 +1,11 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React from 'react';
 import { useQuery } from 'react-query';
-import { getReservationStatus } from '../queries/query';
+import { getAllReservations } from '../queries/reservations';
 import QueryKeys from '../queries/queryKeys';
 
 function Management() {
-  const { data, isLoading, isError } = useQuery(QueryKeys.ReservationStatus, getReservationStatus, {
+  const { data, isLoading, isError } = useQuery(QueryKeys.ReservationStatus, getAllReservations, {
     refetchOnWindowFocus: false,
   });
   return (
@@ -18,24 +18,38 @@ function Management() {
           <div className="text-base">
             <div>
               <h1>Vapaat Ajat</h1>
-              {data.availableSlots.length === 0
+              {data!.availableSlots.length === 0
                 ? <p> Ei vapaita aikoja saatavilla</p>
                 : (
                   <ul>
-                    {data.availableSlots.map(
-                      (slot: any) => <li key={slot.id}>{slot.startTime}</li>,
+                    {data!.availableSlots.map(
+                      (slot: any) => (
+                        <li key={slot.id}>
+                          <div>
+                            <span><b>Aloitus</b>: {slot.start}</span>
+                            <span><b>Lopetus</b>: {slot.end}</span>
+                          </div>
+                        </li>
+                      ),
                     )}
                   </ul>
                 )}
             </div>
             <div>
               <h1>Varatut Ajat</h1>
-              {data.reservedSlots.length === 0
+              {data!.reservedSlots.length === 0
                 ? <p> Ei Varattuja aikoja</p>
                 : (
                   <ul>
-                    {data.reservedSlots.map(
-                      (slot: any) => <li key={slot.id}>{slot.startTime}</li>,
+                    {data!.reservedSlots.map(
+                      (slot: any) => (
+                        <li key={slot.id}>
+                          <div>
+                            <span><b>Aloitus</b>: {slot.start}</span>
+                            <span><b>Lopetus</b>: {slot.end}</span>
+                          </div>
+                        </li>
+                      ),
                     )}
                   </ul>
                 )}
