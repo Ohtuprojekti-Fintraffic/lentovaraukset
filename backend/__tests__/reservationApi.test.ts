@@ -7,21 +7,21 @@ const api = request(app);
 
 const reservations = [
   {
-    start: new Date('2023-02-02T08:00:00.000Z'),
-    end: new Date('2023-02-02T10:00:00.000Z'),
+    start: new Date('2023-02-14T08:00:00.000Z'),
+    end: new Date('2023-02-14T10:00:00.000Z'),
     aircraftId: 'XZ-ABC',
     info: 'example info',
     phone: '0401111111',
   },
   {
-    start: new Date('2023-02-02T14:00:00.000Z'),
-    end: new Date('2023-02-02T16:00:00.000Z'),
+    start: new Date('2023-02-14T14:00:00.000Z'),
+    end: new Date('2023-02-14T16:00:00.000Z'),
     aircraftId: 'DK-ASD',
     phone: '0401111111',
   },
   {
-    start: new Date('2023-02-02T16:00:00.000Z'),
-    end: new Date('2023-02-02T18:00:00.000Z'),
+    start: new Date('2023-02-14T16:00:00.000Z'),
+    end: new Date('2023-02-14T18:00:00.000Z'),
     aircraftId: 'RF-SDR',
     info: 'First time landing!',
     phone: '0401111111',
@@ -38,6 +38,12 @@ const latestReservation = reservations.reduce(
 
 beforeAll(async () => {
   await connectToDatabase();
+
+  // backend uses system time for some stuff
+  // so let's fake it as a specific date,
+  // while keeping timers running
+  jest.useFakeTimers({ advanceTimers: true });
+  jest.setSystemTime(new Date('2023-02-13T08:00:00.000Z'));
 });
 
 beforeEach(async () => {
@@ -47,6 +53,9 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  // return to the present
+  jest.useRealTimers();
+
   // otherwise Jest needs --forceExit
   await sequelize.close();
 });
@@ -56,7 +65,7 @@ describe('Calls to api', () => {
     const newReservation: any = await api.post('/api/reservations/')
       .set('Content-type', 'application/json')
       .send({
-        start: new Date('2023-01-02T12:00:00.000Z'), end: new Date('2023-01-02T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
       });
 
     const createdReservation: Reservation | null = await Reservation.findOne(
@@ -64,8 +73,8 @@ describe('Calls to api', () => {
     );
 
     expect(createdReservation).toBeDefined();
-    expect(createdReservation?.dataValues.start).toEqual(new Date('2023-01-02T12:00:00.000Z'));
-    expect(createdReservation?.dataValues.end).toEqual(new Date('2023-01-02T14:00:00.000Z'));
+    expect(createdReservation?.dataValues.start).toEqual(new Date('2023-02-14T12:00:00.000Z'));
+    expect(createdReservation?.dataValues.end).toEqual(new Date('2023-02-14T14:00:00.000Z'));
     expect(createdReservation?.dataValues.aircraftId).toEqual('OH-QAA');
     expect(createdReservation?.dataValues.info).toEqual('Training flight');
     expect(createdReservation?.dataValues.phone).toEqual('11104040');
@@ -75,7 +84,7 @@ describe('Calls to api', () => {
     const newReservation: any = await api.post('/api/reservations/')
       .set('Content-type', 'application/json')
       .send({
-        start: new Date('2023-01-02T12:00:00.000Z'), end: new Date('2023-01-02T14:00:00.000Z'), aircraftId: 'OH-QAA', phone: '11104040',
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-QAA', phone: '11104040',
       });
 
     const createdReservation: Reservation | null = await Reservation.findOne(
@@ -83,8 +92,8 @@ describe('Calls to api', () => {
     );
 
     expect(createdReservation).toBeDefined();
-    expect(createdReservation?.dataValues.start).toEqual(new Date('2023-01-02T12:00:00.000Z'));
-    expect(createdReservation?.dataValues.end).toEqual(new Date('2023-01-02T14:00:00.000Z'));
+    expect(createdReservation?.dataValues.start).toEqual(new Date('2023-02-14T12:00:00.000Z'));
+    expect(createdReservation?.dataValues.end).toEqual(new Date('2023-02-14T14:00:00.000Z'));
     expect(createdReservation?.dataValues.aircraftId).toEqual('OH-QAA');
     expect(createdReservation?.dataValues.info).toEqual(null);
     expect(createdReservation?.dataValues.phone).toEqual('11104040');
@@ -112,13 +121,13 @@ describe('Calls to api', () => {
     const id = createdReservation?.dataValues.id;
     await api.patch(`/api/reservations/${id}`)
       .set('Content-type', 'application/json')
-      .send({ start: '2023-01-02T02:00:00.000Z', end: '2023-01-02T16:00:00.000Z' });
+      .send({ start: '2023-02-14T02:00:00.000Z', end: '2023-02-14T16:00:00.000Z' });
 
     const updatedReservation: Reservation | null = await Reservation.findByPk(id);
 
     expect(updatedReservation).not.toEqual(null);
-    expect(updatedReservation?.dataValues.start).toEqual(new Date('2023-01-02T02:00:00.000Z'));
-    expect(updatedReservation?.dataValues.end).toEqual(new Date('2023-01-02T16:00:00.000Z'));
+    expect(updatedReservation?.dataValues.start).toEqual(new Date('2023-02-14T02:00:00.000Z'));
+    expect(updatedReservation?.dataValues.end).toEqual(new Date('2023-02-14T16:00:00.000Z'));
   });
 
   test('can get reservations in a range', async () => {
@@ -147,17 +156,19 @@ describe('Calls to api', () => {
   });
 
   test('Reservation cannot be add in past', async () => {
-    const start = new Date();
-    start.setDate(start.getDate() - 1);
-    start.setHours(start.getHours() - 2);
-    const end = new Date();
-    end.setDate(end.getDate() - 1);
+    const start = new Date('2023-02-13T06:00:00.000Z');
+    const end = new Date('2023-02-13T08:00:00.000Z');
+
     const newReservation: any = await api.post('/api/reservations/')
       .set('Content-type', 'application/json')
       .send({
         start, end, aircraftId: 'OH-QAA', phone: '11104040',
       });
 
-    expect(newReservation).toEqual(null);
+    const response = await api
+      .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
+
+    expect(newReservation.status).toEqual(400);
+    expect(response.body).toHaveLength(0);
   });
 });
