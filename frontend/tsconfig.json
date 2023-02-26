@@ -1,7 +1,6 @@
 {
   "extends": "@lentovaraukset/shared/tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
     "outDir": "dist",
     "noImplicitAny": true,
     "module": "es6",

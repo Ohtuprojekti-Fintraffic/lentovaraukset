@@ -1,28 +1,25 @@
 import React from 'react';
 
-type UndisableableVariants = 'primary';
-interface UndisableableProps {
-  variant: UndisableableVariants;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
-  // I don't want disabled. This is needed because ???
-  disabled?: undefined;
-  children?: React.ReactNode;
-}
-
 type DisableableVariants = 'secondary' | 'tertiary' | 'danger' | 'glyph';
 interface DisableableProps {
   variant: DisableableVariants;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
   children?: React.ReactNode;
+  className?: string;
 }
 
+type UndisableableVariants = 'primary';
+interface UndisableableProps extends Omit<DisableableProps, 'variant' | 'disabled'> {
+  variant: UndisableableVariants;
+  disabled?: undefined;
+}
 // This is mostly to make it clear that
 // some button types can't be disabled
 type ButtonProps = DisableableProps | UndisableableProps;
 
 function Button({
-  variant, children, onClick, disabled,
+  variant, children, onClick, disabled, className,
 }: ButtonProps) {
   const buttonBaseClass = 'mx-1 py-3 px-4 rounded-ft-large font-ft-button text-ft-button';
 
@@ -46,7 +43,7 @@ function Button({
   };
 
   return (
-    <button type="button" className={`${buttonBaseClass} ${buttonVariantClasses[variant]}`} onClick={onClick}>
+    <button type="button" className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`} onClick={onClick}>
       {children}
     </button>
   );
