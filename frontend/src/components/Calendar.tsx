@@ -61,13 +61,13 @@ function Calendar({
   const handleEventClick = async (clickData: EventClickArg) => {
     if (clickData.event.display.includes('background')) return;
     const { event } = clickData;
-    //await clickEventFn({
+    // await clickEventFn({
     //  id: event.id,
     //  start: event.start || undefined,
     //  end: event.start || undefined,
     //  title: event.title,
     //  extendedProps: event.extendedProps,
-    //});
+    // });
     await clickEventFn(event);
   };
 
