@@ -120,7 +120,7 @@ function ReservationCalendar() {
             <p className="text-2xl pb-2">Varaus</p>
             <pre>
               {
-                JSON.stringify(selectedReservationRef, null, 2)
+                JSON.stringify(selectedReservationRef.current, null, 2)
               }
             </pre>
           </div>

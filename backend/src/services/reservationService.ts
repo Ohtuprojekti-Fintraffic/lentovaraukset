@@ -45,7 +45,7 @@ const getInTimeRange = async (
         start,
         end,
         aircraftId,
-        reservationInfo,
+        info: reservationInfo,
         phone,
         email: undefined,
         user: 'user',
