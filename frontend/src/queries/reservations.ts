@@ -26,12 +26,10 @@ const deleteReservation = async (id: Number): Promise<string> => {
   return response.text();
 };
 
-const modifyReservation = async (reservation: ReservationEntry): Promise<ReservationEntry> => {
-  const modifiedReservation = {
-    start: reservation.start,
-    end: reservation.end,
-  };
-  const res = await fetch(`${process.env.BASE_PATH}/api/reservations/${reservation.id}`, {
+const modifyReservation = async (
+  modifiedReservation: ReservationEntry,
+): Promise<ReservationEntry> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/reservations/${modifiedReservation.id}`, {
     method: 'PATCH',
     body: JSON.stringify(modifiedReservation),
     headers: {
