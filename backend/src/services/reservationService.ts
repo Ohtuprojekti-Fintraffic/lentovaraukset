@@ -44,16 +44,21 @@ const getInTimeRange = async (
     aircraftId,
     phone,
     info,
-  }) => ({
-    id,
-    start,
-    end,
-    aircraftId,
-    info,
-    phone,
-    email: undefined,
-    user: 'user',
-  }));
+  }) => {
+    const reservationInfo = info ?? undefined;
+    return (
+      {
+        id,
+        start,
+        end,
+        aircraftId,
+        reservationInfo,
+        phone,
+        email: undefined,
+        user: 'user',
+      }
+    );
+  });
 };
 
 const deleteById = async (id: number): Promise<boolean> => {
@@ -76,15 +81,23 @@ const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | '
 
 const updateById = async (
   id: number,
-  reservation: Omit<ReservationEntry, 'id' | 'user'>,
-): Promise<void> => {
+  newReservation: Omit<ReservationEntry, 'id' | 'user'>,
+): Promise<ReservationEntry> => {
   const newTimeslots = await timeslotService
-    .getTimeslotFromRange(reservation.start, reservation.end);
+    .getTimeslotFromRange(newReservation.start, newReservation.end);
   const oldReservation: Reservation | null = await Reservation.findByPk(id);
   const oldTimeslots = await oldReservation?.getTimeslots();
   await oldReservation?.removeTimeslots(oldTimeslots);
   await oldReservation?.addTimeslots(newTimeslots);
-  await Reservation.update(reservation, { where: { id } });
+  const [, reservations]: [number, Reservation[]] = await Reservation.update(
+    newReservation,
+    {
+      where: { id },
+      returning: true,
+    },
+  );
+  const user = 'NYI';
+  return { ...reservations[0].dataValues, user };
 };
 
 export default {

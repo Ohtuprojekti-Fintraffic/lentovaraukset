@@ -12,13 +12,19 @@ import { EventImpl } from '@fullcalendar/core/internal';
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>;
   eventSources: EventSourceInput[];
-  addEventFn: (event: { start: Date; end: Date }) => Promise<void>;
-  modifyEventFn: (event: { id: string; start: Date; end: Date }) => Promise<void>;
+  addEventFn: (event: { start: Date; end: Date; }) => Promise<any>;
+  modifyEventFn: (event: {
+    id: string;
+    start: Date;
+    end: Date,
+    extendedProps: any }) => Promise<any>;
   clickEventFn: (event: {
     id: string;
     start?: Date;
     end?: Date;
-    title?: string }) => Promise<void>;
+    title?: string;
+    extendedProps: any
+  }) => Promise<void>;
   granularity: { minutes: number };
   eventColors: {
     backgroundColor?: string;
@@ -71,6 +77,7 @@ function Calendar({
       start: event.start || undefined,
       end: event.start || undefined,
       title: event.title,
+      extendedProps: event.extendedProps,
     });
 
     // Refresh calendar if changes were made
@@ -86,6 +93,7 @@ function Calendar({
       id: event.id,
       start: event.start || new Date(),
       end: event.end || new Date(),
+      extendedProps: event.extendedProps,
     });
 
     calendarRef.current?.getApi().refetchEvents();
