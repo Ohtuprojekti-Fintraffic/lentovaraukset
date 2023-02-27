@@ -47,6 +47,10 @@ function Calendar({
         && e.start < span.end && e.end > span.start,
     );
 
+    if (span.start < new Date()) {
+      return false;
+    }
+
     console.log(events);
     return events
       ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
@@ -65,17 +69,29 @@ function Calendar({
     // Open confirmation popup here
     const { event } = changeData;
 
-    await modifyEventFn({
-      id: event.id,
-      start: event.start || new Date(),
-      end: event.end || new Date(),
-    });
+    const eventStartTime: Date = event.start || new Date();
+    const currentTime: Date = new Date();
 
+    if (eventStartTime >= currentTime) {
+      await modifyEventFn({
+        id: event.id,
+        start: event.start || new Date(),
+        end: event.end || new Date(),
+      });
+    }
     calendarRef.current?.getApi().refetchEvents();
   };
 
   // When a new event is selected (dragged) in the calendar.
   const handleEventCreate = async (dropData: DateSelectArg) => {
+    const newStartTime: Date = dropData.start || new Date();
+    const currentTime: Date = new Date();
+
+    if (newStartTime < currentTime) {
+      calendarRef.current?.getApi().unselect();
+      return;
+    }
+
     await addEventFn({
       start: dropData.start,
       end: dropData.end,
