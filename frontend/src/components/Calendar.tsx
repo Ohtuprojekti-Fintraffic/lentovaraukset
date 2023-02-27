@@ -47,6 +47,10 @@ function Calendar({
         && e.start < span.end && e.end > span.start,
     );
 
+    if (span.start < new Date()) {
+      return false;
+    }
+
     console.log(events);
     return events
       ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
@@ -102,16 +106,6 @@ function Calendar({
     calendarRef.current?.getApi().unselect();
   };
 
-  const validRange = () => {
-    const start = new Date();
-    const end = new Date(start.getTime());
-    end.setMonth(end.getMonth() + 6);
-    return {
-      start,
-      end,
-    };
-  };
-
   return (
     <FullCalendar
       ref={calendarRef}
@@ -149,7 +143,6 @@ function Calendar({
       select={handleEventCreate}
       selectConstraint={selectConstraint}
       eventSources={eventSources}
-      validRange={validRange}
       slotEventOverlap={false}
       selectAllow={allowEvent}
       eventAllow={allowEvent}
