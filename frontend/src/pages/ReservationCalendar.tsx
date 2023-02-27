@@ -1,4 +1,4 @@
-import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
+import { EventRemoveArg, EventSourceFunc, EventInput } from '@fullcalendar/core';
 import React, { useState, useRef } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import Calendar from '../components/Calendar';
@@ -33,6 +33,25 @@ function ReservationCalendar() {
     }
   };
 
+  const mergeTimeloSlots = (timeslots: EventInput[]): EventInput[] => {
+    let mergedTimeslots: EventInput[] = [];
+
+    timeslots.forEach((timeslot) => {
+      const lastMerged = mergedTimeslots[mergedTimeslots.length - 1];
+
+      if (lastMerged && lastMerged.end === timeslot.start) {
+        mergedTimeslots = mergedTimeslots
+          .slice(0, -1)
+          .concat([{ ...lastMerged, end: timeslot.end }]);
+      } else {
+        mergedTimeslots = mergedTimeslots
+          .concat([{ ...timeslot }]);
+      }
+    });
+
+    return mergedTimeslots;
+  };
+
   const timeSlotsSourceFn: EventSourceFunc = async (
     { start, end },
     successCallback,
@@ -40,15 +59,17 @@ function ReservationCalendar() {
   ) => {
     try {
       const timeslots = await getTimeSlots(start, end);
-      const timeslotsMapped = timeslots.map((timeSlot) => ({
+      const timeslotsMapped: EventInput[] = timeslots.map((timeSlot) => ({
         ...timeSlot, groupId: 'timeslots', display: 'inverse-background', color: '#2C2C44',
       }));
+
+      const mergedTimeslots = mergeTimeloSlots(timeslotsMapped);
 
       const notReservable = [{
         title: 'ei varattavissa', start, end, display: 'background', color: '#2C2C44', overlap: false,
       }];
 
-      successCallback(timeslotsMapped.length ? timeslotsMapped : notReservable);
+      successCallback(mergedTimeslots.length ? mergedTimeslots : notReservable);
     } catch (error) {
       failureCallback(error as Error);
     }
