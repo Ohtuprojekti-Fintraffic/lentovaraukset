@@ -55,7 +55,6 @@ function Calendar({
       return false;
     }
 
-    console.log(events);
     return events
       ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
       : true;
