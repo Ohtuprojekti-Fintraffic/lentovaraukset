@@ -56,6 +56,9 @@ const updateReservationValidator = (slotGranularityMinutes: number) => {
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
       .refine((value) => isTimeInPast(value), { message: pastErrorMessage }),
+    aircraftId: z.string(),
+    info: z.string().optional(),
+    phone: z.string(),
   });
 
   return Reservation;

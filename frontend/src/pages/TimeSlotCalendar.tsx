@@ -34,7 +34,7 @@ function TimeSlotCalendar() {
       const reservations = await getReservations(start, end);
 
       const reservationsMapped = reservations.map((reservation) => ({
-        ...reservation, groupId: 'reservations', display: 'background', color: '#000000',
+        ...reservation, id: reservation.id.toString(), groupId: 'reservations', display: 'background', color: '#000000',
       }));
 
       successCallback(reservationsMapped);

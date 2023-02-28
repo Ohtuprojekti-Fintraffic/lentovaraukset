@@ -12,8 +12,12 @@ import { EventImpl } from '@fullcalendar/core/internal';
 
 type CalendarProps = {
   eventSources: EventSourceInput[];
-  addEventFn: (event: { start: Date; end: Date }) => Promise<void>;
-  modifyEventFn: (event: { id: string; start: Date; end: Date }) => Promise<void>;
+  addEventFn: (event: { start: Date; end: Date; }) => Promise<any>;
+  modifyEventFn: (event: {
+    id: string;
+    start: Date;
+    end: Date,
+    extendedProps: any }) => Promise<any>;
   clickEventFn: (event: EventImpl) => Promise<void>;
   removeEventFn: (event: EventRemoveArg) => Promise<void>;
   granularity: { minutes: number };
@@ -51,7 +55,6 @@ function Calendar({
       return false;
     }
 
-    console.log(events);
     return events
       ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
       : true;
@@ -77,6 +80,7 @@ function Calendar({
         id: event.id,
         start: event.start || new Date(),
         end: event.end || new Date(),
+        extendedProps: event.extendedProps,
       });
     }
     calendarRef.current?.getApi().refetchEvents();

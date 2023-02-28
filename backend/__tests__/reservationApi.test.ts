@@ -119,15 +119,21 @@ describe('Calls to api', () => {
   test('can edit a reservation ', async () => {
     const createdReservation: Reservation | null = await Reservation.findOne();
     const id = createdReservation?.dataValues.id;
+    const aircraftId = createdReservation?.dataValues.aircraftId;
+    const phone = createdReservation?.dataValues.phone;
     await api.patch(`/api/reservations/${id}`)
       .set('Content-type', 'application/json')
-      .send({ start: '2023-02-14T02:00:00.000Z', end: '2023-02-14T16:00:00.000Z' });
+      .send({
+        start: '2023-02-14T02:00:00.000Z', end: '2023-02-14T16:00:00.000Z', aircraftId, phone,
+      });
 
     const updatedReservation: Reservation | null = await Reservation.findByPk(id);
 
     expect(updatedReservation).not.toEqual(null);
     expect(updatedReservation?.dataValues.start).toEqual(new Date('2023-02-14T02:00:00.000Z'));
     expect(updatedReservation?.dataValues.end).toEqual(new Date('2023-02-14T16:00:00.000Z'));
+    expect(updatedReservation?.dataValues.aircraftId).toEqual(aircraftId);
+    expect(updatedReservation?.dataValues.phone).toEqual(phone);
   });
 
   test('can get reservations in a range', async () => {

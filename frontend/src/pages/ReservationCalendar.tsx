@@ -24,7 +24,17 @@ function ReservationCalendar() {
       const reservations = await getReservations(start, end);
 
       const reservationsMapped = reservations.map((reservation) => ({
-        ...reservation, constraint: 'timeslots',
+        ...reservation,
+        id: reservation.id.toString(),
+        title: reservation.aircraftId,
+        constraint: 'timeslots',
+        extendedProps: {
+          user: reservation.user,
+          aircraftId: reservation.aircraftId,
+          phone: reservation.phone,
+          email: reservation.email,
+          info: reservation.info,
+        },
       }));
 
       successCallback(reservationsMapped);
@@ -77,6 +87,28 @@ function ReservationCalendar() {
     }
   };
 
+  const modifyReservationFn = async (event: {
+    id: string;
+    start: Date;
+    end: Date,
+    extendedProps: any
+  }): Promise<void> => {
+    const {
+      user, aircraftId, phone, email, info,
+    } = event.extendedProps;
+
+    await modifyReservation({
+      id: parseInt(event.id, 10),
+      start: event.start,
+      end: event.end,
+      user,
+      aircraftId,
+      phone,
+      email,
+      info,
+    });
+  };
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <Card show={showInspectModal} handleClose={closeReservationModalFn}>
@@ -88,7 +120,7 @@ function ReservationCalendar() {
             <p className="text-2xl pb-2">Varaus</p>
             <pre>
               {
-                JSON.stringify(selectedReservationRef, null, 2)
+                JSON.stringify(selectedReservationRef.current, null, 2)
               }
             </pre>
           </div>
@@ -112,7 +144,7 @@ function ReservationCalendar() {
       <Calendar
         eventSources={eventsSourceRef.current}
         addEventFn={addReservation}
-        modifyEventFn={modifyReservation}
+        modifyEventFn={modifyReservationFn}
         clickEventFn={clickReservation}
         removeEventFn={removeReservation}
         granularity={{ minutes: 20 }} // TODO: Get from airfield api
