@@ -24,12 +24,34 @@ const getReservationFromRange = async (startTime: Date, endTime: Date) => {
   return reservations;
 };
 
-const getInTimeRange = async (rangeStartTime: Date, rangeEndTime: Date) => {
+const getInTimeRange = async (
+  rangeStartTime: Date,
+  rangeEndTime: Date,
+): Promise<ReservationEntry[]> => {
   const reservations = await getReservationFromRange(rangeStartTime, rangeEndTime);
 
-  return reservations.map(({ id, start, end }) => ({
-    title: 'Varattu', id, start, end,
-  }));
+  return reservations.map(({
+    id,
+    start,
+    end,
+    aircraftId,
+    phone,
+    info,
+  }) => {
+    const reservationInfo = info ?? undefined;
+    return (
+      {
+        id,
+        start,
+        end,
+        aircraftId,
+        info: reservationInfo,
+        phone,
+        email: undefined,
+        user: 'user',
+      }
+    );
+  });
 };
 
 const allowReservation = async (
@@ -53,12 +75,7 @@ const deleteById = async (id: number) => {
   reservation.destroy();
 };
 
-const createReservation = async (newReservation: {
-  start: Date,
-  end: Date,
-  aircraftId: string,
-  info?: string,
-  phone: string, }): Promise<ReservationEntry> => {
+const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | 'user'>): Promise<ReservationEntry> => {
   if (!await allowReservation(newReservation.start, newReservation.end, undefined)) {
     throw new Error('Too many concurrent reservations');
   } else {
@@ -73,8 +90,8 @@ const createReservation = async (newReservation: {
 
 const updateById = async (
   id: number,
-  reservation: { start: Date, end: Date },
-): Promise<void> => {
+  reservation: Omit<ReservationEntry, 'id' | 'user'>,
+): Promise<ReservationEntry> => {
   if (!await allowReservation(reservation.start, reservation.end, id)) {
     throw new Error('Too many concurrent reservations');
   } else {
@@ -84,7 +101,15 @@ const updateById = async (
     const oldTimeslots = await oldReservation?.getTimeslots();
     await oldReservation?.removeTimeslots(oldTimeslots);
     await oldReservation?.addTimeslots(newTimeslots);
-    await Reservation.update(reservation, { where: { id } });
+    const [, reservations]: [number, Reservation[]] = await Reservation.update(
+      reservation,
+      {
+        where: { id },
+        returning: true,
+      },
+    );
+    const user = 'NYI';
+    return { ...reservations[0].dataValues, user };
   }
 };
 

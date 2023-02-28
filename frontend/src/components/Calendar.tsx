@@ -12,8 +12,12 @@ import { EventImpl } from '@fullcalendar/core/internal';
 
 type CalendarProps = {
   eventSources: EventSourceInput[];
-  addEventFn: (event: { start: Date; end: Date }) => Promise<void>;
-  modifyEventFn: (event: { id: string; start: Date; end: Date }) => Promise<void>;
+  addEventFn: (event: { start: Date; end: Date; }) => Promise<any>;
+  modifyEventFn: (event: {
+    id: string;
+    start: Date;
+    end: Date,
+    extendedProps: any }) => Promise<any>;
   clickEventFn: (event: EventImpl) => Promise<void>;
   removeEventFn: (event: EventRemoveArg) => Promise<void>;
   granularity: { minutes: number };
@@ -47,7 +51,10 @@ function Calendar({
         && e.start < span.end && e.end > span.start,
     );
 
-    console.log(events);
+    if (span.start < new Date()) {
+      return false;
+    }
+
     return events
       ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
       : true;
@@ -65,17 +72,30 @@ function Calendar({
     // Open confirmation popup here
     const { event } = changeData;
 
-    await modifyEventFn({
-      id: event.id,
-      start: event.start || new Date(),
-      end: event.end || new Date(),
-    });
+    const eventStartTime: Date = event.start || new Date();
+    const currentTime: Date = new Date();
 
+    if (eventStartTime >= currentTime) {
+      await modifyEventFn({
+        id: event.id,
+        start: event.start || new Date(),
+        end: event.end || new Date(),
+        extendedProps: event.extendedProps,
+      });
+    }
     calendarRef.current?.getApi().refetchEvents();
   };
 
   // When a new event is selected (dragged) in the calendar.
   const handleEventCreate = async (dropData: DateSelectArg) => {
+    const newStartTime: Date = dropData.start || new Date();
+    const currentTime: Date = new Date();
+
+    if (newStartTime < currentTime) {
+      calendarRef.current?.getApi().unselect();
+      return;
+    }
+
     await addEventFn({
       start: dropData.start,
       end: dropData.end,

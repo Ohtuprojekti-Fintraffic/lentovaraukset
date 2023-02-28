@@ -6,7 +6,7 @@ export interface ReservationEntry {
   aircraftId: string;
   phone: string;
   email?: string;
-  info: string;
+  info?: string;
 }
 
 export interface TimeslotEntry {
