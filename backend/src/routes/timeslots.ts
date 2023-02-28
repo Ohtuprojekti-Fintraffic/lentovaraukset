@@ -15,19 +15,17 @@ router.get('/', async (req: express.Request, res: express.Response) => {
   res.json(timeslots);
 });
 
-router.delete('/:id', async (req: express.Request, res: express.Response) => {
+router.delete('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const id = Number(req.params.id);
   try {
     await timeslotService.deleteById(id);
     res.send(`Timeslot ${id} deleted`);
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(400).json(error.message);
-    }
+    next(error);
   }
 });
 
-router.post('/', async (req: express.Request, res: express.Response) => {
+router.post('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // TODO: get slotGranularityMinutes from airfield
     const newTimeSlot = createTimeSlotValidator(20).parse(req.body);
@@ -35,13 +33,11 @@ router.post('/', async (req: express.Request, res: express.Response) => {
     const timeslot = await timeslotService.createTimeslot(newTimeSlot);
     res.json(timeslot);
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(400).json(error.message);
-    }
+    next(error);
   }
 });
 
-router.patch('/:id', async (req: express.Request, res: express.Response) => {
+router.patch('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // TODO: get slotGranularityMinutes from airfield
     const modifiedTimeslot = createTimeSlotValidator(20).parse(req.body);
@@ -50,9 +46,7 @@ router.patch('/:id', async (req: express.Request, res: express.Response) => {
     await timeslotService.updateById(id, modifiedTimeslot);
     res.status(200).json(modifiedTimeslot);
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(400).json(error.message);
-    }
+    next(error);
   }
 });
 
