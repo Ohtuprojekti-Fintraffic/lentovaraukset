@@ -14,8 +14,3 @@ export interface TimeslotEntry {
   start: Date;
   end: Date;
 }
-
-export interface ReservationStatus {
-  availableSlots: (TimeslotEntry & { freeSlotsAmount: number })[];
-  reservedSlots: ReservationEntry[];
-}

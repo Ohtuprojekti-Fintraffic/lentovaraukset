@@ -1,10 +1,4 @@
 import { EventInput } from '@fullcalendar/core';
-import { ReservationStatus } from '@lentovaraukset/shared/src';
-
-const getReservationStatus = async (): Promise<ReservationStatus> => {
-  const res = await fetch(`${process.env.BASE_PATH}/api/reservations/status`);
-  return res.json();
-};
 
 const getReservations = async (from: Date, until: Date): Promise<EventInput[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
@@ -55,5 +49,4 @@ export {
   addReservation,
   modifyReservation,
   deleteReservation,
-  getReservationStatus,
 };
