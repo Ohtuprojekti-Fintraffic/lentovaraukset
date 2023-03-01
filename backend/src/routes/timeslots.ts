@@ -1,6 +1,7 @@
 import express from 'express';
 import { createTimeSlotValidator, getTimeRangeValidator } from '@lentovaraukset/shared/src/validation/validation';
 import timeslotService from '../services/timeslotService';
+import airfieldService from '../services/airfieldService';
 
 const router = express.Router();
 
@@ -29,8 +30,9 @@ router.delete('/:id', async (req: express.Request, res: express.Response) => {
 
 router.post('/', async (req: express.Request, res: express.Response) => {
   try {
-    // TODO: get slotGranularityMinutes from airfield
-    const newTimeSlot = createTimeSlotValidator(20).parse(req.body);
+    const airfield = await airfieldService.getAirfield(1); // TODO: get airfieldId from request
+    const newTimeSlot = createTimeSlotValidator(airfield.eventGranularityMinutes).parse(req.body);
+    // TODO: check if timeslot overlaps with existing timeslots
 
     const timeslot = await timeslotService.createTimeslot(newTimeSlot);
     res.json(timeslot);
@@ -43,8 +45,10 @@ router.post('/', async (req: express.Request, res: express.Response) => {
 
 router.patch('/:id', async (req: express.Request, res: express.Response) => {
   try {
-    // TODO: get slotGranularityMinutes from airfield
-    const modifiedTimeslot = createTimeSlotValidator(20).parse(req.body);
+    const airfield = await airfieldService.getAirfield(1); // TODO: get airfieldId from request
+    const modifiedTimeslot = createTimeSlotValidator(airfield.eventGranularityMinutes)
+      .parse(req.body);
+    // TODO: check if timeslot overlaps with existing timeslots
 
     const id = Number(req.params.id);
     await timeslotService.updateById(id, modifiedTimeslot);
