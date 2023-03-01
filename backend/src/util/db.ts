@@ -8,9 +8,9 @@ if (process.env.NODE_ENV === 'test') {
   console.log('creating an in-memory test database');
 }
 
-const createTestAirfield = () => {
+const createTestAirfield = async () => {
   // TODO: Remove this when we have a proper admin interface for creating airfields
-  Airfield.upsert({
+  await Airfield.upsert({
     id: 1,
     name: 'Test Airfield',
     maxConcurrentFlights: 3,
@@ -36,4 +36,4 @@ const connectToDatabase = async () => {
   return null;
 };
 
-export { connectToDatabase, sequelize };
+export { connectToDatabase, sequelize, createTestAirfield };
