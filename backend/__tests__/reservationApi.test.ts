@@ -1,7 +1,8 @@
 import request from 'supertest';
 import app from '@lentovaraukset/backend/src/index';
 import { Reservation } from '@lentovaraukset/backend/src/models';
-import { connectToDatabase, createTestAirfield, sequelize } from '../src/util/db';
+import { connectToDatabase, sequelize } from '../src/util/db';
+import airfieldService from '../src/services/airfieldService';
 
 const api = request(app);
 
@@ -49,7 +50,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   // wipe db before each test
   await sequelize.truncate({ cascade: true });
-  await createTestAirfield();
+  await airfieldService.createTestAirfield();
   await Reservation.bulkCreate(reservations);
 });
 

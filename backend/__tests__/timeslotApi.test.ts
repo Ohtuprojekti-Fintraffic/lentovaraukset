@@ -1,7 +1,8 @@
 import request from 'supertest';
 import app from '@lentovaraukset/backend/src/index';
 import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
-import { connectToDatabase, createTestAirfield, sequelize } from '../src/util/db';
+import { connectToDatabase, sequelize } from '../src/util/db';
+import airfieldService from '../src/services/airfieldService';
 
 const api = request(app);
 
@@ -31,7 +32,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   // wipe db before each test
   await sequelize.truncate({ cascade: true });
-  await createTestAirfield();
+  await airfieldService.createTestAirfield();
   await Timeslot.bulkCreate(timeslotData);
 });
 
@@ -100,11 +101,9 @@ describe('Calls to api', () => {
   test('can edit a timeslot', async () => {
     const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z') });
 
-    const res = await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({ start: '2023-02-17T12:00:00.000Z', end: '2023-02-17T14:00:00.000Z' });
-
-    console.log(res.body);
 
     const updatedSlot: Timeslot | null = await Timeslot.findOne(
       { where: { id: createdSlot.dataValues.id } },

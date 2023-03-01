@@ -19,7 +19,18 @@ const getAirfields = async (): Promise<Airfield[]> => {
   return airfields;
 };
 
+const createTestAirfield = async () => {
+  // TODO: Remove this when we have a proper admin interface for creating airfields
+  await Airfield.upsert({
+    id: 1,
+    name: 'Test Airfield',
+    maxConcurrentFlights: 3,
+    eventGranularityMinutes: 20,
+  });
+};
+
 export default {
   getAirfield,
   getAirfields,
+  createTestAirfield,
 };
