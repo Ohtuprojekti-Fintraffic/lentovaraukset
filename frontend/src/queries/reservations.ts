@@ -39,7 +39,7 @@ const modifyReservation = async (
       'Content-Type': 'application/json',
     },
   });
-  return res.json()
+  return res.json();
 };
 
 export {

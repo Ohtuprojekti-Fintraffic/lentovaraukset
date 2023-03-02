@@ -14,6 +14,13 @@ export function reservationEntryToCalendarEvent(
     title: reservation.aircraftId,
     start: reservation.start,
     end: reservation.end,
+    extendedProps: {
+      user: reservation.user,
+      aircraftId: reservation.aircraftId,
+      phone: reservation.phone,
+      email: reservation.email,
+      info: reservation.info,
+    },
     ...eventInputArgs,
   };
 }
