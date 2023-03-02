@@ -1,17 +1,8 @@
+import { EventImpl } from '@fullcalendar/core/internal';
 import React from 'react';
 
 type ReservationInfoProps = {
-  reservation: Partial<{
-    id: string;
-    start: Date;
-    end: Date;
-    title: string;
-    user?: string;
-    aircraftId?: string;
-    phone?: string;
-    email?: string;
-    info?: string;
-  }>
+  reservation?: EventImpl
 };
 
 function ReservationInfoForm({
@@ -23,35 +14,46 @@ function ReservationInfoForm({
   return (
     <div>
       <div className="bg-black p-3">
-        <p className="text-white">{`Varaus #${reservation.id}`}</p>
+        <p className="text-white">{
+        reservation
+        ? `Varaus #${reservation.id}`
+        : 'Virhe'
+        }</p>
       </div>
       <div className="p-8">
-        <form className="flex flex-col w-full space-y-4">
-          <label className={labelStyle}>
-            Alku:
-            <input
-              type="datetime-local"
-              defaultValue={reservation.start?.toISOString()}
-              className={textFieldStyle}
-            />
-          </label>
-          <label className={labelStyle}>
-            Loppu:
-            <input
-              type="datetime-local"
-              defaultValue={reservation.end?.toISOString()}
-              className={textFieldStyle}
-            />
-          </label>
-          <label className={labelStyle}>
-            Info:
-            <input
-              type="text"
-              defaultValue={reservation.title}
-              className={textFieldStyle}
-            />
-          </label>
-        </form>
+        {
+          !reservation &&
+          <p>Virhe varausta haettaessa</p>
+        }
+        {
+          reservation &&
+          <form className="flex flex-col w-full space-y-4">
+            <label className={labelStyle}>
+              Alku:
+              <input
+                type="datetime-local"
+                defaultValue={reservation.start?.toISOString()}
+                className={textFieldStyle}
+              />
+            </label>
+            <label className={labelStyle}>
+              Loppu:
+              <input
+                type="datetime-local"
+                defaultValue={reservation.end?.toISOString()}
+                className={textFieldStyle}
+              />
+            </label>
+            <label className={labelStyle}>
+              Info:
+              <input
+                type="text"
+                defaultValue={reservation.title}
+                className={textFieldStyle}
+              />
+            </label>
+          </form>
+        }
       </div>
     </div>
   );

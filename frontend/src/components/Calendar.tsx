@@ -5,20 +5,21 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import {
-  DateSelectArg, EventChangeArg, EventClickArg, EventSourceInput, OverlapFunc,
+  AllowFunc, DateSelectArg, EventChangeArg, EventClickArg, EventRemoveArg, EventSourceInput,
 } from '@fullcalendar/core';
+import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { EventImpl } from '@fullcalendar/core/internal';
 
 type CalendarProps = {
-  calendarRef?: React.RefObject<FullCalendar>;
   eventSources: EventSourceInput[];
-  addEventFn: (event: { start: Date; end: Date }) => Promise<void>;
-  modifyEventFn: (event: { id: string; start: Date; end: Date }) => Promise<void>;
-  clickEventFn: (event: {
+  addEventFn: (event: { start: Date; end: Date; }) => Promise<any>;
+  modifyEventFn: (event: {
     id: string;
-    start?: Date;
-    end?: Date;
-    title: string }) => Promise<void>;
+    start: Date;
+    end: Date,
+    extendedProps: any }) => Promise<any>;
+  clickEventFn: (event: EventImpl) => Promise<void>;
+  removeEventFn: (event: EventRemoveArg) => Promise<void>;
   granularity: { minutes: number };
   eventColors: {
     backgroundColor?: string;
@@ -26,55 +27,44 @@ type CalendarProps = {
     textColor?: string;
   } | undefined;
   selectConstraint: string | undefined;
+  maxConcurrentLimit?: number;
 };
 
 function Calendar({
-  calendarRef = React.createRef(),
   eventSources,
   addEventFn,
   modifyEventFn,
   clickEventFn,
+  removeEventFn,
   granularity,
   eventColors,
   selectConstraint,
+  maxConcurrentLimit = 1,
 }: CalendarProps) {
-  const isOverlap = (eventA: EventImpl, eventB: EventImpl) => {
-    if (eventA.start && eventA.end && eventB.start && eventB.end) {
-      return !(eventA.end <= eventB.start || eventB.end <= eventA.start);
-    }
-    return false;
-  };
-  const areEventsColliding: OverlapFunc = (
-    stillEvent: EventImpl,
-    movingEvent: EventImpl | null,
-  ) => {
-    if (movingEvent === null) return true;
-    if (stillEvent.groupId === 'timeslots') return true;
-    // TODO: allow overlapping reservations based on airfield maxConcurrentFlights
-    return !(isOverlap(stillEvent, movingEvent) || isOverlap(movingEvent, stillEvent));
-  };
+  const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
-  const newEventColliding: OverlapFunc = (event: EventImpl) => {
-    if (event.groupId === 'timeslots') return true;
-    // TODO: allow overlapping reservations based on airfield maxConcurrentFlights
-    return false;
+  const allowEvent: AllowFunc = (span, movingEvent) => {
+    const events = calendarRef.current?.getApi().getEvents().filter(
+      (e) => e.id !== movingEvent?.id
+        && e.start && e.end
+        && !e.display.includes('background')
+        && e.start < span.end && e.end > span.start,
+    );
+
+    if (span.start < new Date()) {
+      return false;
+    }
+
+    return events
+      ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
+      : true;
   };
 
   // When a event box is clicked
   const handleEventClick = async (clickData: EventClickArg) => {
     if (clickData.event.display.includes('background')) return;
-
     const { event } = clickData;
-
-    await clickEventFn({
-      id: event.id,
-      start: event.start || undefined,
-      end: event.start || undefined,
-      title: event.title,
-    });
-
-    // Refresh calendar if changes were made
-    calendarRef.current?.getApi().refetchEvents();
+    await clickEventFn(event);
   };
 
   // When a event box is moved or resized
@@ -82,22 +72,40 @@ function Calendar({
     // Open confirmation popup here
     const { event } = changeData;
 
-    await modifyEventFn({
-      id: event.id,
-      start: event.start || new Date(),
-      end: event.end || new Date(),
-    });
+    const eventStartTime: Date = event.start || new Date();
+    const currentTime: Date = new Date();
 
+    if (eventStartTime >= currentTime) {
+      await modifyEventFn({
+        id: event.id,
+        start: event.start || new Date(),
+        end: event.end || new Date(),
+        extendedProps: event.extendedProps,
+      });
+    }
     calendarRef.current?.getApi().refetchEvents();
   };
 
   // When a new event is selected (dragged) in the calendar.
   const handleEventCreate = async (dropData: DateSelectArg) => {
+    const newStartTime: Date = dropData.start || new Date();
+    const currentTime: Date = new Date();
+
+    if (newStartTime < currentTime) {
+      calendarRef.current?.getApi().unselect();
+      return;
+    }
+
     await addEventFn({
       start: dropData.start,
       end: dropData.end,
     });
+    calendarRef.current?.getApi().refetchEvents();
+    calendarRef.current?.getApi().unselect();
+  };
 
+  const handleEventRemove = async (removeInfo: EventRemoveArg) => {
+    await removeEventFn(removeInfo);
     calendarRef.current?.getApi().refetchEvents();
     calendarRef.current?.getApi().unselect();
   };
@@ -135,11 +143,13 @@ function Calendar({
       eventTextColor={eventColors?.textColor || '#000000'}
       eventClick={handleEventClick}
       eventChange={handleEventChange}
+      eventRemove={handleEventRemove}
       select={handleEventCreate}
       selectConstraint={selectConstraint}
       eventSources={eventSources}
-      eventOverlap={areEventsColliding}
-      selectOverlap={newEventColliding}
+      slotEventOverlap={false}
+      selectAllow={allowEvent}
+      eventAllow={allowEvent}
     />
   );
 }

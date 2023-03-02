@@ -6,16 +6,11 @@ export interface ReservationEntry {
   aircraftId: string;
   phone: string;
   email?: string;
-  info: string;
+  info?: string;
 }
 
 export interface TimeslotEntry {
   id: number;
   start: Date;
   end: Date;
-}
-
-export interface ReservationStatus {
-  availableSlots: (TimeslotEntry & { freeSlotsAmount: number })[];
-  reservedSlots: ReservationEntry[];
 }

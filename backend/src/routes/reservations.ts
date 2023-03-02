@@ -15,42 +15,34 @@ router.get('/', async (req: express.Request, res: express.Response) => {
   res.json(reservations);
 });
 
-router.delete('/:id', async (req: express.Request, res: express.Response) => {
+router.delete('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const id = Number(req.params.id);
   try {
-    const deleted = await reservationService.deleteById(id);
-    if (deleted) {
-      res.send(`Reservation ${id} deleted`);
-    } else {
-      res.status(404).json(`Reservation ${id} not found`);
-    }
+    await reservationService.deleteById(id);
+    res.send(`Reservation ${id} deleted`);
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(500).json(error);
-    }
+    next(error);
   }
 });
 
-router.post('/', async (req: express.Request, res: express.Response) => {
+router.post('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const newReservation = createReservationValidator(10).parse(req.body);
     const reservation = await reservationService.createReservation(newReservation);
     res.json(reservation);
-  } catch (error) {
-    console.log(error);
-    res.status(400).json(error);
+  } catch (error: unknown) {
+    next(error);
   }
 });
 
-router.patch('/:id', async (req: express.Request, res: express.Response) => {
+router.patch('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const id = Number(req.params.id);
     const validReservationUpdate = updateReservationValidator(10).parse(req.body);
     const modifiedReservation = await reservationService.updateById(id, validReservationUpdate);
     res.status(200).json(modifiedReservation);
-  } catch (error) {
-    console.log(error);
-    res.status(400).json(error);
+  } catch (error: unknown) {
+    next(error);
   }
 });
 

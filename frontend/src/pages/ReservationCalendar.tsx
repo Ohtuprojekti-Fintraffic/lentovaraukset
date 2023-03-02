@@ -1,8 +1,6 @@
-import { EventSourceFunc } from '@fullcalendar/core';
-import React, { useState } from 'react';
-
-import { useMutation } from 'react-query';
-import FullCalendar from '@fullcalendar/react';
+import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
+import React, { useState, useRef } from 'react';
+import { EventImpl } from '@fullcalendar/core/internal';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -17,14 +15,7 @@ import ReservationInfoForm from '../components/forms/ReservationInfoForm';
 
 function ReservationCalendar() {
   const [showInspectModal, setShowInspectModal] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState<Partial<{
-    id: string,
-    start: Date,
-    end: Date,
-    title: string
-  }>>({});
-
-  const calendarRef: React.RefObject<FullCalendar> = React.createRef();
+  const selectedReservationRef = useRef<EventImpl | null>(null);
 
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -35,7 +26,17 @@ function ReservationCalendar() {
       const reservations = await getReservations(start, end);
 
       const reservationsMapped = reservations.map((reservation) => ({
-        ...reservation, constraint: 'timeslots',
+        ...reservation,
+        id: reservation.id.toString(),
+        title: reservation.aircraftId,
+        constraint: 'timeslots',
+        extendedProps: {
+          user: reservation.user,
+          aircraftId: reservation.aircraftId,
+          phone: reservation.phone,
+          email: reservation.email,
+          info: reservation.info,
+        },
       }));
 
       successCallback(reservationsMapped);
@@ -65,35 +66,60 @@ function ReservationCalendar() {
     }
   };
 
-  const deleteReservationFn = useMutation((id: Number) => deleteReservation(id));
+  const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
 
-  const clickReservation = async (event: {
-    id: string;
-    start?: Date;
-    end?: Date;
-    title: string
-  }): Promise<void> => {
-    setSelectedReservation(event);
+  const clickReservation = async (event:EventImpl): Promise<void> => {
+    selectedReservationRef.current = event;
     setShowInspectModal(true);
   };
 
   const closeReservationModalFn = () => {
     setShowInspectModal(false);
-    calendarRef.current?.getApi().refetchEvents();
+  };
+
+  const removeReservation = async (removeInfo: EventRemoveArg) => {
+    const { event } = removeInfo;
+    const res = await deleteReservation(Number(event.id));
+    if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
+      closeReservationModalFn();
+      selectedReservationRef.current = null;
+    } else {
+      removeInfo.revert();
+      throw new Error('Removing reservation failed');
+    }
+  };
+
+  const modifyReservationFn = async (event: {
+    id: string;
+    start: Date;
+    end: Date,
+    extendedProps: any
+  }): Promise<void> => {
+    const {
+      user, aircraftId, phone, email, info,
+    } = event.extendedProps;
+
+    await modifyReservation({
+      id: parseInt(event.id, 10),
+      start: event.start,
+      end: event.end,
+      user,
+      aircraftId,
+      phone,
+      email,
+      info,
+    });
   };
 
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <Card show={showInspectModal} handleClose={closeReservationModalFn}>
         <ReservationInfoForm
-          reservation={selectedReservation}
+          reservation={selectedReservationRef.current ?? undefined}
         />
         <Button
           variant="danger"
-          onClick={async () => {
-            await deleteReservationFn.mutateAsync(Number(selectedReservation.id));
-            closeReservationModalFn();
-          }}
+          onClick={() => selectedReservationRef.current?.remove()}
         >
           Poista
         </Button>
@@ -106,14 +132,15 @@ function ReservationCalendar() {
       </Card>
       <h1 className="text-3xl">Varauskalenteri</h1>
       <Calendar
-        calendarRef={calendarRef}
-        eventSources={[reservationsSourceFn, timeSlotsSourceFn]}
+        eventSources={eventsSourceRef.current}
         addEventFn={addReservation}
-        modifyEventFn={modifyReservation}
+        modifyEventFn={modifyReservationFn}
         clickEventFn={clickReservation}
+        removeEventFn={removeReservation}
         granularity={{ minutes: 20 }} // TODO: Get from airfield api
         eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFF' }}
         selectConstraint="timeslots"
+        maxConcurrentLimit={3} // TODO: get from airfield api
       />
     </div>
   );
