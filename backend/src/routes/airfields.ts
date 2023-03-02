@@ -1,4 +1,5 @@
 import express from 'express';
+// eslint-disable-next-line import/extensions
 import airfieldService from '../services/airfieldService';
 
 const router = express.Router();
