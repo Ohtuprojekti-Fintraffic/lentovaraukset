@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '@lentovaraukset/backend/src/index';
+import app from '@lentovaraukset/backend/src/app';
 import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
 import { connectToDatabase, sequelize } from '../src/util/db';
 

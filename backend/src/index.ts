@@ -1,18 +1,6 @@
-import express from 'express';
-import cors from 'cors';
-import timeslotRouter from './routes/timeslots';
-import reservationRouter from './routes/reservations';
-import errorHandler from './util/middleware';
+import app from './app';
+import { connectToDatabase } from './util/db';
+import { PORT } from './util/config';
 
-const app = express();
-
-app.use(express.json());
-app.use(cors());
-app.get('/api', async (_req: any, res: express.Response) => {
-  res.send('Hello World');
-});
-app.use('/api/timeslots', timeslotRouter);
-app.use('/api/reservations', reservationRouter);
-app.use(errorHandler);
-
-export default app;
+connectToDatabase();
+app.listen(PORT, () => console.log(`Server is running on port: ${PORT}`));
