@@ -4,7 +4,7 @@ import reservationService from '@lentovaraukset/backend/src/services/reservation
 import { Timeslot } from '../models';
 
 const getTimeslotFromRange = async (startTime: Date, endTime: Date) => {
-  const timeslots: Timeslot[] = await Timeslot.findAll({
+  const timeslot: Timeslot | null = await Timeslot.findOne({
     where: {
       [Op.and]: [
         {
@@ -18,7 +18,7 @@ const getTimeslotFromRange = async (startTime: Date, endTime: Date) => {
       ],
     },
   });
-  return timeslots;
+  return timeslot;
 };
 
 const getInTimeRange = async (

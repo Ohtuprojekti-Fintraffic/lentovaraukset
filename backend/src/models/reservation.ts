@@ -4,9 +4,9 @@ import {
   InferAttributes,
   InferCreationAttributes,
   CreationOptional,
-  HasManyAddAssociationsMixin,
-  HasManyGetAssociationsMixin,
-  HasManyRemoveAssociationsMixin,
+  HasOneSetAssociationMixin,
+  HasOneGetAssociationMixin,
+  HasManyRemoveAssociationMixin,
 } from 'sequelize';
 
 import { Timeslot } from '@lentovaraukset/backend/src/models';
@@ -28,11 +28,11 @@ InferCreationAttributes<Reservation>
 
   declare phone: string;
 
-  declare addTimeslots: HasManyAddAssociationsMixin<Timeslot, number>;
+  declare addTimeslot: HasOneSetAssociationMixin<Timeslot, number>;
 
-  declare getTimeslots: HasManyGetAssociationsMixin<Timeslot>;
+  declare getTimeslot: HasOneGetAssociationMixin<Timeslot>;
 
-  declare removeTimeslots: HasManyRemoveAssociationsMixin<Timeslot, number>;
+  declare removeTimeslot: HasManyRemoveAssociationMixin<Timeslot, number>;
 }
 
 Reservation.init(
@@ -70,4 +70,5 @@ Reservation.init(
     modelName: 'reservation',
   },
 );
+
 export default Reservation;
