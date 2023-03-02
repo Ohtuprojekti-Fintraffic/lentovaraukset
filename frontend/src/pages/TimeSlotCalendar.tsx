@@ -1,4 +1,5 @@
 import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
+import { EventImpl } from '@fullcalendar/core/internal';
 import React from 'react';
 import Calendar from '../components/Calendar';
 import {
@@ -48,10 +49,10 @@ function TimeSlotCalendar() {
     }
   };
 
-  const clickEventFn = async (event: { id: string }): Promise<void> => {
+  const clickEventFn = async (event: EventImpl): Promise<void> => {
     // eslint-disable-next-line no-restricted-globals
-    if (confirm('Haluatko varmasti poistaa aikaikkunan?')) {
-      await deleteTimeslot(Number(event.id));
+    if (confirm('Haluatko varmasti poistaa aikaikkunan?')) { // TODO: Replace with modal, example in ReservationCalendar
+      event.remove();
     }
   };
 
@@ -59,6 +60,7 @@ function TimeSlotCalendar() {
     const { event } = removeInfo;
     await deleteTimeslot(Number(event.id));
   };
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <h1 className="text-3xl">Vapaat varausikkunat</h1>

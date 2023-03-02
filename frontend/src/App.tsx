@@ -5,6 +5,8 @@ import {
   QueryClientProvider,
 } from 'react-query';
 import Navigation from './components/Navigation';
+import { AlertContextProvider } from './contexts/AlertContext';
+import AlertContainer from './components/AlertContainer';
 
 const queryClient = new QueryClient();
 
@@ -17,9 +19,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-col h-full">
         <Navigation />
-        <main className="flex flex-row flex-grow p-10 overflow-y-auto">
-          <Outlet />
-        </main>
+        <AlertContextProvider>
+          <AlertContainer />
+          <main className="flex flex-row flex-grow p-10 overflow-y-auto">
+            <Outlet />
+          </main>
+        </AlertContextProvider>
       </div>
     </QueryClientProvider>
   );

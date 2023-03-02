@@ -6,16 +6,17 @@ const getReservations = async (from: Date, until: Date): Promise<ReservationEntr
   return res.json();
 };
 
-const addReservation = async ({ start, end }: Pick<ReservationCalendarEvent, 'start' | 'end'>): Promise<void> => {
-  await fetch(`${process.env.BASE_PATH}/api/reservations/`, {
+const addReservation = async (newReservation: ReservationCalendarEvent): Promise<ReservationEntry> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/reservations/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      start, end, aircraftId: '1', phone: '1',
+      ...newReservation, aircraftId: 'OH-EXMPL', phone: '051 123 4567', info: 'placeholder',
     }),
   });
+  return res.json();
 };
 
 const deleteReservation = async (id: Number): Promise<string> => {
@@ -28,17 +29,17 @@ const deleteReservation = async (id: Number): Promise<string> => {
   return response.text();
 };
 
-const modifyReservation = async ({ start, end, id }: Pick<ReservationCalendarEvent, 'start' | 'end' | 'id'>): Promise<void> => {
-  const modifiedReservation = {
-    start, end,
-  };
-  await fetch(`${process.env.BASE_PATH}/api/reservations/${id}`, {
+const modifyReservation = async (
+  modifiedReservation: ReservationEntry,
+): Promise<ReservationEntry> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/reservations/${modifiedReservation.id}`, {
     method: 'PATCH',
     body: JSON.stringify(modifiedReservation),
     headers: {
       'Content-Type': 'application/json',
     },
   });
+  return res.json()
 };
 
 export {
