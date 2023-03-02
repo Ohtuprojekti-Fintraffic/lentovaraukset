@@ -8,8 +8,8 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "nodemon -e ts,js --exec ts-node src/app.ts",
-    "start:test": "NODE_ENV=test ts-node src/app.ts",
+    "start": "nodemon -e ts,js --exec ts-node src",
+    "start:test": "NODE_ENV=test ts-node src",
     "test": "NODE_ENV=test jest"
   },
   "dependencies": {
