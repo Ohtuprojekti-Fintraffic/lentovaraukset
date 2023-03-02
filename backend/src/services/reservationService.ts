@@ -72,7 +72,7 @@ const deleteById = async (id: number) => {
   if (!reservation) {
     throw new Error('Reservation does not exist');
   }
-  reservation.destroy();
+  await reservation.destroy();
 };
 
 const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | 'user'>): Promise<ReservationEntry> => {
