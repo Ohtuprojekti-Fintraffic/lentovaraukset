@@ -53,7 +53,7 @@ const deleteById = async (id: number) => {
   if (reservations?.length !== 0) {
     throw new Error('Timeslot has reservations');
   }
-  timeslot?.destroy();
+  await timeslot?.destroy();
 };
 
 const updateById = async (
