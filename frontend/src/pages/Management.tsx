@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React from 'react';
 import {useQuery} from 'react-query';
-import { getAirfield } from '../queries/airfields';
+import { getAirfield } from '../queries/airfield';
 import QueryKeys from '../queries/queryKeys';
 import AirfieldForm from '../components/forms/AirfieldForm';
 
