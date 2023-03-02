@@ -5,6 +5,7 @@ import {
   InferCreationAttributes,
   CreationOptional,
   HasOneSetAssociationMixin,
+  HasManyAddAssociationMixin,
   HasOneGetAssociationMixin,
   HasManyRemoveAssociationMixin,
 } from 'sequelize';
@@ -28,7 +29,9 @@ InferCreationAttributes<Reservation>
 
   declare phone: string;
 
-  declare addTimeslot: HasOneSetAssociationMixin<Timeslot, number>;
+  declare addTimeslot: HasManyAddAssociationMixin<Timeslot, number>;
+
+  declare setTimeslot: HasOneSetAssociationMixin<Timeslot, number>;
 
   declare getTimeslot: HasOneGetAssociationMixin<Timeslot>;
 

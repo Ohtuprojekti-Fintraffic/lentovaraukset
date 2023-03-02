@@ -83,7 +83,7 @@ const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | '
       .getTimeslotFromRange(newReservation.start, newReservation.end);
     const reservation: Reservation = await Reservation.create(newReservation);
     if (timeslot) {
-      await reservation.addTimeslot(timeslot);
+      await reservation.setTimeslot(timeslot);
     }
     const user = 'NYI';
     return { ...reservation.dataValues, user };
@@ -102,11 +102,8 @@ const updateById = async (
 
     const oldReservation: Reservation | null = await Reservation.findByPk(id);
     const oldTimeslot = await oldReservation?.getTimeslot();
-    if (oldTimeslot) {
-      await oldReservation?.removeTimeslot(oldTimeslot);
-    }
-    if (newTimeslot) {
-      await oldReservation?.addTimeslot(newTimeslot);
+    if (newTimeslot && oldTimeslot) {
+      await oldReservation?.setTimeslot(oldTimeslot);
     }
     const [, reservations]: [number, Reservation[]] = await Reservation.update(
       reservation,
