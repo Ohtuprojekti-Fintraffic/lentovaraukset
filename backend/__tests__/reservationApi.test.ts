@@ -179,4 +179,38 @@ describe('Calls to api', () => {
     expect(newReservation.status).toEqual(400);
     expect(response.body).toHaveLength(0);
   });
+
+  test('Reservation cannot be added further than the max days ahead', async () => {
+    const start = new Date('2023-02-24T06:00:00.000Z');
+    const end = new Date('2023-02-24T08:00:00.000Z');
+
+    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    });
+
+    expect(newReservation.body.error).toBeDefined();
+    expect(newReservation.body.error.message).toContain('Reservation start time cannot be further');
+
+    const response = await api
+      .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
+
+    expect(response.body).toHaveLength(0);
+  });
+
+  test('Reservation cannot be added if start is later than end', async () => {
+    const start = new Date('2023-02-24T08:00:00.000Z');
+    const end = new Date('2023-02-24T06:00:00.000Z');
+
+    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    });
+
+    expect(newReservation.body.error).toBeDefined();
+    expect(newReservation.body.error.message).toContain('start time cannot be later than the end time');
+
+    const response = await api
+      .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
+
+    expect(response.body).toHaveLength(0);
+  });
 });
