@@ -7,6 +7,7 @@ interface DisableableProps {
   disabled?: boolean;
   children?: React.ReactNode;
   className?: string;
+  type?: JSX.IntrinsicElements['button']['type'];
 }
 
 type UndisableableVariants = 'primary';
@@ -19,7 +20,7 @@ interface UndisableableProps extends Omit<DisableableProps, 'variant' | 'disable
 type ButtonProps = DisableableProps | UndisableableProps;
 
 function Button({
-  variant, children, onClick, disabled, className,
+  variant, children, onClick, disabled, className, type = 'button',
 }: ButtonProps) {
   const buttonBaseClass = 'mx-1 py-3 px-4 rounded-ft-large font-ft-button text-ft-button';
 
@@ -43,7 +44,7 @@ function Button({
   };
 
   return (
-    <button type="button" className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`} onClick={onClick}>
+    <button type={ type } className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`} onClick={onClick}>
       {children}
     </button>
   );

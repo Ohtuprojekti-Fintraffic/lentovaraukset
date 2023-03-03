@@ -7,8 +7,8 @@ type FormProps = {
   airfield: AirfieldEntry;
 };
 
-type FormValues = {
-  maxFlights?: string;
+type Inputs = {
+  maxFlights?: number;
 };
 
 function AirfieldForm(
@@ -16,13 +16,14 @@ function AirfieldForm(
 ) {
   const {
     register, handleSubmit,
-  } = useForm();
+  } = useForm<Inputs>({
+    defaultValues: {
+      maxFlights: airfield.maxConcurrentFlights,
+    }
+  });
   const textFieldStyle = 'border border-black rounded p-1 ml-4';
   const labelStyle = 'flex flex-row justify-between items-center w-full';
-  const maxFlightsReg = register('maxFlights');
-  const onSubmit: SubmitHandler<FormValues> = (data: FormValues) => console.log(data);
-
-  // const {airfield} = data;
+  const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => console.log(data);
   return (
     <div>
       <div className="p-8">
@@ -33,19 +34,14 @@ function AirfieldForm(
           <p className={labelStyle}>
             {`Airfield name: ${airfield.name}`}
           </p>
-          <label className={labelStyle} htmlFor="flight-input">
+          <label className={labelStyle}>
             Max concurrent flights:
             <input
-              defaultValue={airfield.maxConcurrentFlights}
               className={textFieldStyle}
-              onChange={maxFlightsReg.onChange}
-              onBlur={maxFlightsReg.onBlur}
-              name={maxFlightsReg.name}
-              ref={maxFlightsReg.ref}
-              id="flight-input"
+              {...register('maxFlights')}
             />
           </label>
-          <button type="submit"> Submit</button>
+          <Button type="submit" variant="primary"> Submit</Button>
         </form>
       </div>
     </div>
