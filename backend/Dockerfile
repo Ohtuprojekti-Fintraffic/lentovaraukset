@@ -23,4 +23,4 @@ RUN npm ci
 
 EXPOSE 8080
 
-CMD node ./backend/src/app.js
+CMD node ./backend/src/index.js

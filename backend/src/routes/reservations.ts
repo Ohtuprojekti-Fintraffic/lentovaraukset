@@ -1,5 +1,5 @@
 import express from 'express';
-import { createReservationValidator, updateReservationValidator, getTimeRangeValidator } from '@lentovaraukset/shared/src/validation/validation';
+import { createReservationValidator, getTimeRangeValidator } from '@lentovaraukset/shared/src/validation/validation';
 import reservationService from '../services/reservationService';
 
 const router = express.Router();
@@ -15,40 +15,36 @@ router.get('/', async (req: express.Request, res: express.Response) => {
   res.json(reservations);
 });
 
-router.delete('/:id', async (req: express.Request, res: express.Response) => {
+router.delete('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const id = Number(req.params.id);
   try {
     await reservationService.deleteById(id);
     res.send(`Reservation ${id} deleted`);
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(400).json(error.message);
-    }
+    next(error);
   }
 });
 
-router.post('/', async (req: express.Request, res: express.Response) => {
+router.post('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const newReservation = createReservationValidator(10).parse(req.body);
+    // TODO: get maxDaysInFuture from airfield
+    const newReservation = createReservationValidator(10, 7).parse(req.body);
     const reservation = await reservationService.createReservation(newReservation);
     res.json(reservation);
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(400).json(error.message);
-    }
+    next(error);
   }
 });
 
-router.patch('/:id', async (req: express.Request, res: express.Response) => {
+router.patch('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const id = Number(req.params.id);
-    const validReservationUpdate = updateReservationValidator(10).parse(req.body);
+    // TODO: get maxDaysInFuture from airfield
+    const validReservationUpdate = createReservationValidator(10, 7).parse(req.body);
     const modifiedReservation = await reservationService.updateById(id, validReservationUpdate);
     res.status(200).json(modifiedReservation);
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(400).json(error.message);
-    }
+    next(error);
   }
 });
 
