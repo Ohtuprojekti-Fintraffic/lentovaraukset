@@ -1,7 +1,6 @@
 import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
 import React, { useState, useRef } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { ReservationEntry } from '@lentovaraukset/shared/src';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -92,22 +91,22 @@ function ReservationCalendar() {
     id: string;
     start: Date;
     end: Date,
-    extendedProps?: any
+    extendedProps: any
   }): Promise<void> => {
-    let data: Partial<ReservationEntry> = {
+    const {
+      user, aircraftId, phone, email, info,
+    } = event.extendedProps;
+
+    await modifyReservation({
       id: parseInt(event.id, 10),
       start: event.start,
       end: event.end,
-    };
-    if (event.extendedProps) {
-      const {
-        user, aircraftId, phone, email, info,
-      } = event.extendedProps;
-      data = {
-        ...data, user, aircraftId, phone, email, info,
-      };
-    }
-    await modifyReservation(data);
+      user,
+      aircraftId,
+      phone,
+      email,
+      info,
+    });
   };
 
   return (

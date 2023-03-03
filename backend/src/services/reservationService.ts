@@ -90,30 +90,27 @@ const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | '
 
 const updateById = async (
   id: number,
-  reservation: Omit<Partial<ReservationEntry>, 'id' | 'user'>,
+  reservation: Omit<ReservationEntry, 'id' | 'user'>,
 ): Promise<ReservationEntry> => {
-  const { start, end } = reservation;
-  if (start && end) {
-    if (!await allowReservation(start, end, id)) {
-      throw new Error('Too many concurrent reservations');
-    } else {
-      const newTimeslots = await timeslotService
-        .getTimeslotFromRange(start, end);
-      const oldReservation: Reservation | null = await Reservation.findByPk(id);
-      const oldTimeslots = await oldReservation?.getTimeslots();
-      await oldReservation?.removeTimeslots(oldTimeslots);
-      await oldReservation?.addTimeslots(newTimeslots);
-    }
+  if (!await allowReservation(reservation.start, reservation.end, id)) {
+    throw new Error('Too many concurrent reservations');
+  } else {
+    const newTimeslots = await timeslotService
+      .getTimeslotFromRange(reservation.start, reservation.end);
+    const oldReservation: Reservation | null = await Reservation.findByPk(id);
+    const oldTimeslots = await oldReservation?.getTimeslots();
+    await oldReservation?.removeTimeslots(oldTimeslots);
+    await oldReservation?.addTimeslots(newTimeslots);
+    const [, reservations]: [number, Reservation[]] = await Reservation.update(
+      reservation,
+      {
+        where: { id },
+        returning: true,
+      },
+    );
+    const user = 'NYI';
+    return { ...reservations[0].dataValues, user };
   }
-  const [, reservations]: [number, Reservation[]] = await Reservation.update(
-    reservation,
-    {
-      where: { id },
-      returning: true,
-    },
-  );
-  const user = 'NYI';
-  return { ...reservations[0].dataValues, user };
 };
 
 export default {

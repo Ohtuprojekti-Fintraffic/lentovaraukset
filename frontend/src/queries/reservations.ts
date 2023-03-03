@@ -29,7 +29,7 @@ const deleteReservation = async (id: Number): Promise<string> => {
 };
 
 const modifyReservation = async (
-  modifiedReservation: Partial<ReservationEntry>,
+  modifiedReservation: ReservationEntry,
 ): Promise<ReservationEntry> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/reservations/${modifiedReservation.id}`, {
     method: 'PATCH',

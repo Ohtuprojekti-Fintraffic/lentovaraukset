@@ -17,7 +17,7 @@ type CalendarProps = {
     id: string;
     start: Date;
     end: Date,
-    extendedProps?: any }) => Promise<any>;
+    extendedProps: any }) => Promise<any>;
   clickEventFn: (event: EventImpl) => Promise<void>;
   removeEventFn: (event: EventRemoveArg) => Promise<void>;
   granularity: { minutes: number };
@@ -80,6 +80,7 @@ function Calendar({
         id: event.id,
         start: event.start || new Date(),
         end: event.end || new Date(),
+        extendedProps: event.extendedProps,
       });
     }
     calendarRef.current?.getApi().refetchEvents();
