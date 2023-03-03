@@ -12,7 +12,7 @@ type Inputs = {
   maxFlights: string;
 };
 
-function AirfieldForm(
+export function AirfieldForm(
   { airfield }: FormProps,
 ) {
   const {
@@ -31,10 +31,16 @@ function AirfieldForm(
       <div className="p-8">
         <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <p className={labelStyle}>
-            {`Airfield id: ${airfield.id}`}
+            {`Id: ${airfield.id}`}
           </p>
           <p className={labelStyle}>
-            {`Airfield name: ${airfield.name}`}
+            {`Name: ${airfield.name}`}
+          </p>
+          <p className={labelStyle}>
+            {`Event granularity in minutes: ${airfield.eventGranularityMinutes}`}
+          </p>
+          <p className={labelStyle}>
+            {`How many days in future reservation can be done: ${airfield.futureReservationDays}`}
           </p>
           <InputField
             labelText=" Max concurrent flights:"
