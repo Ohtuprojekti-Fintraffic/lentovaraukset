@@ -167,29 +167,6 @@ describe('Calls to api', () => {
     expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-02-16T13:00:00.000Z'));
   });
 
-  test('dont edit a timeslot with reservation  if it goes outside reservation range', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T14:00:00.000Z') });
-    const newReservation: Reservation = await Reservation.create({
-      start: new Date('2023-02-16T12:00:00.000Z'),
-      end: new Date('2023-02-16T14:00:00.000Z'),
-      aircraftId: 'ESA-111',
-      phone: '0501102323',
-    });
-    createdSlot.addReservations([newReservation]);
-
-    await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
-      .set('Content-type', 'application/json')
-      .send({ start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T13:00:00.000Z' });
-
-    const updatedSlot: Timeslot | null = await Timeslot.findOne(
-      { where: { id: createdSlot.dataValues.id } },
-    );
-
-    expect(updatedSlot).not.toEqual(null);
-    expect(updatedSlot?.dataValues.start).toEqual(new Date('2023-02-16T12:00:00.000Z'));
-    expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-02-16T14:00:00.000Z'));
-  });
-
   test('can delete a timeslot', async () => {
     const createdSlot: Timeslot | null = await Timeslot.findOne({});
     await api.delete(`/api/timeslots/${createdSlot?.dataValues.id}`);

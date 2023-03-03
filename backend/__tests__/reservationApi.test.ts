@@ -1,6 +1,6 @@
 import request from 'supertest';
 import app from '@lentovaraukset/backend/src/index';
-import { Reservation } from '@lentovaraukset/backend/src/models';
+import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
 import { connectToDatabase, sequelize } from '../src/util/db';
 
 const api = request(app);
@@ -50,6 +50,10 @@ beforeEach(async () => {
   // wipe db before each test
   await sequelize.truncate({ cascade: true });
   await Reservation.bulkCreate(reservations);
+  await Timeslot.create({
+    start: new Date('2023-02-13T08:00:00.000Z'),
+    end: new Date('2023-02-15T08:00:00.000Z'),
+  });
 });
 
 afterAll(async () => {
