@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
+import Button from '../Button';
 
 type FormProps = {
   airfield: AirfieldEntry;
@@ -24,9 +25,14 @@ function AirfieldForm(
   // const {airfield} = data;
   return (
     <div>
-      <p>{`Airfield: ${airfield.name}`}</p>
       <div className="p-8">
         <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <p className={labelStyle}>
+            {`Airfield id: ${airfield.id}`}
+          </p>
+          <p className={labelStyle}>
+            {`Airfield name: ${airfield.name}`}
+          </p>
           <label className={labelStyle} htmlFor="flight-input">
             Max concurrent flights:
             <input
@@ -39,7 +45,7 @@ function AirfieldForm(
               id="flight-input"
             />
           </label>
-          <input type="submit" />
+          <button type="submit"> Submit</button>
         </form>
       </div>
     </div>
