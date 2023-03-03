@@ -8,6 +8,7 @@ import {
 import {
   getTimeSlots, modifyTimeSlot, addTimeSlot, deleteTimeslot,
 } from '../queries/timeSlots';
+import { reservationEntryToCalendarEvent, timeslotEntryToCalendarEvent } from '../types';
 
 function TimeSlotCalendar() {
   const timeSlotsSourceFn: EventSourceFunc = async (
@@ -17,9 +18,11 @@ function TimeSlotCalendar() {
   ) => {
     try {
       const timeslots = await getTimeSlots(start, end);
-      const timeslotsMapped = timeslots.map((timeslot) => ({
-        ...timeslot, color: '#84cc1680',
-      }));
+      const timeslotsMapped = timeslots.map((timeslot) => (
+        timeslotEntryToCalendarEvent(
+          timeslot,
+          { color: '#84cc1680' },
+        )));
       successCallback(timeslotsMapped);
     } catch (error) {
       failureCallback(error as Error);
@@ -34,9 +37,11 @@ function TimeSlotCalendar() {
     try {
       const reservations = await getReservations(start, end);
 
-      const reservationsMapped = reservations.map((reservation) => ({
-        ...reservation, id: reservation.id.toString(), groupId: 'reservations', display: 'background', color: '#000000',
-      }));
+      const reservationsMapped = reservations.map((reservation) => (
+        reservationEntryToCalendarEvent(
+          reservation,
+          { groupId: 'reservations', display: 'background', color: '#000000' },
+        )));
 
       successCallback(reservationsMapped);
     } catch (error) {
