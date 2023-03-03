@@ -17,6 +17,8 @@ InferCreationAttributes<Airfield>
   declare name: string;
 
   declare maxConcurrentFlights: number;
+
+  declare eventGranularityMinutes: number;
 }
 
 Airfield.init(
@@ -32,6 +34,10 @@ Airfield.init(
       unique: true,
     },
     maxConcurrentFlights: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    eventGranularityMinutes: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
