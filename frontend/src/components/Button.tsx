@@ -44,7 +44,7 @@ function Button({
   };
 
   return (
-    <button type={type} className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`} onClick={onClick}>
+    <button type={ type } className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`} onClick={onClick}>
       {children}
     </button>
   );
