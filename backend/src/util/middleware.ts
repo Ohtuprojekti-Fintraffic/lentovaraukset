@@ -8,7 +8,6 @@ const handleZodError = (zodError: z.ZodError): { message: string, statusCode: nu
 };
 
 const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-  console.log(err);
   if (err instanceof z.ZodError) {
     const { message, statusCode } = handleZodError(err);
     res.status(statusCode).json({ error: { message } });

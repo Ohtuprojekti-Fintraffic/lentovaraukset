@@ -249,4 +249,21 @@ describe('Calls to api', () => {
 
     expect(response.body).toEqual([]);
   });
+
+  test('Timeslot cannot be added if start is later than end', async () => {
+    const start = new Date('2023-02-24T08:00:00.000Z');
+    const end = new Date('2023-02-24T06:00:00.000Z');
+
+    const newTimeslot: any = await api.post('/api/timeslots/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    });
+
+    expect(newTimeslot.body.error).toBeDefined();
+    expect(newTimeslot.body.error.message).toContain('start time cannot be later than the end time');
+
+    const response = await api
+      .get(`/api/timeslots?from=${start.toISOString()}&until=${end.toISOString()}`);
+
+    expect(response.body).toHaveLength(0);
+  });
 });
