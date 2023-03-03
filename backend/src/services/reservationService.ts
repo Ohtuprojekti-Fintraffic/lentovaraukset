@@ -103,7 +103,7 @@ const updateById = async (
     const oldReservation: Reservation | null = await Reservation.findByPk(id);
     const oldTimeslot = await oldReservation?.getTimeslot();
     if (newTimeslot && oldTimeslot) {
-      await oldReservation?.setTimeslot(oldTimeslot);
+      await oldReservation?.setTimeslot(newTimeslot);
     }
     const [, reservations]: [number, Reservation[]] = await Reservation.update(
       reservation,
