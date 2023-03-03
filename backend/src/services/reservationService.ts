@@ -12,10 +12,10 @@ const getReservationFromRange = async (startTime: Date, endTime: Date) => {
       [Op.and]: [
         {
           start: {
-            [Op.gte]: startTime,
+            [Op.lt]: endTime,
           },
           end: {
-            [Op.lte]: endTime,
+            [Op.gt]: startTime,
           },
         },
       ],
@@ -79,8 +79,12 @@ const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | '
   if (!await allowReservation(newReservation.start, newReservation.end, undefined)) {
     throw new Error('Too many concurrent reservations');
   } else {
-    const timeslot = await timeslotService
-      .getTimeslotFromRange(newReservation.start, newReservation.end);
+    const timeslots = await timeslotService
+      .getInTimeRange(newReservation.start, newReservation.end);
+    if (timeslots.length !== 1) {
+      throw new Error('Reservation should be created for one timeslot');
+    }
+    const timeslot = timeslots[0];
     const reservation: Reservation = await Reservation.create(newReservation);
     if (timeslot) {
       await reservation.setTimeslot(timeslot);
@@ -97,9 +101,12 @@ const updateById = async (
   if (!await allowReservation(reservation.start, reservation.end, id)) {
     throw new Error('Too many concurrent reservations');
   } else {
-    const newTimeslot = await timeslotService
-      .getTimeslotFromRange(reservation.start, reservation.end);
-
+    const newTimeslots = await timeslotService
+      .getInTimeRange(reservation.start, reservation.end);
+    if (newTimeslots.length !== 1) {
+      throw new Error('Reservation should be created for one timeslot');
+    }
+    const newTimeslot = newTimeslots[0];
     const oldReservation: Reservation | null = await Reservation.findByPk(id);
     const oldTimeslot = await oldReservation?.getTimeslot();
     if (newTimeslot && oldTimeslot) {

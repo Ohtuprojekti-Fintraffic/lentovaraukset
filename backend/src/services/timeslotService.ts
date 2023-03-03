@@ -3,45 +3,25 @@ import type { TimeslotEntry } from '@lentovaraukset/shared/src/index';
 import reservationService from '@lentovaraukset/backend/src/services/reservationService';
 import { Timeslot } from '../models';
 
-const getTimeslotFromRange = async (startTime: Date, endTime: Date) => {
-  const timeslot: Timeslot | null = await Timeslot.findOne({
+const getInTimeRange = async (
+  rangeStartTime: Date,
+  rangeEndTime: Date,
+): Promise<Timeslot[]> => {
+  const timeslots: Timeslot[] = await Timeslot.findAll({
     where: {
       [Op.and]: [
         {
           start: {
-            [Op.lte]: startTime,
+            [Op.lt]: rangeEndTime,
           },
           end: {
-            [Op.gte]: endTime,
+            [Op.gt]: rangeStartTime,
           },
         },
       ],
     },
   });
-  return timeslot;
-};
-
-const getInTimeRange = async (
-  rangeStartTime: Date,
-  rangeEndTime: Date,
-): Promise<TimeslotEntry[]> => {
-  const timeslots: Timeslot[] = await Timeslot.findAll({
-    where: {
-      [Op.or]: [
-        {
-          start: {
-            [Op.between]: [rangeStartTime, rangeEndTime],
-          },
-        },
-        {
-          end: {
-            [Op.between]: [rangeStartTime, rangeEndTime],
-          },
-        },
-      ],
-    },
-  });
-  return timeslots.map(({ id, start, end }) => ({ id, start, end }));
+  return timeslots;
 };
 
 const deleteById = async (id: number) => {
@@ -88,5 +68,4 @@ export default {
   deleteById,
   updateById,
   createTimeslot,
-  getTimeslotFromRange,
 };
