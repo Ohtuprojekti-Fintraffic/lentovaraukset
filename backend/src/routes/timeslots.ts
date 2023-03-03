@@ -37,7 +37,7 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
   }
 });
 
-router.patch('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.put('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // TODO: get slotGranularityMinutes from airfield
     const modifiedTimeslot = createTimeSlotValidator(20).parse(req.body);
