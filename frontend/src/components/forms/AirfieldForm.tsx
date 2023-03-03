@@ -2,13 +2,14 @@ import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import Button from '../Button';
+imprt InputField from '../InputField';
 
 type FormProps = {
   airfield: AirfieldEntry;
 };
 
 type Inputs = {
-  maxFlights?: number;
+  maxFlights: string;
 };
 
 function AirfieldForm(
@@ -18,11 +19,12 @@ function AirfieldForm(
     register, handleSubmit,
   } = useForm<Inputs>({
     defaultValues: {
-      maxFlights: airfield.maxConcurrentFlights,
+      maxFlights: airfield.maxConcurrentFlights.toString(),
     }
   });
   const textFieldStyle = 'border border-black rounded p-1 ml-4';
   const labelStyle = 'flex flex-row justify-between items-center w-full';
+  const {ref, ...rest} = register("maxFlights")
   const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => console.log(data);
   return (
     <div>
@@ -34,18 +36,15 @@ function AirfieldForm(
           <p className={labelStyle}>
             {`Airfield name: ${airfield.name}`}
           </p>
-          <label className={labelStyle}>
-            Max concurrent flights:
-            <input
-              className={textFieldStyle}
-              {...register('maxFlights')}
-            />
-          </label>
+          <InputField
+            labelText=" Max concurrent flights:"
+            type="number"
+            reference={ref}
+            {...rest}
+          />
           <Button type="submit" variant="primary"> Submit</Button>
         </form>
       </div>
     </div>
   );
 }
-
-export default AirfieldForm;
