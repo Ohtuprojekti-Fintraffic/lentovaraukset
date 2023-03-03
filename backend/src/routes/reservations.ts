@@ -38,7 +38,7 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
 router.patch('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const id = Number(req.params.id);
-    const validReservationUpdate = createReservationValidator(10).parse(req.body);
+    const validReservationUpdate = createReservationValidator(10).partial().parse(req.body);
     const modifiedReservation = await reservationService.updateById(id, validReservationUpdate);
     res.status(200).json(modifiedReservation);
   } catch (error: unknown) {
