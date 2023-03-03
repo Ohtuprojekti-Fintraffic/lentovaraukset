@@ -101,15 +101,11 @@ const updateById = async (
     const oldTimeslots = await oldReservation?.getTimeslots();
     await oldReservation?.removeTimeslots(oldTimeslots);
     await oldReservation?.addTimeslots(newTimeslots);
-    const [, reservations]: [number, Reservation[]] = await Reservation.update(
-      reservation,
-      {
-        where: { id },
-        returning: true,
-      },
+    const [updatedReservation] = await Reservation.upsert(
+      { ...reservation, id },
     );
     const user = 'NYI';
-    return { ...reservations[0].dataValues, user };
+    return { ...updatedReservation.dataValues, user };
   }
 };
 

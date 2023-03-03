@@ -36,7 +36,7 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
   }
 });
 
-router.patch('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.put('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const id = Number(req.params.id);
     // TODO: get maxDaysInFuture from airfield
