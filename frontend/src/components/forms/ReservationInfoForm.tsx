@@ -10,6 +10,8 @@ type ReservationInfoProps = {
 type Inputs = {
   start?: string
   end?: string
+  aircraftId: string
+  phone: string
   info: string
 };
 
@@ -21,15 +23,14 @@ function ReservationInfoForm({
 
   const {register, handleSubmit, reset, formState: {errors} } = useForm<Inputs>({
     values: {
-      start: reservation?.start?.toISOString().replace(/z.*/,''),
-      end: reservation?.end?.toISOString().replace(/z.*/,''),
-      info: reservation?.extendedProps.aircraftId
+      start: reservation?.start?.toISOString().replace(/.{7}(?:Z|\+).*/,''),
+      end: reservation?.end?.toISOString().replace(/.{7}(?:Z|\+).*/,''),
+      aircraftId: reservation?.extendedProps.aircraftId,
+      phone: reservation?.extendedProps.phone,
+      info: reservation?.extendedProps.info
     }
   });
   const onSubmit: SubmitHandler<Inputs> = data => {console.dir(data)}
-
-  console.log(reservation?.start?.toISOString().replace(/Z.*/,''))
-  console.log(reservation?.end?.toISOString().replace(/Z.*/,''))
 
   useEffect(() => {
     reset()
@@ -53,7 +54,7 @@ function ReservationInfoForm({
           reservation &&
           <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <label className={labelStyle}>
-              Alku:
+              Varaus alkaa:
               <input
                 type="datetime-local"
                 {...register('start')}
@@ -61,7 +62,7 @@ function ReservationInfoForm({
               />
             </label>
             <label className={labelStyle}>
-              Loppu:
+              Varaus päättyy:
               <input
                 type="datetime-local"
                 {...register('end')}
@@ -69,7 +70,23 @@ function ReservationInfoForm({
               />
             </label>
             <label className={labelStyle}>
-              Info:
+              Koneen rekisteritunnus:
+              <input
+                type="text"
+                {...register('aircraftId')}
+                className={textFieldStyle}
+              />
+            </label>
+            <label className={labelStyle}>
+              Puhelinnumero:
+              <input
+                type="text"
+                {...register('phone')}
+                className={textFieldStyle}
+              />
+            </label>
+            <label className={labelStyle}>
+              Lisätietoja:
               <input
                 type="text"
                 {...register('info')}
