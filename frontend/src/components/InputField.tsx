@@ -1,9 +1,11 @@
 import React, { useId } from 'react';
+import { UseFormRegisterReturn } from 'react-hook-form';
 
 type InputStates = 'default' | 'error' | 'disabled';
-interface FieldProps {
+export interface FieldProps {
   state?: InputStates;
   type: React.InputHTMLAttributes<HTMLInputElement>['type']
+
   value: React.InputHTMLAttributes<HTMLInputElement>['value']
   onChange: React.ChangeEventHandler<HTMLInputElement>;
 
@@ -17,21 +19,28 @@ interface FieldProps {
   inputClassName?: string;
   helperTextClassName?: string;
 
-  // React Hook Form things
-  onBlur?: React.FocusEventHandler<HTMLInputElement>;
-  name?: string;
-  ref?: React.Ref<any>;
+  // used in separate type below
+  registerReturn: undefined;
+}
+
+export interface RHFFieldProps extends Omit<FieldProps, 'registerReturn' | 'value' | 'onChange'> {
+  // these are optional with RHF
+  value?: React.InputHTMLAttributes<HTMLInputElement>['value']
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+
+  // React Hook Form register return value
+  registerReturn: UseFormRegisterReturn<any>;
 }
 
 function InputField({
   state = 'default',
   type, value, onChange,
   placeholder, labelText, helperText,
-  onBlur, name, ref,
+  registerReturn,
   labelClassName = '',
   inputClassName = '',
   helperTextClassName = '',
-}: FieldProps) {
+}: FieldProps | RHFFieldProps) {
   const fieldBaseClass = 'border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
                        + 'placeholder:text-ft-text-300 mb-4';
 
@@ -61,9 +70,11 @@ function InputField({
         disabled={state === 'disabled'}
         placeholder={placeholder}
         className={`${fieldBaseClass} ${fieldStateClasses[state]} ${inputClassName}`}
-        onBlur={onBlur}
-        name={name}
-        ref={ref}
+        // This is the only way to use RHF without requiring input
+        // types for the Hook Form inputs and whatever which
+        // are complicated to do
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        {...registerReturn}
       />
       {helperText ? <p className={`text-ft-text-300 -mt-4 ${helperTextClassName}`}>{helperText}</p> : null}
     </div>
