@@ -278,6 +278,12 @@ module.exports = {
       '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
       inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
       none: 'none',
+
+      // FINTRAFFIC ELEVATION
+      'ft-elevation-100': '0.0px 1.0px 2.0px 0px rgba(0, 0, 0, 0.24),0.0px 1.0px 3.0px 0px rgba(0, 0, 0, 0.12)',
+      'ft-elevation-200': '0.0px 6.0px 6.0px 0px rgba(0, 0, 0, 0.23),0.0px 3.0px 6.0px 0px rgba(0, 0, 0, 0.16)',
+      'ft-elevation-300': '0.0px 6.0px 12.0px 0px rgba(0, 0, 0, 0.23),0.0px 20.0px 20.0px 0px rgba(0, 0, 0, 0.19)',
+      'ft-elevation-400': '0.0px 20.0px 20.0px 0px rgba(0, 0, 0, 0.22),0.0px 50.0px 100.0px 0px rgba(0, 0, 0, 0.25)',
     },
     boxShadowColor: ({ theme }) => theme('colors'),
     caretColor: ({ theme }) => theme('colors'),
@@ -479,6 +485,7 @@ module.exports = {
       // Semantic
       'ft-helper': ['0.9375rem', { lineHeight: '1' }],
       'ft-label': ['1rem', { lineHeight: '1' }],
+      'ft-popup-message': ['1rem', { lineHeight: '1' }],
       'ft-placeholder': ['1rem', { lineHeight: '1' }],
       'ft-tag': ['1rem', { lineHeight: '1' }],
 
