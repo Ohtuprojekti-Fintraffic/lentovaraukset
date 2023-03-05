@@ -86,6 +86,9 @@ module.exports = {
       'ft-success-200': '#25A794',
       'ft-success-100': '#82E8C3',
       'ft-success-50': '#EAFFF8',
+
+      // Misc
+      'ft-input-placeholder': '#F5F5F7',
     }),
     columns: {
       auto: 'auto',
