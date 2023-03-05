@@ -16,6 +16,7 @@ import ReservationInfoForm from '../components/forms/ReservationInfoForm';
 function ReservationCalendar() {
   const [showInspectModal, setShowInspectModal] = useState(false);
   const selectedReservationRef = useRef<EventImpl | null>(null);
+  const reservationInfoFormRef = useRef<string>("reservation_info_form");
 
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -115,6 +116,7 @@ function ReservationCalendar() {
     <div className="flex flex-col space-y-2 h-full w-full">
       <Card show={showInspectModal} handleClose={closeReservationModalFn}>
         <ReservationInfoForm
+          id={reservationInfoFormRef.current}
           reservation={selectedReservationRef.current ?? undefined}
         />
         <Button
@@ -124,8 +126,9 @@ function ReservationCalendar() {
           Poista
         </Button>
         <Button
+          id={reservationInfoFormRef.current}
+          type={"submit"}
           variant="primary"
-          onClick={() => { setShowInspectModal(false); }}
         >
           Tallenna
         </Button>

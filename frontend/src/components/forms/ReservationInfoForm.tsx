@@ -5,6 +5,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 
 type ReservationInfoProps = {
   reservation?: EventImpl
+  id?: string
 };
 
 type Inputs = {
@@ -16,7 +17,8 @@ type Inputs = {
 };
 
 function ReservationInfoForm({
-  reservation
+  reservation,
+  id
 }: ReservationInfoProps) {
   const textFieldStyle = 'border border-black rounded p-1 ml-4';
   const labelStyle = 'flex flex-row justify-between items-center w-full';
@@ -30,7 +32,7 @@ function ReservationInfoForm({
       info: reservation?.extendedProps.info
     }
   });
-  const onSubmit: SubmitHandler<Inputs> = data => {console.dir(data)}
+  const onSubmit: SubmitHandler<Inputs> = data => {console.log("test")}
 
   useEffect(() => {
     reset()
@@ -52,7 +54,7 @@ function ReservationInfoForm({
         }
         {
           reservation &&
-          <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <form id={id} className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <label className={labelStyle}>
               Varaus alkaa:
               <input
