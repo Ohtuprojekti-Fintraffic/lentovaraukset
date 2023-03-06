@@ -14,3 +14,10 @@ export interface TimeslotEntry {
   start: Date;
   end: Date;
 }
+
+export interface AirfieldEntry {
+  id: number;
+  name: string;
+  maxConcurrentFlights: number;
+  eventGranularityMinutes: number;
+}

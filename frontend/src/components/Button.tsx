@@ -7,6 +7,8 @@ interface DisableableProps {
   disabled?: boolean;
   children?: React.ReactNode;
   className?: string;
+  form?: string;
+  type?: JSX.IntrinsicElements['button']['type'];
 }
 
 type UndisableableVariants = 'primary';
@@ -19,7 +21,7 @@ interface UndisableableProps extends Omit<DisableableProps, 'variant' | 'disable
 type ButtonProps = DisableableProps | UndisableableProps;
 
 function Button({
-  variant, children, onClick, disabled, className,
+  variant, children, onClick, disabled, className, form, type = 'button',
 }: ButtonProps) {
   const buttonBaseClass = 'mx-1 py-3 px-4 rounded-ft-large font-ft-button text-ft-button';
 
@@ -43,7 +45,13 @@ function Button({
   };
 
   return (
-    <button type="button" className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`} onClick={onClick}>
+    <button
+      // eslint-disable-next-line react/button-has-type
+      type={type}
+      className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`}
+      onClick={onClick}
+      form={form}
+    >
       {children}
     </button>
   );

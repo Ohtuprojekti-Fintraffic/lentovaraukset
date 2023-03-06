@@ -1,4 +1,5 @@
 import React, { Children } from 'react';
+import Button from './Button';
 import Modal from './Modal';
 
 type CardProps = {
@@ -29,13 +30,12 @@ function Card({
                 cancelButton
                 && (
                   <div>
-                    <button
-                      className="bg-transparent text-black p-3 rounded-lg"
+                    <Button
+                      variant="tertiary"
                       onClick={() => handleClose()}
-                      type="button"
                     >
                       {cancelButtonText}
-                    </button>
+                    </Button>
                   </div>
                 )
               }
