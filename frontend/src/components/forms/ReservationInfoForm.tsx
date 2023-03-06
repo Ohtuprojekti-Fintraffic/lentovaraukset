@@ -32,8 +32,8 @@ function ReservationInfoForm({
     register, handleSubmit, reset, formState: { errors },
   } = useForm<Inputs>({
     values: {
-      start: reservation?.start?.toISOString().replace(/.{7}(?:Z|\+).*/, '') || '',
-      end: reservation?.end?.toISOString().replace(/.{7}(?:Z|\+).*/, '') || '',
+      start: reservation?.startStr.replace(/.{3}\+.*/, '') || '',
+      end: reservation?.endStr.replace(/.{3}\+.*/, '') || '',
       aircraftId: reservation?.extendedProps.aircraftId,
       phone: reservation?.extendedProps.phone,
       info: reservation?.extendedProps.info,
@@ -44,11 +44,11 @@ function ReservationInfoForm({
     console.dir(formData);
     
     const updatedReservation = {
-      start: new Date(),
-      end: new Date(),
-      aircraftId: "",
-      phone: "",
-      info: "",
+      start: new Date(formData.start),
+      end: new Date(formData.end),
+      aircraftId: formData.aircraftId,
+      phone: formData.phone,
+      info: formData.info,
     };
 
     onSubmit(updatedReservation)
@@ -79,7 +79,7 @@ function ReservationInfoForm({
           reservation
           && (
           /* eslint-disable  react/jsx-props-no-spreading */
-          <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(submitHandler, onError)}>
+          <form id={id} className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(submitHandler, onError)}>
             <div className={labelStyle}>
               <p>
                 Varaus alkaa:
