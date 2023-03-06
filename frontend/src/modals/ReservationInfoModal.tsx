@@ -54,7 +54,7 @@ function ReservationInfoModal({
           Poista
         </Button>
         <Button
-          id="reservation_info_form"
+          form="reservation_info_form"
           type="submit"
           variant="primary"
         >

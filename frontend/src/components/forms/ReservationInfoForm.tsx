@@ -131,7 +131,6 @@ function ReservationInfoForm({
                 className={textFieldStyle}
               />
             </div>
-            <Button type="submit" variant="primary">Tallenna</Button>
           </form>
           /* eslint-enable  react/jsx-props-no-spreading */
           )

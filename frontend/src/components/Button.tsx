@@ -7,7 +7,7 @@ interface DisableableProps {
   disabled?: boolean;
   children?: React.ReactNode;
   className?: string;
-  id?: string;
+  form?: string;
   type?: 'button' | 'submit' | 'reset';
 }
 
@@ -21,7 +21,7 @@ interface UndisableableProps extends Omit<DisableableProps, 'variant' | 'disable
 type ButtonProps = DisableableProps | UndisableableProps;
 
 function Button({
-  variant, children, onClick, disabled, className, id, type,
+  variant, children, onClick, disabled, className, form, type,
 }: ButtonProps) {
   const buttonBaseClass = 'mx-1 py-3 px-4 rounded-ft-large font-ft-button text-ft-button';
 
@@ -46,10 +46,10 @@ function Button({
 
   return (
     <button
-      id={id}
-      type={type || 'button'}
-      className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`}
-      onClick={onClick}
+    type={type || 'button'}
+    className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`}
+    onClick={onClick}
+    form={form}
     >
       {children}
     </button>
