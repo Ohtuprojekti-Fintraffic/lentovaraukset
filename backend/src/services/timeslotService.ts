@@ -40,10 +40,11 @@ const updateById = async (
   id: number,
   timeslot: { start: Date, end: Date },
 ): Promise<void> => {
-  const newReservations = await reservationService
-    .getReservationFromRange(timeslot.start, timeslot.end);
   const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
   const oldReservations = await oldTimeslot?.getReservations();
+  const newReservations = oldReservations?.filter(
+    (reservation) => reservation.start >= timeslot.start && reservation.end <= timeslot.end,
+  );
   if (oldReservations?.length !== newReservations?.length) {
     throw new Error('Timeslot has reservations');
   }
