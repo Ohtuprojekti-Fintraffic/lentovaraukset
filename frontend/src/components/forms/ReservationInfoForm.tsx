@@ -37,7 +37,7 @@ function ReservationInfoForm({
       phone: reservation?.extendedProps.phone,
       info: reservation?.extendedProps.info,
     },
-    resolver: zodResolver(createReservationValidator(20)),
+    resolver: zodResolver(createReservationValidator(20, 7)),
   });
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
     console.dir(formData);
