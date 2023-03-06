@@ -60,48 +60,40 @@ const deleteById = async (id: number) => {
 };
 
 const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | 'user'>): Promise<ReservationEntry> => {
-  if (!await allowReservation(newReservation.start, newReservation.end, undefined)) {
-    throw new Error('Too many concurrent reservations');
-  } else {
-    const timeslots = await timeslotService
-      .getInTimeRange(newReservation.start, newReservation.end);
-    if (timeslots.length !== 1) {
-      throw new Error('Reservation should be created for one timeslot');
-    }
-    const timeslot = timeslots[0];
-    const reservation: Reservation = await Reservation.create(newReservation);
-    if (timeslot) {
-      await reservation.setTimeslot(timeslot);
-    }
-    const user = 'NYI';
-    return { ...reservation.dataValues, user };
+  const timeslots = await timeslotService
+    .getInTimeRange(newReservation.start, newReservation.end);
+  if (timeslots.length !== 1) {
+    throw new Error('Reservation should be created for one timeslot');
   }
+  const timeslot = timeslots[0];
+  const reservation: Reservation = await Reservation.create(newReservation);
+  if (timeslot) {
+    await reservation.setTimeslot(timeslot);
+  }
+  const user = 'NYI';
+  return { ...reservation.dataValues, user };
 };
 
 const updateById = async (
   id: number,
   reservation: Omit<ReservationEntry, 'id' | 'user'>,
 ): Promise<ReservationEntry> => {
-  if (!await allowReservation(reservation.start, reservation.end, id)) {
-    throw new Error('Too many concurrent reservations');
-  } else {
-    const newTimeslots = await timeslotService
-      .getInTimeRange(reservation.start, reservation.end);
-    if (newTimeslots.length !== 1) {
-      throw new Error('Reservation should be created for one timeslot');
-    }
-    const newTimeslot = newTimeslots[0];
-    const oldReservation: Reservation | null = await Reservation.findByPk(id);
-    const oldTimeslot = await oldReservation?.getTimeslot();
-    if (newTimeslot && oldTimeslot) {
-      await oldReservation?.setTimeslot(newTimeslot);
-    }
-    const [updatedReservation] = await Reservation.upsert(
-      { ...reservation, id },
-    );
-    const user = 'NYI';
-    return { ...updatedReservation.dataValues, user };
+  const newTimeslots = await timeslotService
+    .getInTimeRange(reservation.start, reservation.end);
+  if (newTimeslots.length !== 1) {
+    throw new Error('Reservation should be created for one timeslot');
   }
+  const newTimeslot = newTimeslots[0];
+  const oldReservation: Reservation | null = await Reservation.findByPk(id);
+  const oldTimeslot = await oldReservation?.getTimeslot();
+  if (newTimeslot && oldTimeslot) {
+    await oldReservation?.setTimeslot(newTimeslot);
+  }
+  const [updatedReservation] = await Reservation.upsert(
+    { ...reservation, id },
+  );
+  const user = 'NYI';
+  return { ...updatedReservation.dataValues, user };
 };
 
 export default {
