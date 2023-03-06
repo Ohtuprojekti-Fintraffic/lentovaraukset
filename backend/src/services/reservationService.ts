@@ -1,10 +1,7 @@
 import { Op } from 'sequelize';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
-import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
 import { Reservation } from '../models';
-
-const maxConcurrentReservations: number = 3;
 
 const getReservationFromRange = async (startTime: Date, endTime: Date) => {
   const reservations: Reservation[] = await Reservation.findAll({
@@ -54,19 +51,6 @@ const getInTimeRange = async (
   });
 };
 
-const allowReservation = async (
-  startTime: Date,
-  endTime: Date,
-  id: number | undefined,
-): Promise<boolean> => {
-  const reservations = (await getReservationFromRange(startTime, endTime))
-    .filter((e) => e.id !== id);
-
-  const mostConcurrentReservations = countMostConcurrent(reservations);
-
-  return mostConcurrentReservations < maxConcurrentReservations;
-};
-
 const deleteById = async (id: number) => {
   const reservation = await Reservation.findByPk(id);
   if (!reservation) {
@@ -112,15 +96,11 @@ const updateById = async (
     if (newTimeslot && oldTimeslot) {
       await oldReservation?.setTimeslot(newTimeslot);
     }
-    const [, reservations]: [number, Reservation[]] = await Reservation.update(
-      reservation,
-      {
-        where: { id },
-        returning: true,
-      },
+    const [updatedReservation] = await Reservation.upsert(
+      { ...reservation, id },
     );
     const user = 'NYI';
-    return { ...reservations[0].dataValues, user };
+    return { ...updatedReservation.dataValues, user };
   }
 };
 

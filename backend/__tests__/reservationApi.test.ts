@@ -2,6 +2,7 @@ import request from 'supertest';
 import app from '@lentovaraukset/backend/src/app';
 import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
 import { connectToDatabase, sequelize } from '../src/util/db';
+import airfieldService from '../src/services/airfieldService';
 
 const api = request(app);
 
@@ -49,6 +50,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   // wipe db before each test
   await sequelize.truncate({ cascade: true });
+  await airfieldService.createTestAirfield();
   await Reservation.bulkCreate(reservations);
   await Timeslot.create({
     start: new Date('2023-02-13T08:00:00.000Z'),
@@ -125,7 +127,7 @@ describe('Calls to api', () => {
     const id = createdReservation?.dataValues.id;
     const aircraftId = createdReservation?.dataValues.aircraftId;
     const phone = createdReservation?.dataValues.phone;
-    await api.patch(`/api/reservations/${id}`)
+    await api.put(`/api/reservations/${id}`)
       .set('Content-type', 'application/json')
       .send({
         start: '2023-02-14T02:00:00.000Z', end: '2023-02-14T16:00:00.000Z', aircraftId, phone,
