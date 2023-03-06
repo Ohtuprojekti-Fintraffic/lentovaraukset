@@ -23,7 +23,9 @@
     "test": "npm -ws --if-present run test"
   },
   "dependencies": {
-    "dotenv": "^16.0.3"
+    "@hookform/resolvers": "^2.9.11",
+    "dotenv": "^16.0.3",
+    "react-hook-form": "^7.43.3"
   },
   "devDependencies": {
     "@types/jest": "^29.2.6",
