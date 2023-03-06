@@ -44,6 +44,7 @@ function Button({
   };
 
   return (
+    // eslint-disable-next-line react/button-has-type
     <button type={type} className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`} onClick={onClick}>
       {children}
     </button>
