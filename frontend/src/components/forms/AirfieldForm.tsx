@@ -39,13 +39,13 @@ function AirfieldForm(
             labelText="Kuinka monta päivää tulevaisuuteen varauksen voi tehdä:"
             type="number"
             registerReturn={register('maxDays')}
-            defaultValue="7"
+            defaultValue={airfield.futureReservationDays.toString()}
           />
           <InputField
             labelText="Samanaikaisten varausten maksimimäärä:"
             type="number"
             registerReturn={register('maxFlights')}
-            defaultValue="2"
+            defaultValue={airfield.maxConcurrentFlights.toString()}
           />
           <Button type="submit" variant="primary"> Submit</Button>
         </form>
