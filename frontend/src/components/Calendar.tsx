@@ -20,7 +20,7 @@ type CalendarProps = {
     extendedProps: any }) => Promise<any>;
   clickEventFn: (event: EventImpl) => Promise<void>;
   removeEventFn: (event: EventRemoveArg) => Promise<void>;
-  granularity: { minutes: number };
+  granularity: { minutes: number } | undefined;
   eventColors: {
     backgroundColor?: string;
     eventColor?: string;
@@ -36,7 +36,7 @@ function Calendar({
   modifyEventFn,
   clickEventFn,
   removeEventFn,
-  granularity,
+  granularity = { minutes: 20 },
   eventColors,
   selectConstraint,
   maxConcurrentLimit = 1,
