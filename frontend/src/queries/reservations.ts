@@ -32,7 +32,7 @@ const modifyReservation = async (
   modifiedReservation: ReservationEntry,
 ): Promise<ReservationEntry> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/reservations/${modifiedReservation.id}`, {
-    method: 'PATCH',
+    method: 'PUT',
     body: JSON.stringify(modifiedReservation),
     headers: {
       'Content-Type': 'application/json',

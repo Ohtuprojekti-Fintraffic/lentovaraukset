@@ -123,7 +123,7 @@ describe('Calls to api', () => {
     const id = createdReservation?.dataValues.id;
     const aircraftId = createdReservation?.dataValues.aircraftId;
     const phone = createdReservation?.dataValues.phone;
-    await api.patch(`/api/reservations/${id}`)
+    await api.put(`/api/reservations/${id}`)
       .set('Content-type', 'application/json')
       .send({
         start: '2023-02-14T02:00:00.000Z', end: '2023-02-14T16:00:00.000Z', aircraftId, phone,

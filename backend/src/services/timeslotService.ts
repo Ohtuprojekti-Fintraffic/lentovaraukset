@@ -69,7 +69,7 @@ const updateById = async (
   }
   await oldTimeslot?.removeReservations(oldReservations);
   await oldTimeslot?.addReservations(newReservations);
-  await Timeslot.update(timeslot, { where: { id } });
+  await Timeslot.upsert({ ...timeslot, id });
 };
 
 const createTimeslot = async (newTimeSlot: {

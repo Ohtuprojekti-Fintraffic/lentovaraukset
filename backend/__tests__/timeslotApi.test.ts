@@ -101,7 +101,7 @@ describe('Calls to api', () => {
   test('can edit a timeslot', async () => {
     const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z') });
 
-    await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({ start: '2023-02-17T12:00:00.000Z', end: '2023-02-17T14:00:00.000Z' });
 
@@ -124,7 +124,7 @@ describe('Calls to api', () => {
     });
     createdSlot.addReservations([newReservation]);
 
-    await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({ start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T14:00:00.000Z' });
 
@@ -156,7 +156,7 @@ describe('Calls to api', () => {
   test('dont edit a timeslot if granularity is wrong', async () => {
     const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z') });
 
-    await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({ start: new Date('2023-02-17T12:00:00.000Z'), end: new Date('2023-02-17T13:15:00.000Z') });
 
@@ -179,7 +179,7 @@ describe('Calls to api', () => {
     });
     createdSlot.addReservations([newReservation]);
 
-    await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({ start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T13:00:00.000Z' });
 
