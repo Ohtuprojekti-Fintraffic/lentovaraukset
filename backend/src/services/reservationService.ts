@@ -3,52 +3,22 @@ import { ReservationEntry } from '@lentovaraukset/shared/src';
 import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
 import { Reservation } from '../models';
 
-const getReservationFromRange = async (startTime: Date, endTime: Date) => {
+const getInTimeRange = async (startTime: Date, endTime: Date) => {
   const reservations: Reservation[] = await Reservation.findAll({
     where: {
       [Op.and]: [
         {
           start: {
-            [Op.gte]: startTime,
+            [Op.lt]: endTime,
           },
           end: {
-            [Op.lte]: endTime,
+            [Op.gt]: startTime,
           },
         },
       ],
     },
   });
   return reservations;
-};
-
-const getInTimeRange = async (
-  rangeStartTime: Date,
-  rangeEndTime: Date,
-): Promise<ReservationEntry[]> => {
-  const reservations = await getReservationFromRange(rangeStartTime, rangeEndTime);
-
-  return reservations.map(({
-    id,
-    start,
-    end,
-    aircraftId,
-    phone,
-    info,
-  }) => {
-    const reservationInfo = info ?? undefined;
-    return (
-      {
-        id,
-        start,
-        end,
-        aircraftId,
-        info: reservationInfo,
-        phone,
-        email: undefined,
-        user: 'user',
-      }
-    );
-  });
 };
 
 const deleteById = async (id: number) => {
@@ -87,8 +57,7 @@ const updateById = async (
 
 export default {
   createReservation,
-  getInTimeRange,
   deleteById,
   updateById,
-  getReservationFromRange,
+  getInTimeRange,
 };

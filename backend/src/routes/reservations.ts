@@ -10,7 +10,7 @@ const allowReservation = async (
   id: number | undefined,
   maxConcurrentReservations: number,
 ): Promise<boolean> => {
-  const reservations = (await reservationService.getReservationFromRange(startTime, endTime))
+  const reservations = (await reservationService.getInTimeRange(startTime, endTime))
     .filter((e) => e.id !== id);
 
   const mostConcurrentReservations = countMostConcurrent(reservations);
@@ -74,7 +74,7 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
     if (!await allowReservation(
       validReservationUpdate.start,
       validReservationUpdate.end,
-      undefined,
+      id,
       airfield.maxConcurrentFlights,
     )) {
       throw new Error('Too many concurrent reservations');
