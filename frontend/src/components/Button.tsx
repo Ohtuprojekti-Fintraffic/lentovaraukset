@@ -46,10 +46,11 @@ function Button({
 
   return (
     <button
-    type={type || 'button'}
-    className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`}
-    onClick={onClick}
-    form={form}
+      // eslint-disable-next-line react/button-has-type
+      type={type || 'button'}
+      className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`}
+      onClick={onClick}
+      form={form}
     >
       {children}
     </button>

@@ -11,7 +11,7 @@ import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { EventImpl } from '@fullcalendar/core/internal';
 
 type CalendarProps = {
-  calendarRef?: React.RefObject<FullCalendar>
+  forwardedCalendarRef?: React.RefObject<FullCalendar>
   eventSources: EventSourceInput[];
   addEventFn: (event: { start: Date; end: Date; }) => Promise<any>;
   modifyEventFn: (event: {
@@ -32,7 +32,7 @@ type CalendarProps = {
 };
 
 function Calendar({
-  calendarRef,
+  forwardedCalendarRef,
   eventSources,
   addEventFn,
   modifyEventFn,
@@ -43,8 +43,7 @@ function Calendar({
   selectConstraint,
   maxConcurrentLimit = 1,
 }: CalendarProps) {
-
-  calendarRef ??= React.createRef();
+  const calendarRef = forwardedCalendarRef || React.createRef();
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
     const events = calendarRef?.current?.getApi().getEvents().filter(

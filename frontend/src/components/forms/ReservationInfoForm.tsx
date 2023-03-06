@@ -3,12 +3,11 @@ import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
-import Button from '../Button';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 
 type ReservationInfoProps = {
   reservation?: EventImpl
-  onSubmit: (formData: Omit<ReservationEntry, "id" | "user">) => void
+  onSubmit: (formData: Omit<ReservationEntry, 'id' | 'user'>) => void
   id?: string
 };
 
@@ -29,7 +28,7 @@ function ReservationInfoForm({
   const labelStyle = 'flex flex-row justify-between items-center w-full';
 
   const {
-    register, handleSubmit, reset, formState: { errors },
+    register, handleSubmit, reset,
   } = useForm<Inputs>({
     values: {
       start: reservation?.startStr.replace(/.{3}\+.*/, '') || '',
@@ -42,7 +41,7 @@ function ReservationInfoForm({
   });
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
     console.dir(formData);
-    
+
     const updatedReservation = {
       start: new Date(formData.start),
       end: new Date(formData.end),
@@ -51,7 +50,7 @@ function ReservationInfoForm({
       info: formData.info,
     };
 
-    onSubmit(updatedReservation)
+    onSubmit(updatedReservation);
   };
   const onError = (e: any) => console.error(e);
 

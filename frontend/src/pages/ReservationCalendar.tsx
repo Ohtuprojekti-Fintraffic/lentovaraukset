@@ -1,6 +1,7 @@
 import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
 import React, { useState, useRef } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
+import FullCalendar from '@fullcalendar/react';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -10,7 +11,6 @@ import {
 } from '../queries/reservations';
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
-import FullCalendar from '@fullcalendar/react';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -115,13 +115,19 @@ function ReservationCalendar() {
     <div className="flex flex-col space-y-2 h-full w-full">
       <ReservationInfoModal
         showInfoModal={showInfoModal}
-        closeReservationModal={closeReservationModalFn}
-        reservationRef={selectedReservationRef}
-        calendarRef={calendarRef}
+        reservation={selectedReservationRef?.current || undefined}
+        removeReservation={() => {
+          selectedReservationRef.current?.remove();
+        }}
+        closeReservationModal={() => {
+          closeReservationModalFn();
+          selectedReservationRef.current = null;
+          calendarRef.current?.getApi().refetchEvents();
+        }}
       />
       <h1 className="text-3xl">Varauskalenteri</h1>
       <Calendar
-        calendarRef={calendarRef}
+        forwardedCalendarRef={calendarRef}
         eventSources={eventsSourceRef.current}
         addEventFn={addReservation}
         modifyEventFn={modifyReservationFn}
