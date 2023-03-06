@@ -53,7 +53,7 @@ const deleteById = async (id: number) => {
   if (reservations?.length !== 0) {
     throw new Error('Timeslot has reservations');
   }
-  timeslot?.destroy();
+  await timeslot?.destroy();
 };
 
 const updateById = async (
@@ -69,7 +69,7 @@ const updateById = async (
   }
   await oldTimeslot?.removeReservations(oldReservations);
   await oldTimeslot?.addReservations(newReservations);
-  await Timeslot.update(timeslot, { where: { id } });
+  await Timeslot.upsert({ ...timeslot, id });
 };
 
 const createTimeslot = async (newTimeSlot: {

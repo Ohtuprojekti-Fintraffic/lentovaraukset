@@ -24,7 +24,7 @@ const modifyTimeSlot = async (
   };
 
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${timeSlot.id}`, {
-    method: 'PATCH',
+    method: 'PUT',
     body: JSON.stringify(modifiedTimeSlot),
     headers: {
       'Content-Type': 'application/json',

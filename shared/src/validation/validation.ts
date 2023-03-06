@@ -1,14 +1,24 @@
 import { z } from 'zod';
 
 const minutesToMilliseconds = (minutes: number) => minutes * 1000 * 60;
+
 const isMultipleOfMinutes = (minutes: number) => (dateToCheck: Date) => (
   dateToCheck.getTime() % minutesToMilliseconds(minutes) === 0
 );
-const isTimeInPast = (time: any): boolean => new Date(time) >= new Date();
+
+const isTimeInPast = (time: Date): boolean => new Date(time) >= new Date();
+
+const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => {
+  const max = new Date();
+  max.setDate(max.getDate() + maxDaysInFuture);
+
+  return time <= max;
+};
 
 const createTimeSlotValidator = (slotGranularityMinutes: number) => {
   const message = `Times must be multiples of ${slotGranularityMinutes} minutes`;
   const pastErrorMessage = 'Timeslot cannot be in past';
+  const startNotLessThanEndErrorMessage = 'Timeslot start time cannot be later than the end time';
 
   const TimeSlot = z.object({
     start: z.coerce
@@ -19,19 +29,27 @@ const createTimeSlotValidator = (slotGranularityMinutes: number) => {
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
       .refine((value) => isTimeInPast(value), { message: pastErrorMessage }),
-  });
+  })
+    .refine((res) => res.start < res.end, { message: startNotLessThanEndErrorMessage });
 
   return TimeSlot;
 };
 
-const createReservationValidator = (slotGranularityMinutes: number) => {
+const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFuture: number) => {
   const message = `Reservation must be multiples of ${slotGranularityMinutes} minutes`;
   const pastErrorMessage = 'Reservation cannot be in past';
+  const tooFarInFutureErrorMessage = `Reservation start time cannot be further than ${maxDaysInFuture} days away`;
+  const startNotLessThanEndErrorMessage = 'Reservation start time cannot be later than the end time';
+
   const Reservation = z.object({
     start: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
-      .refine((value) => isTimeInPast(value), { message: pastErrorMessage }),
+      .refine((value) => isTimeInPast(value), { message: pastErrorMessage })
+      .refine(
+        (value) => isTimeAtMostInFuture(value, maxDaysInFuture),
+        { message: tooFarInFutureErrorMessage },
+      ),
     end: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
@@ -39,27 +57,8 @@ const createReservationValidator = (slotGranularityMinutes: number) => {
     aircraftId: z.string(),
     info: z.string().optional(),
     phone: z.string(),
-  });
-
-  return Reservation;
-};
-
-const updateReservationValidator = (slotGranularityMinutes: number) => {
-  const message = `Reservation must be multiples of ${slotGranularityMinutes} minutes`;
-  const pastErrorMessage = 'Reservation cannot be in past';
-  const Reservation = z.object({
-    start: z.coerce
-      .date()
-      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
-      .refine((value) => isTimeInPast(value), { message: pastErrorMessage }),
-    end: z.coerce
-      .date()
-      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
-      .refine((value) => isTimeInPast(value), { message: pastErrorMessage }),
-    aircraftId: z.string(),
-    info: z.string().optional(),
-    phone: z.string(),
-  });
+  })
+    .refine((res) => res.start < res.end, { message: startNotLessThanEndErrorMessage });
 
   return Reservation;
 };
@@ -76,6 +75,5 @@ const getTimeRangeValidator = () => {
 export {
   createTimeSlotValidator,
   createReservationValidator,
-  updateReservationValidator,
   getTimeRangeValidator,
 };
