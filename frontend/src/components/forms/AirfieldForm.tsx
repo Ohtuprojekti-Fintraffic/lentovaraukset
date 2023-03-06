@@ -10,6 +10,7 @@ type FormProps = {
 
 type Inputs = {
   maxFlights: string;
+  maxDays: string;
 };
 
 function AirfieldForm(
@@ -20,32 +21,34 @@ function AirfieldForm(
   } = useForm<Inputs>({
     defaultValues: {
       maxFlights: airfield.maxConcurrentFlights.toString(),
+      maxDays: airfield.futureReservationDays.toString(),
     },
   });
-  const labelStyle = 'flex flex-row justify-between items-center w-full';
-  const { ref, ...rest } = register('maxFlights');
   const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => console.log(data);
   return (
     <div>
       <div className="p-8">
         <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <p className={labelStyle}>
-            {`Id: ${airfield.id}`}
-          </p>
-          <p className={labelStyle}>
-            {`Name: ${airfield.name}`}
-          </p>
-          <p className={labelStyle}>
-            {`Event granularity in minutes: ${airfield.eventGranularityMinutes}`}
-          </p>
-          <p className={labelStyle}>
-            {`How many days in future reservation can be done: ${airfield.futureReservationDays}`}
-          </p>
+          <ul>
+            <li>
+              {`Id: ${airfield.id}`}
+            </li>
+            <li>
+              {`Nimi: ${airfield.name}`}
+            </li>
+            <li>
+              {`Varausikkunan minimikoko: ${airfield.eventGranularityMinutes}`}
+            </li>
+          </ul>
           <InputField
-            labelText=" Max concurrent flights:"
+            labelText="Kuinka monta päivää tulevaisuuteen varauksen voi tehdä:"
             type="number"
-            reference={ref}
-            {...rest}
+            registerReturn={register('maxDays')}
+          />
+          <InputField
+            labelText="Samanaikaisten varausten maksimimäärä:"
+            type="number"
+            registerReturn={register('maxFlights')}
           />
           <Button type="submit" variant="primary"> Submit</Button>
         </form>
