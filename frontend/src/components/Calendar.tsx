@@ -11,6 +11,7 @@ import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { EventImpl } from '@fullcalendar/core/internal';
 
 type CalendarProps = {
+  calendarRef?: React.RefObject<FullCalendar>
   eventSources: EventSourceInput[];
   addEventFn: (event: { start: Date; end: Date; }) => Promise<any>;
   modifyEventFn: (event: {
@@ -31,6 +32,7 @@ type CalendarProps = {
 };
 
 function Calendar({
+  calendarRef,
   eventSources,
   addEventFn,
   modifyEventFn,
@@ -41,10 +43,11 @@ function Calendar({
   selectConstraint,
   maxConcurrentLimit = 1,
 }: CalendarProps) {
-  const calendarRef: React.RefObject<FullCalendar> = React.createRef();
+
+  calendarRef ??= React.createRef();
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
-    const events = calendarRef.current?.getApi().getEvents().filter(
+    const events = calendarRef?.current?.getApi().getEvents().filter(
       (e) => e.id !== movingEvent?.id
         && e.start && e.end
         && !e.display.includes('background')
@@ -83,7 +86,7 @@ function Calendar({
         extendedProps: event.extendedProps,
       });
     }
-    calendarRef.current?.getApi().refetchEvents();
+    calendarRef?.current?.getApi().refetchEvents();
   };
 
   // When a new event is selected (dragged) in the calendar.
@@ -92,7 +95,7 @@ function Calendar({
     const currentTime: Date = new Date();
 
     if (newStartTime < currentTime) {
-      calendarRef.current?.getApi().unselect();
+      calendarRef?.current?.getApi().unselect();
       return;
     }
 
@@ -100,14 +103,14 @@ function Calendar({
       start: dropData.start,
       end: dropData.end,
     });
-    calendarRef.current?.getApi().refetchEvents();
-    calendarRef.current?.getApi().unselect();
+    calendarRef?.current?.getApi().refetchEvents();
+    calendarRef?.current?.getApi().unselect();
   };
 
   const handleEventRemove = async (removeInfo: EventRemoveArg) => {
     await removeEventFn(removeInfo);
-    calendarRef.current?.getApi().refetchEvents();
-    calendarRef.current?.getApi().unselect();
+    calendarRef?.current?.getApi().refetchEvents();
+    calendarRef?.current?.getApi().unselect();
   };
 
   return (

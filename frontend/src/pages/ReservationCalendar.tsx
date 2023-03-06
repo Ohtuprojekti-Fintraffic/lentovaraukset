@@ -10,10 +10,12 @@ import {
 } from '../queries/reservations';
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
+import FullCalendar from '@fullcalendar/react';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const selectedReservationRef = useRef<EventImpl | null>(null);
+  const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -115,9 +117,11 @@ function ReservationCalendar() {
         showInfoModal={showInfoModal}
         closeReservationModal={closeReservationModalFn}
         reservationRef={selectedReservationRef}
+        calendarRef={calendarRef}
       />
       <h1 className="text-3xl">Varauskalenteri</h1>
       <Calendar
+        calendarRef={calendarRef}
         eventSources={eventsSourceRef.current}
         addEventFn={addReservation}
         modifyEventFn={modifyReservationFn}
