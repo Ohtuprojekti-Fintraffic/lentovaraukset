@@ -127,7 +127,7 @@ function ReservationCalendar() {
       />
       <h1 className="text-3xl">Varauskalenteri</h1>
       <Calendar
-        forwardedCalendarRef={calendarRef}
+        calendarRef={calendarRef}
         eventSources={eventsSourceRef.current}
         addEventFn={addReservation}
         modifyEventFn={modifyReservationFn}
