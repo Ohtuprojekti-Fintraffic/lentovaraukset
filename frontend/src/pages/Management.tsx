@@ -5,7 +5,7 @@ import AirfieldForm from '../components/forms/AirfieldForm';
 
 function Management() {
   const airfield: AirfieldEntry = {
-    id: 1, name: 'lentokentta', maxConcurrentFlights: 2, eventGranularityMinutes: 20, futureReservationDays: 7,
+    id: 1, name: 'lentokentta', maxConcurrentFlights: 2, eventGranularityMinutes: 20,
   };
   return (
     <div className="flex flex-col space-y-2">

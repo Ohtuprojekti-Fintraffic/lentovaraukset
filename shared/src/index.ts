@@ -20,5 +20,4 @@ export interface AirfieldEntry {
   name: string;
   maxConcurrentFlights: number;
   eventGranularityMinutes: number;
-  futureReservationDays: number;
 }

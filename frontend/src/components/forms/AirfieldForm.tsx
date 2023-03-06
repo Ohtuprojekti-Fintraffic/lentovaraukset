@@ -11,6 +11,8 @@ type FormProps = {
 type Inputs = {
   maxFlights: string;
   maxDays: string;
+  name: string;
+  granularity: string;
 };
 
 function AirfieldForm(
@@ -24,22 +26,26 @@ function AirfieldForm(
     <div>
       <div className="p-8">
         <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <ul>
-            <li>
-              {`Id: ${airfield.id}`}
-            </li>
-            <li>
-              {`Nimi: ${airfield.name}`}
-            </li>
-            <li>
-              {`Varausikkunan minimikoko: ${airfield.eventGranularityMinutes}`}
-            </li>
-          </ul>
+          <p>
+            {`Id: ${airfield.id}`}
+          </p>
+          <InputField
+            labelText="Nimi:"
+            type="string"
+            registerReturn={register('name')}
+            defaultValue={airfield.name}
+          />
+          <InputField
+            labelText="Varausikkunan minimikoko minuutteina:"
+            type="number"
+            registerReturn={register('granularity')}
+            defaultValue={airfield.eventGranularityMinutes.toString()}
+          />
           <InputField
             labelText="Kuinka monta päivää tulevaisuuteen varauksen voi tehdä:"
             type="number"
             registerReturn={register('maxDays')}
-            defaultValue={airfield.futureReservationDays.toString()}
+            defaultValue="7"
           />
           <InputField
             labelText="Samanaikaisten varausten maksimimäärä:"
