@@ -23,6 +23,7 @@
     "test": "npm -ws --if-present run test"
   },
   "dependencies": {
+    "@hookform/resolvers": "^2.9.11",
     "dotenv": "^16.0.3",
     "react-hook-form": "^7.43.3"
   },

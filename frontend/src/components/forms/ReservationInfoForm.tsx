@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import Button from '../Button';
 
 
 type ReservationInfoProps = {
@@ -9,8 +10,8 @@ type ReservationInfoProps = {
 };
 
 type Inputs = {
-  start?: string
-  end?: string
+  start: string
+  end: string
   aircraftId: string
   phone: string
   info: string
@@ -23,16 +24,20 @@ function ReservationInfoForm({
   const textFieldStyle = 'border border-black rounded p-1 ml-4';
   const labelStyle = 'flex flex-row justify-between items-center w-full';
 
-  const {register, handleSubmit, reset, formState: {errors} } = useForm<Inputs>({
+  const {register, handleSubmit, reset} = useForm<Inputs>({
+    mode: "onSubmit",
     values: {
-      start: reservation?.start?.toISOString().replace(/.{7}(?:Z|\+).*/,''),
-      end: reservation?.end?.toISOString().replace(/.{7}(?:Z|\+).*/,''),
+      start: reservation?.start?.toISOString().replace(/.{7}(?:Z|\+).*/,'') || "",
+      end: reservation?.end?.toISOString().replace(/.{7}(?:Z|\+).*/,'') || "",
       aircraftId: reservation?.extendedProps.aircraftId,
       phone: reservation?.extendedProps.phone,
-      info: reservation?.extendedProps.info
-    }
+      info: reservation?.extendedProps.info,
+    },
+
   });
-  const onSubmit: SubmitHandler<Inputs> = data => {console.log("test")}
+  const onSubmit: SubmitHandler<Inputs> = data => {console.dir(data)}
+  const onError = (errors: any) => console.error(errors)
+
 
   useEffect(() => {
     reset()
@@ -54,47 +59,48 @@ function ReservationInfoForm({
         }
         {
           reservation &&
-          <form id={id} className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit, onError)}>
             <label className={labelStyle}>
               Varaus alkaa:
-              <input
-                type="datetime-local"
-                {...register('start')}
-                className={textFieldStyle}
-              />
             </label>
+            <input
+              type="datetime-local"
+              {...register('start')}
+              className={textFieldStyle}
+            />
             <label className={labelStyle}>
               Varaus päättyy:
-              <input
-                type="datetime-local"
-                {...register('end')}
-                className={textFieldStyle}
-              />
             </label>
+            <input
+              type="datetime-local"
+              {...register('end')}
+              className={textFieldStyle}
+            />
             <label className={labelStyle}>
               Koneen rekisteritunnus:
-              <input
-                type="text"
-                {...register('aircraftId')}
-                className={textFieldStyle}
-              />
             </label>
+            <input
+              type="text"
+              {...register('aircraftId')}
+              className={textFieldStyle}
+            />
             <label className={labelStyle}>
-              Puhelinnumero:
-              <input
-                type="text"
-                {...register('phone')}
-                className={textFieldStyle}
-              />
+              Puhelin:
             </label>
+            <input
+              type="tel"
+              {...register('phone')}
+              className={textFieldStyle}
+            />
             <label className={labelStyle}>
               Lisätietoja:
-              <input
-                type="text"
-                {...register('info')}
-                className={textFieldStyle}
-              />
             </label>
+            <input
+              type="text"
+              {...register('info')}
+              className={textFieldStyle}
+            />
+            <Button type='submit' variant='primary'>Submit</Button>
           </form>
         }
       </div>
