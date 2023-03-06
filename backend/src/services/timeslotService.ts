@@ -60,10 +60,13 @@ const updateById = async (
   id: number,
   timeslot: { start: Date, end: Date },
 ): Promise<void> => {
-  const newReservations = await reservationService
-    .getReservationFromRange(timeslot.start, timeslot.end);
   const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
   const oldReservations = await oldTimeslot?.getReservations();
+
+  const newReservations = oldReservations?.filter(
+    (reservation) => reservation.start >= timeslot.start && reservation.end <= timeslot.end,
+  );
+
   if (oldReservations?.length !== newReservations?.length) {
     throw new Error('Timeslot has reservations');
   }
@@ -77,7 +80,7 @@ const createTimeslot = async (newTimeSlot: {
   end: Date;
 }): Promise<TimeslotEntry> => {
   const reservations = await reservationService
-    .getReservationFromRange(newTimeSlot.start, newTimeSlot.end);
+    .getInTimeRange(newTimeSlot.start, newTimeSlot.end);
   const timeslot: Timeslot = await Timeslot.create(newTimeSlot);
   await timeslot.addReservations(reservations);
   return timeslot.dataValues;

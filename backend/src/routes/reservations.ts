@@ -10,7 +10,7 @@ const allowReservation = async (
   id: number | undefined,
   maxConcurrentReservations: number,
 ): Promise<boolean> => {
-  const reservations = (await reservationService.getReservationFromRange(startTime, endTime))
+  const reservations = (await reservationService.getInTimeRange(startTime, endTime))
     .filter((e) => e.id !== id);
 
   const mostConcurrentReservations = countMostConcurrent(reservations);
