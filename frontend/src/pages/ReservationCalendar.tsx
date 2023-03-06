@@ -8,15 +8,12 @@ import {
   modifyReservation,
   deleteReservation,
 } from '../queries/reservations';
-import Card from '../components/Card';
 import { getTimeSlots } from '../queries/timeSlots';
-import Button from '../components/Button';
-import ReservationInfoForm from '../components/forms/ReservationInfoForm';
+import ReservationInfoModal from '../modals/ReservationInfoModal';
 
 function ReservationCalendar() {
-  const [showInspectModal, setShowInspectModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
   const selectedReservationRef = useRef<EventImpl | null>(null);
-  const reservationInfoFormRef = useRef<string>("reservation_info_form");
 
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -71,11 +68,11 @@ function ReservationCalendar() {
 
   const clickReservation = async (event:EventImpl): Promise<void> => {
     selectedReservationRef.current = event;
-    setShowInspectModal(true);
+    setShowInfoModal(true);
   };
 
   const closeReservationModalFn = () => {
-    setShowInspectModal(false);
+    setShowInfoModal(false);
   };
 
   const removeReservation = async (removeInfo: EventRemoveArg) => {
@@ -114,25 +111,11 @@ function ReservationCalendar() {
 
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
-      <Card show={showInspectModal} handleClose={closeReservationModalFn}>
-        <ReservationInfoForm
-          id={reservationInfoFormRef.current}
-          reservation={selectedReservationRef.current ?? undefined}
-        />
-        <Button
-          variant="danger"
-          onClick={() => selectedReservationRef.current?.remove()}
-        >
-          Poista
-        </Button>
-        <Button
-          id={reservationInfoFormRef.current}
-          type={"submit"}
-          variant="primary"
-        >
-          Tallenna
-        </Button>
-      </Card>
+      <ReservationInfoModal
+        showInfoModal={showInfoModal}
+        closeReservationModal={closeReservationModalFn}
+        reservationRef={selectedReservationRef}
+      />
       <h1 className="text-3xl">Varauskalenteri</h1>
       <Calendar
         eventSources={eventsSourceRef.current}
