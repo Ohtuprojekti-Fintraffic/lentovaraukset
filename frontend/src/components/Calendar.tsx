@@ -46,7 +46,7 @@ function Calendar({
   const calendarRef = forwardedCalendarRef || React.createRef();
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
-    const events = calendarRef?.current?.getApi().getEvents().filter(
+    const events = calendarRef.current?.getApi().getEvents().filter(
       (e) => e.id !== movingEvent?.id
         && e.start && e.end
         && !e.display.includes('background')
@@ -85,7 +85,7 @@ function Calendar({
         extendedProps: event.extendedProps,
       });
     }
-    calendarRef?.current?.getApi().refetchEvents();
+    calendarRef.current?.getApi().refetchEvents();
   };
 
   // When a new event is selected (dragged) in the calendar.
@@ -94,7 +94,7 @@ function Calendar({
     const currentTime: Date = new Date();
 
     if (newStartTime < currentTime) {
-      calendarRef?.current?.getApi().unselect();
+      calendarRef.current?.getApi().unselect();
       return;
     }
 
@@ -102,14 +102,14 @@ function Calendar({
       start: dropData.start,
       end: dropData.end,
     });
-    calendarRef?.current?.getApi().refetchEvents();
-    calendarRef?.current?.getApi().unselect();
+    calendarRef.current?.getApi().refetchEvents();
+    calendarRef.current?.getApi().unselect();
   };
 
   const handleEventRemove = async (removeInfo: EventRemoveArg) => {
     await removeEventFn(removeInfo);
-    calendarRef?.current?.getApi().refetchEvents();
-    calendarRef?.current?.getApi().unselect();
+    calendarRef.current?.getApi().refetchEvents();
+    calendarRef.current?.getApi().unselect();
   };
 
   return (
