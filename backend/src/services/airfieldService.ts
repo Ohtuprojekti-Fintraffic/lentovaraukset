@@ -1,6 +1,7 @@
+import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import { Airfield } from '../models';
 
-const getAirfield = async (id: number): Promise<Airfield> => {
+const getAirfield = async (id: number): Promise<AirfieldEntry> => {
   const airfield = await Airfield.findOne({
     where: {
       id,
@@ -11,12 +12,12 @@ const getAirfield = async (id: number): Promise<Airfield> => {
     throw new Error('Airfield not found');
   }
 
-  return airfield;
+  return airfield.dataValues;
 };
 
-const getAirfields = async (): Promise<Airfield[]> => {
+const getAirfields = async (): Promise<AirfieldEntry[]> => {
   const airfields = await Airfield.findAll();
-  return airfields;
+  return airfields.map((airfield) => airfield.dataValues);
 };
 
 const createTestAirfield = async () => {

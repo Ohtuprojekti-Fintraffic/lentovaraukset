@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
+import useAirfield from '../../queries/airfields';
 
 type ReservationInfoProps = {
   reservation?: EventImpl
@@ -27,6 +28,9 @@ function ReservationInfoForm({
   const textFieldStyle = 'border border-black rounded p-1 ml-4';
   const labelStyle = 'flex flex-row justify-between items-center w-full';
 
+  const { data: airfield } = useAirfield(1);
+  const reservationGranularity = airfield?.eventGranularityMinutes || 20;
+
   const {
     register, handleSubmit, reset,
   } = useForm<Inputs>({
@@ -37,7 +41,7 @@ function ReservationInfoForm({
       phone: reservation?.extendedProps.phone,
       info: reservation?.extendedProps.info,
     },
-    resolver: zodResolver(createReservationValidator(20, 7)),
+    resolver: zodResolver(createReservationValidator(reservationGranularity, 7)),
   });
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
     console.dir(formData);

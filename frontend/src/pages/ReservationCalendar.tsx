@@ -11,11 +11,14 @@ import {
 } from '../queries/reservations';
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
+import useAirfield from '../queries/airfields';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const selectedReservationRef = useRef<EventImpl | null>(null);
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
+
+  const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
 
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -133,10 +136,10 @@ function ReservationCalendar() {
         modifyEventFn={modifyReservationFn}
         clickEventFn={clickReservation}
         removeEventFn={removeReservation}
-        granularity={{ minutes: 20 }} // TODO: Get from airfield api
+        granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
         eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFF' }}
         selectConstraint="timeslots"
-        maxConcurrentLimit={3} // TODO: get from airfield api
+        maxConcurrentLimit={airfield?.maxConcurrentFlights}
       />
     </div>
   );

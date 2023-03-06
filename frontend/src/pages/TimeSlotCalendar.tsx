@@ -2,6 +2,7 @@ import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 import React from 'react';
 import Calendar from '../components/Calendar';
+import useAirfield from '../queries/airfields';
 import {
   getReservations,
 } from '../queries/reservations';
@@ -10,6 +11,8 @@ import {
 } from '../queries/timeSlots';
 
 function TimeSlotCalendar() {
+  const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
+
   const timeSlotsSourceFn: EventSourceFunc = async (
     { start, end },
     successCallback,
@@ -65,7 +68,7 @@ function TimeSlotCalendar() {
         modifyEventFn={modifyTimeSlot}
         clickEventFn={clickEventFn}
         removeEventFn={removeTimeSlot}
-        granularity={{ minutes: 20 }} // TODO: Get from airfield api
+        granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
         eventColors={{ backgroundColor: '#bef264', eventColor: '#84cc1680', textColor: '#000000' }}
         selectConstraint={undefined}
         maxConcurrentLimit={1}
