@@ -21,6 +21,7 @@ export interface FieldProps {
 
   // used in separate type below
   registerReturn: undefined;
+  defaultValue?: string;
 }
 
 export interface RHFFieldProps extends Omit<FieldProps, 'registerReturn' | 'value' | 'onChange'> {
@@ -40,6 +41,7 @@ function InputField({
   labelClassName = '',
   inputClassName = '',
   helperTextClassName = '',
+  defaultValue = '',
 }: FieldProps | RHFFieldProps) {
   const fieldBaseClass = 'border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
                        + 'placeholder:text-ft-text-300 mb-4';
@@ -70,6 +72,7 @@ function InputField({
         disabled={state === 'disabled'}
         placeholder={placeholder}
         className={`${fieldBaseClass} ${fieldStateClasses[state]} ${inputClassName}`}
+        defaultValue={defaultValue}
         // This is the only way to use RHF without requiring input
         // types for the Hook Form inputs and whatever which
         // are complicated to do

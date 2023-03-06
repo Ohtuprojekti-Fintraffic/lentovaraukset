@@ -18,12 +18,7 @@ function AirfieldForm(
 ) {
   const {
     register, handleSubmit,
-  } = useForm<Inputs>({
-    defaultValues: {
-      maxFlights: airfield.maxConcurrentFlights.toString(),
-      maxDays: airfield.futureReservationDays.toString(),
-    },
-  });
+  } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => console.log(data);
   return (
     <div>
@@ -44,11 +39,13 @@ function AirfieldForm(
             labelText="Kuinka monta päivää tulevaisuuteen varauksen voi tehdä:"
             type="number"
             registerReturn={register('maxDays')}
+            defaultValue="7"
           />
           <InputField
             labelText="Samanaikaisten varausten maksimimäärä:"
             type="number"
             registerReturn={register('maxFlights')}
+            defaultValue="2"
           />
           <Button type="submit" variant="primary"> Submit</Button>
         </form>
