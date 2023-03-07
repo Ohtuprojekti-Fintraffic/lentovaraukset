@@ -31,9 +31,15 @@ const deleteById = async (id: number) => {
 
 const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | 'user'>): Promise<ReservationEntry> => {
   const timeslots = await timeslotService
-    .getTimeslotFromRange(newReservation.start, newReservation.end);
+    .getInTimeRange(newReservation.start, newReservation.end);
+  if (timeslots.length !== 1) {
+    throw new Error('Reservation should be created for one timeslot');
+  }
+  const timeslot = timeslots[0];
   const reservation: Reservation = await Reservation.create(newReservation);
-  await reservation.addTimeslots(timeslots);
+  if (timeslot) {
+    await reservation.setTimeslot(timeslot);
+  }
   const user = 'NYI';
   return { ...reservation.dataValues, user };
 };
@@ -43,11 +49,16 @@ const updateById = async (
   reservation: Omit<ReservationEntry, 'id' | 'user'>,
 ): Promise<ReservationEntry> => {
   const newTimeslots = await timeslotService
-    .getTimeslotFromRange(reservation.start, reservation.end);
+    .getInTimeRange(reservation.start, reservation.end);
+  if (newTimeslots.length !== 1) {
+    throw new Error('Reservation should be created for one timeslot');
+  }
+  const newTimeslot = newTimeslots[0];
   const oldReservation: Reservation | null = await Reservation.findByPk(id);
-  const oldTimeslots = await oldReservation?.getTimeslots();
-  await oldReservation?.removeTimeslots(oldTimeslots);
-  await oldReservation?.addTimeslots(newTimeslots);
+  const oldTimeslot = await oldReservation?.getTimeslot();
+  if (newTimeslot && oldTimeslot) {
+    await oldReservation?.setTimeslot(newTimeslot);
+  }
   const [updatedReservation] = await Reservation.upsert(
     { ...reservation, id },
   );
