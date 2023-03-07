@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 import useAirfield from '../../queries/airfields';
+import InputField from '../InputField';
 
 type ReservationInfoProps = {
   reservation?: EventImpl
@@ -25,9 +26,6 @@ function ReservationInfoForm({
   onSubmit,
   id,
 }: ReservationInfoProps) {
-  const textFieldStyle = 'border border-black rounded p-1 ml-4';
-  const labelStyle = 'flex flex-row justify-between items-center w-full';
-
   const { data: airfield } = useAirfield(1);
   const reservationGranularity = airfield?.eventGranularityMinutes || 20;
 
@@ -82,58 +80,38 @@ function ReservationInfoForm({
           reservation
           && (
           /* eslint-disable  react/jsx-props-no-spreading */
-          <form id={id} className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(submitHandler, onError)}>
-            <div className={labelStyle}>
-              <p>
-                Varaus alkaa:
-              </p>
-              <input
-                type="datetime-local"
-                {...register('start')}
-                className={textFieldStyle}
-              />
+          <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
+            <div className="flex flex-row">
+              <div className="flex flex-col">
+                <InputField
+                  labelText="Varaus alkaa:"
+                  type="datetime-local"
+                  registerReturn={register('start')}
+                />
+                <InputField
+                  labelText="Varaus päättyy:"
+                  type="datetime-local"
+                  registerReturn={register('end')}
+                />
+              </div>
+              <div className="flex flex-col">
+                <InputField
+                  labelText="Koneen rekisteritunnus:"
+                  type="text"
+                  registerReturn={register('aircraftId')}
+                />
+                <InputField
+                  labelText="Puhelinnumero:"
+                  type="tel"
+                  registerReturn={register('phone')}
+                />
+              </div>
             </div>
-            <div className={labelStyle}>
-              <p>
-                Varaus päättyy:
-              </p>
-              <input
-                type="datetime-local"
-                {...register('end')}
-                className={textFieldStyle}
-              />
-            </div>
-            <div className={labelStyle}>
-              <p>
-                Koneen rekisteritunnus:
-              </p>
-              <input
-                type="text"
-                {...register('aircraftId')}
-                className={textFieldStyle}
-              />
-            </div>
-            <div className={labelStyle}>
-              <p>
-                Puhelin:
-              </p>
-              <input
-                type="tel"
-                {...register('phone')}
-                className={textFieldStyle}
-              />
-
-            </div>
-            <div className={labelStyle}>
-              <p>
-                Lisätietoja:
-              </p>
-              <input
-                type="text"
-                {...register('info')}
-                className={textFieldStyle}
-              />
-            </div>
+            <InputField
+              labelText="Lisätietoja:"
+              type="text"
+              registerReturn={register('info')}
+            />
           </form>
           /* eslint-enable  react/jsx-props-no-spreading */
           )
