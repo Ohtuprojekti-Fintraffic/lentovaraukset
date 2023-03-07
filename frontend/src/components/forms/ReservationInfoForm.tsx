@@ -111,7 +111,7 @@ function ReservationInfoForm({
               labelText="Lisätietoja:"
               type="text"
               registerReturn={register('info')}
-              inputClassName={"w-full"}
+              inputClassName="w-full"
             />
           </form>
           /* eslint-enable  react/jsx-props-no-spreading */
