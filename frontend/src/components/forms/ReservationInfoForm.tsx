@@ -81,7 +81,7 @@ function ReservationInfoForm({
           && (
           /* eslint-disable  react/jsx-props-no-spreading */
           <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
-            <div className="flex flex-row">
+            <div className="flex flex-row space-x-6">
               <div className="flex flex-col">
                 <InputField
                   labelText="Varaus alkaa:"
@@ -89,16 +89,16 @@ function ReservationInfoForm({
                   registerReturn={register('start')}
                 />
                 <InputField
-                  labelText="Varaus päättyy:"
-                  type="datetime-local"
-                  registerReturn={register('end')}
+                  labelText="Koneen rekisteritunnus:"
+                  type="text"
+                  registerReturn={register('aircraftId')}
                 />
               </div>
               <div className="flex flex-col">
                 <InputField
-                  labelText="Koneen rekisteritunnus:"
-                  type="text"
-                  registerReturn={register('aircraftId')}
+                  labelText="Varaus päättyy:"
+                  type="datetime-local"
+                  registerReturn={register('end')}
                 />
                 <InputField
                   labelText="Puhelinnumero:"
