@@ -6,6 +6,7 @@ import { Timeslot } from '../models';
 const getInTimeRange = async (
   rangeStartTime: Date,
   rangeEndTime: Date,
+  id: number | null = null,
 ): Promise<Timeslot[]> => {
   const timeslots: Timeslot[] = await Timeslot.findAll({
     where: {
@@ -18,10 +19,34 @@ const getInTimeRange = async (
             [Op.gt]: rangeStartTime,
           },
         },
+        id
+          ? {
+            id: {
+              [Op.ne]: id,
+            },
+          }
+          : {},
       ],
     },
   });
   return timeslots;
+};
+
+const timeslotsAreConsecutive = async (
+  timeslot: { start: Date, end: Date },
+  id: number | null = null,
+): Promise<boolean> => {
+  const { start, end } = timeslot;
+  const newStart = new Date(start);
+  const newEnd = new Date(end);
+  newStart.setMinutes(newStart.getMinutes() - 1);
+  newEnd.setMinutes(newEnd.getMinutes() + 1);
+  if (id) {
+    const consecutiveTimeslots = await getInTimeRange(newStart, newEnd, id);
+    return consecutiveTimeslots.length > 0;
+  }
+  const consecutiveTimeslots = await getInTimeRange(newStart, newEnd);
+  return consecutiveTimeslots.length > 0;
 };
 
 const deleteById = async (id: number) => {
@@ -40,6 +65,9 @@ const updateById = async (
   id: number,
   timeslot: { start: Date, end: Date },
 ): Promise<void> => {
+  if (await timeslotsAreConsecutive(timeslot, id)) {
+    throw new Error('Timeslot can\'t be consecutive');
+  }
   const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
   const oldReservations = await oldTimeslot?.getReservations();
   const newReservations = oldReservations?.filter(
@@ -58,6 +86,9 @@ const createTimeslot = async (newTimeSlot: {
   start: Date;
   end: Date;
 }): Promise<TimeslotEntry> => {
+  if (await timeslotsAreConsecutive(newTimeSlot)) {
+    throw new Error('Timeslot can\'t be consecutive');
+  }
   const reservations = await reservationService
     .getInTimeRange(newTimeSlot.start, newTimeSlot.end);
   const timeslot: Timeslot = await Timeslot.create(newTimeSlot);
