@@ -63,6 +63,18 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
   return Reservation;
 };
 
+const deleteValidator = () => {
+  const pastErrorMessage = 'Timeslot or reservation in past cannot be deleted';
+
+  const time = z.object({
+    start: z.coerce
+      .date()
+      .refine((value) => isTimeInPast(value), { message: pastErrorMessage }),
+  });
+
+  return time;
+};
+
 const getTimeRangeValidator = () => {
   const TimeRange = z.object({
     start: z.coerce.date(),
@@ -76,4 +88,6 @@ export {
   createTimeSlotValidator,
   createReservationValidator,
   getTimeRangeValidator,
+  deleteValidator,
+  isTimeInPast,
 };
