@@ -50,6 +50,8 @@ function TimeSlotCalendar() {
     }
   };
 
+  const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
+
   const clickTimeslot = async (event: EventImpl): Promise<void> => {
     selectedTimeslotRef.current = event;
     setShowInfoModal(true);
@@ -81,7 +83,7 @@ function TimeSlotCalendar() {
 
       <h1 className="text-3xl">Vapaat varausikkunat</h1>
       <Calendar
-        eventSources={[timeSlotsSourceFn, reservationsSourceFn]}
+        eventSources={eventsSourceRef.current}
         addEventFn={addTimeSlot}
         modifyEventFn={modifyTimeSlot}
         clickEventFn={clickTimeslot}
