@@ -107,7 +107,13 @@ function Calendar({
   };
 
   const handleEventRemove = async (removeInfo: EventRemoveArg) => {
-    await removeEventFn(removeInfo);
+    const { event } = removeInfo;
+
+    const eventStartTime: Date = event.start || new Date();
+    const currentTime: Date = new Date();
+    if (eventStartTime >= currentTime) {
+      await removeEventFn(removeInfo);
+    }
     calendarRef.current?.getApi().refetchEvents();
     calendarRef.current?.getApi().unselect();
   };
