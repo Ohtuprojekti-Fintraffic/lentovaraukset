@@ -211,6 +211,17 @@ describe('Calls to api', () => {
     expect(numberOfTimeslots).toEqual(timeslotData.length);
   });
 
+  test('dont delete a timeslot from past', async () => {
+    const newTimeslot: any = await Timeslot.create({
+      start: new Date('2022-02-13T08:00:00.000Z'),
+      end: new Date('2022-02-13T09:00:00.000Z'),
+    });
+
+    await api.delete(`/api/timeslots/${newTimeslot.id}`);
+
+    expect(await Timeslot.count()).toEqual(timeslotData.length + 1);
+  });
+
   test('dont delete a timeslot if it has reservations', async () => {
     const createdSlot: Timeslot | null = await Timeslot.findOne({});
     const newReservation: Reservation = await Reservation.create({
