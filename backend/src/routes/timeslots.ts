@@ -13,6 +13,7 @@ router.get('/', async (req: express.Request, res: express.Response) => {
     end: new Date(until as string),
   });
   const timeslots = await timeslotService.getInTimeRange(start, end);
+
   res.json(timeslots);
 });
 
