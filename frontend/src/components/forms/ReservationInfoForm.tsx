@@ -42,8 +42,6 @@ function ReservationInfoForm({
     resolver: zodResolver(createReservationValidator(reservationGranularity, 7)),
   });
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
-    console.dir(formData);
-
     const updatedReservation = {
       start: new Date(formData.start),
       end: new Date(formData.end),

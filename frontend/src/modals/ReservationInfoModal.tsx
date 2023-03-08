@@ -24,8 +24,6 @@ function ReservationInfoModal({
         id="reservation_info_form"
         reservation={reservation}
         onSubmit={async (updatedReservation) => {
-          console.dir(updatedReservation);
-
           await modifyReservation(
             {
               id: parseInt(reservation!.id, 10),
