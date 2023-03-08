@@ -20,7 +20,7 @@ function Card({
   return (
     <Modal show={show} handleClose={handleClose}>
       <div
-        className=" flex flex-col max-w-md h-fit bg-white rounded-lg shadow-2xl overflow-hidden"
+        className=" flex flex-col max-w-fit h-fit bg-white rounded-lg shadow-2xl overflow-hidden"
       >
         {Children.toArray(children)[0]}
         {(Children.count(children) > 1 || cancelButton)
