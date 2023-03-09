@@ -9,6 +9,7 @@ import {
 } from '@fullcalendar/core';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { EventImpl } from '@fullcalendar/core/internal';
+import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>
@@ -74,10 +75,7 @@ function Calendar({
     // Open confirmation popup here
     const { event } = changeData;
 
-    const eventStartTime: Date = event.start || new Date();
-    const currentTime: Date = new Date();
-
-    if (eventStartTime >= currentTime) {
+    if (!isTimeInPast(event.start || new Date())) {
       await modifyEventFn({
         id: event.id,
         start: event.start || new Date(),
@@ -91,9 +89,8 @@ function Calendar({
   // When a new event is selected (dragged) in the calendar.
   const handleEventCreate = async (dropData: DateSelectArg) => {
     const newStartTime: Date = dropData.start || new Date();
-    const currentTime: Date = new Date();
 
-    if (newStartTime < currentTime) {
+    if (isTimeInPast(newStartTime)) {
       calendarRef.current?.getApi().unselect();
       return;
     }
@@ -107,7 +104,11 @@ function Calendar({
   };
 
   const handleEventRemove = async (removeInfo: EventRemoveArg) => {
-    await removeEventFn(removeInfo);
+    const { event } = removeInfo;
+
+    if (!isTimeInPast(event.start || new Date())) {
+      await removeEventFn(removeInfo);
+    }
     calendarRef.current?.getApi().refetchEvents();
     calendarRef.current?.getApi().unselect();
   };
