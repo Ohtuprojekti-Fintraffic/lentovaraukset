@@ -6,7 +6,7 @@ const isMultipleOfMinutes = (minutes: number) => (dateToCheck: Date) => (
   dateToCheck.getTime() % minutesToMilliseconds(minutes) === 0
 );
 
-const isTimeInPast = (time: Date): boolean => new Date(time) >= new Date();
+const isTimeInPast = (time: Date): boolean => new Date(time) < new Date();
 
 const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => {
   const max = new Date();
@@ -24,11 +24,11 @@ const createTimeSlotValidator = (slotGranularityMinutes: number) => {
     start: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
-      .refine((value) => isTimeInPast(value), { message: pastErrorMessage }),
+      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
     end: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
-      .refine((value) => isTimeInPast(value), { message: pastErrorMessage }),
+      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
   })
     .refine((res) => res.start < res.end, { message: startNotLessThanEndErrorMessage });
 
@@ -45,7 +45,7 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
     start: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
-      .refine((value) => isTimeInPast(value), { message: pastErrorMessage })
+      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage })
       .refine(
         (value) => isTimeAtMostInFuture(value, maxDaysInFuture),
         { message: tooFarInFutureErrorMessage },
@@ -53,7 +53,7 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
     end: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
-      .refine((value) => isTimeInPast(value), { message: pastErrorMessage }),
+      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
     aircraftId: z.string(),
     info: z.string().optional(),
     phone: z.string(),
@@ -76,4 +76,5 @@ export {
   createTimeSlotValidator,
   createReservationValidator,
   getTimeRangeValidator,
+  isTimeInPast,
 };

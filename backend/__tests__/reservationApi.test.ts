@@ -122,6 +122,19 @@ describe('Calls to api', () => {
     expect(await Reservation.count()).toEqual(reservations.length);
   });
 
+  test('can\'t delete a reservation from past', async () => {
+    const newReservation: any = await Reservation.create({
+      start: new Date('2022-02-13T08:00:00.000Z'),
+      end: new Date('2022-02-13T09:00:00.000Z'),
+      aircraftId: 'OH-QAA',
+      phone: '11104040',
+    });
+
+    await api.delete(`/api/reservations/${newReservation.id}`);
+
+    expect(await Reservation.count()).toEqual(reservations.length + 1);
+  });
+
   test('can edit a reservation ', async () => {
     const createdReservation: Reservation | null = await Reservation.findOne();
     const id = createdReservation?.dataValues.id;

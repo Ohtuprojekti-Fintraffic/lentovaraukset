@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
+import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import { Reservation } from '../models';
 
 const getInTimeRange = async (startTime: Date, endTime: Date) => {
@@ -23,9 +24,8 @@ const getInTimeRange = async (startTime: Date, endTime: Date) => {
 
 const deleteById = async (id: number) => {
   const reservation = await Reservation.findByPk(id);
-  if (!reservation) {
-    throw new Error('Reservation does not exist');
-  }
+  if (!reservation) throw new Error('Reservation does not exist');
+  if (isTimeInPast(reservation.start)) throw new Error('Reservation in past cannot be deleted');
   await reservation.destroy();
 };
 
