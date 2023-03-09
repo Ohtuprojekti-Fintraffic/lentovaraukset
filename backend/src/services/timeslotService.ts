@@ -28,7 +28,7 @@ const getInTimeRange = async (
 const deleteById = async (id: number) => {
   const timeslot = await Timeslot.findByPk(id);
   if (!timeslot) throw new Error('Timeslot does not exist');
-  if (!isTimeInPast(timeslot.start)) throw new Error('Timeslot in past cannot be deleted');
+  if (isTimeInPast(timeslot.start)) throw new Error('Timeslot in past cannot be deleted');
   const reservations = await timeslot?.getReservations();
   if (reservations?.length !== 0) {
     throw new Error('Timeslot has reservations');

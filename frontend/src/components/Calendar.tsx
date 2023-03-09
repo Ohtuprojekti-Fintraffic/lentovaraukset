@@ -75,7 +75,7 @@ function Calendar({
     // Open confirmation popup here
     const { event } = changeData;
 
-    if (isTimeInPast(event.start || new Date())) {
+    if (!isTimeInPast(event.start || new Date())) {
       await modifyEventFn({
         id: event.id,
         start: event.start || new Date(),
@@ -90,7 +90,7 @@ function Calendar({
   const handleEventCreate = async (dropData: DateSelectArg) => {
     const newStartTime: Date = dropData.start || new Date();
 
-    if (!isTimeInPast(newStartTime)) {
+    if (isTimeInPast(newStartTime)) {
       calendarRef.current?.getApi().unselect();
       return;
     }
@@ -106,7 +106,7 @@ function Calendar({
   const handleEventRemove = async (removeInfo: EventRemoveArg) => {
     const { event } = removeInfo;
 
-    if (isTimeInPast(event.start || new Date())) {
+    if (!isTimeInPast(event.start || new Date())) {
       await removeEventFn(removeInfo);
     }
     calendarRef.current?.getApi().refetchEvents();

@@ -25,7 +25,7 @@ const getInTimeRange = async (startTime: Date, endTime: Date) => {
 const deleteById = async (id: number) => {
   const reservation = await Reservation.findByPk(id);
   if (!reservation) throw new Error('Reservation does not exist');
-  if (!isTimeInPast(reservation.start)) throw new Error('Reservation in past cannot be deleted');
+  if (isTimeInPast(reservation.start)) throw new Error('Reservation in past cannot be deleted');
   await reservation.destroy();
 };
 
