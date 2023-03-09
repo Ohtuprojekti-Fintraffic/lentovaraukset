@@ -10,6 +10,7 @@ import {
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
+import AlertContext from '../contexts/AlertContext';
 
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>
@@ -45,6 +46,7 @@ function Calendar({
   maxConcurrentLimit = 1,
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
+  const { addNewAlert} = React.useContext(AlertContext);
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
     const events = calendarRef.current?.getApi().getEvents().filter(
@@ -54,7 +56,8 @@ function Calendar({
         && e.start < span.end && e.end > span.start,
     );
 
-    if (span.start < new Date()) {
+    if (isTimeInPast(span.start)) {
+      addNewAlert('Aika on menneisyydessä', 'warning', 500);
       return false;
     }
 
@@ -66,6 +69,10 @@ function Calendar({
   // When a event box is clicked
   const handleEventClick = async (clickData: EventClickArg) => {
     if (clickData.event.display.includes('background')) return;
+    if (isTimeInPast(clickData.event.start || new Date())) {
+      addNewAlert('Aika on menneisyydessä', 'warning', 500);
+      return;
+    }
     const { event } = clickData;
     await clickEventFn(event);
   };
