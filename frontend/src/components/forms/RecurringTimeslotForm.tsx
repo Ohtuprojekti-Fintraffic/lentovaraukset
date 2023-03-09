@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TimeslotEntry } from '@lentovaraukset/shared/src';
@@ -13,7 +13,9 @@ type RecurringTimeslotProps = {
 type Inputs = {
   start: string
   end: string
-  recurring: string
+  isRecurring: boolean
+  periodStarts: string | null
+  periodEnds: string | null
 };
 
 function RecurringTimeslotForm({
@@ -21,22 +23,26 @@ function RecurringTimeslotForm({
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
+  const [showRecurring, setShowRecurring] = useState(false);
   const {
     register, handleSubmit, reset,
   } = useForm<Inputs>({
     values: {
       start: timeslot?.startStr.replace(/.{3}\+.*/, '') || '',
       end: timeslot?.endStr.replace(/.{3}\+.*/, '') || '',
-      recurring: 'Ei toistu',
+      isRecurring: false,
+      periodStarts: timeslot?.startStr.replace(/T.*/, '') || '',
+      periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
     },
   });
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
     const updatedTimeslot = {
       start: new Date(formData.start),
       end: new Date(formData.end),
-      recurring: formData.recurring,
+      isRecurring: formData.isRecurring,
+      periodStarts: formData.periodStarts,
+      periodEnds: formData.periodEnds,
     };
-
     onSubmit(updatedTimeslot);
   };
   const onError = (e: any) => console.error(e);
@@ -64,7 +70,6 @@ function RecurringTimeslotForm({
         {
           timeslot
           && (
-          /* eslint-disable  react/jsx-props-no-spreading */
           <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
             <div className="flex flex-row space-x-6">
               <div className="flex flex-col">
@@ -82,17 +87,34 @@ function RecurringTimeslotForm({
                 />
               </div>
             </div>
-            <div className="flex flex-col">
-              <p>
-                Toistuvuus:
-              </p>
-              <select name="recurring-events">
-                <option value="none">Ei toistu</option>
-                <option value="weekdays">Arkipäivisin</option>
-              </select>
+            <InputField
+              labelText="Määritä toistuvuus"
+              type="checkbox"
+              onChange={() => {
+                console.log('moi');
+                setShowRecurring(!showRecurring);
+              }}
+              registerReturn={register('isRecurring')}
+            />
+            {showRecurring && (
+            <div className="flex flex-row space-x-6">
+              <div className="flex flex-col">
+                <InputField
+                  labelText="Alkaa:"
+                  type="date"
+                  registerReturn={register('periodStarts')}
+                />
+              </div>
+              <div className="flex flex-col">
+                <InputField
+                  labelText="Päättyy:"
+                  type="date"
+                  registerReturn={register('periodEnds')}
+                />
+              </div>
             </div>
+            )}
           </form>
-          /* eslint-enable  react/jsx-props-no-spreading */
           )
         }
       </div>

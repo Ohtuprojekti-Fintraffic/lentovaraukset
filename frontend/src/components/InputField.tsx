@@ -68,7 +68,6 @@ function InputField({
         id={id}
         type={type}
         value={value}
-        onChange={onChange}
         disabled={state === 'disabled'}
         placeholder={placeholder}
         className={`${fieldBaseClass} ${fieldStateClasses[state]} ${inputClassName}`}
@@ -78,6 +77,7 @@ function InputField({
         // are complicated to do
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...registerReturn}
+        onChange={onChange}
       />
       {helperText ? <p className={`text-ft-text-300 -mt-4 ${helperTextClassName}`}>{helperText}</p> : null}
     </div>
