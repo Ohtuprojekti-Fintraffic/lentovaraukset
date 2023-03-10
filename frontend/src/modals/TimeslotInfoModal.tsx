@@ -3,6 +3,7 @@ import React from 'react';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import RecurringTimeslotForm from '../components/forms/RecurringTimeslotForm';
+import { modifyTimeSlot } from '../queries/timeSlots';
 
 type InfoModalProps = {
   showInfoModal: boolean
@@ -23,7 +24,13 @@ function TimeslotInfoModal({
         id="recurring_timeslot_form"
         timeslot={timeslot}
         onSubmit={async (updatedTimeslot) => {
-          console.dir(updatedTimeslot);
+          await modifyTimeSlot(
+            {
+              id: timeslot!.id,
+              start: updatedTimeslot.start,
+              end: updatedTimeslot.end,
+            },
+          );
           closeTimeslotModal();
         }}
       />

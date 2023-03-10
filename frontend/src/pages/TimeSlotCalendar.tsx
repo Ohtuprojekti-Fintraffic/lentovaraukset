@@ -1,5 +1,6 @@
 import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
+import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
@@ -15,6 +16,7 @@ function TimeSlotCalendar() {
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
   const [showInfoModal, setShowInfoModal] = useState(false);
   const selectedTimeslotRef = useRef<EventImpl | null>(null);
+  const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const timeSlotsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -78,11 +80,13 @@ function TimeSlotCalendar() {
         closeTimeslotModal={() => {
           closeTimeslotModalFn();
           selectedTimeslotRef.current = null;
+          calendarRef.current?.getApi().refetchEvents();
         }}
       />
 
       <h1 className="text-3xl">Vapaat varausikkunat</h1>
       <Calendar
+        calendarRef={calendarRef}
         eventSources={eventsSourceRef.current}
         addEventFn={addTimeSlot}
         modifyEventFn={modifyTimeSlot}
