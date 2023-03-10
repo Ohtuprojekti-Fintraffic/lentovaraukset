@@ -39,10 +39,9 @@ function RecurringTimeslotForm({
     const updatedTimeslot = {
       start: new Date(formData.start),
       end: new Date(formData.end),
-      isRecurring: formData.isRecurring,
-      periodStarts: formData.periodStarts,
-      periodEnds: formData.periodEnds,
     };
+    // TODO: create recurring events if possible
+    // const { isRecurring, periodStarts, periodEnds } = formData;
     onSubmit(updatedTimeslot);
   };
   const onError = (e: any) => console.error(e);
@@ -78,6 +77,20 @@ function RecurringTimeslotForm({
                   type="datetime-local"
                   registerReturn={register('start')}
                 />
+                <InputField
+                  labelText="Määritä toistuvuus"
+                  type="checkbox"
+                  onChange={() => setShowRecurring(!showRecurring)}
+                  registerReturn={register('isRecurring')}
+                />
+                {showRecurring && (
+                <InputField
+                  labelText="Alkaa:"
+                  type="date"
+                  inputClassName="w-full"
+                  registerReturn={register('periodStarts')}
+                />
+                )}
               </div>
               <div className="flex flex-col">
                 <InputField
@@ -85,35 +98,17 @@ function RecurringTimeslotForm({
                   type="datetime-local"
                   registerReturn={register('end')}
                 />
-              </div>
-            </div>
-            <InputField
-              labelText="Määritä toistuvuus"
-              type="checkbox"
-              onChange={() => {
-                console.log('moi');
-                setShowRecurring(!showRecurring);
-              }}
-              registerReturn={register('isRecurring')}
-            />
-            {showRecurring && (
-            <div className="flex flex-row space-x-6">
-              <div className="flex flex-col">
-                <InputField
-                  labelText="Alkaa:"
-                  type="date"
-                  registerReturn={register('periodStarts')}
-                />
-              </div>
-              <div className="flex flex-col">
+                <div className="flex-1" />
+                {showRecurring && (
                 <InputField
                   labelText="Päättyy:"
                   type="date"
+                  inputClassName="w-full"
                   registerReturn={register('periodEnds')}
                 />
+                )}
               </div>
             </div>
-            )}
           </form>
           )
         }
