@@ -46,7 +46,7 @@ function Calendar({
   maxConcurrentLimit = 1,
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
-  const { addNewAlert} = React.useContext(AlertContext);
+  const { addNewAlert } = React.useContext(AlertContext);
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
     const events = calendarRef.current?.getApi().getEvents().filter(
@@ -69,10 +69,6 @@ function Calendar({
   // When a event box is clicked
   const handleEventClick = async (clickData: EventClickArg) => {
     if (clickData.event.display.includes('background')) return;
-    if (isTimeInPast(clickData.event.start || new Date())) {
-      addNewAlert('Aika on menneisyydessä', 'warning', 500);
-      return;
-    }
     const { event } = clickData;
     await clickEventFn(event);
   };
