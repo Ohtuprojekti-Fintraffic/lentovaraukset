@@ -1,4 +1,4 @@
-import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
+import { EventRemoveArg, EventSourceFunc, AllowFunc } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
@@ -13,10 +13,10 @@ import {
 } from '../queries/timeSlots';
 
 function TimeSlotCalendar() {
+  const calendarRef = useRef<FullCalendar>(null);
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
   const [showInfoModal, setShowInfoModal] = useState(false);
   const selectedTimeslotRef = useRef<EventImpl | null>(null);
-  const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const timeSlotsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -69,6 +69,20 @@ function TimeSlotCalendar() {
     setShowInfoModal(false);
   };
 
+  const allowEvent: AllowFunc = (span, movingEvent) => {
+    const timeIsConsecutive = calendarRef.current?.getApi().getEvents().some(
+      (e) => e.id !== movingEvent?.id
+        && e.groupId !== 'reservations'
+        && e.start && e.end
+        && (e.start.getTime() === span.start.getTime()
+          || e.start.getTime() === span.end.getTime()
+          || e.end.getTime() === span.start.getTime()
+          || e.end.getTime() === span.end.getTime()),
+    );
+
+    return !timeIsConsecutive;
+  };
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <TimeslotInfoModal
@@ -96,6 +110,7 @@ function TimeSlotCalendar() {
         eventColors={{ backgroundColor: '#bef264', eventColor: '#84cc1680', textColor: '#000000' }}
         selectConstraint={undefined}
         maxConcurrentLimit={1}
+        allowEventRef={allowEvent}
       />
     </div>
   );
