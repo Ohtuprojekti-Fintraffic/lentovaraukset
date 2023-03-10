@@ -109,7 +109,7 @@ function TimeSlotCalendar() {
 
       <div className="flex flex-row justify-between">
         <h1 className="text-3xl">Vapaat varausikkunat</h1>
-        <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varaus</Button>
+        <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varausikkuna</Button>
       </div>
       <Calendar
         calendarRef={calendarRef}
