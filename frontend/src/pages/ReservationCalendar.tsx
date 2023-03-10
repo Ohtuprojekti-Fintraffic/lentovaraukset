@@ -12,6 +12,7 @@ import {
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
 import useAirfield from '../queries/airfields';
+import Button from '../components/Button';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -128,7 +129,10 @@ function ReservationCalendar() {
           calendarRef.current?.getApi().refetchEvents();
         }}
       />
-      <h1 className="text-3xl">Varauskalenteri</h1>
+      <div className="flex flex-row justify-between">
+        <h1 className="text-3xl">Varauskalenteri</h1>
+        <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varaus</Button>
+      </div>
       <Calendar
         calendarRef={calendarRef}
         eventSources={eventsSourceRef.current}

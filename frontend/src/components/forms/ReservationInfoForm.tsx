@@ -58,6 +58,22 @@ function ReservationInfoForm({
     reset();
   }, [reservation]);
 
+  // step is relative to min: https://stackoverflow.com/a/75353708
+  const stepSeconds = airfield ? (airfield.eventGranularityMinutes * 60) : 600;
+  const stepMillis = stepSeconds * 1000;
+  const nowMillis = new Date().getTime();
+  // round up to nearest even whatever minutes
+  const roundedDate = new Date(Math.ceil(nowMillis / stepMillis) * stepMillis);
+  // HTML element takes a weird time format so cut off the end
+  const min = roundedDate.toISOString().slice(0, new Date().toISOString().lastIndexOf(':'));
+
+  // important detail: the browser GUI doesn't give a damn and will show
+  // whatever minutes it wants, but at least Chrome checks the field on submit
+  // and shows a popover with the nearest acceptable divisible values
+
+  // TODO: add max future time
+  // const max =
+
   return (
     <div>
       <div className="bg-black p-3">
@@ -65,56 +81,56 @@ function ReservationInfoForm({
           {
         reservation
           ? `Varaus #${reservation.id}`
-          : 'Virhe'
+          : 'Uusi varaus'
         }
         </p>
       </div>
       <div className="p-8">
-        {
+        {/* {
           !reservation
           && <p>Virhe varausta haettaessa</p>
-        }
+        } */}
         {
-          reservation
-          && (
-          /* eslint-disable  react/jsx-props-no-spreading */
-          <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
-            <div className="flex flex-row space-x-6">
-              <div className="flex flex-col">
-                <InputField
-                  labelText="Varaus alkaa:"
-                  type="datetime-local"
-                  registerReturn={register('start')}
-                />
-                <InputField
-                  labelText="Koneen rekisteritunnus:"
-                  type="text"
-                  registerReturn={register('aircraftId')}
-                />
-              </div>
-              <div className="flex flex-col">
-                <InputField
-                  labelText="Varaus päättyy:"
-                  type="datetime-local"
-                  registerReturn={register('end')}
-                />
-                <InputField
-                  labelText="Puhelinnumero:"
-                  type="tel"
-                  registerReturn={register('phone')}
-                />
-              </div>
+          /* eslint-disable  react/jsx-props-no-spreading */}
+        <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
+          <div className="flex flex-row space-x-6">
+            <div className="flex flex-col">
+              <InputField
+                labelText="Varaus alkaa:"
+                type="datetime-local"
+                registerReturn={register('start')}
+                step={stepSeconds}
+                min={min}
+              />
+              <InputField
+                labelText="Koneen rekisteritunnus:"
+                type="text"
+                registerReturn={register('aircraftId')}
+              />
             </div>
-            <InputField
-              labelText="Lisätietoja:"
-              type="text"
-              registerReturn={register('info')}
-              inputClassName="w-full"
-            />
-          </form>
-          /* eslint-enable  react/jsx-props-no-spreading */
-          )
-        }
+            <div className="flex flex-col">
+              <InputField
+                labelText="Varaus päättyy:"
+                type="datetime-local"
+                registerReturn={register('end')}
+                step={stepSeconds}
+                min={min}
+              />
+              <InputField
+                labelText="Puhelinnumero:"
+                type="tel"
+                registerReturn={register('phone')}
+              />
+            </div>
+          </div>
+          <InputField
+            labelText="Lisätietoja:"
+            type="text"
+            registerReturn={register('info')}
+            inputClassName="w-full"
+          />
+        </form>
+        {/* eslint-enable  react/jsx-props-no-spreading */}
       </div>
     </div>
   );
