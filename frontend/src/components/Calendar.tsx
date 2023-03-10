@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -46,6 +46,7 @@ function Calendar({
   maxConcurrentLimit = 1,
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
+  const [alert, setAlert] = useState('');
   const { addNewAlert } = React.useContext(AlertContext);
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
@@ -57,7 +58,7 @@ function Calendar({
     );
 
     if (isTimeInPast(span.start)) {
-      addNewAlert('Aika on menneisyydessä', 'warning', 500);
+      setAlert('Menneisyydessä olevaa aikaa ei voi lisätä tai muokata');
       return false;
     }
 
@@ -116,6 +117,11 @@ function Calendar({
     calendarRef.current?.getApi().unselect();
   };
 
+  const handleEventStop = async () => {
+    if (alert !== '') addNewAlert(alert, 'warning', 1000);
+    setAlert('');
+  };
+
   return (
     <FullCalendar
       ref={calendarRef}
@@ -156,6 +162,8 @@ function Calendar({
       slotEventOverlap={false}
       selectAllow={allowEvent}
       eventAllow={allowEvent}
+      eventDragStop={handleEventStop}
+      eventResizeStop={handleEventStop}
     />
   );
 }
