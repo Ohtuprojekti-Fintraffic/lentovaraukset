@@ -1,8 +1,10 @@
 import { EventImpl } from '@fullcalendar/core/internal';
-import React from 'react';
+import { ReservationEntry } from '@lentovaraukset/shared/src';
+import React, { useContext } from 'react';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import ReservationInfoForm from '../components/forms/ReservationInfoForm';
+import AlertContext from '../contexts/AlertContext';
 import { modifyReservation } from '../queries/reservations';
 
 type InfoModalProps = {
@@ -18,26 +20,30 @@ function ReservationInfoModal({
   reservation,
   removeReservation,
 }: InfoModalProps) {
+  const { addNewAlert } = useContext(AlertContext);
+  const handleSubmit = async (updatedReservation: Omit<ReservationEntry, 'id' | 'user'>) => {
+    const modifiedReservation = await modifyReservation(
+      {
+        id: parseInt(reservation!.id, 10),
+        start: updatedReservation.start,
+        end: updatedReservation.end,
+        user: 'NYI',
+        aircraftId: updatedReservation.aircraftId,
+        phone: updatedReservation.phone,
+        info: updatedReservation.info,
+      },
+    );
+    if (modifiedReservation) {
+      addNewAlert(`Varaus #${modifiedReservation.id} päivitetty!`, 'success');
+    }
+    closeReservationModal();
+  };
   return (
     <Card show={showInfoModal} handleClose={closeReservationModal}>
       <ReservationInfoForm
         id="reservation_info_form"
         reservation={reservation}
-        onSubmit={async (updatedReservation) => {
-          await modifyReservation(
-            {
-              id: parseInt(reservation!.id, 10),
-              start: updatedReservation.start,
-              end: updatedReservation.end,
-              user: 'NYI',
-              aircraftId: updatedReservation.aircraftId,
-              phone: updatedReservation.phone,
-              info: updatedReservation.info,
-            },
-          );
-
-          closeReservationModal();
-        }}
+        onSubmit={handleSubmit}
       />
       <Button
         variant="danger"
