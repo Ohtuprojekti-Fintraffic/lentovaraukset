@@ -114,6 +114,8 @@ function Calendar({
     calendarRef.current?.getApi().unselect();
   };
 
+  const handleAllow: AllowFunc = (s, m) => allowEvent(s, m) && allowEventRef(s, m);
+
   return (
     <FullCalendar
       ref={calendarRef}
@@ -152,8 +154,8 @@ function Calendar({
       selectConstraint={selectConstraint}
       eventSources={eventSources}
       slotEventOverlap={false}
-      selectAllow={(s, m) => allowEvent(s, m) && allowEventRef(s, m)}
-      eventAllow={(s, m) => allowEvent(s, m) && allowEventRef(s, m)}
+      selectAllow={handleAllow}
+      eventAllow={handleAllow}
     />
   );
 }

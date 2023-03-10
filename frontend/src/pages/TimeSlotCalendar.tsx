@@ -64,6 +64,7 @@ function TimeSlotCalendar() {
   const allowEvent: AllowFunc = (span, movingEvent) => {
     const timeIsConsecutive = calendarRef.current?.getApi().getEvents().some(
       (e) => e.id !== movingEvent?.id
+        && e.groupId !== 'reservations'
         && e.start && e.end
         && (e.start.getTime() === span.start.getTime()
           || e.start.getTime() === span.end.getTime()
