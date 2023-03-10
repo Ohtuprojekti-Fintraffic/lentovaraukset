@@ -74,8 +74,8 @@ const getTimeRangeValidator = () => {
 
 const airfieldValidator = z.object({
   name: z.string(),
-  eventGranularityMinutes: z.number(),
-  maxConcurrentFlights: z.number(),
+  eventGranularityMinutes: z.coerce.number(),
+  maxConcurrentFlights: z.coerce.number(),
 });
 
 export {
