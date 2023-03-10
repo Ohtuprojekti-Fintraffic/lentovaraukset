@@ -10,13 +10,14 @@ type InfoModalProps = {
   showInfoModal: boolean
   closeReservationModal: () => void
   reservation?: EventImpl
+  draggedTimes?: { start: Date, end: Date }
   removeReservation: () => void
 };
 
 function ReservationInfoModal({
   showInfoModal,
   closeReservationModal,
-  reservation,
+  reservation, draggedTimes,
   removeReservation,
 }: InfoModalProps) {
   const onSubmitModifyHandler = async (updatedReservation: Omit<ReservationEntry, 'id' | 'user'>) => {
@@ -44,6 +45,7 @@ function ReservationInfoModal({
       <ReservationInfoForm
         id="reservation_info_form"
         reservation={reservation}
+        draggedTimes={draggedTimes}
         onSubmit={reservation ? onSubmitModifyHandler : onSubmitAddHandler}
       />
       {reservation && (

@@ -5,7 +5,6 @@ import FullCalendar from '@fullcalendar/react';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
-  addReservation,
   modifyReservation,
   deleteReservation,
 } from '../queries/reservations';
@@ -17,6 +16,7 @@ import Button from '../components/Button';
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const selectedReservationRef = useRef<EventImpl | null>(null);
+  const draggedTimesRef = useRef<{ start: Date, end: Date } | null>(null);
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
@@ -115,11 +115,17 @@ function ReservationCalendar() {
     });
   };
 
+  const showModalAfterDrag = (times: { start: Date, end: Date }) => {
+    draggedTimesRef.current = times;
+    setShowInfoModal(true);
+  };
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <ReservationInfoModal
         showInfoModal={showInfoModal}
         reservation={selectedReservationRef?.current || undefined}
+        draggedTimes={draggedTimesRef?.current || undefined}
         removeReservation={() => {
           selectedReservationRef.current?.remove();
         }}
@@ -136,7 +142,7 @@ function ReservationCalendar() {
       <Calendar
         calendarRef={calendarRef}
         eventSources={eventsSourceRef.current}
-        addEventFn={addReservation}
+        addEventFn={showModalAfterDrag}
         modifyEventFn={modifyReservationFn}
         clickEventFn={clickReservation}
         removeEventFn={removeReservation}

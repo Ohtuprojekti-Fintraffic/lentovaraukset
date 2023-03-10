@@ -6,9 +6,11 @@ import { createReservationValidator } from '@lentovaraukset/shared/src/validatio
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 import useAirfield from '../../queries/airfields';
 import InputField from '../InputField';
+import { HTMLDateTimeConvert } from '../../util';
 
 type ReservationInfoProps = {
   reservation?: EventImpl
+  draggedTimes?: { start: Date, end: Date }
   onSubmit: (formData: Omit<ReservationEntry, 'id' | 'user'>) => void
   id?: string
 };
@@ -22,19 +24,22 @@ type Inputs = {
 };
 
 function ReservationInfoForm({
-  reservation,
+  reservation, draggedTimes,
   onSubmit,
   id,
 }: ReservationInfoProps) {
   const { data: airfield } = useAirfield(1);
   const reservationGranularity = airfield?.eventGranularityMinutes || 20;
 
+  const start = reservation?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
+  const end = reservation?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
+
   const {
     register, handleSubmit, reset,
   } = useForm<Inputs>({
     values: {
-      start: reservation?.startStr.replace(/.{3}\+.*/, '') || '',
-      end: reservation?.endStr.replace(/.{3}\+.*/, '') || '',
+      start,
+      end,
       aircraftId: reservation?.extendedProps.aircraftId,
       phone: reservation?.extendedProps.phone,
       info: reservation?.extendedProps.info,
@@ -59,13 +64,12 @@ function ReservationInfoForm({
   }, [reservation]);
 
   // step is relative to min: https://stackoverflow.com/a/75353708
-  const stepSeconds = airfield ? (airfield.eventGranularityMinutes * 60) : 600;
+  const stepSeconds = reservationGranularity * 60;
   const stepMillis = stepSeconds * 1000;
   const nowMillis = new Date().getTime();
   // round up to nearest even whatever minutes
   const roundedDate = new Date(Math.ceil(nowMillis / stepMillis) * stepMillis);
-  // HTML element takes a weird time format so cut off the end
-  const min = roundedDate.toISOString().slice(0, new Date().toISOString().lastIndexOf(':'));
+  const min = HTMLDateTimeConvert(roundedDate);
 
   // important detail: the browser GUI doesn't give a damn and will show
   // whatever minutes it wants, but at least Chrome checks the field on submit
@@ -86,12 +90,6 @@ function ReservationInfoForm({
         </p>
       </div>
       <div className="p-8">
-        {/* {
-          !reservation
-          && <p>Virhe varausta haettaessa</p>
-        } */}
-        {
-          /* eslint-disable  react/jsx-props-no-spreading */}
         <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
           <div className="flex flex-row space-x-6">
             <div className="flex flex-col">
@@ -130,7 +128,6 @@ function ReservationInfoForm({
             inputClassName="w-full"
           />
         </form>
-        {/* eslint-enable  react/jsx-props-no-spreading */}
       </div>
     </div>
   );

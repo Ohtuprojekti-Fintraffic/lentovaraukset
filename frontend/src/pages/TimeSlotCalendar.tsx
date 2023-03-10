@@ -2,6 +2,7 @@ import { EventRemoveArg, EventSourceFunc, AllowFunc } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
+import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
 import useAirfield from '../queries/airfields';
@@ -9,14 +10,16 @@ import {
   getReservations,
 } from '../queries/reservations';
 import {
-  getTimeSlots, modifyTimeSlot, addTimeSlot, deleteTimeslot,
+  getTimeSlots, modifyTimeSlot, deleteTimeslot,
 } from '../queries/timeSlots';
 
 function TimeSlotCalendar() {
-  const calendarRef = useRef<FullCalendar>(null);
-  const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
   const [showInfoModal, setShowInfoModal] = useState(false);
   const selectedTimeslotRef = useRef<EventImpl | null>(null);
+  const draggedTimesRef = useRef<{ start: Date, end: Date } | null>(null);
+  const calendarRef = useRef<FullCalendar>(null);
+
+  const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
 
   const timeSlotsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -83,11 +86,17 @@ function TimeSlotCalendar() {
     return !timeIsConsecutive;
   };
 
+  const showModalAfterDrag = (times: { start: Date, end: Date }) => {
+    draggedTimesRef.current = times;
+    setShowInfoModal(true);
+  };
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <TimeslotInfoModal
         showInfoModal={showInfoModal}
         timeslot={selectedTimeslotRef?.current || undefined}
+        draggedTimes={draggedTimesRef?.current || undefined}
         removeTimeslot={() => {
           selectedTimeslotRef.current?.remove();
         }}
@@ -98,11 +107,14 @@ function TimeSlotCalendar() {
         }}
       />
 
-      <h1 className="text-3xl">Vapaat varausikkunat</h1>
+      <div className="flex flex-row justify-between">
+        <h1 className="text-3xl">Vapaat varausikkunat</h1>
+        <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varaus</Button>
+      </div>
       <Calendar
         calendarRef={calendarRef}
         eventSources={eventsSourceRef.current}
-        addEventFn={addTimeSlot}
+        addEventFn={showModalAfterDrag}
         modifyEventFn={modifyTimeSlot}
         clickEventFn={clickTimeslot}
         removeEventFn={removeTimeSlot}
