@@ -26,9 +26,10 @@ function TimeslotInfoModal({
         onSubmit={async (updatedTimeslot) => {
           await modifyTimeSlot(
             {
-              id: timeslot!.id,
+              id: Number(timeslot!.id),
               start: updatedTimeslot.start,
               end: updatedTimeslot.end,
+              type: updatedTimeslot.type,
             },
           );
           closeTimeslotModal();

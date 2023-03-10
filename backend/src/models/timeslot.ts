@@ -22,6 +22,8 @@ InferCreationAttributes<Timeslot>
 
   declare end: Date;
 
+  declare type: 'available' | 'blocked';
+
   declare addReservations: HasManyAddAssociationsMixin<Reservation, number>;
 
   declare getReservations: HasManyGetAssociationsMixin<Reservation>;
@@ -45,6 +47,19 @@ Timeslot.init(
       type: DataTypes.DATE,
       unique: true,
       allowNull: false,
+    },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'available',
+      validate: {
+        customValidator: (value: string) => {
+          const enums = ['available', 'blocked'];
+          if (!enums.includes(value)) {
+            throw new Error('not a valid option');
+          }
+        },
+      },
     },
   },
   {

@@ -63,6 +63,16 @@ function TimeSlotCalendar() {
     setShowInfoModal(false);
   };
 
+  const addTimeslotFn = async (event: { start: Date, end: Date }) => {
+    await addTimeSlot({ ...event, type: 'available' });
+  };
+
+  const modifyTimeslotFn = async (event: { id: string, start: Date, end: Date }) => {
+    await modifyTimeSlot({
+      ...event, id: Number(event.id), type: 'available',
+    });
+  };
+
   const removeTimeSlot = async (removeInfo: EventRemoveArg) => {
     const { event } = removeInfo;
     await deleteTimeslot(Number(event.id));
@@ -102,8 +112,8 @@ function TimeSlotCalendar() {
       <Calendar
         calendarRef={calendarRef}
         eventSources={eventsSourceRef.current}
-        addEventFn={addTimeSlot}
-        modifyEventFn={modifyTimeSlot}
+        addEventFn={addTimeslotFn}
+        modifyEventFn={modifyTimeslotFn}
         clickEventFn={clickTimeslot}
         removeEventFn={removeTimeSlot}
         granularity={airfield && { minutes: airfield.eventGranularityMinutes }}

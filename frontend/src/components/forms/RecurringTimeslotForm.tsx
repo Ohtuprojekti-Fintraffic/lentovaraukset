@@ -13,6 +13,7 @@ type RecurringTimeslotProps = {
 type Inputs = {
   start: string
   end: string
+  type: 'available' | 'blocked'
   isRecurring: boolean
   periodStarts: string | null
   periodEnds: string | null
@@ -30,6 +31,7 @@ function RecurringTimeslotForm({
     values: {
       start: timeslot?.startStr.replace(/.{3}\+.*/, '') || '',
       end: timeslot?.endStr.replace(/.{3}\+.*/, '') || '',
+      type: 'available',
       isRecurring: false,
       periodStarts: timeslot?.startStr.replace(/T.*/, '') || '',
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
@@ -39,6 +41,7 @@ function RecurringTimeslotForm({
     const updatedTimeslot = {
       start: new Date(formData.start),
       end: new Date(formData.end),
+      type: formData.type,
     };
     // TODO: create recurring events if possible
     // const { isRecurring, periodStarts, periodEnds } = formData;
