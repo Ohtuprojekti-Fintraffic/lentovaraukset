@@ -40,8 +40,8 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
   const pastErrorMessage = 'Reservation cannot be in past';
   const tooFarInFutureErrorMessage = `Reservation start time cannot be further than ${maxDaysInFuture} days away`;
   const startNotLessThanEndErrorMessage = 'Reservation start time cannot be later than the end time';
-  const aircraftIdEmptyErrorMessage = 'Koneen rekisteritunnus ei voi olla tyhjä';
-  const phoneNumberEmptyErrorMessage = 'Puhelinnumero ei voi olla tyhjä';
+  const aircraftIdEmptyErrorMessage = 'Aircraft ID cannot be empty';
+  const phoneNumberEmptyErrorMessage = 'Phone number cannot be empty';
 
   const Reservation = z.object({
     start: z.coerce
