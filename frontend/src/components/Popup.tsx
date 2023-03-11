@@ -47,7 +47,7 @@ function Popup() {
 
   const popupClassName = 'fixed justify-center items-center flex overflow-x-hidden overflow-y-auto inset-0 z-50';
 
-  const popupContentClassName = 'relative w-auto shadow-ft-elevation-400 bg-white p-8 rounded-ft-large';
+  const popupContentClassName = 'relative w-auto shadow-ft-elevation-400 bg-white p-8 rounded-ft-large max-w-prose';
 
   return (
     <div
@@ -59,12 +59,15 @@ function Popup() {
           <h4 className="text-ft-hs4 text-black font-ft-heading mr-4">{ popupTitle }</h4>
           {crossOnClick && <Button variant="glyph" onClick={crossOnClick}><Cross strokeWidth="1.5" /></Button>}
         </div>
-        {popupText && <p className="text-ft-popup-message text-black font-ft-body justify-items-end mt-4">Modal message</p>}
-        <div className="flex flex-row items-center pt-8">
+        {popupText && <p className="text-ft-popup-message text-black font-ft-body mt-4">{ popupText }</p>}
+        <div className="flex flex-row items-center justify-between pt-8">
           {dangerText && <Button variant="danger" className="justify-self-start mr-[88px] ml-0" onClick={dangerOnClick}>{dangerText}</Button>}
-          {tertiaryText && <Button variant="tertiary" onClick={tertiaryOnClick}>{tertiaryText}</Button>}
-          {secondaryText && <Button variant="secondary" onClick={secondaryOnClick}>{secondaryText}</Button>}
-          {primaryText && <Button variant="primary" onClick={primaryOnClick}>{primaryText}</Button>}
+          <div className="flex flex-row justify-end">
+            {tertiaryText && <Button variant="tertiary" onClick={tertiaryOnClick}>{tertiaryText}</Button>}
+            {secondaryText && <Button variant="secondary" onClick={secondaryOnClick}>{secondaryText}</Button>}
+            {primaryText && <Button variant="primary" onClick={primaryOnClick}>{primaryText}</Button>}
+
+          </div>
         </div>
       </div>
 
