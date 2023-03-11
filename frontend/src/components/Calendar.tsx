@@ -31,6 +31,7 @@ type CalendarProps = {
   } | undefined;
   selectConstraint: string | undefined;
   maxConcurrentLimit?: number;
+  allowEventRef?: AllowFunc;
 };
 
 function Calendar({
@@ -44,6 +45,7 @@ function Calendar({
   eventColors,
   selectConstraint,
   maxConcurrentLimit = 1,
+  allowEventRef = () => true,
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
   const [alert, setAlert] = useState('');
@@ -121,6 +123,7 @@ function Calendar({
     if (alert !== '') addNewAlert(alert, 'warning', 1000);
     setAlert('');
   };
+  const handleAllow: AllowFunc = (s, m) => allowEvent(s, m) && allowEventRef(s, m);
 
   return (
     <FullCalendar
@@ -160,10 +163,10 @@ function Calendar({
       selectConstraint={selectConstraint}
       eventSources={eventSources}
       slotEventOverlap={false}
-      selectAllow={allowEvent}
-      eventAllow={allowEvent}
       eventDragStop={handleEventStop}
       eventResizeStop={handleEventStop}
+      selectAllow={handleAllow}
+      eventAllow={handleAllow}
     />
   );
 }

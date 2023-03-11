@@ -1,7 +1,9 @@
-import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
+import { EventRemoveArg, EventSourceFunc, AllowFunc } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
-import React from 'react';
+import FullCalendar from '@fullcalendar/react';
+import React, { useState, useRef } from 'react';
 import Calendar from '../components/Calendar';
+import TimeslotInfoModal from '../modals/TimeslotInfoModal';
 import useAirfield from '../queries/airfields';
 import {
   getReservations,
@@ -11,7 +13,10 @@ import {
 } from '../queries/timeSlots';
 
 function TimeSlotCalendar() {
+  const calendarRef = useRef<FullCalendar>(null);
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const selectedTimeslotRef = useRef<EventImpl | null>(null);
 
   const timeSlotsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -47,31 +52,65 @@ function TimeSlotCalendar() {
     }
   };
 
-  const clickEventFn = async (event: EventImpl): Promise<void> => {
-    // eslint-disable-next-line no-restricted-globals
-    if (confirm('Haluatko varmasti poistaa aikaikkunan?')) { // TODO: Replace with modal, example in ReservationCalendar
-      event.remove();
-    }
+  const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
+
+  const clickTimeslot = async (event: EventImpl): Promise<void> => {
+    selectedTimeslotRef.current = event;
+    setShowInfoModal(true);
+  };
+
+  const closeTimeslotModalFn = () => {
+    setShowInfoModal(false);
   };
 
   const removeTimeSlot = async (removeInfo: EventRemoveArg) => {
     const { event } = removeInfo;
     await deleteTimeslot(Number(event.id));
+    setShowInfoModal(false);
+  };
+
+  const allowEvent: AllowFunc = (span, movingEvent) => {
+    const timeIsConsecutive = calendarRef.current?.getApi().getEvents().some(
+      (e) => e.id !== movingEvent?.id
+        && e.groupId !== 'reservations'
+        && e.start && e.end
+        && (e.start.getTime() === span.start.getTime()
+          || e.start.getTime() === span.end.getTime()
+          || e.end.getTime() === span.start.getTime()
+          || e.end.getTime() === span.end.getTime()),
+    );
+
+    return !timeIsConsecutive;
   };
 
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
+      <TimeslotInfoModal
+        showInfoModal={showInfoModal}
+        timeslot={selectedTimeslotRef?.current || undefined}
+        removeTimeslot={() => {
+          selectedTimeslotRef.current?.remove();
+        }}
+        closeTimeslotModal={() => {
+          closeTimeslotModalFn();
+          selectedTimeslotRef.current = null;
+          calendarRef.current?.getApi().refetchEvents();
+        }}
+      />
+
       <h1 className="text-3xl">Vapaat varausikkunat</h1>
       <Calendar
-        eventSources={[timeSlotsSourceFn, reservationsSourceFn]}
+        calendarRef={calendarRef}
+        eventSources={eventsSourceRef.current}
         addEventFn={addTimeSlot}
         modifyEventFn={modifyTimeSlot}
-        clickEventFn={clickEventFn}
+        clickEventFn={clickTimeslot}
         removeEventFn={removeTimeSlot}
         granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
         eventColors={{ backgroundColor: '#bef264', eventColor: '#84cc1680', textColor: '#000000' }}
         selectConstraint={undefined}
         maxConcurrentLimit={1}
+        allowEventRef={allowEvent}
       />
     </div>
   );
