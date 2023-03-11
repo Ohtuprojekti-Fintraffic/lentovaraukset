@@ -48,7 +48,7 @@ function Calendar({
   allowEventRef = () => true,
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
-  const [alert, setAlert] = useState('');
+  const [alerts, setAlerts] = useState(Array<string>);
   const { addNewAlert } = React.useContext(AlertContext);
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
@@ -60,7 +60,7 @@ function Calendar({
     );
 
     if (isTimeInPast(span.start)) {
-      setAlert('Menneisyydessä olevaa aikaa ei voi lisätä tai muokata');
+      setAlerts([...alerts, 'Menneisyydessä olevaa aikaa ei voi lisätä tai muokata']);
       return false;
     }
 
@@ -120,8 +120,9 @@ function Calendar({
   };
 
   const handleEventStop = async () => {
-    if (alert !== '') addNewAlert(alert, 'warning', 1000);
-    setAlert('');
+    const distinctAlerts = Array.from(new Set(alerts));
+    if (distinctAlerts) distinctAlerts.map((a) => addNewAlert(a, 'warning', 1000));
+    setAlerts([]);
   };
   const handleAllow: AllowFunc = (s, m) => allowEvent(s, m) && allowEventRef(s, m);
 
