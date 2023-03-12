@@ -3,6 +3,7 @@ import app from '@lentovaraukset/backend/src/app';
 import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
 import { connectToDatabase, sequelize } from '../src/util/db';
 import airfieldService from '../src/services/airfieldService';
+import reservationService from '../src/services/reservationService';
 
 const api = request(app);
 
@@ -229,5 +230,62 @@ describe('Calls to api', () => {
       .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
 
     expect(response.body).toHaveLength(0);
+  });
+
+  test('can add concurrent reservations up to the max concurrent reservations', async () => {
+    const start = new Date('2023-02-14T12:00:00.000Z');
+    const end = new Date('2023-02-14T14:00:00.000Z');
+
+    const res = await Promise.all([...Array(3)].map(async () => api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    })));
+
+    res.forEach((r) => { expect(r.status).toEqual(200); });
+
+    const reservationsInDB = await reservationService.getInTimeRange(start, end);
+    expect(reservationsInDB).toHaveLength(3);
+  });
+
+  test('cannot add concurrent reservations past the max concurrent reservations', async () => {
+    const start = new Date('2023-02-14T12:00:00.000Z');
+    const end = new Date('2023-02-14T14:00:00.000Z');
+
+    await Promise.all([...Array(3)].map(async () => api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    })));
+
+    const res = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    });
+
+    // expect(res.status).toEqual(400);
+    expect(res.body.error).toBeDefined();
+    expect(res.body.error.message).toContain('Too many concurrent reservations');
+
+    const reservationsInDB = await reservationService.getInTimeRange(start, end);
+    expect(reservationsInDB).toHaveLength(3);
+  });
+
+  test('can add reservation that overlaps more reservations than the maxConcurrentFlights', async () => {
+    await Promise.all([
+      {
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-ASD', phone: '+358494678748',
+      },
+      {
+        start: new Date('2023-02-14T11:00:00.000Z'), end: new Date('2023-02-14T13:00:00.000Z'), aircraftId: 'OH-SDF', phone: '+358494678748',
+      },
+      {
+        start: new Date('2023-02-14T13:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-DFG', phone: '+358494678748',
+      },
+    ].map(async (flight) => api.post('/api/reservations/').set('Content-type', 'application/json').send(flight)));
+
+    const res = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-FGH', phone: '+358494678748',
+    });
+
+    expect(res.status).toEqual(200);
+
+    const reservationsInDB = await reservationService.getInTimeRange(new Date('2023-02-14T12:00:00.000Z'), new Date('2023-02-14T14:00:00.000Z'));
+    expect(reservationsInDB).toHaveLength(4);
   });
 });
