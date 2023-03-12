@@ -16,7 +16,7 @@ export interface TimeslotEntry {
 }
 
 export interface AirfieldEntry {
-  id: number;
+  id?: number;
   name: string;
   maxConcurrentFlights: number;
   eventGranularityMinutes: number;
