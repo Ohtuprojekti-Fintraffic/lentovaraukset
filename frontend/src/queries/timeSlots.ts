@@ -17,10 +17,13 @@ const addTimeSlot = async (newTimeSlot: { start: Date, end: Date }): Promise<voi
 
 const modifyTimeSlot = async (
   timeSlot: { id: string, start: Date, end: Date },
+  period?: { start: Date, end: Date },
 ): Promise<void> => {
   const modifiedTimeSlot = {
     start: timeSlot.start,
     end: timeSlot.end,
+    periodStart: period?.start,
+    periodEnd: period?.end,
   };
 
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${timeSlot.id}`, {
