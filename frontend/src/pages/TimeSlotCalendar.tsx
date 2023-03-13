@@ -2,6 +2,7 @@ import { EventRemoveArg, EventSourceFunc, AllowFunc } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
+import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
 import { useAirfield } from '../queries/airfields';
@@ -26,7 +27,10 @@ function TimeSlotCalendar() {
     try {
       const timeslots = await getTimeSlots(start, end);
       const timeslotsMapped = timeslots.map((timeslot) => ({
-        ...timeslot, color: '#84cc1680',
+        ...timeslot,
+        id: timeslot.id.toString(),
+        color: '#84cc1680',
+        editable: !isTimeInPast(timeslot.start),
       }));
       successCallback(timeslotsMapped);
     } catch (error) {
