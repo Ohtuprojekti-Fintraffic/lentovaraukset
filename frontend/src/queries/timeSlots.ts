@@ -1,11 +1,12 @@
 import { EventInput } from '@fullcalendar/core';
+import { TimeslotEntry } from '@lentovaraukset/shared/src';
 
 const getTimeSlots = async (from: Date, until: Date): Promise<EventInput[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots?from=${from.toISOString()}&until=${until.toISOString()}`);
   return res.json();
 };
 
-const addTimeSlot = async (newTimeSlot: { start: Date, end: Date }): Promise<void> => {
+const addTimeSlot = async (newTimeSlot: { start: Date, end: Date, type: 'available' | 'blocked' }): Promise<void> => {
   await fetch(`${process.env.BASE_PATH}/api/timeslots/`, {
     method: 'POST',
     headers: {
@@ -16,16 +17,11 @@ const addTimeSlot = async (newTimeSlot: { start: Date, end: Date }): Promise<voi
 };
 
 const modifyTimeSlot = async (
-  timeSlot: { id: string, start: Date, end: Date },
+  timeSlot: TimeslotEntry,
 ): Promise<void> => {
-  const modifiedTimeSlot = {
-    start: timeSlot.start,
-    end: timeSlot.end,
-  };
-
-  const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${timeSlot.id}`, {
+  const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${String(timeSlot.id)}`, {
     method: 'PUT',
-    body: JSON.stringify(modifiedTimeSlot),
+    body: JSON.stringify(timeSlot),
     headers: {
       'Content-Type': 'application/json',
     },

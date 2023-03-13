@@ -63,7 +63,7 @@ const deleteById = async (id: number) => {
 
 const updateById = async (
   id: number,
-  timeslot: { start: Date, end: Date },
+  timeslot: { start: Date, end: Date, type: 'available' | 'blocked' },
 ): Promise<void> => {
   if (await timeslotsAreConsecutive(timeslot, id)) {
     throw new Error('Timeslot can\'t be consecutive');
@@ -85,6 +85,7 @@ const updateById = async (
 const createTimeslot = async (newTimeSlot: {
   start: Date;
   end: Date;
+  type: 'available' | 'blocked';
 }): Promise<TimeslotEntry> => {
   if (await timeslotsAreConsecutive(newTimeSlot)) {
     throw new Error('Timeslot can\'t be consecutive');

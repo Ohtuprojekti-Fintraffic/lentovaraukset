@@ -29,6 +29,7 @@ const createTimeSlotValidator = (slotGranularityMinutes: number) => {
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
+    type: z.enum(['available', 'blocked']),
   })
     .refine((res) => res.start < res.end, { message: startNotLessThanEndErrorMessage });
 

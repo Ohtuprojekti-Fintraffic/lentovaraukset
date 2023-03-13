@@ -13,6 +13,7 @@ export interface TimeslotEntry {
   id: number;
   start: Date;
   end: Date;
+  type: 'available' | 'blocked'
 }
 
 export interface AirfieldEntry {
