@@ -62,7 +62,7 @@ const deleteById = async (id: number) => {
 };
 
 const createPeriod = async (
-  period: { periodStart: Date, periodEnd: Date },
+  period: { periodStart: Date, periodEnd: Date, name: string },
   timeslot: { start: Date, end: Date },
 ): Promise<Timeslot[]> => {
   const oneWeek = 7 * 24 * 60 * 60 * 1000;
@@ -88,9 +88,8 @@ const createPeriod = async (
       throw new Error('Period has already timeslot');
     }
   }
-  const groupId = 'test';
   const addedTimeslot = await Timeslot
-    .addGroupTimeslots(timeslotGroup.map((t) => ({ ...t, groupId })));
+    .addGroupTimeslots(timeslotGroup.map((t) => ({ ...t, groupId: period.name })));
   return addedTimeslot;
 };
 

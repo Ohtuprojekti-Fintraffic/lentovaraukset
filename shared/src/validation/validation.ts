@@ -40,6 +40,7 @@ const createPeriodValidation = () => {
   const period = z.object({
     periodStart: z.coerce.date(),
     periodEnd: z.coerce.date(),
+    name: z.coerce.string(),
   })
     .refine((res) => {
       if (!res.periodStart && !res.periodEnd) return true;

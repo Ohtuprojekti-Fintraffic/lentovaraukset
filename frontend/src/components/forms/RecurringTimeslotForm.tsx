@@ -7,7 +7,7 @@ import InputField from '../InputField';
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
   onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>,
-    period?: { start: Date, end: Date }) => void
+    period?: { start: Date, end: Date, periodName: string }) => void
   id?: string
 };
 
@@ -17,6 +17,7 @@ type Inputs = {
   isRecurring: boolean
   periodStarts: string | null
   periodEnds: string | null
+  periodName: string
 };
 
 function RecurringTimeslotForm({
@@ -34,6 +35,7 @@ function RecurringTimeslotForm({
       isRecurring: false,
       periodStarts: timeslot?.startStr.replace(/T.*/, '') || '',
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
+      periodName: timeslot?.extendedProps.periodName,
     },
   });
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
@@ -47,6 +49,7 @@ function RecurringTimeslotForm({
       const period = {
         start: new Date(periodStarts),
         end: new Date(periodEnds),
+        periodName: formData.periodName,
       };
       onSubmit(updatedTimeslot, period);
     } else {
@@ -118,6 +121,14 @@ function RecurringTimeslotForm({
                 )}
               </div>
             </div>
+            {showRecurring && (
+            <InputField
+              labelText="Toistuvuuden nimi"
+              type="text"
+              registerReturn={register('periodName')}
+              inputClassName="w-full"
+            />
+            )}
           </form>
           )
         }
