@@ -6,8 +6,10 @@ export interface FieldProps {
   state?: InputStates;
   type: React.InputHTMLAttributes<HTMLInputElement>['type']
 
-  value: React.InputHTMLAttributes<HTMLInputElement>['value']
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  value?: React.InputHTMLAttributes<HTMLInputElement>['value'];
+  name?: React.InputHTMLAttributes<HTMLInputElement>['name'];
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
 
   placeholder?: string;
 
@@ -24,10 +26,12 @@ export interface FieldProps {
   defaultValue?: string;
 }
 
-export interface RHFFieldProps extends Omit<FieldProps, 'registerReturn' | 'value' | 'onChange'> {
-  // these are optional with RHF
-  value?: React.InputHTMLAttributes<HTMLInputElement>['value']
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+export interface RHFFieldProps extends Omit<FieldProps, 'registerReturn' | 'value' | 'onChange' | 'onBlur'> {
+  // RHF's register provides these
+  value?: undefined;
+  onChange?: undefined;
+  name?: undefined;
+  onBlur?: undefined;
 
   // React Hook Form register return value
   registerReturn: UseFormRegisterReturn<any>;
@@ -35,7 +39,8 @@ export interface RHFFieldProps extends Omit<FieldProps, 'registerReturn' | 'valu
 
 function InputField({
   state = 'default',
-  type, value, onChange,
+  type,
+  value, name, onChange, onBlur,
   placeholder, labelText, helperText,
   registerReturn,
   labelClassName = '',
@@ -68,6 +73,9 @@ function InputField({
         id={id}
         type={type}
         value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        name={name}
         disabled={state === 'disabled'}
         placeholder={placeholder}
         className={`${fieldBaseClass} ${fieldStateClasses[state]} ${inputClassName}`}
@@ -77,7 +85,6 @@ function InputField({
         // are complicated to do
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...registerReturn}
-        onChange={onChange}
       />
       {helperText ? <p className={`text-ft-text-300 -mt-4 ${helperTextClassName}`}>{helperText}</p> : null}
     </div>
