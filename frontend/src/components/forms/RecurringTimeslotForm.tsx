@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TimeslotEntry } from '@lentovaraukset/shared/src';
@@ -52,9 +52,7 @@ function RecurringTimeslotForm({
     reset();
   }, [timeslot]);
 
-  console.log(watch());
-
-  const showRecurring = false;
+  const showRecurring = watch('isRecurring');
 
   return (
     <div>
@@ -78,8 +76,6 @@ function RecurringTimeslotForm({
           <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
             <div className="flex flex-row space-x-6">
               <div className="flex flex-col">
-                {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                <input type="checkbox" {...register('asd')} />
                 <InputField
                   labelText="Aikaikkuna alkaa:"
                   type="datetime-local"
@@ -88,7 +84,6 @@ function RecurringTimeslotForm({
                 <InputField
                   labelText="Määritä toistuvuus"
                   type="checkbox"
-                  // onChange={() => setShowRecurring(!showRecurring)}
                   registerReturn={register('isRecurring')}
                 />
                 {showRecurring && (
