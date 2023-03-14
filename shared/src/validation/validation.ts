@@ -74,9 +74,16 @@ const getTimeRangeValidator = () => {
   return TimeRange;
 };
 
+const airfieldValidator = z.object({
+  name: z.string(),
+  eventGranularityMinutes: z.coerce.number(),
+  maxConcurrentFlights: z.coerce.number(),
+});
+
 export {
   createTimeSlotValidator,
   createReservationValidator,
   getTimeRangeValidator,
   isTimeInPast,
+  airfieldValidator,
 };

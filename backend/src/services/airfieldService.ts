@@ -20,6 +20,16 @@ const getAirfields = async (): Promise<AirfieldEntry[]> => {
   return airfields.map((airfield) => airfield.dataValues);
 };
 
+const updateById = async (
+  id: number,
+  airfield: AirfieldEntry,
+): Promise<AirfieldEntry> => {
+  const [updatedAirfield] = await Airfield.upsert(
+    { ...airfield, id },
+  );
+  return updatedAirfield.dataValues;
+};
+
 const createTestAirfield = async () => {
   // TODO: Remove this when we have a proper admin interface for creating airfields
   await Airfield.upsert({
@@ -33,5 +43,6 @@ const createTestAirfield = async () => {
 export default {
   getAirfield,
   getAirfields,
+  updateById,
   createTestAirfield,
 };

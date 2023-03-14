@@ -11,7 +11,7 @@ import {
 } from '../queries/reservations';
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
-import useAirfield from '../queries/airfields';
+import { useAirfield } from '../queries/airfields';
 import AlertContext from '../contexts/AlertContext';
 
 function ReservationCalendar() {
