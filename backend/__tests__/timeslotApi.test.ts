@@ -192,6 +192,21 @@ describe('Calls to api', () => {
     expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-02-16T14:00:00.000Z'));
   });
 
+  test('dont edit a timeslot if it is in past', async () => {
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z') });
+
+    const response = await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+      .set('Content-type', 'application/json')
+      .send({ start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T13:00:00.000Z' });
+
+    const updatedSlot: Timeslot | null = await Timeslot.findByPk(createdSlot.id);
+
+    expect(updatedSlot).not.toEqual(null);
+    expect(updatedSlot?.dataValues.start).toEqual(new Date('2023-02-12T12:00:00.000Z'));
+    expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-02-12T14:00:00.000Z'));
+    expect(response.body.error.message).toContain('Timeslot in past cannot be modified');
+  });
+
   test('can delete a timeslot', async () => {
     const createdSlot: Timeslot | null = await Timeslot.findOne({});
     await api.delete(`/api/timeslots/${createdSlot?.dataValues.id}`);

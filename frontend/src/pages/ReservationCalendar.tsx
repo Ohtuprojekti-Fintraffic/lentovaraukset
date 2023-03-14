@@ -2,6 +2,7 @@ import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
 import React, { useState, useRef } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
+import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -40,6 +41,7 @@ function ReservationCalendar() {
           email: reservation.email,
           info: reservation.info,
         },
+        editable: !isTimeInPast(reservation.start),
       }));
 
       successCallback(reservationsMapped);
@@ -56,7 +58,7 @@ function ReservationCalendar() {
     try {
       const timeslots = await getTimeSlots(start, end);
       const timeslotsMapped = timeslots.map((timeSlot) => ({
-        ...timeSlot, groupId: 'timeslots', display: 'inverse-background', color: '#2C2C44',
+        ...timeSlot, id: timeSlot.id.toString(), groupId: 'timeslots', display: 'inverse-background', color: '#2C2C44',
       }));
 
       const notReservable = [{
