@@ -5,7 +5,7 @@ import React, { useState, useRef } from 'react';
 import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
-import useAirfield from '../queries/airfields';
+import { useAirfield } from '../queries/airfields';
 import {
   getReservations,
 } from '../queries/reservations';
