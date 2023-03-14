@@ -1,5 +1,5 @@
 import express from 'express';
-import { createTimeSlotValidator, getTimeRangeValidator } from '@lentovaraukset/shared/src/validation/validation';
+import { createTimeSlotValidator, getTimeRangeValidator, createPeriodValidation } from '@lentovaraukset/shared/src/validation/validation';
 import timeslotService from '../services/timeslotService';
 import airfieldService from '../services/airfieldService';
 
@@ -48,8 +48,14 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
     // TODO: check if timeslot overlaps with existing timeslots
 
     const id = Number(req.params.id);
-    await timeslotService.updateById(id, modifiedTimeslot);
-    res.status(200).json(modifiedTimeslot);
+    if (req.body.periodStart && req.body.periodEnd) {
+      const period = createPeriodValidation().parse(req.body);
+      const createdPeriod = await timeslotService.createPeriod(period, modifiedTimeslot);
+      res.json(createdPeriod);
+    } else {
+      await timeslotService.updateById(id, modifiedTimeslot);
+      res.status(200).json(modifiedTimeslot);
+    }
   } catch (error: unknown) {
     next(error);
   }
