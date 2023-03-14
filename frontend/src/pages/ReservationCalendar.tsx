@@ -1,5 +1,5 @@
 import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import Calendar from '../components/Calendar';
@@ -11,7 +11,8 @@ import {
 } from '../queries/reservations';
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
-import useAirfield from '../queries/airfields';
+import { useAirfield } from '../queries/airfields';
+import AlertContext from '../contexts/AlertContext';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -19,7 +20,7 @@ function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
-
+  const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
     successCallback,
@@ -102,7 +103,7 @@ function ReservationCalendar() {
       user, aircraftId, phone, email, info,
     } = event.extendedProps;
 
-    await modifyReservation({
+    const modifiedReservation = await modifyReservation({
       id: parseInt(event.id, 10),
       start: event.start,
       end: event.end,
@@ -112,6 +113,9 @@ function ReservationCalendar() {
       email,
       info,
     });
+    if (modifiedReservation) {
+      addNewAlert('Reservation modified', 'success');
+    }
   };
 
   return (
