@@ -14,7 +14,6 @@ type Inputs = {
   start: string
   end: string
   isRecurring: boolean
-  asd: boolean
   periodStarts: string | null
   periodEnds: string | null
 };
@@ -24,7 +23,6 @@ function RecurringTimeslotForm({
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
-  // const [showRecurring, setShowRecurring] = useState(false);
   const {
     register, handleSubmit, reset, watch,
   } = useForm<Inputs>({
@@ -32,7 +30,6 @@ function RecurringTimeslotForm({
       start: timeslot?.startStr.replace(/.{3}\+.*/, '') || '',
       end: timeslot?.endStr.replace(/.{3}\+.*/, '') || '',
       isRecurring: false,
-      asd: false,
       periodStarts: timeslot?.startStr.replace(/T.*/, '') || '',
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
     },
