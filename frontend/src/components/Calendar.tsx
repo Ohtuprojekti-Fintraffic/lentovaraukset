@@ -65,6 +65,21 @@ function Calendar({
       : true;
   };
 
+  const isTimeInAllowedRange = (time: Date) => {
+    if (isTimeInPast(time)) {
+      calendarRef.current?.getApi().unselect();
+      addNewAlert('Aikaa ei voi lisätä menneisyyteen', 'warning');
+      return false;
+    }
+    // TODO: Get timeAtMostInFuture from airfield
+    if (checkIfTimeInFuture && !isTimeAtMostInFuture(time, 7)) {
+      calendarRef.current?.getApi().unselect();
+      addNewAlert('Aikaa ei voi lisätä yli 7 päivän päähän', 'warning');
+      return false;
+    }
+    return true;
+  };
+
   // When a event box is clicked
   const handleEventClick = async (clickData: EventClickArg) => {
     if (clickData.event.display.includes('background')) return;
@@ -77,7 +92,7 @@ function Calendar({
     // Open confirmation popup here
     const { event } = changeData;
 
-    if (!isTimeInPast(event.start || new Date())) {
+    if (isTimeInAllowedRange(event.start || new Date())) {
       await modifyEventFn({
         id: event.id,
         start: event.start || new Date(),
@@ -92,17 +107,7 @@ function Calendar({
   const handleEventCreate = async (dropData: DateSelectArg) => {
     const newStartTime: Date = dropData.start || new Date();
 
-    if (isTimeInPast(newStartTime)) {
-      calendarRef.current?.getApi().unselect();
-      addNewAlert('Aikaa ei voi lisätä menneisyyteen', 'warning', 2000);
-      return;
-    }
-
-    if (checkIfTimeInFuture && !isTimeAtMostInFuture(newStartTime, 7)) {
-      calendarRef.current?.getApi().unselect();
-      addNewAlert('Aikaa ei voi lisätä yli 7 päivän päähän', 'warning', 2000);
-      return;
-    }
+    if (!isTimeInAllowedRange(newStartTime)) return;
 
     await addEventFn({
       start: dropData.start,
