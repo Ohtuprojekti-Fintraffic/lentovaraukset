@@ -14,7 +14,7 @@ import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>
   eventSources: EventSourceInput[];
-  addEventFn: (event: { start: Date; end: Date; }) => Promise<any>;
+  addEventFn: (event: { start: Date; end: Date; }) => void;
   modifyEventFn: (event: {
     id: string;
     start: Date;
@@ -97,7 +97,7 @@ function Calendar({
       return;
     }
 
-    await addEventFn({
+    addEventFn({
       start: dropData.start,
       end: dropData.end,
     });
