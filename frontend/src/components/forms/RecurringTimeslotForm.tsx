@@ -4,7 +4,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { TimeslotEntry } from '@lentovaraukset/shared/src';
 import InputField from '../InputField';
 import { HTMLDateTimeConvert } from '../../util';
-import useAirfield from '../../queries/airfields';
+import { useAirfield } from '../../queries/airfields';
 
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
