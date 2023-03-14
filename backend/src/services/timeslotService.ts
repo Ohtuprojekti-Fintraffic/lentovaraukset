@@ -61,6 +61,39 @@ const deleteById = async (id: number) => {
   await timeslot?.destroy();
 };
 
+const createPeriod = async (
+  period: { periodStart: Date, periodEnd: Date },
+  timeslot: { start: Date, end: Date },
+): Promise<Timeslot[]> => {
+  const oneWeek = 7 * 24 * 60 * 60 * 1000;
+  const { periodEnd } = period;
+  const timeslotGroup: { start: Date, end: Date }[] = [];
+  let { start, end } = timeslot;
+  start = new Date(start.getTime() + oneWeek);
+  end = new Date(end.getTime() + oneWeek);
+  while (end <= periodEnd) {
+    timeslotGroup.push({ start, end });
+    start = new Date(start.getTime() + oneWeek);
+    end = new Date(end.getTime() + oneWeek);
+  }
+  // eslint-disable-next-line no-restricted-syntax
+  for (const t of timeslotGroup) {
+    // eslint-disable-next-line no-await-in-loop
+    if (await timeslotsAreConsecutive(t)) {
+      throw new Error('Timeslot can\'t be consecutive');
+    }
+    // eslint-disable-next-line no-await-in-loop
+    const timeslots = await getInTimeRange(t.start, t.end);
+    if (timeslots.length > 0) {
+      throw new Error('Period has already timeslot');
+    }
+  }
+  const groupId = 'test';
+  const addedTimeslot = await Timeslot
+    .addGroupTimeslots(timeslotGroup.map((t) => ({ ...t, groupId })));
+  return addedTimeslot;
+};
+
 const updateById = async (
   id: number,
   timeslot: { start: Date, end: Date },
@@ -101,4 +134,5 @@ export default {
   deleteById,
   updateById,
   createTimeslot,
+  createPeriod,
 };

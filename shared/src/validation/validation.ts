@@ -35,6 +35,22 @@ const createTimeSlotValidator = (slotGranularityMinutes: number) => {
   return TimeSlot;
 };
 
+const createPeriodValidation = () => {
+  const periodErrorMessage = 'Period start time cannot be later than the end time';
+  const period = z.object({
+    periodStart: z.coerce.date(),
+    periodEnd: z.coerce.date(),
+  })
+    .refine((res) => {
+      if (!res.periodStart && !res.periodEnd) return true;
+      if (res.periodStart && res.periodEnd) {
+        return res.periodStart < res.periodEnd;
+      }
+      return false;
+    }, { message: periodErrorMessage });
+  return period;
+};
+
 const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFuture: number) => {
   const message = `Reservation must be multiples of ${slotGranularityMinutes} minutes`;
   const pastErrorMessage = 'Reservation cannot be in past';
@@ -84,4 +100,5 @@ export {
   getTimeRangeValidator,
   isTimeInPast,
   airfieldValidator,
+  createPeriodValidation,
 };
