@@ -105,6 +105,27 @@ describe('Calls to api', () => {
     expect(createdReservation?.dataValues.phone).toEqual('11104040');
   });
 
+  test('cannot create a reservation with empty phone number', async () => {
+    const result: any = await api.post('/api/reservations/')
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: ' ',
+      });
+    console.log(result.body);
+    expect(result.statusCode).toEqual(400);
+    expect(result.body.error.message.includes('Phone number cannot be empty'));
+  });
+
+  test('cannot create a reservation with empty aircraft ID', async () => {
+    const result: any = await api.post('/api/reservations/')
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: ' ', info: 'Training flight', phone: '11104040',
+      });
+    expect(result.statusCode).toEqual(400);
+    expect(result.body.error.message.includes('Aircraft ID cannot be empty'));
+  });
+
   test('can delete a reservation', async () => {
     const createdReservation: Reservation | null = await Reservation.findOne();
     const id = createdReservation?.dataValues.id;
@@ -153,6 +174,40 @@ describe('Calls to api', () => {
     expect(updatedReservation?.dataValues.end).toEqual(new Date('2023-02-14T16:00:00.000Z'));
     expect(updatedReservation?.dataValues.aircraftId).toEqual(aircraftId);
     expect(updatedReservation?.dataValues.phone).toEqual(phone);
+  });
+
+  test('cannot modify a reservation to have an empty phone number', async () => {
+    const createdReservation: Reservation | null = await Reservation.findOne();
+    const id = createdReservation?.dataValues.id;
+
+    const updatedReservation: any = await api.put(`/api/reservations/${id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: ' ',
+      });
+
+    expect(updatedReservation.statusCode).toEqual(400);
+    expect(updatedReservation.body.error.message.includes('Phone number cannot be empty'));
+
+    const reservationAfterUpdate: Reservation | null = await Reservation.findByPk(id);
+    expect(reservationAfterUpdate?.dataValues.phone).not.toEqual('');
+  });
+
+  test('cannot modify a reservation to have an empty aircraft ID', async () => {
+    const createdReservation: Reservation | null = await Reservation.findOne();
+    const id = createdReservation?.dataValues.id;
+
+    const updatedReservation: any = await api.put(`/api/reservations/${id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: ' ', info: 'Training flight', phone: '11104040',
+      });
+
+    expect(updatedReservation.statusCode).toEqual(400);
+    expect(updatedReservation.body.error.message.includes('Aircraft ID cannot be empty'));
+
+    const reservationAfterUpdate: Reservation | null = await Reservation.findByPk(id);
+    expect(reservationAfterUpdate?.dataValues.aircraftId).not.toEqual('');
   });
 
   test('can get reservations in a range', async () => {

@@ -40,6 +40,8 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
   const pastErrorMessage = 'Reservation cannot be in past';
   const tooFarInFutureErrorMessage = `Reservation start time cannot be further than ${maxDaysInFuture} days away`;
   const startNotLessThanEndErrorMessage = 'Reservation start time cannot be later than the end time';
+  const aircraftIdEmptyErrorMessage = 'Aircraft ID cannot be empty';
+  const phoneNumberEmptyErrorMessage = 'Phone number cannot be empty';
 
   const Reservation = z.object({
     start: z.coerce
@@ -54,9 +56,9 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
-    aircraftId: z.string(),
+    aircraftId: z.string().trim().min(1, { message: aircraftIdEmptyErrorMessage }),
     info: z.string().optional(),
-    phone: z.string(),
+    phone: z.string().trim().min(1, { message: phoneNumberEmptyErrorMessage }),
   })
     .refine((res) => res.start < res.end, { message: startNotLessThanEndErrorMessage });
 
