@@ -77,4 +77,5 @@ export {
   createReservationValidator,
   getTimeRangeValidator,
   isTimeInPast,
+  isTimeAtMostInFuture,
 };

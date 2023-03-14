@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -9,7 +9,7 @@ import {
 } from '@fullcalendar/core';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
+import { isTimeInPast, isTimeAtMostInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import AlertContext from '../contexts/AlertContext';
 
 type CalendarProps = {
@@ -32,6 +32,7 @@ type CalendarProps = {
   selectConstraint: string | undefined;
   maxConcurrentLimit?: number;
   allowEventRef?: AllowFunc;
+  checkIfTimeInFuture?: boolean;
 };
 
 function Calendar({
@@ -46,9 +47,9 @@ function Calendar({
   selectConstraint,
   maxConcurrentLimit = 1,
   allowEventRef = () => true,
+  checkIfTimeInFuture = false,
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
-  const [alerts, setAlerts] = useState(Array<string>);
   const { addNewAlert } = React.useContext(AlertContext);
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
@@ -58,11 +59,6 @@ function Calendar({
         && !e.display.includes('background')
         && e.start < span.end && e.end > span.start,
     );
-
-    if (isTimeInPast(span.start)) {
-      setAlerts([...alerts, 'Menneisyydessä olevaa aikaa ei voi lisätä tai muokata']);
-      return false;
-    }
 
     return events
       ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
@@ -98,6 +94,13 @@ function Calendar({
 
     if (isTimeInPast(newStartTime)) {
       calendarRef.current?.getApi().unselect();
+      addNewAlert('Aikaa ei voi lisätä menneisyyteen', 'warning', 2000);
+      return;
+    }
+
+    if (checkIfTimeInFuture && !isTimeAtMostInFuture(newStartTime, 7)) {
+      calendarRef.current?.getApi().unselect();
+      addNewAlert('Aikaa ei voi lisätä yli 7 päivän päähän', 'warning', 2000);
       return;
     }
 
@@ -119,11 +122,6 @@ function Calendar({
     calendarRef.current?.getApi().unselect();
   };
 
-  const handleEventStop = async () => {
-    const distinctAlerts = Array.from(new Set(alerts));
-    if (distinctAlerts) distinctAlerts.map((a) => addNewAlert(a, 'warning', 1000));
-    setAlerts([]);
-  };
   const handleAllow: AllowFunc = (s, m) => allowEvent(s, m) && allowEventRef(s, m);
 
   return (
@@ -164,8 +162,6 @@ function Calendar({
       selectConstraint={selectConstraint}
       eventSources={eventSources}
       slotEventOverlap={false}
-      eventDragStop={handleEventStop}
-      eventResizeStop={handleEventStop}
       selectAllow={handleAllow}
       eventAllow={handleAllow}
     />
