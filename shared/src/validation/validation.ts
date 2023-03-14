@@ -85,5 +85,6 @@ export {
   createReservationValidator,
   getTimeRangeValidator,
   isTimeInPast,
+  isTimeAtMostInFuture,
   airfieldValidator,
 };

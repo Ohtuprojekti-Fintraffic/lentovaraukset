@@ -29,7 +29,7 @@ function Alert({
 
   const alertVariantClasses = {
     danger: 'bg-ft-danger-300 border-ft-danger-400',
-    warning: 'bg-ft-warning-200 border-ft-warning-300',
+    warning: 'bg-ft-warning-200 border-ft-warning-300 text-black',
     info: 'bg-ft-neutral-400 border-black',
     success: 'bg-ft-success-200 border-ft-success-300',
   };
