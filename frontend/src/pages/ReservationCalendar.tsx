@@ -144,6 +144,7 @@ function ReservationCalendar() {
         eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFF' }}
         selectConstraint="timeslots"
         maxConcurrentLimit={airfield?.maxConcurrentFlights}
+        checkIfTimeInFuture
       />
     </div>
   );
