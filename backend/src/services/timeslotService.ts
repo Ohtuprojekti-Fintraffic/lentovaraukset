@@ -62,31 +62,37 @@ const deleteById = async (id: number) => {
 };
 
 const createPeriod = async (
+  id: number,
   period: { periodStart: Date, periodEnd: Date, name: string },
   timeslot: { start: Date, end: Date },
 ): Promise<Timeslot[]> => {
-  const oneWeek = 7 * 24 * 60 * 60 * 1000;
+  const oneWeekInMillis = 7 * 24 * 60 * 60 * 1000;
   const { periodEnd } = period;
   const timeslotGroup: { start: Date, end: Date }[] = [];
-  let { start, end } = timeslot;
-  start = new Date(start.getTime() + oneWeek);
-  end = new Date(end.getTime() + oneWeek);
+  const { start, end } = timeslot;
+  start.setTime(start.getTime() + oneWeekInMillis);
+  end.setTime(end.getTime() + oneWeekInMillis);
   while (end <= periodEnd) {
-    timeslotGroup.push({ start, end });
-    start = new Date(start.getTime() + oneWeek);
-    end = new Date(end.getTime() + oneWeek);
+    timeslotGroup.push({ start: new Date(start.getTime()), end: new Date(end.getTime()) });
+    start.setTime(start.getTime() + oneWeekInMillis);
+    end.setTime(end.getTime() + oneWeekInMillis);
   }
-  // eslint-disable-next-line no-restricted-syntax
-  for (const t of timeslotGroup) {
-    // eslint-disable-next-line no-await-in-loop
-    if (await timeslotsAreConsecutive(t)) {
-      throw new Error('Timeslot can\'t be consecutive');
-    }
-    // eslint-disable-next-line no-await-in-loop
-    const timeslots = await getInTimeRange(t.start, t.end);
-    if (timeslots.length > 0) {
-      throw new Error('Period has already timeslot');
-    }
+  const consecutivesFound = await Promise.all(
+    timeslotGroup.map((ts) => timeslotsAreConsecutive(ts)),
+  );
+  if (consecutivesFound.some((found) => found)) {
+    throw new Error("Timeslot can't be consecutive with another");
+  }
+  const overlaps = await Promise.all(
+    timeslotGroup.map((ts) => getInTimeRange(ts.start, ts.end)),
+  );
+  if (overlaps.some((foundSlots) => foundSlots.length > 0)) {
+    throw new Error('Period already has a timeslot');
+  }
+  const firstTimeslot: Timeslot | null = await Timeslot.findByPk(id);
+  if (firstTimeslot) {
+    firstTimeslot.groupId = period.name;
+    await firstTimeslot.save();
   }
   const addedTimeslot = await Timeslot
     .addGroupTimeslots(timeslotGroup.map((t) => ({ ...t, groupId: period.name })));
