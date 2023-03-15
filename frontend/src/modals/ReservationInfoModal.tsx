@@ -1,9 +1,10 @@
 import { EventImpl } from '@fullcalendar/core/internal';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
-import React from 'react';
+import React, { useContext } from 'react';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import ReservationInfoForm from '../components/forms/ReservationInfoForm';
+import AlertContext from '../contexts/AlertContext';
 import { addReservation, modifyReservation } from '../queries/reservations';
 
 type InfoModalProps = {
@@ -21,7 +22,8 @@ function ReservationInfoModal({
   removeReservation,
 }: InfoModalProps) {
   const onSubmitModifyHandler = async (updatedReservation: Omit<ReservationEntry, 'id' | 'user'>) => {
-    await modifyReservation(
+    const { addNewAlert } = useContext(AlertContext);
+    const modifiedReservation = await modifyReservation(
       {
         id: parseInt(reservation!.id, 10),
         start: updatedReservation.start,
@@ -32,11 +34,15 @@ function ReservationInfoModal({
         info: updatedReservation.info,
       },
     );
+
+    if (modifiedReservation) {
+      addNewAlert(`Varaus #${modifiedReservation.id} päivitetty!`, 'success');
+    }
   };
 
   const onSubmitAddHandler = async (reservationDetails: Omit<ReservationEntry, 'id' | 'user'>) => {
     await addReservation(reservationDetails);
-
+    // TODO: add user
     closeReservationModal();
   };
 

@@ -1,7 +1,8 @@
 import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
+import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -12,6 +13,7 @@ import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
 import { useAirfield } from '../queries/airfields';
 import Button from '../components/Button';
+import AlertContext from '../contexts/AlertContext';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -20,7 +22,7 @@ function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
-
+  const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
     successCallback,
@@ -41,6 +43,7 @@ function ReservationCalendar() {
           email: reservation.email,
           info: reservation.info,
         },
+        editable: !isTimeInPast(reservation.start),
       }));
 
       successCallback(reservationsMapped);
@@ -57,7 +60,7 @@ function ReservationCalendar() {
     try {
       const timeslots = await getTimeSlots(start, end);
       const timeslotsMapped = timeslots.map((timeSlot) => ({
-        ...timeSlot, groupId: 'timeslots', display: 'inverse-background', color: '#2C2C44',
+        ...timeSlot, id: timeSlot.id.toString(), groupId: 'timeslots', display: 'inverse-background', color: '#2C2C44',
       }));
 
       const notReservable = [{
@@ -103,7 +106,7 @@ function ReservationCalendar() {
       user, aircraftId, phone, email, info,
     } = event.extendedProps;
 
-    await modifyReservation({
+    const modifiedReservation = await modifyReservation({
       id: parseInt(event.id, 10),
       start: event.start,
       end: event.end,
@@ -113,6 +116,9 @@ function ReservationCalendar() {
       email,
       info,
     });
+    if (modifiedReservation) {
+      addNewAlert('Reservation modified', 'success');
+    }
   };
 
   const showModalAfterDrag = (times: { start: Date, end: Date }) => {
@@ -150,6 +156,7 @@ function ReservationCalendar() {
         eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFF' }}
         selectConstraint="timeslots"
         maxConcurrentLimit={airfield?.maxConcurrentFlights}
+        checkIfTimeInFuture
       />
     </div>
   );
