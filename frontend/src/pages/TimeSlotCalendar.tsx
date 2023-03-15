@@ -16,6 +16,7 @@ function TimeSlotCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [blocked, setBlocked] = useState(false);
   const selectedTimeslotRef = useRef<EventImpl | null>(null);
 
   const timeSlotsSourceFn: EventSourceFunc = async (
@@ -25,9 +26,11 @@ function TimeSlotCalendar() {
   ) => {
     try {
       const timeslots = await getTimeSlots(start, end);
-      const timeslotsMapped = timeslots.map((timeslot) => ({
-        ...timeslot, color: '#84cc1680',
-      }));
+      const timeslotsMapped = timeslots.map((timeslot) => (
+        timeslot.type === 'available'
+          ? { ...timeslot, color: '#84cc1680', title: 'Vapaa' }
+          : { ...timeslot, color: '#eec200', title: 'Suljettu' }
+      ));
       successCallback(timeslotsMapped);
     } catch (error) {
       failureCallback(error as Error);
@@ -64,12 +67,12 @@ function TimeSlotCalendar() {
   };
 
   const addTimeslotFn = async (event: { start: Date, end: Date }) => {
-    await addTimeSlot({ ...event, type: 'available' });
+    await addTimeSlot({ ...event, type: blocked ? 'blocked' : 'available' });
   };
 
-  const modifyTimeslotFn = async (event: { id: string, start: Date, end: Date }) => {
+  const modifyTimeslotFn = async (event: { id: string, start: Date, end: Date, extendedProps: { type: 'blocked' | 'available' } }) => {
     await modifyTimeSlot({
-      ...event, id: Number(event.id), type: 'available',
+      ...event, id: Number(event.id), type: event.extendedProps.type,
     });
   };
 
@@ -93,6 +96,11 @@ function TimeSlotCalendar() {
     return !timeIsConsecutive;
   };
 
+  const handleToggle = () => {
+    setBlocked(!blocked);
+    calendarRef.current?.getApi().refetchEvents();
+  };
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <TimeslotInfoModal
@@ -109,6 +117,20 @@ function TimeSlotCalendar() {
       />
 
       <h1 className="text-3xl">Vapaat varausikkunat</h1>
+      <div>
+        <label htmlFor="checkbox" className="font-ft-label mb-1">
+          <span>Lisää suljettuja vuoroja</span>
+          <input
+            type="checkbox"
+            id="checkbox"
+            checked={blocked}
+            onChange={handleToggle}
+            className="mx-2"
+          />
+        </label>
+
+        <p> </p>
+      </div>
       <Calendar
         calendarRef={calendarRef}
         eventSources={eventsSourceRef.current}
@@ -117,7 +139,7 @@ function TimeSlotCalendar() {
         clickEventFn={clickTimeslot}
         removeEventFn={removeTimeSlot}
         granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
-        eventColors={{ backgroundColor: '#bef264', eventColor: '#84cc1680', textColor: '#000000' }}
+        eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}
         selectConstraint={undefined}
         maxConcurrentLimit={1}
         allowEventRef={allowEvent}

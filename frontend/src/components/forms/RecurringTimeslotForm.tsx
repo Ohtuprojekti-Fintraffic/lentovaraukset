@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TimeslotEntry } from '@lentovaraukset/shared/src';
@@ -24,9 +24,8 @@ function RecurringTimeslotForm({
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
-  const [showRecurring, setShowRecurring] = useState(false);
   const {
-    register, handleSubmit, reset,
+    register, handleSubmit, reset, watch,
   } = useForm<Inputs>({
     values: {
       start: timeslot?.startStr.replace(/.{3}\+.*/, '') || '',
@@ -52,6 +51,8 @@ function RecurringTimeslotForm({
   useEffect(() => {
     reset();
   }, [timeslot]);
+
+  const showRecurring = watch('isRecurring');
 
   return (
     <div>
@@ -83,7 +84,6 @@ function RecurringTimeslotForm({
                 <InputField
                   labelText="Määritä toistuvuus"
                   type="checkbox"
-                  onChange={() => setShowRecurring(!showRecurring)}
                   registerReturn={register('isRecurring')}
                 />
                 {showRecurring && (
