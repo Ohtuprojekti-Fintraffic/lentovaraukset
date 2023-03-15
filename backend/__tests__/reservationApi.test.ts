@@ -53,7 +53,7 @@ beforeEach(async () => {
   await airfieldService.createTestAirfield();
   await Reservation.bulkCreate(reservations);
   await Timeslot.create({
-    start: new Date('2023-02-13T08:00:00.000Z'),
+    start: new Date('2023-02-12T08:00:00.000Z'),
     end: new Date('2023-02-15T08:00:00.000Z'),
   });
 });
@@ -250,6 +250,30 @@ describe('Calls to api', () => {
 
     expect(newReservation.status).toEqual(400);
     expect(response.body).toHaveLength(0);
+  });
+
+  test('can\'t move reservation from past', async () => {
+    const newReservation: any = await Reservation.create({
+      start: new Date('2022-02-13T08:00:00.000Z'),
+      end: new Date('2022-02-13T09:00:00.000Z'),
+      aircraftId: 'OH-QAA',
+      phone: '11104040',
+    });
+    const response = await api.put(`/api/reservations/${newReservation.id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: '2023-02-15T02:00:00.000Z',
+        end: '2023-02-15T04:00:00.000Z',
+        aircraftId: newReservation.aircraftId,
+        phone: newReservation.phone,
+      });
+
+    const updatedReservation: Reservation | null = await Reservation.findByPk(newReservation.id);
+
+    expect(response.body.error.message).toContain('Reservation in past cannot be modified');
+    expect(updatedReservation).not.toEqual(null);
+    expect(updatedReservation?.dataValues.start).toEqual(new Date('2022-02-13T08:00:00.000Z'));
+    expect(updatedReservation?.dataValues.end).toEqual(new Date('2022-02-13T09:00:00.000Z'));
   });
 
   test('Reservation cannot be added further than the max days ahead', async () => {
