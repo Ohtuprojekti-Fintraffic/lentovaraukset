@@ -75,8 +75,13 @@ function ReservationCalendar() {
 
   const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
 
-  const clickReservation = async (event:EventImpl): Promise<void> => {
+  const clickReservation = async (event: EventImpl): Promise<void> => {
+    if (event.end && isTimeInPast(event.end)) {
+      return;
+    }
+
     selectedReservationRef.current = event;
+
     setShowInfoModal(true);
   };
 
