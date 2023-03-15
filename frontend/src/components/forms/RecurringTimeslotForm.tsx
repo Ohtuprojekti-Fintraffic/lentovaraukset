@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TimeslotEntry } from '@lentovaraukset/shared/src';
@@ -28,13 +28,12 @@ function RecurringTimeslotForm({
 }: RecurringTimeslotProps) {
   const { data: airfield } = useAirfield(1);
   const timeslotGranularity = airfield?.eventGranularityMinutes || 20;
-  const [showRecurring, setShowRecurring] = useState(false);
 
   const start = timeslot?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
   const end = timeslot?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
 
   const {
-    register, handleSubmit, reset,
+    register, handleSubmit, reset, watch,
   } = useForm<Inputs>({
     values: {
       start,
@@ -71,6 +70,8 @@ function RecurringTimeslotForm({
   // whatever minutes it wants, but at least Chrome checks the field on submit
   // and shows a popover with the nearest acceptable divisible values
 
+  const showRecurring = watch('isRecurring');
+
   return (
     <div>
       <div className="bg-black p-3">
@@ -96,7 +97,6 @@ function RecurringTimeslotForm({
               <InputField
                 labelText="Määritä toistuvuus"
                 type="checkbox"
-                onChange={() => setShowRecurring(!showRecurring)}
                 registerReturn={register('isRecurring')}
               />
               {showRecurring && (
