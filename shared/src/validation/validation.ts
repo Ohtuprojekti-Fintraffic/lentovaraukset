@@ -36,19 +36,10 @@ const createTimeSlotValidator = (slotGranularityMinutes: number) => {
 };
 
 const createPeriodValidation = () => {
-  const periodErrorMessage = 'Period start time cannot be later than the end time';
   const period = z.object({
-    periodStart: z.coerce.date(),
     periodEnd: z.coerce.date(),
     name: z.coerce.string(),
-  })
-    .refine((res) => {
-      if (!res.periodStart && !res.periodEnd) return true;
-      if (res.periodStart && res.periodEnd) {
-        return res.periodStart < res.periodEnd;
-      }
-      return false;
-    }, { message: periodErrorMessage });
+  });
   return period;
 };
 

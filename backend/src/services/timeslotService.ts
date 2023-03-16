@@ -63,7 +63,7 @@ const deleteById = async (id: number) => {
 
 const createPeriod = async (
   id: number,
-  period: { periodStart: Date, periodEnd: Date, name: string },
+  period: { periodEnd: Date, name: string },
   timeslot: { start: Date, end: Date },
 ): Promise<Timeslot[]> => {
   const oneWeekInMillis = 7 * 24 * 60 * 60 * 1000;

@@ -32,9 +32,16 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
     const airfield = await airfieldService.getAirfield(1); // TODO: get airfieldId from request
     const newTimeSlot = createTimeSlotValidator(airfield.eventGranularityMinutes).parse(req.body);
     // TODO: check if timeslot overlaps with existing timeslots
-
-    const timeslot = await timeslotService.createTimeslot(newTimeSlot);
-    res.json(timeslot);
+    if (req.body.periodEnd) {
+      const timeslot = await timeslotService.createTimeslot(newTimeSlot);
+      const period = createPeriodValidation().parse(req.body);
+      const createdPeriod = await timeslotService
+        .createPeriod(timeslot.id, period, newTimeSlot);
+      res.json(createdPeriod);
+    } else {
+      const timeslot = await timeslotService.createTimeslot(newTimeSlot);
+      res.json(timeslot);
+    }
   } catch (error: unknown) {
     next(error);
   }
@@ -48,7 +55,7 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
     // TODO: check if timeslot overlaps with existing timeslots
 
     const id = Number(req.params.id);
-    if (req.body.periodStart && req.body.periodEnd) {
+    if (req.body.periodEnd) {
       const period = createPeriodValidation().parse(req.body);
       const createdPeriod = await timeslotService.createPeriod(id, period, modifiedTimeslot);
       res.json(createdPeriod);

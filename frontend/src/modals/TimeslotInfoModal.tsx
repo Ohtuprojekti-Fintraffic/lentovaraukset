@@ -31,7 +31,6 @@ function TimeslotInfoModal({
               end: updatedTimeslot.end,
             },
             period ? {
-              start: period.start,
               end: period.end,
               name: period.periodName,
             } : undefined,

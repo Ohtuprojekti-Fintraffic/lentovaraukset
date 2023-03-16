@@ -17,12 +17,11 @@ const addTimeSlot = async (newTimeSlot: { start: Date, end: Date }): Promise<voi
 
 const modifyTimeSlot = async (
   timeSlot: { id: string, start: Date, end: Date },
-  period?: { start: Date, end: Date, name: string },
+  period?: { end: Date, name: string },
 ): Promise<void> => {
   const modifiedTimeSlot = {
     start: timeSlot.start,
     end: timeSlot.end,
-    periodStart: period?.start,
     periodEnd: period?.end,
     name: period?.name,
   };

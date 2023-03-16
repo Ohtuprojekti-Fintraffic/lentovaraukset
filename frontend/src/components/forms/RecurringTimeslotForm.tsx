@@ -7,7 +7,7 @@ import InputField from '../InputField';
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
   onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>,
-    period?: { start: Date, end: Date, periodName: string }) => void
+    period?: { end: Date, periodName: string }) => void
   id?: string
 };
 
@@ -15,7 +15,6 @@ type Inputs = {
   start: string
   end: string
   isRecurring: boolean
-  periodStarts: string | null
   periodEnds: string | null
   periodName: string
 };
@@ -33,7 +32,6 @@ function RecurringTimeslotForm({
       start: timeslot?.startStr.replace(/.{3}\+.*/, '') || '',
       end: timeslot?.endStr.replace(/.{3}\+.*/, '') || '',
       isRecurring: false,
-      periodStarts: timeslot?.startStr.replace(/T.*/, '') || '',
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
       periodName: timeslot?.extendedProps.periodName,
     },
@@ -44,10 +42,9 @@ function RecurringTimeslotForm({
       end: new Date(formData.end),
     };
     // TODO: create recurring events if possible
-    const { isRecurring, periodStarts, periodEnds } = formData;
-    if (isRecurring && periodStarts && periodEnds) {
+    const { isRecurring, periodEnds } = formData;
+    if (isRecurring && periodEnds) {
       const period = {
-        start: new Date(periodStarts),
         end: new Date(periodEnds),
         periodName: formData.periodName,
       };
@@ -95,14 +92,6 @@ function RecurringTimeslotForm({
                   onChange={() => setShowRecurring(!showRecurring)}
                   registerReturn={register('isRecurring')}
                 />
-                {showRecurring && (
-                <InputField
-                  labelText="Alkaa:"
-                  type="date"
-                  inputClassName="w-full"
-                  registerReturn={register('periodStarts')}
-                />
-                )}
               </div>
               <div className="flex flex-col">
                 <InputField
