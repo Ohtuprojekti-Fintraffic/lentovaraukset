@@ -4,7 +4,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
-import useAirfield from '../../queries/airfields';
+import { useAirfield } from '../../queries/airfields';
 import InputField from '../InputField';
 
 type ReservationInfoProps = {

@@ -7,6 +7,8 @@ import {
 import Navigation from './components/Navigation';
 import { AlertContextProvider } from './contexts/AlertContext';
 import AlertContainer from './components/AlertContainer';
+import { PopupProvider } from './contexts/PopupContext';
+import Popup from './components/Popup';
 
 const queryClient = new QueryClient();
 
@@ -19,12 +21,15 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-col h-full">
         <Navigation />
-        <AlertContextProvider>
-          <AlertContainer />
-          <main className="flex flex-row flex-grow p-10 overflow-y-auto">
-            <Outlet />
-          </main>
-        </AlertContextProvider>
+        <PopupProvider>
+          <AlertContextProvider>
+            <AlertContainer />
+            <Popup />
+            <main className="flex flex-row flex-grow p-10 overflow-y-auto">
+              <Outlet />
+            </main>
+          </AlertContextProvider>
+        </PopupProvider>
       </div>
     </QueryClientProvider>
   );

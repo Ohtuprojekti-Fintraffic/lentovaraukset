@@ -1,17 +1,19 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React from 'react';
-import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import AirfieldForm from '../components/forms/AirfieldForm';
+import { useAirfield } from '../queries/airfields';
 
 function Management() {
-  const airfield: AirfieldEntry = {
-    id: 1, name: 'lentokentta', maxConcurrentFlights: 2, eventGranularityMinutes: 20,
-  };
+  const { isLoading, data: airfield } = useAirfield(1); // TODO: get id from airfield selection
   return (
-    <div className="flex flex-col space-y-2">
-      <h1 className="text-3xl">Hallinta</h1>
-      <AirfieldForm airfield={airfield} />
-    </div>
+    isLoading
+      ? <p>Ladataan...</p>
+      : (
+        <div className="flex flex-col space-y-2">
+          <h1 className="text-3xl">Hallinta</h1>
+          <AirfieldForm airfield={airfield!} />
+        </div>
+      )
   );
 }
 

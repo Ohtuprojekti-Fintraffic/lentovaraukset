@@ -1,7 +1,6 @@
-import { EventInput } from '@fullcalendar/core';
 import { TimeslotEntry } from '@lentovaraukset/shared/src';
 
-const getTimeSlots = async (from: Date, until: Date): Promise<EventInput[]> => {
+const getTimeSlots = async (from: Date, until: Date): Promise<TimeslotEntry[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots?from=${from.toISOString()}&until=${until.toISOString()}`);
   return res.json();
 };

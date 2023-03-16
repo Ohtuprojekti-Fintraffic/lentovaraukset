@@ -2,9 +2,10 @@ import { EventRemoveArg, EventSourceFunc, AllowFunc } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
+import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
-import useAirfield from '../queries/airfields';
+import { useAirfield } from '../queries/airfields';
 import {
   getReservations,
 } from '../queries/reservations';
@@ -28,8 +29,20 @@ function TimeSlotCalendar() {
       const timeslots = await getTimeSlots(start, end);
       const timeslotsMapped = timeslots.map((timeslot) => (
         timeslot.type === 'available'
-          ? { ...timeslot, color: '#84cc1680', title: 'Vapaa' }
-          : { ...timeslot, color: '#eec200', title: 'Suljettu' }
+          ? {
+            ...timeslot,
+            id: timeslot.id.toString(),
+            color: '#84cc1680',
+            title: 'Vapaa',
+            editable: !isTimeInPast(timeslot.start),
+          }
+          : {
+            ...timeslot,
+            id: timeslot.id.toString(),
+            color: '#eec200',
+            title: 'Suljettu',
+            editable: !isTimeInPast(timeslot.start),
+          }
       ));
       successCallback(timeslotsMapped);
     } catch (error) {

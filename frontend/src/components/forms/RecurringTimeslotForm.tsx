@@ -87,12 +87,12 @@ function RecurringTimeslotForm({
                   registerReturn={register('isRecurring')}
                 />
                 {showRecurring && (
-                <InputField
-                  labelText="Alkaa:"
-                  type="date"
-                  inputClassName="w-full"
-                  registerReturn={register('periodStarts')}
-                />
+                  <InputField
+                    labelText="Alkaa:"
+                    type="date"
+                    inputClassName="w-full"
+                    registerReturn={register('periodStarts')}
+                  />
                 )}
               </div>
               <div className="flex flex-col">
