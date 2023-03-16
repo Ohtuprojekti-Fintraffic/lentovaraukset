@@ -40,12 +40,12 @@ Timeslot.init(
     },
     start: {
       type: DataTypes.DATE,
-      unique: true,
+      unique: false,
       allowNull: false,
     },
     end: {
       type: DataTypes.DATE,
-      unique: true,
+      unique: false,
       allowNull: false,
     },
     type: {

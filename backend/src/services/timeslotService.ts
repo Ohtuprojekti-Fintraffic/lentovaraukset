@@ -34,20 +34,20 @@ const getInTimeRange = async (
 };
 
 const timeslotsAreConsecutive = async (
-  timeslot: { start: Date, end: Date },
+  timeslot: { start: Date, end: Date, type: 'available' | 'blocked' },
   id: number | null = null,
 ): Promise<boolean> => {
-  const { start, end } = timeslot;
+  const { start, end, type } = timeslot;
   const newStart = new Date(start);
   const newEnd = new Date(end);
   newStart.setMinutes(newStart.getMinutes() - 1);
   newEnd.setMinutes(newEnd.getMinutes() + 1);
   if (id) {
     const consecutiveTimeslots = await getInTimeRange(newStart, newEnd, id);
-    return consecutiveTimeslots.length > 0;
+    return consecutiveTimeslots.filter((t) => t.type === type).length > 0;
   }
   const consecutiveTimeslots = await getInTimeRange(newStart, newEnd);
-  return consecutiveTimeslots.length > 0;
+  return consecutiveTimeslots.filter((t) => t.type === type).length > 0;
 };
 
 const deleteById = async (id: number) => {
@@ -72,16 +72,17 @@ const updateById = async (
   if (oldTimeslot && isTimeInPast(oldTimeslot.start)) {
     throw new Error('Timeslot in past cannot be modified');
   }
-  const oldReservations = await oldTimeslot?.getReservations();
-  const newReservations = oldReservations?.filter(
-    (reservation) => reservation.start >= timeslot.start && reservation.end <= timeslot.end,
-  );
-
-  if (oldReservations?.length !== newReservations?.length) {
-    throw new Error('Timeslot has reservations');
+  if (timeslot.type === 'available') {
+    const oldReservations = await oldTimeslot?.getReservations();
+    const newReservations = oldReservations?.filter(
+      (reservation) => reservation.start >= timeslot.start && reservation.end <= timeslot.end,
+    );
+    if (oldReservations?.length !== newReservations?.length) {
+      throw new Error('Timeslot has reservations');
+    }
+    await oldTimeslot?.removeReservations(oldReservations);
+    await oldTimeslot?.addReservations(newReservations);
   }
-  await oldTimeslot?.removeReservations(oldReservations);
-  await oldTimeslot?.addReservations(newReservations);
   await Timeslot.upsert({ ...timeslot, id });
 };
 
@@ -93,10 +94,12 @@ const createTimeslot = async (newTimeSlot: {
   if (await timeslotsAreConsecutive(newTimeSlot)) {
     throw new Error('Timeslot can\'t be consecutive');
   }
-  const reservations = await reservationService
-    .getInTimeRange(newTimeSlot.start, newTimeSlot.end);
   const timeslot: Timeslot = await Timeslot.create(newTimeSlot);
-  await timeslot.addReservations(reservations);
+  if (newTimeSlot.type === 'available') {
+    const reservations = await reservationService
+      .getInTimeRange(newTimeSlot.start, newTimeSlot.end);
+    await timeslot.addReservations(reservations);
+  }
   return timeslot.dataValues;
 };
 

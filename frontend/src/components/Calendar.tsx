@@ -127,7 +127,7 @@ function Calendar({
     calendarRef.current?.getApi().unselect();
   };
 
-  const handleAllow: AllowFunc = (s, m) => allowEvent(s, m) && allowEventRef(s, m);
+  const handleAllow: AllowFunc = (s, m) => allowEventRef(s, m) ?? allowEvent(s, m);
 
   return (
     <FullCalendar

@@ -98,15 +98,28 @@ function TimeSlotCalendar() {
   const allowEvent: AllowFunc = (span, movingEvent) => {
     const timeIsConsecutive = calendarRef.current?.getApi().getEvents().some(
       (e) => e.id !== movingEvent?.id
-        && e.groupId !== 'reservations'
-        && e.start && e.end
+      && e.groupId !== 'reservations'
+      && (
+        (e.extendedProps.type === 'available' && !blocked)
+        || (e.extendedProps.type === 'blocked' && blocked)
+      )
+      && e.start && e.end
         && (e.start.getTime() === span.start.getTime()
           || e.start.getTime() === span.end.getTime()
           || e.end.getTime() === span.start.getTime()
           || e.end.getTime() === span.end.getTime()),
     );
-
-    return !timeIsConsecutive;
+    const overlap = calendarRef.current?.getApi().getEvents().some(
+      (e) => e.id !== movingEvent?.id
+        && e.start && e.end
+        && (
+          (e.extendedProps.type === 'available' && !blocked)
+          || (e.extendedProps.type === 'blocked' && blocked)
+        )
+        && !e.display.includes('background')
+        && e.start < span.end && e.end > span.start,
+    );
+    return !timeIsConsecutive && !overlap;
   };
 
   const handleToggle = () => {
