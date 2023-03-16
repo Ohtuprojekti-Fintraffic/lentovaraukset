@@ -9,7 +9,8 @@ import {
 } from '@fullcalendar/core';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
+import { isTimeInPast, isTimeAtMostInFuture } from '@lentovaraukset/shared/src/validation/validation';
+import AlertContext from '../contexts/AlertContext';
 
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>
@@ -31,6 +32,7 @@ type CalendarProps = {
   selectConstraint: string | undefined;
   maxConcurrentLimit?: number;
   allowEventRef?: AllowFunc;
+  checkIfTimeInFuture?: boolean;
 };
 
 function Calendar({
@@ -45,8 +47,10 @@ function Calendar({
   selectConstraint,
   maxConcurrentLimit = 1,
   allowEventRef = () => true,
+  checkIfTimeInFuture = false,
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
+  const { addNewAlert } = React.useContext(AlertContext);
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
     const events = calendarRef.current?.getApi().getEvents().filter(
@@ -56,13 +60,24 @@ function Calendar({
         && e.start < span.end && e.end > span.start,
     );
 
-    if (span.start < new Date()) {
-      return false;
-    }
-
     return events
       ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
       : true;
+  };
+
+  const isTimeInAllowedRange = (time: Date) => {
+    if (isTimeInPast(time)) {
+      calendarRef.current?.getApi().unselect();
+      addNewAlert('Aikaa ei voi lisätä menneisyyteen', 'warning');
+      return false;
+    }
+    // TODO: Get timeAtMostInFuture from airfield
+    if (checkIfTimeInFuture && !isTimeAtMostInFuture(time, 7)) {
+      calendarRef.current?.getApi().unselect();
+      addNewAlert('Aikaa ei voi lisätä yli 7 päivän päähän', 'warning');
+      return false;
+    }
+    return true;
   };
 
   // When a event box is clicked
@@ -77,7 +92,7 @@ function Calendar({
     // Open confirmation popup here
     const { event } = changeData;
 
-    if (!isTimeInPast(event.start || new Date())) {
+    if (isTimeInAllowedRange(event.start || new Date())) {
       await modifyEventFn({
         id: event.id,
         start: event.start || new Date(),
@@ -92,10 +107,7 @@ function Calendar({
   const handleEventCreate = async (dropData: DateSelectArg) => {
     const newStartTime: Date = dropData.start || new Date();
 
-    if (isTimeInPast(newStartTime)) {
-      calendarRef.current?.getApi().unselect();
-      return;
-    }
+    if (!isTimeInAllowedRange(newStartTime)) return;
 
     await addEventFn({
       start: dropData.start,

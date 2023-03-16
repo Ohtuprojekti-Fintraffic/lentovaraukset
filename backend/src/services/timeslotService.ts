@@ -107,6 +107,9 @@ const updateById = async (
     throw new Error('Timeslot can\'t be consecutive');
   }
   const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
+  if (oldTimeslot && isTimeInPast(oldTimeslot.start)) {
+    throw new Error('Timeslot in past cannot be modified');
+  }
   const oldReservations = await oldTimeslot?.getReservations();
   const newReservations = oldReservations?.filter(
     (reservation) => reservation.start >= timeslot.start && reservation.end <= timeslot.end,

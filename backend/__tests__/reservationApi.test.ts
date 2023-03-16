@@ -3,6 +3,7 @@ import app from '@lentovaraukset/backend/src/app';
 import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
 import { connectToDatabase, sequelize } from '../src/util/db';
 import airfieldService from '../src/services/airfieldService';
+import reservationService from '../src/services/reservationService';
 
 const api = request(app);
 
@@ -53,7 +54,7 @@ beforeEach(async () => {
   await airfieldService.createTestAirfield();
   await Reservation.bulkCreate(reservations);
   await Timeslot.create({
-    start: new Date('2023-02-13T08:00:00.000Z'),
+    start: new Date('2023-02-12T08:00:00.000Z'),
     end: new Date('2023-02-15T08:00:00.000Z'),
   });
 });
@@ -103,6 +104,27 @@ describe('Calls to api', () => {
     expect(createdReservation?.dataValues.aircraftId).toEqual('OH-QAA');
     expect(createdReservation?.dataValues.info).toEqual(null);
     expect(createdReservation?.dataValues.phone).toEqual('11104040');
+  });
+
+  test('cannot create a reservation with empty phone number', async () => {
+    const result: any = await api.post('/api/reservations/')
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: ' ',
+      });
+    console.log(result.body);
+    expect(result.statusCode).toEqual(400);
+    expect(result.body.error.message.includes('Phone number cannot be empty'));
+  });
+
+  test('cannot create a reservation with empty aircraft ID', async () => {
+    const result: any = await api.post('/api/reservations/')
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: ' ', info: 'Training flight', phone: '11104040',
+      });
+    expect(result.statusCode).toEqual(400);
+    expect(result.body.error.message.includes('Aircraft ID cannot be empty'));
   });
 
   test('can delete a reservation', async () => {
@@ -155,6 +177,40 @@ describe('Calls to api', () => {
     expect(updatedReservation?.dataValues.phone).toEqual(phone);
   });
 
+  test('cannot modify a reservation to have an empty phone number', async () => {
+    const createdReservation: Reservation | null = await Reservation.findOne();
+    const id = createdReservation?.dataValues.id;
+
+    const updatedReservation: any = await api.put(`/api/reservations/${id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: ' ',
+      });
+
+    expect(updatedReservation.statusCode).toEqual(400);
+    expect(updatedReservation.body.error.message.includes('Phone number cannot be empty'));
+
+    const reservationAfterUpdate: Reservation | null = await Reservation.findByPk(id);
+    expect(reservationAfterUpdate?.dataValues.phone).not.toEqual('');
+  });
+
+  test('cannot modify a reservation to have an empty aircraft ID', async () => {
+    const createdReservation: Reservation | null = await Reservation.findOne();
+    const id = createdReservation?.dataValues.id;
+
+    const updatedReservation: any = await api.put(`/api/reservations/${id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: ' ', info: 'Training flight', phone: '11104040',
+      });
+
+    expect(updatedReservation.statusCode).toEqual(400);
+    expect(updatedReservation.body.error.message.includes('Aircraft ID cannot be empty'));
+
+    const reservationAfterUpdate: Reservation | null = await Reservation.findByPk(id);
+    expect(reservationAfterUpdate?.dataValues.aircraftId).not.toEqual('');
+  });
+
   test('can get reservations in a range', async () => {
     const from = new Date(earliestReservation.end);
     const until = new Date(latestReservation.end);
@@ -197,6 +253,30 @@ describe('Calls to api', () => {
     expect(response.body).toHaveLength(0);
   });
 
+  test('can\'t move reservation from past', async () => {
+    const newReservation: any = await Reservation.create({
+      start: new Date('2022-02-13T08:00:00.000Z'),
+      end: new Date('2022-02-13T09:00:00.000Z'),
+      aircraftId: 'OH-QAA',
+      phone: '11104040',
+    });
+    const response = await api.put(`/api/reservations/${newReservation.id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: '2023-02-15T02:00:00.000Z',
+        end: '2023-02-15T04:00:00.000Z',
+        aircraftId: newReservation.aircraftId,
+        phone: newReservation.phone,
+      });
+
+    const updatedReservation: Reservation | null = await Reservation.findByPk(newReservation.id);
+
+    expect(response.body.error.message).toContain('Reservation in past cannot be modified');
+    expect(updatedReservation).not.toEqual(null);
+    expect(updatedReservation?.dataValues.start).toEqual(new Date('2022-02-13T08:00:00.000Z'));
+    expect(updatedReservation?.dataValues.end).toEqual(new Date('2022-02-13T09:00:00.000Z'));
+  });
+
   test('Reservation cannot be added further than the max days ahead', async () => {
     const start = new Date('2023-02-24T06:00:00.000Z');
     const end = new Date('2023-02-24T08:00:00.000Z');
@@ -229,5 +309,62 @@ describe('Calls to api', () => {
       .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
 
     expect(response.body).toHaveLength(0);
+  });
+
+  test('can add concurrent reservations up to the max concurrent reservations', async () => {
+    const start = new Date('2023-02-14T12:00:00.000Z');
+    const end = new Date('2023-02-14T14:00:00.000Z');
+
+    const res = await Promise.all([...Array(3)].map(async () => api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    })));
+
+    res.forEach((r) => { expect(r.status).toEqual(200); });
+
+    const reservationsInDB = await reservationService.getInTimeRange(start, end);
+    expect(reservationsInDB).toHaveLength(3);
+  });
+
+  test('cannot add concurrent reservations past the max concurrent reservations', async () => {
+    const start = new Date('2023-02-14T12:00:00.000Z');
+    const end = new Date('2023-02-14T14:00:00.000Z');
+
+    await Promise.all([...Array(3)].map(async () => api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    })));
+
+    const res = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    });
+
+    // expect(res.status).toEqual(400);
+    expect(res.body.error).toBeDefined();
+    expect(res.body.error.message).toContain('Too many concurrent reservations');
+
+    const reservationsInDB = await reservationService.getInTimeRange(start, end);
+    expect(reservationsInDB).toHaveLength(3);
+  });
+
+  test('can add reservation that overlaps more reservations than the maxConcurrentFlights', async () => {
+    await Promise.all([
+      {
+        start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-ASD', phone: '+358494678748',
+      },
+      {
+        start: new Date('2023-02-14T11:00:00.000Z'), end: new Date('2023-02-14T13:00:00.000Z'), aircraftId: 'OH-SDF', phone: '+358494678748',
+      },
+      {
+        start: new Date('2023-02-14T13:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-DFG', phone: '+358494678748',
+      },
+    ].map(async (flight) => api.post('/api/reservations/').set('Content-type', 'application/json').send(flight)));
+
+    const res = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-FGH', phone: '+358494678748',
+    });
+
+    expect(res.status).toEqual(200);
+
+    const reservationsInDB = await reservationService.getInTimeRange(new Date('2023-02-14T12:00:00.000Z'), new Date('2023-02-14T14:00:00.000Z'));
+    expect(reservationsInDB).toHaveLength(4);
   });
 });
