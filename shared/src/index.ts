@@ -9,11 +9,13 @@ export interface ReservationEntry {
   info?: string;
 }
 
+export type TimeslotType = 'available' | 'blocked';
+
 export interface TimeslotEntry {
   id: number;
   start: Date;
   end: Date;
-  type: 'available' | 'blocked'
+  type: TimeslotType;
 }
 
 export interface AirfieldEntry {

@@ -3,6 +3,7 @@ import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
+import { TimeslotType } from '@lentovaraukset/shared/src';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
 import { useAirfield } from '../queries/airfields';
@@ -27,23 +28,17 @@ function TimeSlotCalendar() {
   ) => {
     try {
       const timeslots = await getTimeSlots(start, end);
-      const timeslotsMapped = timeslots.map((timeslot) => (
-        timeslot.type === 'available'
-          ? {
-            ...timeslot,
-            id: timeslot.id.toString(),
-            color: '#84cc1680',
-            title: 'Vapaa',
-            editable: !isTimeInPast(timeslot.start),
-          }
-          : {
-            ...timeslot,
-            id: timeslot.id.toString(),
-            color: '#eec200',
-            title: 'Suljettu',
-            editable: !isTimeInPast(timeslot.start),
-          }
-      ));
+      const timeslotsMapped = timeslots.map((timeslot) => {
+        const color = timeslot.type === 'available' ? '#84cc1680' : '#eec200';
+        const title = timeslot.type === 'available' ? 'Vapaa' : 'Suljettu';
+        return {
+          ...timeslot,
+          id: timeslot.id.toString(),
+          color,
+          title,
+          editable: !isTimeInPast(timeslot.start),
+        };
+      });
       successCallback(timeslotsMapped);
     } catch (error) {
       failureCallback(error as Error);
@@ -83,7 +78,9 @@ function TimeSlotCalendar() {
     await addTimeSlot({ ...event, type: blocked ? 'blocked' : 'available' });
   };
 
-  const modifyTimeslotFn = async (event: { id: string, start: Date, end: Date, extendedProps: { type: 'blocked' | 'available' } }) => {
+  const modifyTimeslotFn = async (
+    event: { id: string, start: Date, end: Date, extendedProps: { type: TimeslotType } },
+  ) => {
     await modifyTimeSlot({
       ...event, id: Number(event.id), type: event.extendedProps.type,
     });
@@ -95,28 +92,28 @@ function TimeSlotCalendar() {
     setShowInfoModal(false);
   };
 
+  const isSameType = (
+    stillEventType: TimeslotType,
+    movingEventType?: TimeslotType,
+  ) => {
+    if (movingEventType) return stillEventType === movingEventType;
+    return ((stillEventType === 'available' && !blocked) || (stillEventType === 'blocked' && blocked));
+  };
+
   const allowEvent: AllowFunc = (span, movingEvent) => {
-    const timeIsConsecutive = calendarRef.current?.getApi().getEvents().some(
-      (e) => e.id !== movingEvent?.id
-      && e.groupId !== 'reservations'
-      && (
-        (e.extendedProps.type === 'available' && !blocked)
-        || (e.extendedProps.type === 'blocked' && blocked)
-      )
-      && e.start && e.end
+    const eventsByType = calendarRef.current?.getApi().getEvents()
+      .filter((e) => e.id !== movingEvent?.id && e.groupId !== 'reservations'
+      && isSameType(e.extendedProps.type, movingEvent?.extendedProps?.type));
+
+    const timeIsConsecutive = eventsByType?.some(
+      (e) => e.start && e.end
         && (e.start.getTime() === span.start.getTime()
-          || e.start.getTime() === span.end.getTime()
-          || e.end.getTime() === span.start.getTime()
-          || e.end.getTime() === span.end.getTime()),
+        || e.start.getTime() === span.end.getTime()
+        || e.end.getTime() === span.start.getTime()
+        || e.end.getTime() === span.end.getTime()),
     );
-    const overlap = calendarRef.current?.getApi().getEvents().some(
-      (e) => e.id !== movingEvent?.id
-        && e.start && e.end
-        && (
-          (e.extendedProps.type === 'available' && !blocked)
-          || (e.extendedProps.type === 'blocked' && blocked)
-        )
-        && !e.display.includes('background')
+    const overlap = eventsByType?.some(
+      (e) => e.start && e.end
         && e.start < span.end && e.end > span.start,
     );
     return !timeIsConsecutive && !overlap;
@@ -154,8 +151,6 @@ function TimeSlotCalendar() {
             className="mx-2"
           />
         </label>
-
-        <p> </p>
       </div>
       <Calendar
         calendarRef={calendarRef}

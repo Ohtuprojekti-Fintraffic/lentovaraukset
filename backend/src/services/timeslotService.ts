@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import type { TimeslotEntry } from '@lentovaraukset/shared/src/index';
+import type { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src/index';
 import reservationService from '@lentovaraukset/backend/src/services/reservationService';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import { Timeslot } from '../models';
@@ -34,7 +34,7 @@ const getInTimeRange = async (
 };
 
 const timeslotsAreConsecutive = async (
-  timeslot: { start: Date, end: Date, type: 'available' | 'blocked' },
+  timeslot: { start: Date, end: Date, type: TimeslotType },
   id: number | null = null,
 ): Promise<boolean> => {
   const { start, end, type } = timeslot;
@@ -63,7 +63,7 @@ const deleteById = async (id: number) => {
 
 const updateById = async (
   id: number,
-  timeslot: { start: Date, end: Date, type: 'available' | 'blocked' },
+  timeslot: { start: Date, end: Date, type: TimeslotType },
 ): Promise<void> => {
   if (await timeslotsAreConsecutive(timeslot, id)) {
     throw new Error('Timeslot can\'t be consecutive');
@@ -89,7 +89,7 @@ const updateById = async (
 const createTimeslot = async (newTimeSlot: {
   start: Date;
   end: Date;
-  type: 'available' | 'blocked';
+  type: TimeslotType;
 }): Promise<TimeslotEntry> => {
   if (await timeslotsAreConsecutive(newTimeSlot)) {
     throw new Error('Timeslot can\'t be consecutive');
