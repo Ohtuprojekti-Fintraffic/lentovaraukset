@@ -65,16 +65,34 @@ function Calendar({
       : true;
   };
 
-  const isTimeInAllowedRange = (time: Date) => {
-    if (isTimeInPast(time)) {
+  const timeIsConsecutive = (start: Date, end: Date) => {
+    const consecutive = calendarRef.current?.getApi().getEvents().some(
+      (e) => e.groupId !== 'reservations'
+      && e.start && e.end
+      && ((start.getTime() !== e.start.getTime()) && (end.getTime() !== e.end.getTime()))
+      && (e.start.getTime() === start.getTime()
+        || e.start.getTime() === end.getTime()
+        || e.end.getTime() === start.getTime()
+        || e.end.getTime() === end.getTime()),
+    );
+    return consecutive;
+  };
+
+  const isTimeAllowed = (start: Date, end: Date) => {
+    if (isTimeInPast(start)) {
       calendarRef.current?.getApi().unselect();
       addNewAlert('Aikaa ei voi lisätä menneisyyteen', 'warning');
       return false;
     }
     // TODO: Get timeAtMostInFuture from airfield
-    if (checkIfTimeInFuture && !isTimeAtMostInFuture(time, 7)) {
+    if (checkIfTimeInFuture && !isTimeAtMostInFuture(start, 7)) {
       calendarRef.current?.getApi().unselect();
       addNewAlert('Aikaa ei voi lisätä yli 7 päivän päähän', 'warning');
+      return false;
+    }
+    if (timeIsConsecutive(start, end)) {
+      calendarRef.current?.getApi().unselect();
+      addNewAlert('Ajat eivät voi olla peräkkäin', 'warning');
       return false;
     }
     return true;
@@ -92,7 +110,7 @@ function Calendar({
     // Open confirmation popup here
     const { event } = changeData;
 
-    if (isTimeInAllowedRange(event.start || new Date())) {
+    if (isTimeAllowed(event.start || new Date(), event.end || new Date())) {
       await modifyEventFn({
         id: event.id,
         start: event.start || new Date(),
@@ -106,8 +124,9 @@ function Calendar({
   // When a new event is selected (dragged) in the calendar.
   const handleEventCreate = async (dropData: DateSelectArg) => {
     const newStartTime: Date = dropData.start || new Date();
+    const newEndime: Date = dropData.end || new Date();
 
-    if (!isTimeInAllowedRange(newStartTime)) return;
+    if (!isTimeAllowed(newStartTime, newEndime)) return;
 
     await addEventFn({
       start: dropData.start,
