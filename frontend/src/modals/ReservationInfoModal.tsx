@@ -21,8 +21,9 @@ function ReservationInfoModal({
   reservation, draggedTimes,
   removeReservation,
 }: InfoModalProps) {
+  const { addNewAlert } = useContext(AlertContext);
+
   const onSubmitModifyHandler = async (updatedReservation: Omit<ReservationEntry, 'id' | 'user'>) => {
-    const { addNewAlert } = useContext(AlertContext);
     const modifiedReservation = await modifyReservation(
       {
         id: parseInt(reservation!.id, 10),
@@ -38,6 +39,8 @@ function ReservationInfoModal({
     if (modifiedReservation) {
       addNewAlert(`Varaus #${modifiedReservation.id} päivitetty!`, 'success');
     }
+
+    closeReservationModal();
   };
 
   const onSubmitAddHandler = async (reservationDetails: Omit<ReservationEntry, 'id' | 'user'>) => {
