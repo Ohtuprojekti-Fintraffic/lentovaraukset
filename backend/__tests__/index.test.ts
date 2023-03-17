@@ -46,7 +46,7 @@ describe('basic function tests', () => {
 
   test('Adding timeslot just to db works', async () => {
     const date = new Date();
-    await Timeslot.create({ start: date, end: date });
+    await Timeslot.create({ start: date, end: date, type: 'available' });
 
     // temporarily any. Models don't have types defined yet
     const slot: any = await Timeslot.findOne();

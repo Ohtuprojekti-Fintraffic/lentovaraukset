@@ -56,6 +56,7 @@ beforeEach(async () => {
   await Timeslot.create({
     start: new Date('2023-02-12T08:00:00.000Z'),
     end: new Date('2023-02-15T08:00:00.000Z'),
+    type: 'available',
   });
 });
 
