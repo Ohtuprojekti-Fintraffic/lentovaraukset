@@ -3,9 +3,11 @@ import {
   useMutation, useQuery, useQueryClient,
 } from 'react-query';
 import QueryKeys from './queryKeys';
+import { errorIfNotOk } from './util';
 
 const getAirfields = async (airfieldId: number): Promise<AirfieldEntry> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${airfieldId}`);
+  errorIfNotOk(res);
   return res.json();
 };
 
@@ -24,6 +26,7 @@ const modifyAirfield = async (
       'Content-Type': 'application/json',
     },
   });
+  errorIfNotOk(res);
   return res.json();
 };
 
