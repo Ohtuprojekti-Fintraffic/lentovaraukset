@@ -1,7 +1,9 @@
 import { ReservationEntry } from '@lentovaraukset/shared/src';
+import { errorIfNotOk } from './util';
 
 const getReservations = async (from: Date, until: Date): Promise<ReservationEntry[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
+  errorIfNotOk(res);
   return res.json();
 };
 
@@ -15,17 +17,19 @@ const addReservation = async (newReservation: any): Promise<ReservationEntry> =>
       aircraftId: 'OH-EXMPL', phone: '051 123 4567', info: 'placeholder', ...newReservation,
     }),
   });
+  errorIfNotOk(res);
   return res.json();
 };
 
 const deleteReservation = async (id: Number): Promise<string> => {
-  const response = await fetch(`${process.env.BASE_PATH}/api/reservations/${id}`, {
+  const res = await fetch(`${process.env.BASE_PATH}/api/reservations/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
     },
   });
-  return response.text();
+  errorIfNotOk(res);
+  return res.text();
 };
 
 const modifyReservation = async (
@@ -38,6 +42,7 @@ const modifyReservation = async (
       'Content-Type': 'application/json',
     },
   });
+  errorIfNotOk(res);
   return res.json();
 };
 
