@@ -67,7 +67,7 @@ function Calendar({
 
   const timeIsConsecutive = (start: Date, end: Date) => {
     const consecutive = calendarRef.current?.getApi().getEvents().some(
-      (e) => e.groupId !== 'reservations'
+      (e) => e.extendedProps.description === 'timeslot'
       && e.start && e.end
       && ((start.getTime() !== e.start.getTime()) && (end.getTime() !== e.end.getTime()))
       && (e.start.getTime() === start.getTime()

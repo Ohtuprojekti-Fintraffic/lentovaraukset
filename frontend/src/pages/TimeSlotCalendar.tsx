@@ -31,6 +31,7 @@ function TimeSlotCalendar() {
         id: timeslot.id.toString(),
         color: '#84cc1680',
         editable: !isTimeInPast(timeslot.start),
+        description: 'timeslot',
       }));
       successCallback(timeslotsMapped);
     } catch (error) {
