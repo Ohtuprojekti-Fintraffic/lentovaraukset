@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
+import ReactDatePicker from 'react-datepicker';
 import { useAirfield } from '../../queries/airfields';
 import InputField from '../InputField';
+import 'react-datepicker/dist/react-datepicker.css';
 
 type ReservationInfoProps = {
   reservation?: EventImpl
@@ -30,7 +32,7 @@ function ReservationInfoForm({
   const reservationGranularity = airfield?.eventGranularityMinutes || 20;
 
   const {
-    register, handleSubmit, reset,
+    register, handleSubmit, reset, control,
   } = useForm<Inputs>({
     values: {
       start: reservation?.startStr.replace(/.{3}\+.*/, '') || '',
@@ -81,10 +83,50 @@ function ReservationInfoForm({
           <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
             <div className="flex flex-row space-x-6">
               <div className="flex flex-col">
-                <InputField
+                {/* <InputField
                   labelText="Varaus alkaa:"
                   type="datetime-local"
                   registerReturn={register('start')}
+                /> */}
+                <label
+                  className="font-ft-label mb-1"
+                >
+                  Varaus alkaa:
+                </label>
+                <Controller
+                  control={control}
+                  name="start"
+                  render={({
+                    field: {
+                      onChange, value,
+                    },
+                  }) => {
+                    const fieldBaseClass = 'border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
+                       + 'placeholder:text-ft-text-300 mb-4';
+
+                    const fieldStateClasses = {
+                      default: 'border-ft-neutral-200',
+                      error: 'border-[3px] border-ft-danger-200 text-ft-danger-200',
+                      disabled: 'border-ft-neutral-200 text-ft-text-300 bg-ft-input-placeholder',
+                    };
+
+                    return (
+                      <div className="flex flex-col items-start flex-wrap">
+                        <ReactDatePicker
+                          className={`${fieldBaseClass} ${fieldStateClasses.default}`}
+                          dateFormat="d.MM.yyyy HH:mm"
+                          dropdownMode="select"
+                          minDate={new Date()}
+                          onChange={onChange}
+                          placeholderText="Click to select time"
+                          selected={value ? new Date(value) : null}
+                          shouldCloseOnSelect
+                          showTimeSelect
+                          timeIntervals={reservationGranularity}
+                        />
+                      </div>
+                    );
+                  }}
                 />
                 <InputField
                   labelText="Koneen rekisteritunnus:"
