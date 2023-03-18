@@ -37,10 +37,7 @@ function ReservationInfoModal({
           info: updatedReservation.info,
         },
       );
-
-      if (modifiedReservation) {
-        addNewAlert(`Varaus #${modifiedReservation.id} päivitetty!`, 'success');
-      }
+      addNewAlert(`Varaus #${modifiedReservation.id} päivitetty!`, 'success');
     } catch (exception) {
       if (exception instanceof ApiError) {
         // TODO: communicate the error itself which would
@@ -55,8 +52,19 @@ function ReservationInfoModal({
   };
 
   const onSubmitAddHandler = async (reservationDetails: Omit<ReservationEntry, 'id' | 'user'>) => {
-    await addReservation(reservationDetails);
-    // TODO: add user
+    try {
+      await addReservation(reservationDetails);
+      addNewAlert('Varaus lisätty!', 'success');
+    } catch (exception) {
+      if (exception instanceof ApiError) {
+        // TODO: communicate the error itself which would
+        // require the server to send it as an error code or similar
+        addNewAlert('Virhe tapahtui varausta päivittäessä', 'danger');
+      } else {
+        throw exception;
+      }
+    }
+
     closeReservationModal();
   };
 
