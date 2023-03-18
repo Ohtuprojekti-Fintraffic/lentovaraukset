@@ -2,6 +2,11 @@ export class ApiError extends Error {
   constructor(response: Response) {
     super(`API call to ${response.url} failed with status code ${response.status}`);
     this.name = this.constructor.name;
+
+    // https://github.com/microsoft/TypeScript/issues/13965
+    // https://stackoverflow.com/questions/31626231/custom-error-class-in-typescript
+    // instanceof not working fix:
+    Object.setPrototypeOf(this, ApiError.prototype);
   }
 }
 

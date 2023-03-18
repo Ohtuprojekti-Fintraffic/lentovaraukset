@@ -6,6 +6,7 @@ import Card from '../components/Card';
 import ReservationInfoForm from '../components/forms/ReservationInfoForm';
 import AlertContext from '../contexts/AlertContext';
 import { addReservation, modifyReservation } from '../queries/reservations';
+import { ApiError } from '../queries/util';
 
 type InfoModalProps = {
   showInfoModal: boolean
@@ -24,20 +25,30 @@ function ReservationInfoModal({
   const { addNewAlert } = useContext(AlertContext);
 
   const onSubmitModifyHandler = async (updatedReservation: Omit<ReservationEntry, 'id' | 'user'>) => {
-    const modifiedReservation = await modifyReservation(
-      {
-        id: parseInt(reservation!.id, 10),
-        start: updatedReservation.start,
-        end: updatedReservation.end,
-        user: 'NYI',
-        aircraftId: updatedReservation.aircraftId,
-        phone: updatedReservation.phone,
-        info: updatedReservation.info,
-      },
-    );
+    try {
+      const modifiedReservation = await modifyReservation(
+        {
+          id: parseInt(reservation!.id, 10),
+          start: updatedReservation.start,
+          end: updatedReservation.end,
+          user: 'NYI',
+          aircraftId: updatedReservation.aircraftId,
+          phone: updatedReservation.phone,
+          info: updatedReservation.info,
+        },
+      );
 
-    if (modifiedReservation) {
-      addNewAlert(`Varaus #${modifiedReservation.id} päivitetty!`, 'success');
+      if (modifiedReservation) {
+        addNewAlert(`Varaus #${modifiedReservation.id} päivitetty!`, 'success');
+      }
+    } catch (exception) {
+      if (exception instanceof ApiError) {
+        // TODO: communicate the error itself which would
+        // require the server to send it as an error code or similar
+        addNewAlert('Virhe tapahtui varausta päivittäessä', 'danger');
+      } else {
+        throw exception;
+      }
     }
 
     closeReservationModal();

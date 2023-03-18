@@ -1,14 +1,8 @@
 import { Op } from 'sequelize';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
-import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
-import { Reservation, type Timeslot } from '../models';
-
-const reservationIsWithinTimeslot = (res: { start: Date, end: Date }, ts: Timeslot) => {
-  const startOk = res.start >= ts.start && res.start <= ts.end;
-  const endOk = res.end >= ts.start && res.end <= ts.end;
-  return startOk && endOk;
-};
+import { isTimeInPast, reservationIsWithinTimeslot } from '@lentovaraukset/shared/src/validation/validation';
+import { Reservation } from '../models';
 
 const getInTimeRange = async (startTime: Date, endTime: Date) => {
   const reservations: Reservation[] = await Reservation.findAll({
