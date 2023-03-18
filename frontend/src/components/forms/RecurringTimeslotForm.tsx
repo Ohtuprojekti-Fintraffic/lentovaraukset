@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TimeslotEntry } from '@lentovaraukset/shared/src';
-import InputField from '../InputField';
+import { InputField } from '../InputField';
 
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
