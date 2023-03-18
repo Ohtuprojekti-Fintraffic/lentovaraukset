@@ -309,4 +309,45 @@ describe('Calls to api', () => {
 
     expect(response.body).toHaveLength(0);
   });
+
+  test('Reservation has to be within a timeslot upon creation', async () => {
+    await Timeslot.create({
+      start: new Date('2023-02-16T08:00:00.000Z'),
+      end: new Date('2023-02-16T18:00:00.000Z'),
+    });
+
+    const start = new Date('2023-02-16T07:00:00.000Z');
+    const end = new Date('2023-02-16T09:00:00.000Z');
+
+    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    });
+
+    expect(newReservation.body.error).toBeDefined();
+    expect(newReservation.body.error.message).toContain('Reservation is not within timeslot');
+  });
+
+  test('Reservation has to be within a timeslot when modified', async () => {
+    await Timeslot.create({
+      start: new Date('2023-02-16T08:00:00.000Z'),
+      end: new Date('2023-02-16T18:00:00.000Z'),
+    });
+
+    const start = new Date('2023-02-16T08:00:00.000Z');
+    const newStart = new Date('2023-02-16T07:00:00.000Z');
+    const end = new Date('2023-02-16T09:00:00.000Z');
+
+    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    });
+
+    expect(newReservation.body.error).not.toBeDefined();
+
+    const modifiedReservation: any = await api.put(`/api/reservations/${newReservation.id}`).set('Content-type', 'application/json').send({
+      ...newReservation.body, start: newStart, info: undefined,
+      // TODO: fix weirdness with interacting with API where null isnt undefined
+    });
+    expect(modifiedReservation.body.error).toBeDefined();
+    expect(modifiedReservation.body.error.message).toContain('Reservation is not within timeslot');
+  });
 });

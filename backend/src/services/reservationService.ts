@@ -2,7 +2,13 @@ import { Op } from 'sequelize';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
-import { Reservation } from '../models';
+import { Reservation, type Timeslot } from '../models';
+
+const reservationIsWithinTimeslot = (res: { start: Date, end: Date }, ts: Timeslot) => {
+  const startOk = res.start >= ts.start && res.start <= ts.end;
+  const endOk = res.end >= ts.start && res.end <= ts.end;
+  return startOk && endOk;
+};
 
 const getInTimeRange = async (startTime: Date, endTime: Date) => {
   const reservations: Reservation[] = await Reservation.findAll({
@@ -35,8 +41,15 @@ const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | '
   if (timeslots.length !== 1) {
     throw new Error('Reservation should be created for one timeslot');
   }
+
   const timeslot = timeslots[0];
+
+  if (!reservationIsWithinTimeslot(newReservation, timeslot)) {
+    throw new Error('Reservation is not within timeslot date range');
+  }
+
   const reservation: Reservation = await Reservation.create(newReservation);
+
   if (timeslot) {
     await reservation.setTimeslot(timeslot);
   }
@@ -53,8 +66,15 @@ const updateById = async (
   if (newTimeslots.length !== 1) {
     throw new Error('Reservation should be created for one timeslot');
   }
+
   const newTimeslot = newTimeslots[0];
+
+  if (!reservationIsWithinTimeslot(reservation, newTimeslot)) {
+    throw new Error('Reservation is not within timeslot date range');
+  }
+
   const oldReservation: Reservation | null = await Reservation.findByPk(id);
+
   if (oldReservation && isTimeInPast(oldReservation.start)) {
     throw new Error('Reservation in past cannot be modified');
   }
