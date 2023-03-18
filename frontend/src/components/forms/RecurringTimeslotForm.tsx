@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TimeslotEntry } from '@lentovaraukset/shared/src';
-import { InputField } from '../InputField';
+import { DatePicker, InputField } from '../InputField';
+import { useAirfield } from '../../queries/airfields';
 
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
@@ -23,8 +24,10 @@ function RecurringTimeslotForm({
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
+  const { data: airfield } = useAirfield(1);
+
   const {
-    register, handleSubmit, reset, watch,
+    register, handleSubmit, reset, watch, control,
   } = useForm<Inputs>({
     values: {
       start: timeslot?.startStr.replace(/.{3}\+.*/, '') || '',
@@ -73,10 +76,11 @@ function RecurringTimeslotForm({
           <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
             <div className="flex flex-row space-x-6">
               <div className="flex flex-col">
-                <InputField
+                <DatePicker
+                  control={control}
                   labelText="Aikaikkuna alkaa:"
-                  type="datetime-local"
-                  registerReturn={register('start')}
+                  name="start"
+                  timeGranularityMinutes={airfield?.eventGranularityMinutes || 20}
                 />
                 <InputField
                   labelText="Määritä toistuvuus"
@@ -93,10 +97,11 @@ function RecurringTimeslotForm({
                 )}
               </div>
               <div className="flex flex-col">
-                <InputField
+                <DatePicker
+                  control={control}
                   labelText="Aikaikkuna päättyy:"
-                  type="datetime-local"
-                  registerReturn={register('end')}
+                  name="end"
+                  timeGranularityMinutes={airfield?.eventGranularityMinutes || 20}
                 />
                 <div className="flex-1" />
                 {showRecurring && (

@@ -97,10 +97,11 @@ function ReservationInfoForm({
                 />
               </div>
               <div className="flex flex-col">
-                <InputField
-                  labelText="Varaus päättyy:"
-                  type="datetime-local"
-                  registerReturn={register('end')}
+                <DatePicker
+                  control={control}
+                  labelText="Varays päättyy:"
+                  name="end"
+                  timeGranularityMinutes={reservationGranularity}
                 />
                 <InputField
                   labelText="Puhelinnumero:"
