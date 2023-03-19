@@ -23,13 +23,17 @@ function TimeslotInfoModal({
       <RecurringTimeslotForm
         id="recurring_timeslot_form"
         timeslot={timeslot}
-        onSubmit={async (updatedTimeslot) => {
+        onSubmit={async (updatedTimeslot, period) => {
           await modifyTimeSlot(
             {
               id: timeslot!.id,
               start: updatedTimeslot.start,
               end: updatedTimeslot.end,
             },
+            period ? {
+              end: period.end,
+              name: period.periodName,
+            } : undefined,
           );
           closeTimeslotModal();
         }}
