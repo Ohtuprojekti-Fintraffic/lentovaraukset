@@ -91,11 +91,11 @@ const createPeriod = async (
   }
   const firstTimeslot: Timeslot | null = await Timeslot.findByPk(id);
   if (firstTimeslot) {
-    firstTimeslot.groupId = period.name;
+    firstTimeslot.group = period.name;
     await firstTimeslot.save();
   }
   const addedTimeslot = await Timeslot
-    .addGroupTimeslots(timeslotGroup.map((t) => ({ ...t, groupId: period.name })));
+    .addGroupTimeslots(timeslotGroup.map((t) => ({ ...t, group: period.name })));
   return addedTimeslot;
 };
 

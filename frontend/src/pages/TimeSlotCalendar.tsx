@@ -29,16 +29,14 @@ function TimeSlotCalendar() {
     try {
       const timeslots = await getTimeSlots(start, end);
       const timeslotsMapped = timeslots.map((timeslot) => {
-        const color = timeslot.type === 'available' ? '#84cc1680' : '#eec200';
-        const title = timeslot.type === 'available' ? 'Vapaa' : 'Suljettu';
-        return {
+        const timeslotEvent = {
           ...timeslot,
           id: timeslot.id.toString(),
-          color,
-          title,
+          color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
+          title: timeslot.type === 'available' ? 'Vapaa' : 'Suljettu',
           editable: !isTimeInPast(timeslot.start),
-          groupId: timeslot.groupId ?? undefined,
         };
+        return timeslot.group ? { ...timeslotEvent, groupId: timeslot.group } : timeslotEvent;
       });
       successCallback(timeslotsMapped);
     } catch (error) {
