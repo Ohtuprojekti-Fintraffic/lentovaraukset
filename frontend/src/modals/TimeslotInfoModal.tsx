@@ -20,19 +20,24 @@ function TimeslotInfoModal({
   timeslot, draggedTimes,
   removeTimeslot,
 }: InfoModalProps) {
-  const onModifySubmitHandler = async (updatedTimeslot: Omit<TimeslotEntry, 'id'>) => {
+  const onModifySubmitHandler = async (updatedTimeslot: Omit<TimeslotEntry, 'id'>, period?: { end: Date, periodName: string }) => {
+    console.log(updatedTimeslot, period);
     await modifyTimeSlot(
       {
         id: timeslot!.id,
         start: updatedTimeslot.start,
         end: updatedTimeslot.end,
       },
+      period ? { end: period.end, name: period.periodName } : undefined,
     );
+
     closeTimeslotModal();
   };
 
   const onSubmitAddHandler = async (reservationDetails: Omit<TimeslotEntry, 'id'>) => {
-    await addTimeSlot(reservationDetails);
+    await addTimeSlot(
+      reservationDetails,
+    );
 
     closeTimeslotModal();
   };
