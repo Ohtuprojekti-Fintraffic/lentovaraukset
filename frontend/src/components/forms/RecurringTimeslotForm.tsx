@@ -9,7 +9,7 @@ import { useAirfield } from '../../queries/airfields';
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
   draggedTimes?: { start: Date, end: Date }
-  onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>) => void
+  onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>, period?: { end: Date, periodName: string }) => void
   id?: string
 };
 
@@ -17,8 +17,8 @@ type Inputs = {
   start: string
   end: string
   isRecurring: boolean
-  periodStarts: string | null
   periodEnds: string | null
+  periodName: string
 };
 
 function RecurringTimeslotForm({
@@ -39,8 +39,8 @@ function RecurringTimeslotForm({
       start,
       end,
       isRecurring: false,
-      periodStarts: timeslot?.startStr.replace(/T.*/, '') || '',
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
+      periodName: timeslot?.extendedProps.periodName,
     },
   });
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
@@ -49,8 +49,16 @@ function RecurringTimeslotForm({
       end: new Date(formData.end),
     };
     // TODO: create recurring events if possible
-    // const { isRecurring, periodStarts, periodEnds } = formData;
-    onSubmit(updatedTimeslot);
+    const { isRecurring, periodEnds } = formData;
+    if (isRecurring && periodEnds) {
+      const period = {
+        end: new Date(periodEnds),
+        periodName: formData.periodName,
+      };
+      onSubmit(updatedTimeslot, period);
+    } else {
+      onSubmit(updatedTimeslot);
+    }
   };
   const onError = (e: any) => console.error(e);
 
@@ -94,19 +102,6 @@ function RecurringTimeslotForm({
                 step={stepSeconds}
                 min={min}
               />
-              <InputField
-                labelText="Määritä toistuvuus"
-                type="checkbox"
-                registerReturn={register('isRecurring')}
-              />
-              {showRecurring && (
-                <InputField
-                  labelText="Alkaa:"
-                  type="date"
-                  inputClassName="w-full"
-                  registerReturn={register('periodStarts')}
-                />
-              )}
             </div>
             <div className="flex flex-col">
               <InputField
@@ -116,17 +111,33 @@ function RecurringTimeslotForm({
                 step={stepSeconds}
                 min={min}
               />
-              <div className="flex-1" />
-              {showRecurring && (
-                <InputField
-                  labelText="Päättyy:"
-                  type="date"
-                  inputClassName="w-full"
-                  registerReturn={register('periodEnds')}
-                />
-              )}
             </div>
           </div>
+          {timeslot && (
+          <div className="flex flex-col">
+            <InputField
+              labelText="Määritä toistuvuus"
+              type="checkbox"
+              registerReturn={register('isRecurring')}
+            />
+            {showRecurring && (
+            <InputField
+              labelText="Päättyy:"
+              type="date"
+              inputClassName="w-full"
+              registerReturn={register('periodEnds')}
+            />
+            )}
+            {showRecurring && (
+            <InputField
+              labelText="Toistuvuuden nimi"
+              type="text"
+              registerReturn={register('periodName')}
+              inputClassName="w-full"
+            />
+            )}
+          </div>
+          )}
         </form>
       </div>
     </div>

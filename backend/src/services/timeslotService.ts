@@ -61,6 +61,44 @@ const deleteById = async (id: number) => {
   await timeslot?.destroy();
 };
 
+const createPeriod = async (
+  id: number,
+  period: { periodEnd: Date, name: string },
+  timeslot: { start: Date, end: Date },
+): Promise<Timeslot[]> => {
+  const oneWeekInMillis = 7 * 24 * 60 * 60 * 1000;
+  const { periodEnd } = period;
+  const timeslotGroup: { start: Date, end: Date }[] = [];
+  const { start, end } = timeslot;
+  start.setTime(start.getTime() + oneWeekInMillis);
+  end.setTime(end.getTime() + oneWeekInMillis);
+  while (end <= periodEnd) {
+    timeslotGroup.push({ start: new Date(start.getTime()), end: new Date(end.getTime()) });
+    start.setTime(start.getTime() + oneWeekInMillis);
+    end.setTime(end.getTime() + oneWeekInMillis);
+  }
+  const consecutivesFound = await Promise.all(
+    timeslotGroup.map((ts) => timeslotsAreConsecutive(ts)),
+  );
+  if (consecutivesFound.some((found) => found)) {
+    throw new Error("Timeslot can't be consecutive with another");
+  }
+  const overlaps = await Promise.all(
+    timeslotGroup.map((ts) => getInTimeRange(ts.start, ts.end)),
+  );
+  if (overlaps.some((foundSlots) => foundSlots.length > 0)) {
+    throw new Error('Period already has a timeslot');
+  }
+  const firstTimeslot: Timeslot | null = await Timeslot.findByPk(id);
+  if (firstTimeslot) {
+    firstTimeslot.groupId = period.name;
+    await firstTimeslot.save();
+  }
+  const addedTimeslot = await Timeslot
+    .addGroupTimeslots(timeslotGroup.map((t) => ({ ...t, groupId: period.name })));
+  return addedTimeslot;
+};
+
 const updateById = async (
   id: number,
   timeslot: { start: Date, end: Date },
@@ -104,4 +142,5 @@ export default {
   deleteById,
   updateById,
   createTimeslot,
+  createPeriod,
 };

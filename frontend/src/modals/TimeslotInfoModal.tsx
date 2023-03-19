@@ -24,7 +24,7 @@ function TimeslotInfoModal({
 }: InfoModalProps) {
   const { addNewAlert } = useContext(AlertContext);
 
-  const onModifySubmitHandler = async (updatedTimeslot: Omit<TimeslotEntry, 'id'>) => {
+  const onModifySubmitHandler = async (updatedTimeslot: Omit<TimeslotEntry, 'id'>, period?: { end: Date, periodName: string }) => {
     try {
       await modifyTimeSlot(
         {
@@ -32,6 +32,7 @@ function TimeslotInfoModal({
           start: updatedTimeslot.start,
           end: updatedTimeslot.end,
         },
+        period ? { end: period.end, name: period.periodName } : undefined,
       );
       addNewAlert('Aikaikkuna päivitetty!', 'success');
     } catch (exception) {
