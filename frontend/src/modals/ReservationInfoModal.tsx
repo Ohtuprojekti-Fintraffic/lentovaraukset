@@ -1,12 +1,12 @@
 import { EventImpl } from '@fullcalendar/core/internal';
-import { ReservationEntry } from '@lentovaraukset/shared/src';
+import { ReservationEntry, ServiceErrorCode } from '@lentovaraukset/shared/src';
 import React, { useContext } from 'react';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import ReservationInfoForm from '../components/forms/ReservationInfoForm';
 import AlertContext from '../contexts/AlertContext';
 import { addReservation, modifyReservation } from '../queries/reservations';
-import { ApiError } from '../queries/util';
+import { ApiError, isErrorForCode } from '../queries/util';
 
 type InfoModalProps = {
   showInfoModal: boolean
@@ -38,13 +38,13 @@ function ReservationInfoModal({
         },
       );
       addNewAlert(`Varaus #${modifiedReservation.id} päivitetty!`, 'success');
-    } catch (exception) {
-      if (exception instanceof ApiError) {
-        // TODO: communicate the error itself which would
-        // require the server to send it as an error code or similar
+    } catch (err) {
+      if (await isErrorForCode(err, ServiceErrorCode.ReservationExceedsTimeslot)) {
+        addNewAlert('Aikavarauksen täytyy olla aikaikkunan sisällä', 'danger');
+      } else if (err instanceof ApiError) {
         addNewAlert('Virhe tapahtui varausta päivittäessä', 'danger');
       } else {
-        throw exception;
+        throw err;
       }
     }
 
@@ -55,13 +55,13 @@ function ReservationInfoModal({
     try {
       await addReservation(reservationDetails);
       addNewAlert('Varaus lisätty!', 'success');
-    } catch (exception) {
-      if (exception instanceof ApiError) {
-        // TODO: communicate the error itself which would
-        // require the server to send it as an error code or similar
+    } catch (err) {
+      if (await isErrorForCode(err, ServiceErrorCode.ReservationExceedsTimeslot)) {
+        addNewAlert('Aikavarauksen täytyy olla aikaikkunan sisällä', 'danger');
+      } else if (err instanceof ApiError) {
         addNewAlert('Virhe tapahtui varausta päivittäessä', 'danger');
       } else {
-        throw exception;
+        throw err;
       }
     }
 

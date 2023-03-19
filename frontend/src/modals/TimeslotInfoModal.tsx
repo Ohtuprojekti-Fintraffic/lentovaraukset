@@ -36,8 +36,7 @@ function TimeslotInfoModal({
       addNewAlert('Aikaikkuna päivitetty!', 'success');
     } catch (exception) {
       if (exception instanceof ApiError) {
-        // TODO: communicate the error itself which would
-        // require the server to send it as an error code or similar
+        // TODO: communicate the error itself
         addNewAlert('Virhe tapahtui varausta päivittäessä', 'danger');
       } else {
         throw exception;
@@ -53,8 +52,7 @@ function TimeslotInfoModal({
       addNewAlert('Aikaikkuna lisätty!', 'success');
     } catch (exception) {
       if (exception instanceof ApiError) {
-        // TODO: communicate the error itself which would
-        // require the server to send it as an error code or similar
+        // TODO: communicate the error itself
         addNewAlert('Virhe tapahtui aikaikkunaa lisätessä', 'danger');
       } else {
         throw exception;

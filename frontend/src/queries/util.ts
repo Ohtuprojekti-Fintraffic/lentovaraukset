@@ -1,3 +1,5 @@
+import { ServiceErrorCode } from '@lentovaraukset/shared/src';
+
 export class ApiError extends Error {
   response: Response;
 
@@ -17,3 +19,9 @@ export const errorIfNotOk = (response: Response): void => {
   if (response.ok) { return; }
   throw new ApiError(response);
 };
+
+export const isErrorForCode = async (
+  err: unknown,
+  code: ServiceErrorCode,
+): Promise<boolean> => (err instanceof ApiError)
+  && (await err.response.clone().json())?.error?.code === code;
