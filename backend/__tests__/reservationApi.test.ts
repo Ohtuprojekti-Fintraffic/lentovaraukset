@@ -1,6 +1,7 @@
 import request from 'supertest';
 import app from '@lentovaraukset/backend/src/app';
 import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
+import { ServiceErrorCode } from '@lentovaraukset/shared/src';
 import { connectToDatabase, sequelize } from '../src/util/db';
 import airfieldService from '../src/services/airfieldService';
 import reservationService from '../src/services/reservationService';
@@ -326,6 +327,9 @@ describe('Calls to api', () => {
 
     expect(newReservation.body.error).toBeDefined();
     expect(newReservation.body.error.message).toContain('Reservation is not within timeslot');
+    expect(newReservation.body.error.code).toEqual(
+      ServiceErrorCode.ReservationExceedsTimeslot,
+    );
   });
 
   test('Reservation has to be within a timeslot when modified', async () => {
@@ -350,6 +354,9 @@ describe('Calls to api', () => {
     });
     expect(modifiedReservation.body.error).toBeDefined();
     expect(modifiedReservation.body.error.message).toContain('Reservation is not within timeslot');
+    expect(modifiedReservation.body.error.code).toEqual(
+      ServiceErrorCode.ReservationExceedsTimeslot,
+    );
   });
 
   test('can add concurrent reservations up to the max concurrent reservations', async () => {

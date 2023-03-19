@@ -1,8 +1,9 @@
 import { Op } from 'sequelize';
-import { ReservationEntry } from '@lentovaraukset/shared/src';
+import { ReservationEntry, ServiceErrorCode } from '@lentovaraukset/shared/src';
 import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
 import { isTimeInPast, reservationIsWithinTimeslot } from '@lentovaraukset/shared/src/validation/validation';
 import { Reservation } from '../models';
+import ServiceError from '../util/errors';
 
 const getInTimeRange = async (startTime: Date, endTime: Date) => {
   const reservations: Reservation[] = await Reservation.findAll({
@@ -39,7 +40,7 @@ const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | '
   const timeslot = timeslots[0];
 
   if (!reservationIsWithinTimeslot(newReservation, timeslot)) {
-    throw new Error('Reservation is not within timeslot date range');
+    throw new ServiceError(ServiceErrorCode.ReservationExceedsTimeslot, 'Reservation is not within timeslot date range');
   }
 
   const reservation: Reservation = await Reservation.create(newReservation);
@@ -64,7 +65,7 @@ const updateById = async (
   const newTimeslot = newTimeslots[0];
 
   if (!reservationIsWithinTimeslot(reservation, newTimeslot)) {
-    throw new Error('Reservation is not within timeslot date range');
+    throw new ServiceError(ServiceErrorCode.ReservationExceedsTimeslot, 'Reservation is not within timeslot date range');
   }
 
   const oldReservation: Reservation | null = await Reservation.findByPk(id);
