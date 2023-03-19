@@ -1,22 +1,23 @@
 import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { TimeslotEntry } from '@lentovaraukset/shared/src';
+import { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
 import InputField from '../InputField';
 
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
-  onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>) => void
+  onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>,
+    period?: { end: Date, periodName: string }) => void
   id?: string
 };
 
 type Inputs = {
   start: string
   end: string
-  type: 'available' | 'blocked'
+  type: TimeslotType
   isRecurring: boolean
-  periodStarts: string | null
   periodEnds: string | null
+  periodName: string
 };
 
 function RecurringTimeslotForm({
@@ -30,10 +31,10 @@ function RecurringTimeslotForm({
     values: {
       start: timeslot?.startStr.replace(/.{3}\+.*/, '') || '',
       end: timeslot?.endStr.replace(/.{3}\+.*/, '') || '',
-      type: 'available',
+      type: timeslot?.extendedProps.type,
       isRecurring: false,
-      periodStarts: timeslot?.startStr.replace(/T.*/, '') || '',
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
+      periodName: timeslot?.extendedProps.periodName,
     },
   });
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
@@ -42,9 +43,16 @@ function RecurringTimeslotForm({
       end: new Date(formData.end),
       type: formData.type,
     };
-    // TODO: create recurring events if possible
-    // const { isRecurring, periodStarts, periodEnds } = formData;
-    onSubmit(updatedTimeslot);
+    const { isRecurring, periodEnds } = formData;
+    if (isRecurring && periodEnds) {
+      const period = {
+        end: new Date(periodEnds),
+        periodName: formData.periodName,
+      };
+      onSubmit(updatedTimeslot, period);
+    } else {
+      onSubmit(updatedTimeslot);
+    }
   };
   const onError = (e: any) => console.error(e);
 
@@ -86,14 +94,6 @@ function RecurringTimeslotForm({
                   type="checkbox"
                   registerReturn={register('isRecurring')}
                 />
-                {showRecurring && (
-                  <InputField
-                    labelText="Alkaa:"
-                    type="date"
-                    inputClassName="w-full"
-                    registerReturn={register('periodStarts')}
-                  />
-                )}
               </div>
               <div className="flex flex-col">
                 <InputField
@@ -112,6 +112,14 @@ function RecurringTimeslotForm({
                 )}
               </div>
             </div>
+            {showRecurring && (
+            <InputField
+              labelText="Toistuvuuden nimi"
+              type="text"
+              registerReturn={register('periodName')}
+              inputClassName="w-full"
+            />
+            )}
           </form>
           )
         }

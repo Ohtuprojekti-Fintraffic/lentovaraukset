@@ -8,7 +8,7 @@ import {
   HasManyGetAssociationsMixin,
   HasManyRemoveAssociationsMixin,
 } from 'sequelize';
-
+import { TimeslotType } from '@lentovaraukset/shared/src';
 import { Reservation } from '@lentovaraukset/backend/src/models';
 import { sequelize } from '../util/db';
 
@@ -22,13 +22,22 @@ InferCreationAttributes<Timeslot>
 
   declare end: Date;
 
-  declare type: 'available' | 'blocked';
+  declare type: TimeslotType;
+
+  declare groupId: string | null;
 
   declare addReservations: HasManyAddAssociationsMixin<Reservation, number>;
 
   declare getReservations: HasManyGetAssociationsMixin<Reservation>;
 
   declare removeReservations: HasManyRemoveAssociationsMixin<Reservation, number>;
+
+  static async addGroupTimeslots(
+    timeslots: { groupId:string, start: Date, end: Date, type: TimeslotType }[],
+  ) {
+    return sequelize.transaction(async (transaction) => Timeslot
+      .bulkCreate(timeslots, { transaction }));
+  }
 }
 
 Timeslot.init(
@@ -60,6 +69,12 @@ Timeslot.init(
           }
         },
       },
+    },
+    groupId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: false,
+      defaultValue: null,
     },
   },
   {
