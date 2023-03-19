@@ -16,6 +16,7 @@ export interface TimeslotEntry {
   start: Date;
   end: Date;
   type: TimeslotType;
+  groupId?: string | null;
 }
 
 export interface AirfieldEntry {

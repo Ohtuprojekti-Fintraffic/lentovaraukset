@@ -1,4 +1,4 @@
-import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
+import { AllowFunc, EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
 import React, { useState, useRef, useContext } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
@@ -58,9 +58,12 @@ function ReservationCalendar() {
   ) => {
     try {
       const timeslots = await getTimeSlots(start, end);
-      const timeslotsMapped = timeslots.map((timeSlot) => ({
-        ...timeSlot, id: timeSlot.id.toString(), groupId: 'timeslots', display: 'inverse-background', color: '#2C2C44',
-      }));
+      const timeslotsMapped = timeslots.map((timeslot) => {
+        const display = timeslot.type === 'available' ? 'inverse-background' : 'background';
+        return {
+          ...timeslot, id: timeslot.id.toString(), groupId: 'timeslots', display, color: '#2C2C44',
+        };
+      });
 
       const notReservable = [{
         title: 'ei varattavissa', start, end, display: 'background', color: '#2C2C44', overlap: false,
@@ -120,6 +123,15 @@ function ReservationCalendar() {
     }
   };
 
+  const allowEvent: AllowFunc = (span) => {
+    const eventsByType = calendarRef.current?.getApi().getEvents()
+      .filter((e) => e.start && e.end
+      && e.start < span.end && e.end > span.start
+      && e.extendedProps.type === 'blocked');
+
+    return eventsByType ? !(eventsByType.length > 0) : true;
+  };
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <ReservationInfoModal
@@ -147,6 +159,7 @@ function ReservationCalendar() {
         selectConstraint="timeslots"
         maxConcurrentLimit={airfield?.maxConcurrentFlights}
         checkIfTimeInFuture
+        allowEventRef={allowEvent}
       />
     </div>
   );

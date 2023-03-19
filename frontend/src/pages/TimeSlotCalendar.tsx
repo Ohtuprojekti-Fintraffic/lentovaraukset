@@ -37,6 +37,7 @@ function TimeSlotCalendar() {
           color,
           title,
           editable: !isTimeInPast(timeslot.start),
+          groupId: timeslot.groupId ?? undefined,
         };
       });
       successCallback(timeslotsMapped);
