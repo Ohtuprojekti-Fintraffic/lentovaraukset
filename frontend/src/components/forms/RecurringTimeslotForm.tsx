@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { TimeslotEntry } from '@lentovaraukset/shared/src';
+import { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
 import InputField from '../InputField';
 import { HTMLDateTimeConvert } from '../../util';
 import { useAirfield } from '../../queries/airfields';
 
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
+  isBlocked: boolean
   draggedTimes?: { start: Date, end: Date }
   onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>, period?: { end: Date, periodName: string }) => void
   id?: string
@@ -16,13 +17,14 @@ type RecurringTimeslotProps = {
 type Inputs = {
   start: string
   end: string
+  type: TimeslotType
   isRecurring: boolean
   periodEnds: string | null
   periodName: string
 };
 
 function RecurringTimeslotForm({
-  timeslot, draggedTimes,
+  timeslot, draggedTimes, isBlocked,
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
@@ -38,17 +40,20 @@ function RecurringTimeslotForm({
     values: {
       start,
       end,
+      type: timeslot?.extendedProps.type,
       isRecurring: false,
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
       periodName: timeslot?.extendedProps.periodName,
     },
   });
+
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
+    const type: TimeslotType = formData.type ?? isBlocked ? 'blocked' : 'available';
     const updatedTimeslot = {
       start: new Date(formData.start),
       end: new Date(formData.end),
+      type,
     };
-    // TODO: create recurring events if possible
     const { isRecurring, periodEnds } = formData;
     if (isRecurring && periodEnds) {
       const period = {

@@ -3,6 +3,7 @@ import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
+import { TimeslotType } from '@lentovaraukset/shared/src';
 import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
@@ -15,12 +16,12 @@ import {
 } from '../queries/timeSlots';
 
 function TimeSlotCalendar() {
+  const calendarRef = useRef<FullCalendar>(null);
+  const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [blocked, setBlocked] = useState(false);
   const selectedTimeslotRef = useRef<EventImpl | null>(null);
   const draggedTimesRef = useRef<{ start: Date, end: Date } | null>(null);
-  const calendarRef = useRef<FullCalendar>(null);
-
-  const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
 
   const timeSlotsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -29,12 +30,16 @@ function TimeSlotCalendar() {
   ) => {
     try {
       const timeslots = await getTimeSlots(start, end);
-      const timeslotsMapped = timeslots.map((timeslot) => ({
-        ...timeslot,
-        id: timeslot.id.toString(),
-        color: '#84cc1680',
-        editable: !isTimeInPast(timeslot.start),
-      }));
+      const timeslotsMapped = timeslots.map((timeslot) => {
+        const timeslotEvent = {
+          ...timeslot,
+          id: timeslot.id.toString(),
+          color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
+          title: timeslot.type === 'available' ? 'Vapaa' : 'Suljettu',
+          editable: !isTimeInPast(timeslot.start),
+        };
+        return timeslot.group ? { ...timeslotEvent, groupId: timeslot.group } : timeslotEvent;
+      });
       successCallback(timeslotsMapped);
     } catch (error) {
       failureCallback(error as Error);
@@ -79,18 +84,44 @@ function TimeSlotCalendar() {
     setShowInfoModal(false);
   };
 
-  const allowEvent: AllowFunc = (span, movingEvent) => {
-    const timeIsConsecutive = calendarRef.current?.getApi().getEvents().some(
-      (e) => e.id !== movingEvent?.id
-        && e.groupId !== 'reservations'
-        && e.start && e.end
-        && (e.start.getTime() === span.start.getTime()
-          || e.start.getTime() === span.end.getTime()
-          || e.end.getTime() === span.start.getTime()
-          || e.end.getTime() === span.end.getTime()),
-    );
+  const isSameType = (
+    stillEventType: TimeslotType,
+    movingEventType?: TimeslotType,
+  ) => {
+    if (movingEventType) return stillEventType === movingEventType;
+    return ((stillEventType === 'available' && !blocked) || (stillEventType === 'blocked' && blocked));
+  };
 
-    return !timeIsConsecutive;
+  const allowEvent: AllowFunc = (span, movingEvent) => {
+    const eventsByType = calendarRef.current?.getApi().getEvents()
+      .filter((e) => e.id !== movingEvent?.id && e.groupId !== 'reservations'
+      && isSameType(e.extendedProps.type, movingEvent?.extendedProps?.type));
+
+    const timeIsConsecutive = eventsByType?.some(
+      (e) => e.start && e.end
+        && (e.start.getTime() === span.start.getTime()
+        || e.start.getTime() === span.end.getTime()
+        || e.end.getTime() === span.start.getTime()
+        || e.end.getTime() === span.end.getTime()),
+    );
+    const overlap = eventsByType?.some(
+      (e) => e.start && e.end
+        && e.start < span.end && e.end > span.start,
+    );
+    return !timeIsConsecutive && !overlap;
+  };
+
+  const modifyTimeslotFn = async (
+    event: { id: string, start: Date, end: Date, extendedProps: { type: TimeslotType } },
+  ) => {
+    await modifyTimeSlot({
+      ...event, id: Number(event.id), type: event.extendedProps.type,
+    });
+  };
+
+  const handleToggle = () => {
+    setBlocked(!blocked);
+    calendarRef.current?.getApi().refetchEvents();
   };
 
   const showModalAfterDrag = (times: { start: Date, end: Date }) => {
@@ -104,6 +135,7 @@ function TimeSlotCalendar() {
         showInfoModal={showInfoModal}
         timeslot={selectedTimeslotRef?.current || undefined}
         draggedTimes={draggedTimesRef?.current || undefined}
+        isBlocked={blocked}
         removeTimeslot={() => {
           selectedTimeslotRef.current?.remove();
         }}
@@ -118,15 +150,27 @@ function TimeSlotCalendar() {
         <h1 className="text-3xl">Vapaat varausikkunat</h1>
         <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varausikkuna</Button>
       </div>
+      <div>
+        <label htmlFor="checkbox" className="font-ft-label mb-1">
+          <span>Lisää suljettuja vuoroja</span>
+          <input
+            type="checkbox"
+            id="checkbox"
+            checked={blocked}
+            onChange={handleToggle}
+            className="mx-2"
+          />
+        </label>
+      </div>
       <Calendar
         calendarRef={calendarRef}
         eventSources={eventsSourceRef.current}
         addEventFn={showModalAfterDrag}
-        modifyEventFn={modifyTimeSlot}
+        modifyEventFn={modifyTimeslotFn}
         clickEventFn={clickTimeslot}
         removeEventFn={removeTimeSlot}
         granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
-        eventColors={{ backgroundColor: '#bef264', eventColor: '#84cc1680', textColor: '#000000' }}
+        eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}
         selectConstraint={undefined}
         maxConcurrentLimit={1}
         allowEventRef={allowEvent}

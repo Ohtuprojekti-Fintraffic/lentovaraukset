@@ -12,12 +12,14 @@ type InfoModalProps = {
   showInfoModal: boolean
   closeTimeslotModal: () => void
   timeslot?: EventImpl
+  isBlocked: boolean
   draggedTimes?: { start: Date, end: Date }
   removeTimeslot: () => void
 };
 
 function TimeslotInfoModal({
   showInfoModal,
+  isBlocked,
   closeTimeslotModal,
   timeslot, draggedTimes,
   removeTimeslot,
@@ -28,9 +30,10 @@ function TimeslotInfoModal({
     try {
       await modifyTimeSlot(
         {
-          id: timeslot!.id,
+          id: Number(timeslot!.id),
           start: updatedTimeslot.start,
           end: updatedTimeslot.end,
+          type: updatedTimeslot.type,
         },
         period ? { end: period.end, name: period.periodName } : undefined,
       );
@@ -68,6 +71,7 @@ function TimeslotInfoModal({
       <RecurringTimeslotForm
         id="recurring_timeslot_form"
         timeslot={timeslot}
+        isBlocked={isBlocked}
         draggedTimes={draggedTimes}
         onSubmit={timeslot ? onModifySubmitHandler : onSubmitAddHandler}
       />
