@@ -35,7 +35,7 @@ function TimeSlotCalendar() {
           ...timeslot,
           id: timeslot.id.toString(),
           color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
-          title: timeslot.type === 'available' ? 'Vapaa' : 'Suljettu',
+          title: timeslot.type === 'available' ? 'Vapaa' : timeslot.info || 'Suljettu',
           editable: !isTimeInPast(timeslot.start),
         };
         return timeslot.group ? { ...timeslotEvent, groupId: timeslot.group } : timeslotEvent;
