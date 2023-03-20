@@ -1,5 +1,7 @@
-import React, { useId } from 'react';
-import { UseFormRegisterReturn } from 'react-hook-form';
+import React, {
+  MutableRefObject, useEffect, useId, useRef,
+} from 'react';
+import { UseFormRegisterReturn, FieldError } from 'react-hook-form';
 
 type InputStates = 'default' | 'error' | 'disabled';
 export interface FieldProps {
@@ -15,6 +17,8 @@ export interface FieldProps {
 
   labelText?: string;
   helperText?: string;
+
+  error?: Partial<FieldError>
 
   // CSS class extensions for the elems
   labelClassName?: string;
@@ -42,6 +46,7 @@ function InputField({
   type,
   value, name, onChange, onBlur,
   placeholder, labelText, helperText,
+  error,
   registerReturn,
   labelClassName = '',
   inputClassName = '',
@@ -58,6 +63,13 @@ function InputField({
   };
 
   const id = useId();
+
+  const inputRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
+
+  useEffect(() => {
+    inputRef.current?.setCustomValidity(error?.message || '');
+    inputRef.current?.reportValidity();
+  }, [error]);
 
   return (
     <div className="flex flex-col items-start flex-wrap">
@@ -85,6 +97,10 @@ function InputField({
         // are complicated to do
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...registerReturn}
+        ref={(e) => {
+          registerReturn?.ref(e);
+          inputRef.current = e;
+        }}
       />
       {helperText ? <p className={`text-ft-text-300 -mt-4 ${helperTextClassName}`}>{helperText}</p> : null}
     </div>

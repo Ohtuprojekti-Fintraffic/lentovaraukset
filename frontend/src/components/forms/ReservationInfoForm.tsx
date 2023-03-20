@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
@@ -30,7 +30,7 @@ function ReservationInfoForm({
   const reservationGranularity = airfield?.eventGranularityMinutes || 20;
 
   const {
-    register, handleSubmit, reset,
+    register, handleSubmit, reset, formState: { errors },
   } = useForm<Inputs>({
     values: {
       start: reservation?.startStr.replace(/.{3}\+.*/, '') || '',
@@ -41,6 +41,7 @@ function ReservationInfoForm({
     },
     resolver: zodResolver(createReservationValidator(reservationGranularity, 7)),
   });
+
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
     const updatedReservation = {
       start: new Date(formData.start),
@@ -52,21 +53,24 @@ function ReservationInfoForm({
 
     onSubmit(updatedReservation);
   };
-  const onError = (e: any) => console.error(e);
 
   useEffect(() => {
     reset();
   }, [reservation]);
+
+  const onError = (errorObject: FieldErrors) => {
+    console.error(errorObject);
+  };
 
   return (
     <div>
       <div className="bg-black p-3">
         <p className="text-white">
           {
-        reservation
-          ? `Varaus #${reservation.id}`
-          : 'Virhe'
-        }
+            reservation
+              ? `Varaus #${reservation.id}`
+              : 'Virhe'
+          }
         </p>
       </div>
       <div className="p-8">
@@ -77,42 +81,47 @@ function ReservationInfoForm({
         {
           reservation
           && (
-          /* eslint-disable  react/jsx-props-no-spreading */
-          <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
-            <div className="flex flex-row space-x-6">
-              <div className="flex flex-col">
-                <InputField
-                  labelText="Varaus alkaa:"
-                  type="datetime-local"
-                  registerReturn={register('start')}
-                />
-                <InputField
-                  labelText="Koneen rekisteritunnus:"
-                  type="text"
-                  registerReturn={register('aircraftId')}
-                />
+            /* eslint-disable  react/jsx-props-no-spreading */
+            <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
+              <div className="flex flex-row space-x-6">
+                <div className="flex flex-col">
+                  <InputField
+                    labelText="Varaus alkaa:"
+                    type="datetime-local"
+                    registerReturn={register('start')}
+                    error={errors.start}
+                  />
+                  <InputField
+                    labelText="Koneen rekisteritunnus:"
+                    type="text"
+                    registerReturn={register('aircraftId')}
+                    error={errors.aircraftId}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <InputField
+                    labelText="Varaus päättyy:"
+                    type="datetime-local"
+                    registerReturn={register('end')}
+                    error={errors.end}
+                  />
+                  <InputField
+                    labelText="Puhelinnumero:"
+                    type="tel"
+                    registerReturn={register('phone')}
+                    error={errors.phone}
+                  />
+                </div>
               </div>
-              <div className="flex flex-col">
-                <InputField
-                  labelText="Varaus päättyy:"
-                  type="datetime-local"
-                  registerReturn={register('end')}
-                />
-                <InputField
-                  labelText="Puhelinnumero:"
-                  type="tel"
-                  registerReturn={register('phone')}
-                />
-              </div>
-            </div>
-            <InputField
-              labelText="Lisätietoja:"
-              type="text"
-              registerReturn={register('info')}
-              inputClassName="w-full"
-            />
-          </form>
-          /* eslint-enable  react/jsx-props-no-spreading */
+              <InputField
+                labelText="Lisätietoja:"
+                type="text"
+                registerReturn={register('info')}
+                inputClassName="w-full"
+                error={errors.info}
+              />
+            </form>
+            /* eslint-enable  react/jsx-props-no-spreading */
           )
         }
       </div>
