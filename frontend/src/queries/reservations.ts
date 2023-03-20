@@ -14,7 +14,7 @@ const addReservation = async (newReservation: any): Promise<ReservationEntry> =>
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      ...newReservation, aircraftId: 'OH-EXMPL', phone: '051 123 4567', info: 'placeholder',
+      aircraftId: 'OH-EXMPL', phone: '051 123 4567', info: 'placeholder', ...newReservation,
     }),
   });
   errorIfNotOk(res);

@@ -3,11 +3,14 @@ import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
 import InputField from '../InputField';
+import { HTMLDateTimeConvert } from '../../util';
+import { useAirfield } from '../../queries/airfields';
 
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
-  onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>,
-    period?: { end: Date, periodName: string }) => void
+  isBlocked: boolean
+  draggedTimes?: { start: Date, end: Date }
+  onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>, period?: { end: Date, periodName: string }) => void
   id?: string
 };
 
@@ -21,27 +24,35 @@ type Inputs = {
 };
 
 function RecurringTimeslotForm({
-  timeslot,
+  timeslot, draggedTimes, isBlocked,
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
+  const { data: airfield } = useAirfield(1);
+  const timeslotGranularity = airfield?.eventGranularityMinutes || 20;
+
+  const start = timeslot?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
+  const end = timeslot?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
+
   const {
     register, handleSubmit, reset, watch,
   } = useForm<Inputs>({
     values: {
-      start: timeslot?.startStr.replace(/.{3}\+.*/, '') || '',
-      end: timeslot?.endStr.replace(/.{3}\+.*/, '') || '',
+      start,
+      end,
       type: timeslot?.extendedProps.type,
       isRecurring: false,
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
       periodName: timeslot?.extendedProps.periodName,
     },
   });
+
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
+    const type: TimeslotType = formData.type ?? isBlocked ? 'blocked' : 'available';
     const updatedTimeslot = {
       start: new Date(formData.start),
       end: new Date(formData.end),
-      type: formData.type,
+      type,
     };
     const { isRecurring, periodEnds } = formData;
     if (isRecurring && periodEnds) {
@@ -60,6 +71,18 @@ function RecurringTimeslotForm({
     reset();
   }, [timeslot]);
 
+  // step is relative to min: https://stackoverflow.com/a/75353708
+  const stepSeconds = timeslotGranularity * 60;
+  const stepMillis = stepSeconds * 1000;
+  const nowMillis = new Date().getTime();
+  // round up to nearest even whatever minutes
+  const roundedDate = new Date(Math.ceil(nowMillis / stepMillis) * stepMillis);
+  const min = HTMLDateTimeConvert(roundedDate);
+
+  // important detail: the browser GUI doesn't give a damn and will show
+  // whatever minutes it wants, but at least Chrome checks the field on submit
+  // and shows a popover with the nearest acceptable divisible values
+
   const showRecurring = watch('isRecurring');
 
   return (
@@ -69,49 +92,47 @@ function RecurringTimeslotForm({
           {
         timeslot
           ? `Aikaikkuna #${timeslot.id}`
-          : 'Virhe'
+          : 'Uusi aikaikkuna'
         }
         </p>
       </div>
       <div className="p-8">
-        {
-          !timeslot
-          && <p>Virhe aikaikkunaa haettaessa</p>
-        }
-        {
-          timeslot
-          && (
-          <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
-            <div className="flex flex-row space-x-6">
-              <div className="flex flex-col">
-                <InputField
-                  labelText="Aikaikkuna alkaa:"
-                  type="datetime-local"
-                  registerReturn={register('start')}
-                />
-                <InputField
-                  labelText="Määritä toistuvuus"
-                  type="checkbox"
-                  registerReturn={register('isRecurring')}
-                />
-              </div>
-              <div className="flex flex-col">
-                <InputField
-                  labelText="Aikaikkuna päättyy:"
-                  type="datetime-local"
-                  registerReturn={register('end')}
-                />
-                <div className="flex-1" />
-                {showRecurring && (
-                <InputField
-                  labelText="Päättyy:"
-                  type="date"
-                  inputClassName="w-full"
-                  registerReturn={register('periodEnds')}
-                />
-                )}
-              </div>
+        <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
+          <div className="flex flex-row space-x-6">
+            <div className="flex flex-col">
+              <InputField
+                labelText="Aikaikkuna alkaa:"
+                type="datetime-local"
+                registerReturn={register('start')}
+                step={stepSeconds}
+                min={min}
+              />
             </div>
+            <div className="flex flex-col">
+              <InputField
+                labelText="Aikaikkuna päättyy:"
+                type="datetime-local"
+                registerReturn={register('end')}
+                step={stepSeconds}
+                min={min}
+              />
+            </div>
+          </div>
+          {timeslot && (
+          <div className="flex flex-col">
+            <InputField
+              labelText="Määritä toistuvuus"
+              type="checkbox"
+              registerReturn={register('isRecurring')}
+            />
+            {showRecurring && (
+            <InputField
+              labelText="Päättyy:"
+              type="date"
+              inputClassName="w-full"
+              registerReturn={register('periodEnds')}
+            />
+            )}
             {showRecurring && (
             <InputField
               labelText="Toistuvuuden nimi"
@@ -120,9 +141,9 @@ function RecurringTimeslotForm({
               inputClassName="w-full"
             />
             )}
-          </form>
-          )
-        }
+          </div>
+          )}
+        </form>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import { TimeslotType } from '@lentovaraukset/shared/src';
+import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
 import { useAirfield } from '../queries/airfields';
@@ -11,7 +12,7 @@ import {
   getReservations,
 } from '../queries/reservations';
 import {
-  getTimeSlots, modifyTimeSlot, addTimeSlot, deleteTimeslot,
+  getTimeSlots, modifyTimeSlot, deleteTimeslot,
 } from '../queries/timeSlots';
 
 function TimeSlotCalendar() {
@@ -20,6 +21,7 @@ function TimeSlotCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const selectedTimeslotRef = useRef<EventImpl | null>(null);
+  const draggedTimesRef = useRef<{ start: Date, end: Date } | null>(null);
 
   const timeSlotsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -65,24 +67,15 @@ function TimeSlotCalendar() {
   const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
 
   const clickTimeslot = async (event: EventImpl): Promise<void> => {
+    if (event.end && isTimeInPast(event.end)) {
+      return;
+    }
     selectedTimeslotRef.current = event;
     setShowInfoModal(true);
   };
 
   const closeTimeslotModalFn = () => {
     setShowInfoModal(false);
-  };
-
-  const addTimeslotFn = async (event: { start: Date, end: Date }) => {
-    await addTimeSlot({ ...event, type: blocked ? 'blocked' : 'available' });
-  };
-
-  const modifyTimeslotFn = async (
-    event: { id: string, start: Date, end: Date, extendedProps: { type: TimeslotType } },
-  ) => {
-    await modifyTimeSlot({
-      ...event, id: Number(event.id), type: event.extendedProps.type,
-    });
   };
 
   const removeTimeSlot = async (removeInfo: EventRemoveArg) => {
@@ -118,9 +111,22 @@ function TimeSlotCalendar() {
     return !timeIsConsecutive && !overlap;
   };
 
+  const modifyTimeslotFn = async (
+    event: { id: string, start: Date, end: Date, extendedProps: { type: TimeslotType } },
+  ) => {
+    await modifyTimeSlot({
+      ...event, id: Number(event.id), type: event.extendedProps.type,
+    });
+  };
+
   const handleToggle = () => {
     setBlocked(!blocked);
     calendarRef.current?.getApi().refetchEvents();
+  };
+
+  const showModalAfterDrag = (times: { start: Date, end: Date }) => {
+    draggedTimesRef.current = times;
+    setShowInfoModal(true);
   };
 
   return (
@@ -128,6 +134,8 @@ function TimeSlotCalendar() {
       <TimeslotInfoModal
         showInfoModal={showInfoModal}
         timeslot={selectedTimeslotRef?.current || undefined}
+        draggedTimes={draggedTimesRef?.current || undefined}
+        isBlocked={blocked}
         removeTimeslot={() => {
           selectedTimeslotRef.current?.remove();
         }}
@@ -138,7 +146,10 @@ function TimeSlotCalendar() {
         }}
       />
 
-      <h1 className="text-3xl">Vapaat varausikkunat</h1>
+      <div className="flex flex-row justify-between">
+        <h1 className="text-3xl">Vapaat varausikkunat</h1>
+        <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varausikkuna</Button>
+      </div>
       <div>
         <label htmlFor="checkbox" className="font-ft-label mb-1">
           <span>Lisää suljettuja vuoroja</span>
@@ -154,7 +165,7 @@ function TimeSlotCalendar() {
       <Calendar
         calendarRef={calendarRef}
         eventSources={eventsSourceRef.current}
-        addEventFn={addTimeslotFn}
+        addEventFn={showModalAfterDrag}
         modifyEventFn={modifyTimeslotFn}
         clickEventFn={clickTimeslot}
         removeEventFn={removeTimeSlot}

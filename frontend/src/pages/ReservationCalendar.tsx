@@ -6,18 +6,19 @@ import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
-  addReservation,
   modifyReservation,
   deleteReservation,
 } from '../queries/reservations';
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
 import { useAirfield } from '../queries/airfields';
+import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const selectedReservationRef = useRef<EventImpl | null>(null);
+  const draggedTimesRef = useRef<{ start: Date, end: Date } | null>(null);
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
@@ -77,8 +78,13 @@ function ReservationCalendar() {
 
   const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
 
-  const clickReservation = async (event:EventImpl): Promise<void> => {
+  const clickReservation = async (event: EventImpl): Promise<void> => {
+    if (event.end && isTimeInPast(event.end)) {
+      return;
+    }
+
     selectedReservationRef.current = event;
+
     setShowInfoModal(true);
   };
 
@@ -132,11 +138,17 @@ function ReservationCalendar() {
     return eventsByType ? !(eventsByType.length > 0) : true;
   };
 
+  const showModalAfterDrag = (times: { start: Date, end: Date }) => {
+    draggedTimesRef.current = times;
+    setShowInfoModal(true);
+  };
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <ReservationInfoModal
         showInfoModal={showInfoModal}
         reservation={selectedReservationRef?.current || undefined}
+        draggedTimes={draggedTimesRef?.current || undefined}
         removeReservation={() => {
           selectedReservationRef.current?.remove();
         }}
@@ -146,11 +158,14 @@ function ReservationCalendar() {
           calendarRef.current?.getApi().refetchEvents();
         }}
       />
-      <h1 className="text-3xl">Varauskalenteri</h1>
+      <div className="flex flex-row justify-between">
+        <h1 className="text-3xl">Varauskalenteri</h1>
+        <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varaus</Button>
+      </div>
       <Calendar
         calendarRef={calendarRef}
         eventSources={eventsSourceRef.current}
-        addEventFn={addReservation}
+        addEventFn={showModalAfterDrag}
         modifyEventFn={modifyReservationFn}
         clickEventFn={clickReservation}
         removeEventFn={removeReservation}

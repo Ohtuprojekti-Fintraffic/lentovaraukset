@@ -6,9 +6,11 @@ import { createReservationValidator } from '@lentovaraukset/shared/src/validatio
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 import { useAirfield } from '../../queries/airfields';
 import InputField from '../InputField';
+import { HTMLDateTimeConvert } from '../../util';
 
 type ReservationInfoProps = {
   reservation?: EventImpl
+  draggedTimes?: { start: Date, end: Date }
   onSubmit: (formData: Omit<ReservationEntry, 'id' | 'user'>) => void
   id?: string
 };
@@ -22,19 +24,22 @@ type Inputs = {
 };
 
 function ReservationInfoForm({
-  reservation,
+  reservation, draggedTimes,
   onSubmit,
   id,
 }: ReservationInfoProps) {
   const { data: airfield } = useAirfield(1);
   const reservationGranularity = airfield?.eventGranularityMinutes || 20;
 
+  const start = reservation?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
+  const end = reservation?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
+
   const {
     register, handleSubmit, reset,
   } = useForm<Inputs>({
     values: {
-      start: reservation?.startStr.replace(/.{3}\+.*/, '') || '',
-      end: reservation?.endStr.replace(/.{3}\+.*/, '') || '',
+      start,
+      end,
       aircraftId: reservation?.extendedProps.aircraftId,
       phone: reservation?.extendedProps.phone,
       info: reservation?.extendedProps.info,
@@ -58,6 +63,21 @@ function ReservationInfoForm({
     reset();
   }, [reservation]);
 
+  // step is relative to min: https://stackoverflow.com/a/75353708
+  const stepSeconds = reservationGranularity * 60;
+  const stepMillis = stepSeconds * 1000;
+  const nowMillis = new Date().getTime();
+  // round up to nearest even whatever minutes
+  const roundedDate = new Date(Math.ceil(nowMillis / stepMillis) * stepMillis);
+  const min = HTMLDateTimeConvert(roundedDate);
+
+  // important detail: the browser GUI doesn't give a damn and will show
+  // whatever minutes it wants, but at least Chrome checks the field on submit
+  // and shows a popover with the nearest acceptable divisible values
+
+  // TODO: add max future time
+  // const max =
+
   return (
     <div>
       <div className="bg-black p-3">
@@ -65,56 +85,49 @@ function ReservationInfoForm({
           {
         reservation
           ? `Varaus #${reservation.id}`
-          : 'Virhe'
+          : 'Uusi varaus'
         }
         </p>
       </div>
       <div className="p-8">
-        {
-          !reservation
-          && <p>Virhe varausta haettaessa</p>
-        }
-        {
-          reservation
-          && (
-          /* eslint-disable  react/jsx-props-no-spreading */
-          <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
-            <div className="flex flex-row space-x-6">
-              <div className="flex flex-col">
-                <InputField
-                  labelText="Varaus alkaa:"
-                  type="datetime-local"
-                  registerReturn={register('start')}
-                />
-                <InputField
-                  labelText="Koneen rekisteritunnus:"
-                  type="text"
-                  registerReturn={register('aircraftId')}
-                />
-              </div>
-              <div className="flex flex-col">
-                <InputField
-                  labelText="Varaus päättyy:"
-                  type="datetime-local"
-                  registerReturn={register('end')}
-                />
-                <InputField
-                  labelText="Puhelinnumero:"
-                  type="tel"
-                  registerReturn={register('phone')}
-                />
-              </div>
+        <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
+          <div className="flex flex-row space-x-6">
+            <div className="flex flex-col">
+              <InputField
+                labelText="Varaus alkaa:"
+                type="datetime-local"
+                registerReturn={register('start')}
+                step={stepSeconds}
+                min={min}
+              />
+              <InputField
+                labelText="Koneen rekisteritunnus:"
+                type="text"
+                registerReturn={register('aircraftId')}
+              />
             </div>
-            <InputField
-              labelText="Lisätietoja:"
-              type="text"
-              registerReturn={register('info')}
-              inputClassName="w-full"
-            />
-          </form>
-          /* eslint-enable  react/jsx-props-no-spreading */
-          )
-        }
+            <div className="flex flex-col">
+              <InputField
+                labelText="Varaus päättyy:"
+                type="datetime-local"
+                registerReturn={register('end')}
+                step={stepSeconds}
+                min={min}
+              />
+              <InputField
+                labelText="Puhelinnumero:"
+                type="tel"
+                registerReturn={register('phone')}
+              />
+            </div>
+          </div>
+          <InputField
+            labelText="Lisätietoja:"
+            type="text"
+            registerReturn={register('info')}
+            inputClassName="w-full"
+          />
+        </form>
       </div>
     </div>
   );
