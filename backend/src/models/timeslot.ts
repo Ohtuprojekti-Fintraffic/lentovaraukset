@@ -8,7 +8,7 @@ import {
   HasManyGetAssociationsMixin,
   HasManyRemoveAssociationsMixin,
 } from 'sequelize';
-
+import { TimeslotType } from '@lentovaraukset/shared/src';
 import { Reservation } from '@lentovaraukset/backend/src/models';
 import { sequelize } from '../util/db';
 
@@ -22,7 +22,9 @@ InferCreationAttributes<Timeslot>
 
   declare end: Date;
 
-  declare groupId: string | null;
+  declare type: TimeslotType;
+
+  declare group: string | null;
 
   declare addReservations: HasManyAddAssociationsMixin<Reservation, number>;
 
@@ -31,7 +33,7 @@ InferCreationAttributes<Timeslot>
   declare removeReservations: HasManyRemoveAssociationsMixin<Reservation, number>;
 
   static async addGroupTimeslots(
-    timeslots: { groupId:string, start: Date, end: Date }[],
+    timeslots: { group:string, start: Date, end: Date, type: TimeslotType }[],
   ) {
     return sequelize.transaction(async (transaction) => Timeslot
       .bulkCreate(timeslots, { transaction }));
@@ -47,15 +49,28 @@ Timeslot.init(
     },
     start: {
       type: DataTypes.DATE,
-      unique: true,
+      unique: false,
       allowNull: false,
     },
     end: {
       type: DataTypes.DATE,
-      unique: true,
+      unique: false,
       allowNull: false,
     },
-    groupId: {
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'available',
+      validate: {
+        customValidator: (value: string) => {
+          const enums = ['available', 'blocked'];
+          if (!enums.includes(value)) {
+            throw new Error('not a valid option');
+          }
+        },
+      },
+    },
+    group: {
       type: DataTypes.STRING,
       allowNull: true,
       unique: false,

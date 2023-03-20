@@ -1,15 +1,16 @@
 import request from 'supertest';
 import app from '@lentovaraukset/backend/src/app';
 import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
+import { TimeslotType } from '@lentovaraukset/shared/src';
 import { connectToDatabase, sequelize } from '../src/util/db';
 import airfieldService from '../src/services/airfieldService';
 
 const api = request(app);
 
-const timeslotData = [
-  { start: new Date('2023-02-14T08:00:00.000Z'), end: new Date('2023-02-14T10:00:00.000Z') },
-  { start: new Date('2023-02-14T14:00:00.000Z'), end: new Date('2023-02-14T16:00:00.000Z') },
-  { start: new Date('2023-02-14T16:00:00.000Z'), end: new Date('2023-02-14T18:00:00.000Z') },
+const timeslotData: { start: Date, end: Date, type: TimeslotType }[] = [
+  { start: new Date('2023-02-14T08:00:00.000Z'), end: new Date('2023-02-14T10:00:00.000Z'), type: 'available' },
+  { start: new Date('2023-02-14T14:00:00.000Z'), end: new Date('2023-02-14T16:00:00.000Z'), type: 'available' },
+  { start: new Date('2023-02-14T16:00:00.000Z'), end: new Date('2023-02-14T18:00:00.000Z'), type: 'available' },
 ];
 const timeslotDataBegin = timeslotData.reduce(
   (prev, cur) => (cur.start < prev.start ? cur : prev),
@@ -44,10 +45,10 @@ afterAll(async () => {
   await sequelize.close();
 });
 describe('Calls to api', () => {
-  test('can create a timeslot', async () => {
+  test('can create an available timeslot', async () => {
     await api.post('/api/timeslots/')
       .set('Content-type', 'application/json')
-      .send({ start: new Date('2023-02-18T12:00:00.000Z'), end: new Date('2023-02-18T14:00:00.000Z') });
+      .send({ start: new Date('2023-02-18T12:00:00.000Z'), end: new Date('2023-02-18T14:00:00.000Z'), type: 'available' });
 
     const createdTimeslot: Timeslot | null = await Timeslot.findOne(
       { where: { start: new Date('2023-02-18T12:00:00.000Z') } },
@@ -58,6 +59,24 @@ describe('Calls to api', () => {
     expect(createdTimeslot).not.toEqual(null);
     expect(createdTimeslot?.dataValues.start).toEqual(new Date('2023-02-18T12:00:00.000Z'));
     expect(createdTimeslot?.dataValues.end).toEqual(new Date('2023-02-18T14:00:00.000Z'));
+    expect(createdTimeslot?.dataValues.type).toEqual('available');
+  });
+
+  test('can create a blocked timeslot', async () => {
+    await api.post('/api/timeslots/')
+      .set('Content-type', 'application/json')
+      .send({ start: new Date('2023-02-18T12:00:00.000Z'), end: new Date('2023-02-18T14:00:00.000Z'), type: 'blocked' });
+
+    const createdTimeslot: Timeslot | null = await Timeslot.findOne(
+      { where: { start: new Date('2023-02-18T12:00:00.000Z') } },
+    );
+    const numberOfTimeslots: Number = await Timeslot.count();
+
+    expect(numberOfTimeslots).toEqual(timeslotData.length + 1);
+    expect(createdTimeslot).not.toEqual(null);
+    expect(createdTimeslot?.dataValues.start).toEqual(new Date('2023-02-18T12:00:00.000Z'));
+    expect(createdTimeslot?.dataValues.end).toEqual(new Date('2023-02-18T14:00:00.000Z'));
+    expect(createdTimeslot?.dataValues.type).toEqual('blocked');
   });
 
   test('dont create a timeslot if all fields not provided', async () => {
@@ -74,10 +93,24 @@ describe('Calls to api', () => {
     expect(createdTimeslot).toEqual(null);
   });
 
+  test('dont create a timeslot if type is not available or blocked', async () => {
+    await api.post('/api/timeslots/')
+      .set('Content-type', 'application/json')
+      .send({ start: '2023-02-18T12:00:00.000Z', end: new Date('2023-02-18T14:00:00.000Z'), type: 'error' });
+
+    const createdTimeslot: Timeslot | null = await Timeslot.findOne(
+      { where: { start: new Date('2023-02-18T12:00:00.000Z') } },
+    );
+    const numberOfTimeslots: Number = await Timeslot.count();
+
+    expect(numberOfTimeslots).toEqual(timeslotData.length);
+    expect(createdTimeslot).toEqual(null);
+  });
+
   test('dont create a timeslot if granularity is wrong', async () => {
     await api.post('/api/timeslots/')
       .set('Content-type', 'application/json')
-      .send({ start: new Date('2023-02-18T12:00:00.000Z'), end: new Date('2023-02-18T12:15:00.000Z') });
+      .send({ start: new Date('2023-02-18T12:00:00.000Z'), end: new Date('2023-02-18T12:15:00.000Z'), type: 'available' });
 
     const createdTimeslot: Timeslot | null = await Timeslot.findOne(
       { where: { start: new Date('2023-02-18T12:00:00.000Z') } },
@@ -91,19 +124,19 @@ describe('Calls to api', () => {
   test('dont create a timeslot if provided times are empty', async () => {
     await api.post('/api/timeslots/')
       .set('Content-type', 'application/json')
-      .send({ start: '', end: '' });
+      .send({ start: '', end: '', type: 'available' });
 
     const numberOfTimeslots: Number = await Timeslot.count();
 
     expect(numberOfTimeslots).toEqual(timeslotData.length);
   });
 
-  test('can edit a timeslot', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z') });
+  test('can edit an available timeslot', async () => {
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
 
     await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
-      .send({ start: '2023-02-17T12:00:00.000Z', end: '2023-02-17T14:00:00.000Z' });
+      .send({ start: '2023-02-17T12:00:00.000Z', end: '2023-02-17T14:00:00.000Z', type: 'available' });
 
     const updatedSlot: Timeslot | null = await Timeslot.findOne(
       { where: { id: createdSlot.dataValues.id } },
@@ -114,8 +147,24 @@ describe('Calls to api', () => {
     expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-02-17T14:00:00.000Z'));
   });
 
-  test('can edit a timeslot with reservation', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z') });
+  test('can edit a blocked timeslot', async () => {
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'blocked' });
+
+    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+      .set('Content-type', 'application/json')
+      .send({ start: '2023-02-17T12:00:00.000Z', end: '2023-02-17T14:00:00.000Z', type: 'blocked' });
+
+    const updatedSlot: Timeslot | null = await Timeslot.findOne(
+      { where: { id: createdSlot.dataValues.id } },
+    );
+
+    expect(updatedSlot).toBeDefined();
+    expect(updatedSlot?.dataValues.start).toEqual(new Date('2023-02-17T12:00:00.000Z'));
+    expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-02-17T14:00:00.000Z'));
+  });
+
+  test('can edit an available timeslot with reservation', async () => {
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
     const newReservation: Reservation = await Reservation.create({
       start: new Date('2023-02-16T12:00:00.000Z'),
       end: new Date('2023-02-16T13:00:00.000Z'),
@@ -126,7 +175,7 @@ describe('Calls to api', () => {
 
     await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
-      .send({ start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T14:00:00.000Z' });
+      .send({ start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T14:00:00.000Z', type: 'available' });
 
     const updatedSlot: Timeslot | null = await Timeslot.findOne(
       { where: { id: createdSlot.dataValues.id } },
@@ -138,9 +187,9 @@ describe('Calls to api', () => {
   });
 
   test('dont edit a timeslot if all fields not provided', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z') });
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
 
-    await api.patch(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({ start: '2023-02-17T12:00:00.000Z' });
 
@@ -154,11 +203,27 @@ describe('Calls to api', () => {
   });
 
   test('dont edit a timeslot if granularity is wrong', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z') });
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
 
     await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
-      .send({ start: new Date('2023-02-17T12:00:00.000Z'), end: new Date('2023-02-17T13:15:00.000Z') });
+      .send({ start: new Date('2023-02-17T12:00:00.000Z'), end: new Date('2023-02-17T13:15:00.000Z'), type: 'available' });
+
+    const updatedSlot: Timeslot | null = await Timeslot.findOne(
+      { where: { id: createdSlot.dataValues.id } },
+    );
+
+    expect(updatedSlot).not.toEqual(null);
+    expect(updatedSlot?.dataValues.start).toEqual(new Date('2023-02-16T12:00:00.000Z'));
+    expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-02-16T13:00:00.000Z'));
+  });
+
+  test('dont edit a timeslot if type is not available or blocked', async () => {
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
+
+    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+      .set('Content-type', 'application/json')
+      .send({ start: '2023-02-17T12:00:00.000Z', end: new Date('2023-02-17T13:15:00.000Z'), type: 'error' });
 
     const updatedSlot: Timeslot | null = await Timeslot.findOne(
       { where: { id: createdSlot.dataValues.id } },
@@ -170,7 +235,7 @@ describe('Calls to api', () => {
   });
 
   test('dont edit a timeslot with reservation  if it goes outside reservation range', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T14:00:00.000Z') });
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T14:00:00.000Z'), type: 'available' });
     const newReservation: Reservation = await Reservation.create({
       start: new Date('2023-02-16T12:00:00.000Z'),
       end: new Date('2023-02-16T14:00:00.000Z'),
@@ -181,7 +246,7 @@ describe('Calls to api', () => {
 
     await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
-      .send({ start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T13:00:00.000Z' });
+      .send({ start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T13:00:00.000Z', type: 'available' });
 
     const updatedSlot: Timeslot | null = await Timeslot.findOne(
       { where: { id: createdSlot.dataValues.id } },
@@ -193,11 +258,11 @@ describe('Calls to api', () => {
   });
 
   test('dont edit a timeslot if it is in past', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z') });
+    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), type: 'available' });
 
     const response = await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
-      .send({ start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T13:00:00.000Z' });
+      .send({ start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T13:00:00.000Z', type: 'available' });
 
     const updatedSlot: Timeslot | null = await Timeslot.findByPk(createdSlot.id);
 
@@ -230,6 +295,7 @@ describe('Calls to api', () => {
     const newTimeslot: any = await Timeslot.create({
       start: new Date('2022-02-13T08:00:00.000Z'),
       end: new Date('2022-02-13T09:00:00.000Z'),
+      type: 'available',
     });
 
     await api.delete(`/api/timeslots/${newTimeslot.id}`);
@@ -283,7 +349,7 @@ describe('Calls to api', () => {
     const end = new Date('2023-02-24T06:00:00.000Z');
 
     const newTimeslot: any = await api.post('/api/timeslots/').set('Content-type', 'application/json').send({
-      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+      start, end, type: 'available',
     });
 
     expect(newTimeslot.body.error).toBeDefined();

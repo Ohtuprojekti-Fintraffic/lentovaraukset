@@ -32,6 +32,9 @@ const deleteById = async (id: number) => {
 const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | 'user'>): Promise<ReservationEntry> => {
   const timeslots = await timeslotService
     .getInTimeRange(newReservation.start, newReservation.end);
+  if (timeslots.some((timeslot) => timeslot.type === 'blocked')) {
+    throw new Error('Reservation cannot be created on top of blocked timeslot');
+  }
   if (timeslots.length !== 1) {
     throw new Error('Reservation should be created for one timeslot');
   }
@@ -50,6 +53,9 @@ const updateById = async (
 ): Promise<ReservationEntry> => {
   const newTimeslots = await timeslotService
     .getInTimeRange(reservation.start, reservation.end);
+  if (newTimeslots.some((timeslot) => timeslot.type === 'blocked')) {
+    throw new Error('Reservation cannot be created on top of blocked timeslot');
+  }
   if (newTimeslots.length !== 1) {
     throw new Error('Reservation should be created for one timeslot');
   }
