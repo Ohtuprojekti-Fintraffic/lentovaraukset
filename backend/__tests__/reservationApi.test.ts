@@ -346,10 +346,9 @@ describe('Calls to api', () => {
   });
 
   test('Reservation has to be within a timeslot upon creation', async () => {
-    await Timeslot.create({
-      start: new Date('2023-02-16T08:00:00.000Z'),
-      end: new Date('2023-02-16T18:00:00.000Z'),
-    });
+    await api.post('/api/timeslots/')
+      .set('Content-type', 'application/json')
+      .send({ start: new Date('2023-02-16T08:00:00.000Z'), end: new Date('2023-02-16T18:00:00.000Z'), type: 'available' });
 
     const start = new Date('2023-02-16T07:00:00.000Z');
     const end = new Date('2023-02-16T09:00:00.000Z');
@@ -366,10 +365,9 @@ describe('Calls to api', () => {
   });
 
   test('Reservation has to be within a timeslot when modified', async () => {
-    await Timeslot.create({
-      start: new Date('2023-02-16T08:00:00.000Z'),
-      end: new Date('2023-02-16T18:00:00.000Z'),
-    });
+    await api.post('/api/timeslots/')
+      .set('Content-type', 'application/json')
+      .send({ start: new Date('2023-02-16T08:00:00.000Z'), end: new Date('2023-02-16T18:00:00.000Z'), type: 'available' });
 
     const start = new Date('2023-02-16T08:00:00.000Z');
     const newStart = new Date('2023-02-16T07:00:00.000Z');
