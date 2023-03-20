@@ -35,6 +35,14 @@ const createTimeSlotValidator = (slotGranularityMinutes: number) => {
   return TimeSlot;
 };
 
+const createPeriodValidation = () => {
+  const period = z.object({
+    periodEnd: z.coerce.date(),
+    name: z.coerce.string(),
+  });
+  return period;
+};
+
 const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFuture: number) => {
   const message = `Reservation must be multiples of ${slotGranularityMinutes} minutes`;
   const pastErrorMessage = 'Reservation cannot be in past';
@@ -87,4 +95,5 @@ export {
   isTimeInPast,
   isTimeAtMostInFuture,
   airfieldValidator,
+  createPeriodValidation,
 };

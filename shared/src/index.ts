@@ -13,6 +13,7 @@ export interface TimeslotEntry {
   id: number;
   start: Date;
   end: Date;
+  group?: string | null;
 }
 
 export interface AirfieldEntry {

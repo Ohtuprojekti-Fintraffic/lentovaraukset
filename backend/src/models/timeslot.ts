@@ -22,11 +22,20 @@ InferCreationAttributes<Timeslot>
 
   declare end: Date;
 
+  declare group: string | null;
+
   declare addReservations: HasManyAddAssociationsMixin<Reservation, number>;
 
   declare getReservations: HasManyGetAssociationsMixin<Reservation>;
 
   declare removeReservations: HasManyRemoveAssociationsMixin<Reservation, number>;
+
+  static async addGroupTimeslots(
+    timeslots: { group:string, start: Date, end: Date }[],
+  ) {
+    return sequelize.transaction(async (transaction) => Timeslot
+      .bulkCreate(timeslots, { transaction }));
+  }
 }
 
 Timeslot.init(
@@ -45,6 +54,12 @@ Timeslot.init(
       type: DataTypes.DATE,
       unique: true,
       allowNull: false,
+    },
+    group: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: false,
+      defaultValue: null,
     },
   },
   {
