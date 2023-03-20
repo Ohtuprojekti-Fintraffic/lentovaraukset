@@ -34,9 +34,9 @@ function TimeSlotCalendar() {
         const timeslotEvent = {
           ...timeslot,
           id: timeslot.id.toString(),
+          editable: !isTimeInPast(timeslot.start),
           color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
           title: timeslot.type === 'available' ? 'Vapaa' : timeslot.info || 'Suljettu',
-          editable: !isTimeInPast(timeslot.start),
         };
         return timeslot.group ? { ...timeslotEvent, groupId: timeslot.group } : timeslotEvent;
       });
@@ -97,18 +97,11 @@ function TimeSlotCalendar() {
       .filter((e) => e.id !== movingEvent?.id && e.groupId !== 'reservations'
       && isSameType(e.extendedProps.type, movingEvent?.extendedProps?.type));
 
-    const timeIsConsecutive = eventsByType?.some(
-      (e) => e.start && e.end
-        && (e.start.getTime() === span.start.getTime()
-        || e.start.getTime() === span.end.getTime()
-        || e.end.getTime() === span.start.getTime()
-        || e.end.getTime() === span.end.getTime()),
-    );
     const overlap = eventsByType?.some(
       (e) => e.start && e.end
         && e.start < span.end && e.end > span.start,
     );
-    return !timeIsConsecutive && !overlap;
+    return !overlap;
   };
 
   const modifyTimeslotFn = async (
@@ -181,6 +174,7 @@ function TimeSlotCalendar() {
         eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}
         selectConstraint={undefined}
         maxConcurrentLimit={1}
+        blocked={blocked}
         allowEventRef={allowEvent}
       />
     </div>
