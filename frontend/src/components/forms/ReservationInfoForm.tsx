@@ -94,7 +94,7 @@ function ReservationInfoForm({
         </p>
       </div>
       <div className="p-8">
-        <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)} noValidate>
+        <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
           <div className="flex flex-row space-x-6">
             <div className="flex flex-col">
               <InputField

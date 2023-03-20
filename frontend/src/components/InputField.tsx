@@ -64,10 +64,14 @@ function InputField({
   const fieldBaseClass = 'border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
                        + 'placeholder:text-ft-text-300 mb-4';
 
+  const fieldInvalidClass = 'invalid:bg-ft-warning-100 invalid:text-ft-warning-300'
+                            + 'invalid:border-ft-warning-300';
+
   const fieldStateClasses = {
     default: 'border-ft-neutral-200',
     error: 'border-[3px] border-ft-danger-200 text-ft-danger-200',
     disabled: 'border-ft-neutral-200 text-ft-text-300 bg-ft-input-placeholder',
+    invalid: fieldInvalidClass,
   };
 
   const id = useId();
@@ -98,7 +102,7 @@ function InputField({
         name={name}
         disabled={state === 'disabled'}
         placeholder={placeholder}
-        className={`${fieldBaseClass} ${fieldStateClasses[state]} ${inputClassName}`}
+        className={`${fieldBaseClass} ${fieldStateClasses[state]} ${fieldInvalidClass} ${inputClassName}`}
         defaultValue={defaultValue}
         step={step}
         min={min}
