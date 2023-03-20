@@ -16,22 +16,22 @@ const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => {
 };
 
 const createTimeSlotValidator = (slotGranularityMinutes: number) => {
-  const message = `Times must be multiples of ${slotGranularityMinutes} minutes`;
+  // Time must be a multiple of ${slotGranularityMinutes} minutes
+  const minuteMultipleMessage = `Ajan tulee olla jokin ${slotGranularityMinutes} minuutin moninkerta`;
   const pastErrorMessage = 'Timeslot cannot be in past';
   const startNotLessThanEndErrorMessage = 'Timeslot start time cannot be later than the end time';
 
   const TimeSlot = z.object({
     start: z.coerce
       .date()
-      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
+      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
     end: z.coerce
       .date()
-      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
+      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
     type: z.enum(['available', 'blocked']),
-  })
-    .refine((res) => res.start < res.end, { message: startNotLessThanEndErrorMessage });
+  }).refine((res) => res.start < res.end, { message: startNotLessThanEndErrorMessage });
 
   return TimeSlot;
 };

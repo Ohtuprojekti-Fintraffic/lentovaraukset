@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,6 +7,7 @@ import { ReservationEntry } from '@lentovaraukset/shared/src';
 import { useAirfield } from '../../queries/airfields';
 import InputField from '../InputField';
 import { HTMLDateTimeConvert } from '../../util';
+import ModalAlert from '../ModalAlert';
 
 type ReservationInfoProps = {
   reservation?: EventImpl
@@ -47,6 +48,8 @@ function ReservationInfoForm({
     resolver: zodResolver(createReservationValidator(reservationGranularity, 7)),
   });
 
+  const [formWarning, setFormWarning] = useState<string | undefined>(undefined);
+
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
     const updatedReservation = {
       start: new Date(formData.start),
@@ -55,7 +58,7 @@ function ReservationInfoForm({
       phone: formData.phone,
       info: formData.info,
     };
-
+    setFormWarning(undefined);
     onSubmit(updatedReservation);
   };
 
@@ -63,9 +66,10 @@ function ReservationInfoForm({
     reset();
   }, [reservation]);
 
-  const onError = (errorObject: FieldErrors) => {
-    console.error(errorObject);
-  };
+  useEffect(() => {
+    // field '' is added to allow access to zod errors not related to a specific field
+    setFormWarning((errors as FieldErrors<Inputs & { '': string }>)['']?.message);
+  }, [errors]);
 
   // step is relative to min: https://stackoverflow.com/a/75353708
   const stepSeconds = reservationGranularity * 60;
@@ -93,8 +97,14 @@ function ReservationInfoForm({
         }
         </p>
       </div>
+      <ModalAlert
+        message={formWarning}
+        variant="warning"
+        clearAlert={() => setFormWarning(undefined)}
+        removalDelaySecs={10}
+      />
       <div className="p-8">
-        <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
+        <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler)}>
           <div className="flex flex-row space-x-6">
             <div className="flex flex-col">
               <InputField
