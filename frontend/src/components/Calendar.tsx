@@ -33,6 +33,7 @@ type CalendarProps = {
   maxConcurrentLimit?: number;
   allowEventRef?: AllowFunc;
   checkIfTimeInFuture?: boolean;
+  blocked?: boolean;
 };
 
 function Calendar({
@@ -48,9 +49,18 @@ function Calendar({
   maxConcurrentLimit = 1,
   allowEventRef = () => true,
   checkIfTimeInFuture = false,
+  blocked = false,
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
   const { addNewAlert } = React.useContext(AlertContext);
+
+  const isSameType = (
+    stillEventType: string,
+    movingEventType?: string,
+  ) => {
+    if (movingEventType) return stillEventType === movingEventType;
+    return ((stillEventType === 'available' && !blocked) || (stillEventType === 'blocked' && blocked));
+  };
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
     const events = calendarRef.current?.getApi().getEvents().filter(
@@ -65,9 +75,9 @@ function Calendar({
       : true;
   };
 
-  const timeIsConsecutive = (start: Date, end: Date) => {
+  const timeIsConsecutive = (start: Date, end: Date, type?: string) => {
     const consecutive = calendarRef.current?.getApi().getEvents().some(
-      (e) => e.extendedProps.description === 'timeslot'
+      (e) => (isSameType(e.extendedProps.type, type))
       && e.start && e.end
       && ((start.getTime() !== e.start.getTime()) && (end.getTime() !== e.end.getTime()))
       && (e.start.getTime() === start.getTime()
@@ -78,7 +88,7 @@ function Calendar({
     return consecutive;
   };
 
-  const isTimeAllowed = (start: Date, end: Date) => {
+  const isTimeAllowed = (start: Date, end: Date, type?: string) => {
     if (isTimeInPast(start)) {
       calendarRef.current?.getApi().unselect();
       addNewAlert('Aikaa ei voi lisätä menneisyyteen', 'warning');
@@ -90,7 +100,7 @@ function Calendar({
       addNewAlert('Aikaa ei voi lisätä yli 7 päivän päähän', 'warning');
       return false;
     }
-    if (timeIsConsecutive(start, end)) {
+    if (timeIsConsecutive(start, end, type)) {
       calendarRef.current?.getApi().unselect();
       addNewAlert('Ajat eivät voi olla peräkkäin', 'warning');
       return false;
@@ -110,7 +120,11 @@ function Calendar({
     // Open confirmation popup here
     const { event } = changeData;
 
-    if (isTimeAllowed(event.start || new Date(), event.end || new Date())) {
+    if (isTimeAllowed(
+      event.start || new Date(),
+      event.end || new Date(),
+      event.extendedProps.type,
+    )) {
       await modifyEventFn({
         id: event.id,
         start: event.start || new Date(),
@@ -146,7 +160,7 @@ function Calendar({
     calendarRef.current?.getApi().unselect();
   };
 
-  const handleAllow: AllowFunc = (s, m) => allowEvent(s, m) && allowEventRef(s, m);
+  const handleAllow: AllowFunc = (s, m) => allowEventRef(s, m) ?? allowEvent(s, m);
 
   return (
     <FullCalendar

@@ -56,6 +56,7 @@ beforeEach(async () => {
   await Timeslot.create({
     start: new Date('2023-02-12T08:00:00.000Z'),
     end: new Date('2023-02-15T08:00:00.000Z'),
+    type: 'available',
   });
 });
 
@@ -127,6 +128,21 @@ describe('Calls to api', () => {
     expect(result.body.error.message.includes('Aircraft ID cannot be empty'));
   });
 
+  test('cannot create a reservation on top of blocked timeslot', async () => {
+    await Timeslot.create({
+      start: new Date('2023-02-12T08:00:00.000Z'),
+      end: new Date('2023-02-12T16:00:00.000Z'),
+      type: 'blocked',
+    });
+    const result: any = await api.post('/api/reservations/')
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
+      });
+    expect(result.statusCode).toEqual(400);
+    expect(result.body.error.message.includes('Reservation cannot be created on top of blocked timeslot'));
+  });
+
   test('can delete a reservation', async () => {
     const createdReservation: Reservation | null = await Reservation.findOne();
     const id = createdReservation?.dataValues.id;
@@ -192,6 +208,23 @@ describe('Calls to api', () => {
 
     const reservationAfterUpdate: Reservation | null = await Reservation.findByPk(id);
     expect(reservationAfterUpdate?.dataValues.phone).not.toEqual('');
+  });
+
+  test('cannot update a reservation on top of blocked timeslot', async () => {
+    const createdReservation: Reservation | null = await Reservation.findOne();
+    const id = createdReservation?.dataValues.id;
+    await Timeslot.create({
+      start: new Date('2023-02-12T08:00:00.000Z'),
+      end: new Date('2023-02-12T16:00:00.000Z'),
+      type: 'blocked',
+    });
+    const result: any = await api.put(`/api/reservations/${id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
+      });
+    expect(result.statusCode).toEqual(400);
+    expect(result.body.error.message.includes('Reservation cannot be created on top of blocked timeslot'));
   });
 
   test('cannot modify a reservation to have an empty aircraft ID', async () => {
