@@ -70,6 +70,9 @@ function Calendar({
         && e.start < span.end && e.end > span.start,
     );
 
+    console.log(events);
+    console.log(countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit);
+
     return events
       ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
       : true;

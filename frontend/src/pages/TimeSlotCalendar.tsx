@@ -1,4 +1,4 @@
-import { EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
+import { EventRemoveArg, EventSourceFunc, AllowFunc } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
@@ -84,6 +84,26 @@ function TimeSlotCalendar() {
     setShowInfoModal(false);
   };
 
+  const isSameType = (
+    stillEventType: TimeslotType,
+    movingEventType?: TimeslotType,
+  ) => {
+    if (movingEventType) return stillEventType === movingEventType;
+    return ((stillEventType === 'available' && !blocked) || (stillEventType === 'blocked' && blocked));
+  };
+
+  const allowEvent: AllowFunc = (span, movingEvent) => {
+    const eventsByType = calendarRef.current?.getApi().getEvents()
+      .filter((e) => e.id !== movingEvent?.id && e.groupId !== 'reservations'
+      && isSameType(e.extendedProps.type, movingEvent?.extendedProps?.type));
+
+    const overlap = eventsByType?.some(
+      (e) => e.start && e.end
+        && e.start < span.end && e.end > span.start,
+    );
+    return !overlap;
+  };
+
   const modifyTimeslotFn = async (
     event: { id: string, start: Date, end: Date, extendedProps: { type: TimeslotType } },
   ) => {
@@ -147,6 +167,7 @@ function TimeSlotCalendar() {
         selectConstraint={undefined}
         maxConcurrentLimit={1}
         blocked={blocked}
+        allowEventRef={allowEvent}
       />
     </div>
   );
