@@ -1,5 +1,4 @@
 import { Sequelize } from 'sequelize';
-import { newDb } from 'pg-mem';
 import { DATABASE_URL } from './config';
 
 if (process.env.NODE_ENV === 'test') {
@@ -7,7 +6,9 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 const sequelize = process.env.NODE_ENV === 'test'
-  ? new Sequelize({ dialect: 'postgres', dialectModule: newDb().adapters.createPg(), logging: false })
+  // this requires a conditional export so:
+  // eslint-disable-next-line global-require
+  ? new Sequelize({ dialect: 'postgres', dialectModule: (require('pg-mem')).newDb().adapters.createPg(), logging: false })
   : new Sequelize(DATABASE_URL as string, { dialect: 'postgres', logging: false });
 
 const connectToDatabase = async () => {

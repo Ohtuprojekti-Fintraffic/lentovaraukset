@@ -17,4 +17,6 @@ app.use('/api/reservations', reservationRouter);
 app.use('/api/airfields', airfieldRouter);
 app.use(errorHandler);
 
+app.use('/', express.static('front_dist'));
+
 export default app;

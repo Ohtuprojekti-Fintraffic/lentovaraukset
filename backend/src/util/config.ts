@@ -3,6 +3,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
+console.log(process.env);
+
 if (process.env.NODE_ENV !== 'test' && (process.env.DATABASE_URL === undefined || typeof process.env.DATABASE_URL !== 'string')) {
   throw new Error('Missing key DATABASE_URL in .env');
 }
