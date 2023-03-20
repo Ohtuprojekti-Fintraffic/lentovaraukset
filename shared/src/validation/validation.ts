@@ -29,10 +29,19 @@ const createTimeSlotValidator = (slotGranularityMinutes: number) => {
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message })
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
+    type: z.enum(['available', 'blocked']),
   })
     .refine((res) => res.start < res.end, { message: startNotLessThanEndErrorMessage });
 
   return TimeSlot;
+};
+
+const createPeriodValidation = () => {
+  const period = z.object({
+    periodEnd: z.coerce.date(),
+    name: z.coerce.string(),
+  });
+  return period;
 };
 
 const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFuture: number) => {
@@ -93,4 +102,5 @@ export {
   isTimeInPast,
   isTimeAtMostInFuture,
   airfieldValidator,
+  createPeriodValidation,
 };

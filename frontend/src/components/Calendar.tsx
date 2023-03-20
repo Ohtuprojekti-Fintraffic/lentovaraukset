@@ -15,7 +15,7 @@ import AlertContext from '../contexts/AlertContext';
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>
   eventSources: EventSourceInput[];
-  addEventFn: (event: { start: Date; end: Date; }) => Promise<any>;
+  addEventFn: (event: { start: Date; end: Date; }) => void;
   modifyEventFn: (event: {
     id: string;
     start: Date;
@@ -109,7 +109,7 @@ function Calendar({
 
     if (!isTimeInAllowedRange(newStartTime)) return;
 
-    await addEventFn({
+    addEventFn({
       start: dropData.start,
       end: dropData.end,
     });
@@ -127,7 +127,7 @@ function Calendar({
     calendarRef.current?.getApi().unselect();
   };
 
-  const handleAllow: AllowFunc = (s, m) => allowEvent(s, m) && allowEventRef(s, m);
+  const handleAllow: AllowFunc = (s, m) => allowEventRef(s, m) ?? allowEvent(s, m);
 
   return (
     <FullCalendar

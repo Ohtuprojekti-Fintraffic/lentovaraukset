@@ -4,14 +4,21 @@ import React, {
 import { UseFormRegisterReturn, FieldError } from 'react-hook-form';
 
 type InputStates = 'default' | 'error' | 'disabled';
+
 export interface FieldProps {
   state?: InputStates;
-  type: React.InputHTMLAttributes<HTMLInputElement>['type']
+  type: React.InputHTMLAttributes<HTMLInputElement>['type'];
 
   value?: React.InputHTMLAttributes<HTMLInputElement>['value'];
   name?: React.InputHTMLAttributes<HTMLInputElement>['name'];
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
   onBlur?: React.FocusEventHandler<HTMLInputElement>;
+
+  // only applicable to field types:
+  // 'datetime-local' | 'date' | 'month' | 'week' | 'time' | 'number' | 'range'
+  step?: React.InputHTMLAttributes<HTMLInputElement>['step'];
+  min?: React.InputHTMLAttributes<HTMLInputElement>['min'];
+  max?: React.InputHTMLAttributes<HTMLInputElement>['max'];
 
   placeholder?: string;
 
@@ -45,6 +52,7 @@ function InputField({
   state = 'default',
   type,
   value, name, onChange, onBlur,
+  step, min, max,
   placeholder, labelText, helperText,
   error,
   registerReturn,
@@ -92,6 +100,9 @@ function InputField({
         placeholder={placeholder}
         className={`${fieldBaseClass} ${fieldStateClasses[state]} ${inputClassName}`}
         defaultValue={defaultValue}
+        step={step}
+        min={min}
+        max={max}
         // This is the only way to use RHF without requiring input
         // types for the Hook Form inputs and whatever which
         // are complicated to do
