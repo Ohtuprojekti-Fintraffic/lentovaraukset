@@ -64,7 +64,7 @@ function ReservationCalendar() {
         const color = timeslot.type === 'available' ? '#2C2C44' : '#B40000';
         const title = timeslot.type === 'available' ? '' : timeslot.info || 'Ei varattavissa';
         return {
-          ...timeslot, id: timeslot.id.toString(), groupId: 'timeslots', display, color, title,
+          ...timeslot, id: timeslot.id.toString(), groupId: 'timeslots', display, color, title, editable: false,
         };
       });
 
@@ -172,7 +172,7 @@ function ReservationCalendar() {
         clickEventFn={clickReservation}
         removeEventFn={removeReservation}
         granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
-        eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#000000' }}
+        eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFFF' }}
         selectConstraint="timeslots"
         maxConcurrentLimit={airfield?.maxConcurrentFlights}
         checkIfTimeInFuture
