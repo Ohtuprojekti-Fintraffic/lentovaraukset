@@ -50,7 +50,7 @@ function RecurringTimeslotForm({
   });
 
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
-    const type: TimeslotType = formData.type ?? isBlocked ? 'blocked' : 'available';
+    const type: TimeslotType = formData.type ?? (isBlocked ? 'blocked' : 'available');
     const updatedTimeslot = {
       start: new Date(formData.start),
       end: new Date(formData.end),
