@@ -1,6 +1,7 @@
 import request from 'supertest';
 import app from '@lentovaraukset/backend/src/app';
 import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
+import { ServiceErrorCode } from '@lentovaraukset/shared/src';
 import { connectToDatabase, sequelize } from '../src/util/db';
 import airfieldService from '../src/services/airfieldService';
 import reservationService from '../src/services/reservationService';
@@ -342,6 +343,51 @@ describe('Calls to api', () => {
       .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
 
     expect(response.body).toHaveLength(0);
+  });
+
+  test('Reservation has to be within a timeslot upon creation', async () => {
+    await api.post('/api/timeslots/')
+      .set('Content-type', 'application/json')
+      .send({ start: new Date('2023-02-16T08:00:00.000Z'), end: new Date('2023-02-16T18:00:00.000Z'), type: 'available' });
+
+    const start = new Date('2023-02-16T07:00:00.000Z');
+    const end = new Date('2023-02-16T09:00:00.000Z');
+
+    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    });
+
+    expect(newReservation.body.error).toBeDefined();
+    expect(newReservation.body.error.message).toContain('Reservation is not within timeslot');
+    expect(newReservation.body.error.code).toEqual(
+      ServiceErrorCode.ReservationExceedsTimeslot,
+    );
+  });
+
+  test('Reservation has to be within a timeslot when modified', async () => {
+    await api.post('/api/timeslots/')
+      .set('Content-type', 'application/json')
+      .send({ start: new Date('2023-02-16T08:00:00.000Z'), end: new Date('2023-02-16T18:00:00.000Z'), type: 'available' });
+
+    const start = new Date('2023-02-16T08:00:00.000Z');
+    const newStart = new Date('2023-02-16T07:00:00.000Z');
+    const end = new Date('2023-02-16T09:00:00.000Z');
+
+    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    });
+
+    expect(newReservation.body.error).not.toBeDefined();
+
+    const modifiedReservation: any = await api.put(`/api/reservations/${newReservation.id}`).set('Content-type', 'application/json').send({
+      ...newReservation.body, start: newStart, info: undefined,
+      // TODO: fix weirdness with interacting with API where null isnt undefined
+    });
+    expect(modifiedReservation.body.error).toBeDefined();
+    expect(modifiedReservation.body.error.message).toContain('Reservation is not within timeslot');
+    expect(modifiedReservation.body.error.code).toEqual(
+      ServiceErrorCode.ReservationExceedsTimeslot,
+    );
   });
 
   test('can add concurrent reservations up to the max concurrent reservations', async () => {

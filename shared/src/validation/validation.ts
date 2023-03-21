@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ReservationEntry, TimeslotEntry } from '..';
 
 const minutesToMilliseconds = (minutes: number) => minutes * 1000 * 60;
 
@@ -74,6 +75,12 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
   return Reservation;
 };
 
+const reservationIsWithinTimeslot = (res: Pick<ReservationEntry, 'start' | 'end'>, ts: Pick<TimeslotEntry, 'start' | 'end'>) => {
+  const startOk = res.start >= ts.start && res.start <= ts.end;
+  const endOk = res.end >= ts.start && res.end <= ts.end;
+  return startOk && endOk;
+};
+
 const getTimeRangeValidator = () => {
   const TimeRange = z.object({
     start: z.coerce.date(),
@@ -92,6 +99,7 @@ const airfieldValidator = z.object({
 export {
   createTimeSlotValidator,
   createReservationValidator,
+  reservationIsWithinTimeslot,
   getTimeRangeValidator,
   isTimeInPast,
   isTimeAtMostInFuture,
