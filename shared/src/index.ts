@@ -26,3 +26,7 @@ export interface AirfieldEntry {
   maxConcurrentFlights: number;
   eventGranularityMinutes: number;
 }
+
+export enum ServiceErrorCode {
+  ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
+}
