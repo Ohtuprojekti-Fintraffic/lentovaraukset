@@ -320,7 +320,7 @@ describe('Calls to api', () => {
     });
 
     expect(newReservation.body.error).toBeDefined();
-    expect(newReservation.body.error.message).toContain('Reservation start time cannot be further');
+    expect(newReservation.body.error.message).toContain('Voit tehdä varauksen korkeintaan');
 
     const response = await api
       .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
@@ -337,7 +337,7 @@ describe('Calls to api', () => {
     });
 
     expect(newReservation.body.error).toBeDefined();
-    expect(newReservation.body.error.message).toContain('start time cannot be later than the end time');
+    expect(newReservation.body.error.message).toContain('Varauksen alkuaika ei voi olla myöhempi kuin loppuaika');
 
     const response = await api
       .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
