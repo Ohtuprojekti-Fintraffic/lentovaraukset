@@ -3,31 +3,31 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import Button from '../Button';
 import InputField from '../InputField';
-import { useAirfieldMutation } from '../../queries/airfields';
 
 type FormProps = {
-  airfield: AirfieldEntry;
+  airfield: AirfieldEntry | undefined;
+  airfieldMutation: any;
 };
 
 type Inputs = {
   maxConcurrentFlights: number;
-  // maxDays: string;
   name: string;
   eventGranularityMinutes: number;
 };
 
-function AirfieldForm(
-  { airfield }: FormProps,
-) {
+function AirfieldForm({
+  airfield,
+  airfieldMutation,
+}: FormProps) {
   const {
     register, handleSubmit,
   } = useForm<Inputs>();
 
-  const airfieldMutator = useAirfieldMutation();
+  const airfieldMutator = airfieldMutation();
 
   const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => {
     airfieldMutator.mutate({
-      ...data, id: airfield.id,
+      ...data, id: airfield?.id,
     });
   };
 
@@ -35,14 +35,11 @@ function AirfieldForm(
     <div>
       <div className="p-8">
         <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <p>
-            {`Id: ${airfield.id}`}
-          </p>
           <InputField
             labelText="Nimi:"
             type="string"
             registerReturn={register('name')}
-            defaultValue={airfield.name}
+            defaultValue={airfield?.name}
           />
           <InputField
             labelText="Varausikkunan minimikoko minuutteina:"
@@ -50,21 +47,15 @@ function AirfieldForm(
             registerReturn={register('eventGranularityMinutes', {
               valueAsNumber: true,
             })}
-            defaultValue={airfield.eventGranularityMinutes.toString()}
+            defaultValue={airfield?.eventGranularityMinutes.toString()}
           />
-          {/* <InputField
-            labelText="Kuinka monta päivää tulevaisuuteen varauksen voi tehdä:"
-            type="number"
-            registerReturn={register('maxDays')}
-            defaultValue="7"
-          /> */}
           <InputField
             labelText="Samanaikaisten varausten maksimimäärä:"
             type="number"
             registerReturn={register('maxConcurrentFlights', {
               valueAsNumber: true,
             })}
-            defaultValue={airfield.maxConcurrentFlights.toString()}
+            defaultValue={airfield?.maxConcurrentFlights.toString()}
           />
           <Button type="submit" variant="primary"> Submit</Button>
         </form>

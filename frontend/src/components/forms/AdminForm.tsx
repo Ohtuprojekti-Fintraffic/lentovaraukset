@@ -4,6 +4,7 @@ import Button from '../Button';
 import InputField from '../InputField';
 
 type Inputs = {
+  daysBeforeStart: number;
   maxDaysInFuture: number;
 };
 
@@ -20,6 +21,14 @@ function AdminForm() {
     <div>
       <div className="p-8">
         <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <InputField
+            labelText="Kuinka monta päivää vähintään pitää olla varauksen alkuun:"
+            type="number"
+            registerReturn={register('daysBeforeStart', {
+              valueAsNumber: true,
+            })}
+            defaultValue="0"
+          />
           <InputField
             labelText="Kuinka monta päivää tulevaisuuteen varauksen voi tehdä:"
             type="number"

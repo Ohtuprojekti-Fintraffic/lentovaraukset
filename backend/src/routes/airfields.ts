@@ -36,4 +36,14 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
   }
 });
 
+router.post('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const airfieldEntry: AirfieldEntry = airfieldValidator.parse(req.body);
+    const airfield = await airfieldService.createAirfield(airfieldEntry);
+    res.json(airfield);
+  } catch (error: unknown) {
+    next(error);
+  }
+});
+
 export default router;
