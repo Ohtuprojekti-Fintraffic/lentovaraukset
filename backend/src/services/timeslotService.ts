@@ -83,7 +83,12 @@ const createPeriod = async (
   const weekdays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
   const timeslotGroup: { start: Date, end: Date, type: TimeslotType, info: string | null }[] = [];
-  const { start, end, type, info } = timeslot;
+  const {
+    start,
+    end,
+    type,
+    info,
+  } = timeslot;
   const currentDate = new Date(start.getTime() + dayInMillis);
 
   while (currentDate <= periodEnd) {
@@ -91,7 +96,12 @@ const createPeriod = async (
     if (days[dayOfWeek as keyof typeof days]) {
       const startTime = new Date(currentDate.getTime());
       const endTime = new Date(currentDate.getTime() + (end.getTime() - start.getTime()));
-      timeslotGroup.push({ start: startTime, end: endTime, type, info });
+      timeslotGroup.push({
+        start: startTime,
+        end: endTime,
+        type,
+        info,
+      });
     }
     currentDate.setTime(currentDate.getTime() + dayInMillis);
   }
