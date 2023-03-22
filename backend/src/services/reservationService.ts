@@ -1,8 +1,9 @@
 import { Op } from 'sequelize';
-import { ReservationEntry } from '@lentovaraukset/shared/src';
+import { ReservationEntry, ServiceErrorCode } from '@lentovaraukset/shared/src';
 import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
-import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
+import { isTimeInPast, reservationIsWithinTimeslot } from '@lentovaraukset/shared/src/validation/validation';
 import { Reservation } from '../models';
+import ServiceError from '../util/errors';
 
 const getInTimeRange = async (startTime: Date, endTime: Date) => {
   const reservations: Reservation[] = await Reservation.findAll({
@@ -32,11 +33,21 @@ const deleteById = async (id: number) => {
 const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | 'user'>): Promise<ReservationEntry> => {
   const timeslots = await timeslotService
     .getInTimeRange(newReservation.start, newReservation.end);
+  if (timeslots.some((timeslot) => timeslot.type === 'blocked')) {
+    throw new Error('Reservation cannot be created on top of blocked timeslot');
+  }
   if (timeslots.length !== 1) {
     throw new Error('Reservation should be created for one timeslot');
   }
+
   const timeslot = timeslots[0];
+
+  if (!reservationIsWithinTimeslot(newReservation, timeslot)) {
+    throw new ServiceError(ServiceErrorCode.ReservationExceedsTimeslot, 'Reservation is not within timeslot date range');
+  }
+
   const reservation: Reservation = await Reservation.create(newReservation);
+
   if (timeslot) {
     await reservation.setTimeslot(timeslot);
   }
@@ -50,11 +61,21 @@ const updateById = async (
 ): Promise<ReservationEntry> => {
   const newTimeslots = await timeslotService
     .getInTimeRange(reservation.start, reservation.end);
+  if (newTimeslots.some((timeslot) => timeslot.type === 'blocked')) {
+    throw new Error('Reservation cannot be created on top of blocked timeslot');
+  }
   if (newTimeslots.length !== 1) {
     throw new Error('Reservation should be created for one timeslot');
   }
+
   const newTimeslot = newTimeslots[0];
+
+  if (!reservationIsWithinTimeslot(reservation, newTimeslot)) {
+    throw new ServiceError(ServiceErrorCode.ReservationExceedsTimeslot, 'Reservation is not within timeslot date range');
+  }
+
   const oldReservation: Reservation | null = await Reservation.findByPk(id);
+
   if (oldReservation && isTimeInPast(oldReservation.start)) {
     throw new Error('Reservation in past cannot be modified');
   }

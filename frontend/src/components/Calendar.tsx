@@ -15,7 +15,7 @@ import AlertContext from '../contexts/AlertContext';
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>
   eventSources: EventSourceInput[];
-  addEventFn: (event: { start: Date; end: Date; }) => Promise<any>;
+  addEventFn: (event: { start: Date; end: Date; }) => void;
   modifyEventFn: (event: {
     id: string;
     start: Date;
@@ -33,6 +33,7 @@ type CalendarProps = {
   maxConcurrentLimit?: number;
   allowEventRef?: AllowFunc;
   checkIfTimeInFuture?: boolean;
+  blocked?: boolean;
 };
 
 function Calendar({
@@ -48,9 +49,18 @@ function Calendar({
   maxConcurrentLimit = 1,
   allowEventRef = () => true,
   checkIfTimeInFuture = false,
+  blocked = false,
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
   const { addNewAlert } = React.useContext(AlertContext);
+
+  const isSameType = (
+    stillEventType: string,
+    movingEventType?: string,
+  ) => {
+    if (movingEventType) return stillEventType === movingEventType;
+    return ((stillEventType === 'available' && !blocked) || (stillEventType === 'blocked' && blocked));
+  };
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
     const events = calendarRef.current?.getApi().getEvents().filter(
@@ -59,22 +69,39 @@ function Calendar({
         && !e.display.includes('background')
         && e.start < span.end && e.end > span.start,
     );
-
     return events
       ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
       : true;
   };
 
-  const isTimeInAllowedRange = (time: Date) => {
-    if (isTimeInPast(time)) {
+  const timeIsConsecutive = (start: Date, end: Date, type?: string) => {
+    const consecutive = calendarRef.current?.getApi().getEvents().some(
+      (e) => (isSameType(e.extendedProps.type, type))
+      && e.start && e.end
+      && ((start.getTime() !== e.start.getTime()) && (end.getTime() !== e.end.getTime()))
+      && (e.start.getTime() === start.getTime()
+        || e.start.getTime() === end.getTime()
+        || e.end.getTime() === start.getTime()
+        || e.end.getTime() === end.getTime()),
+    );
+    return consecutive;
+  };
+
+  const isTimeAllowed = (start: Date, end: Date, type?: string) => {
+    if (isTimeInPast(start)) {
       calendarRef.current?.getApi().unselect();
       addNewAlert('Aikaa ei voi lisätä menneisyyteen', 'warning');
       return false;
     }
     // TODO: Get timeAtMostInFuture from airfield
-    if (checkIfTimeInFuture && !isTimeAtMostInFuture(time, 7)) {
+    if (checkIfTimeInFuture && !isTimeAtMostInFuture(start, 7)) {
       calendarRef.current?.getApi().unselect();
       addNewAlert('Aikaa ei voi lisätä yli 7 päivän päähän', 'warning');
+      return false;
+    }
+    if (timeIsConsecutive(start, end, type)) {
+      calendarRef.current?.getApi().unselect();
+      addNewAlert('Ajat eivät voi olla peräkkäin', 'warning');
       return false;
     }
     return true;
@@ -92,7 +119,11 @@ function Calendar({
     // Open confirmation popup here
     const { event } = changeData;
 
-    if (isTimeInAllowedRange(event.start || new Date())) {
+    if (isTimeAllowed(
+      event.start || new Date(),
+      event.end || new Date(),
+      event.extendedProps.type,
+    )) {
       await modifyEventFn({
         id: event.id,
         start: event.start || new Date(),
@@ -106,10 +137,11 @@ function Calendar({
   // When a new event is selected (dragged) in the calendar.
   const handleEventCreate = async (dropData: DateSelectArg) => {
     const newStartTime: Date = dropData.start || new Date();
+    const newEndime: Date = dropData.end || new Date();
 
-    if (!isTimeInAllowedRange(newStartTime)) return;
+    if (!isTimeAllowed(newStartTime, newEndime)) return;
 
-    await addEventFn({
+    addEventFn({
       start: dropData.start,
       end: dropData.end,
     });
@@ -127,7 +159,7 @@ function Calendar({
     calendarRef.current?.getApi().unselect();
   };
 
-  const handleAllow: AllowFunc = (s, m) => allowEvent(s, m) && allowEventRef(s, m);
+  const handleAllow: AllowFunc = (s, m) => allowEventRef(s, m) ?? allowEvent(s, m);
 
   return (
     <FullCalendar

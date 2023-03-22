@@ -1,6 +1,7 @@
 import request from 'supertest';
 import app from '@lentovaraukset/backend/src/app';
 import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
+import { ServiceErrorCode } from '@lentovaraukset/shared/src';
 import { connectToDatabase, sequelize } from '../src/util/db';
 import airfieldService from '../src/services/airfieldService';
 import reservationService from '../src/services/reservationService';
@@ -56,6 +57,7 @@ beforeEach(async () => {
   await Timeslot.create({
     start: new Date('2023-02-12T08:00:00.000Z'),
     end: new Date('2023-02-15T08:00:00.000Z'),
+    type: 'available',
   });
 });
 
@@ -127,6 +129,21 @@ describe('Calls to api', () => {
     expect(result.body.error.message.includes('Aircraft ID cannot be empty'));
   });
 
+  test('cannot create a reservation on top of blocked timeslot', async () => {
+    await Timeslot.create({
+      start: new Date('2023-02-12T08:00:00.000Z'),
+      end: new Date('2023-02-12T16:00:00.000Z'),
+      type: 'blocked',
+    });
+    const result: any = await api.post('/api/reservations/')
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
+      });
+    expect(result.statusCode).toEqual(400);
+    expect(result.body.error.message.includes('Reservation cannot be created on top of blocked timeslot'));
+  });
+
   test('can delete a reservation', async () => {
     const createdReservation: Reservation | null = await Reservation.findOne();
     const id = createdReservation?.dataValues.id;
@@ -192,6 +209,23 @@ describe('Calls to api', () => {
 
     const reservationAfterUpdate: Reservation | null = await Reservation.findByPk(id);
     expect(reservationAfterUpdate?.dataValues.phone).not.toEqual('');
+  });
+
+  test('cannot update a reservation on top of blocked timeslot', async () => {
+    const createdReservation: Reservation | null = await Reservation.findOne();
+    const id = createdReservation?.dataValues.id;
+    await Timeslot.create({
+      start: new Date('2023-02-12T08:00:00.000Z'),
+      end: new Date('2023-02-12T16:00:00.000Z'),
+      type: 'blocked',
+    });
+    const result: any = await api.put(`/api/reservations/${id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
+      });
+    expect(result.statusCode).toEqual(400);
+    expect(result.body.error.message.includes('Reservation cannot be created on top of blocked timeslot'));
   });
 
   test('cannot modify a reservation to have an empty aircraft ID', async () => {
@@ -286,7 +320,7 @@ describe('Calls to api', () => {
     });
 
     expect(newReservation.body.error).toBeDefined();
-    expect(newReservation.body.error.message).toContain('Reservation start time cannot be further');
+    expect(newReservation.body.error.message).toContain('Voit tehdä varauksen korkeintaan');
 
     const response = await api
       .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
@@ -303,12 +337,57 @@ describe('Calls to api', () => {
     });
 
     expect(newReservation.body.error).toBeDefined();
-    expect(newReservation.body.error.message).toContain('start time cannot be later than the end time');
+    expect(newReservation.body.error.message).toContain('Varauksen alkuaika ei voi olla myöhempi kuin loppuaika');
 
     const response = await api
       .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
 
     expect(response.body).toHaveLength(0);
+  });
+
+  test('Reservation has to be within a timeslot upon creation', async () => {
+    await api.post('/api/timeslots/')
+      .set('Content-type', 'application/json')
+      .send({ start: new Date('2023-02-16T08:00:00.000Z'), end: new Date('2023-02-16T18:00:00.000Z'), type: 'available' });
+
+    const start = new Date('2023-02-16T07:00:00.000Z');
+    const end = new Date('2023-02-16T09:00:00.000Z');
+
+    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    });
+
+    expect(newReservation.body.error).toBeDefined();
+    expect(newReservation.body.error.message).toContain('Reservation is not within timeslot');
+    expect(newReservation.body.error.code).toEqual(
+      ServiceErrorCode.ReservationExceedsTimeslot,
+    );
+  });
+
+  test('Reservation has to be within a timeslot when modified', async () => {
+    await api.post('/api/timeslots/')
+      .set('Content-type', 'application/json')
+      .send({ start: new Date('2023-02-16T08:00:00.000Z'), end: new Date('2023-02-16T18:00:00.000Z'), type: 'available' });
+
+    const start = new Date('2023-02-16T08:00:00.000Z');
+    const newStart = new Date('2023-02-16T07:00:00.000Z');
+    const end = new Date('2023-02-16T09:00:00.000Z');
+
+    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+      start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
+    });
+
+    expect(newReservation.body.error).not.toBeDefined();
+
+    const modifiedReservation: any = await api.put(`/api/reservations/${newReservation.id}`).set('Content-type', 'application/json').send({
+      ...newReservation.body, start: newStart, info: undefined,
+      // TODO: fix weirdness with interacting with API where null isnt undefined
+    });
+    expect(modifiedReservation.body.error).toBeDefined();
+    expect(modifiedReservation.body.error.message).toContain('Reservation is not within timeslot');
+    expect(modifiedReservation.body.error.code).toEqual(
+      ServiceErrorCode.ReservationExceedsTimeslot,
+    );
   });
 
   test('can add concurrent reservations up to the max concurrent reservations', async () => {

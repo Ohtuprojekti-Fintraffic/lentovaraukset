@@ -9,10 +9,14 @@ export interface ReservationEntry {
   info?: string;
 }
 
+export type TimeslotType = 'available' | 'blocked';
+
 export interface TimeslotEntry {
   id: number;
   start: Date;
   end: Date;
+  type: TimeslotType;
+  group?: string | null;
 }
 
 export interface AirfieldEntry {
@@ -20,4 +24,8 @@ export interface AirfieldEntry {
   name: string;
   maxConcurrentFlights: number;
   eventGranularityMinutes: number;
+}
+
+export enum ServiceErrorCode {
+  ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
 }
