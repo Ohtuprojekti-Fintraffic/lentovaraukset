@@ -7,7 +7,7 @@ const getTimeSlots = async (from: Date, until: Date): Promise<TimeslotEntry[]> =
   return res.json();
 };
 
-const addTimeSlot = async (newTimeSlot: { start: Date, end: Date, type: 'available' | 'blocked' }): Promise<void> => {
+const addTimeSlot = async (newTimeSlot: { start: Date, end: Date, type: 'available' | 'blocked', info: string | null }): Promise<void> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/`, {
     method: 'POST',
     headers: {

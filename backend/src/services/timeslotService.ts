@@ -76,15 +76,14 @@ const createPeriod = async (
       sunday: boolean,
     }
   },
-  timeslot: { start: Date, end: Date, type: TimeslotType },
+  timeslot: { start: Date, end: Date, type: TimeslotType, info: string | null },
 ): Promise<Timeslot[]> => {
   const { periodEnd, days } = period;
   const dayInMillis = 24 * 60 * 60 * 1000;
   const weekdays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-  const timeslotGroup: { start: Date, end: Date, type: TimeslotType }[] = [];
-
-  const { start, end, type } = timeslot;
+  const timeslotGroup: { start: Date, end: Date, type: TimeslotType, info: string | null }[] = [];
+  const { start, end, type, info } = timeslot;
   const currentDate = new Date(start.getTime() + dayInMillis);
 
   while (currentDate <= periodEnd) {
@@ -92,7 +91,7 @@ const createPeriod = async (
     if (days[dayOfWeek as keyof typeof days]) {
       const startTime = new Date(currentDate.getTime());
       const endTime = new Date(currentDate.getTime() + (end.getTime() - start.getTime()));
-      timeslotGroup.push({ start: startTime, end: endTime, type });
+      timeslotGroup.push({ start: startTime, end: endTime, type, info });
     }
     currentDate.setTime(currentDate.getTime() + dayInMillis);
   }
@@ -121,7 +120,7 @@ const createPeriod = async (
 
 const updateById = async (
   id: number,
-  timeslot: { start: Date, end: Date, type: TimeslotType },
+  timeslot: { start: Date, end: Date, type: TimeslotType, info: string | null },
 ): Promise<void> => {
   if (await timeslotsAreConsecutive(timeslot, id)) {
     throw new Error('Timeslot can\'t be consecutive');
@@ -148,6 +147,7 @@ const createTimeslot = async (newTimeSlot: {
   start: Date;
   end: Date;
   type: TimeslotType;
+  info: string | null;
 }): Promise<TimeslotEntry> => {
   if (await timeslotsAreConsecutive(newTimeSlot)) {
     throw new Error('Timeslot can\'t be consecutive');
