@@ -20,7 +20,19 @@ const addTimeSlot = async (newTimeSlot: { start: Date, end: Date, type: 'availab
 
 const modifyTimeSlot = async (
   timeSlot: TimeslotEntry,
-  period?: { end: Date, name: string },
+  period?: {
+    end: Date,
+    name: string,
+    days: {
+      monday: boolean,
+      tuesday: boolean,
+      wednesday: boolean,
+      thursday: boolean,
+      friday: boolean,
+      saturday: boolean,
+      sunday: boolean,
+    }
+  },
 ): Promise<void> => {
   const modifiedTimeSlot = {
     ...timeSlot,

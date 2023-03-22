@@ -10,7 +10,21 @@ type RecurringTimeslotProps = {
   timeslot?: EventImpl
   isBlocked: boolean
   draggedTimes?: { start: Date, end: Date }
-  onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>, period?: { end: Date, periodName: string }) => void
+  onSubmit: (
+    formData: Omit<TimeslotEntry, 'id' | 'user'>,
+    period?:
+    { end: Date,
+      periodName: string,
+      days: {
+        monday: boolean,
+        tuesday: boolean,
+        wednesday: boolean,
+        thursday: boolean,
+        friday: boolean,
+        saturday: boolean,
+        sunday: boolean,
+      }
+    }) => void
   id?: string
 };
 
@@ -21,6 +35,15 @@ type Inputs = {
   isRecurring: boolean
   periodEnds: string | null
   periodName: string
+  days: {
+    maanatai: boolean
+    tiistai: boolean
+    keskiviikko: boolean
+    torstai: boolean
+    perjantai: boolean
+    lauantai: boolean
+    sunnuntai: boolean
+  }
 };
 
 function RecurringTimeslotForm({
@@ -44,6 +67,15 @@ function RecurringTimeslotForm({
       isRecurring: false,
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
       periodName: timeslot?.extendedProps.periodName,
+      days: {
+        maanatai: true,
+        tiistai: true,
+        keskiviikko: true,
+        torstai: true,
+        perjantai: true,
+        lauantai: true,
+        sunnuntai: true,
+      },
     },
   });
 
@@ -59,6 +91,15 @@ function RecurringTimeslotForm({
       const period = {
         end: new Date(periodEnds),
         periodName: formData.periodName,
+        days: {
+          monday: formData.days.maanatai,
+          tuesday: formData.days.tiistai,
+          wednesday: formData.days.keskiviikko,
+          thursday: formData.days.torstai,
+          friday: formData.days.perjantai,
+          saturday: formData.days.lauantai,
+          sunday: formData.days.sunnuntai,
+        },
       };
       onSubmit(updatedTimeslot, period);
     } else {
@@ -84,6 +125,8 @@ function RecurringTimeslotForm({
   // and shows a popover with the nearest acceptable divisible values
 
   const showRecurring = watch('isRecurring');
+
+  const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
   return (
     <div>
@@ -125,6 +168,20 @@ function RecurringTimeslotForm({
               type="checkbox"
               registerReturn={register('isRecurring')}
             />
+            {showRecurring && (
+              <div className="grid grid-cols-4 gap-2">
+                {['maanatai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai'].map(
+                  (day) => (
+                    <InputField
+                      key={day}
+                      labelText={capitalizeFirstLetter(day)}
+                      type="checkbox"
+                      registerReturn={register(`days.${day}` as keyof Inputs)}
+                    />
+                  ),
+                )}
+              </div>
+            )}
             {showRecurring && (
             <InputField
               labelText="Päättyy:"
