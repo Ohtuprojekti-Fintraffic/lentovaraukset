@@ -38,6 +38,15 @@ const modifyTimeSlot = async (
     ...timeSlot,
     periodEnd: period?.end,
     name: period?.name,
+    days: {
+      monday: period?.days.monday,
+      tuesday: period?.days.thursday,
+      wednesday: period?.days.wednesday,
+      thursday: period?.days.thursday,
+      friday: period?.days.friday,
+      saturday: period?.days.saturday,
+      sunday: period?.days.sunday,
+    },
   };
 
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${timeSlot.id}`, {
