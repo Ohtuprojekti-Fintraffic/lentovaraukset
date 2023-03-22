@@ -37,7 +37,7 @@ function AirfieldForm({
     <div>
       <div className="p-8 space-y-4">
         <h1 className="text-3xl">{title}</h1>
-        <form className="flex flex-col w-full space-y-2" onSubmit={handleSubmit(onSubmit)}>
+        <form className="flex flex-col w-full" onSubmit={handleSubmit(onSubmit)}>
           <InputField
             labelText="Nimi:"
             type="string"

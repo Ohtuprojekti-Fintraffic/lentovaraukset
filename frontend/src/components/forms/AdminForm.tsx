@@ -27,7 +27,7 @@ function AdminForm({ title }: FormProps) {
     <div>
       <div className="p-8 space-y-4">
         <h1 className="text-3xl">{title}</h1>
-        <form className="flex flex-col w-full space-y-2" onSubmit={handleSubmit(onSubmit)}>
+        <form className="flex flex-col w-full" onSubmit={handleSubmit(onSubmit)}>
           <InputField
             labelText="Kuinka monta päivää vähintään pitää olla varauksen alkuun:"
             type="number"
