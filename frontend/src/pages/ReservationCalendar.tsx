@@ -60,9 +60,11 @@ function ReservationCalendar() {
     try {
       const timeslots = await getTimeSlots(start, end);
       const timeslotsMapped = timeslots.map((timeslot) => {
-        const display = timeslot.type === 'available' ? 'inverse-background' : 'background';
+        const display = timeslot.type === 'available' ? 'inverse-background' : 'block';
+        const color = timeslot.type === 'available' ? '#2C2C44' : '#B40000';
+        const title = timeslot.type === 'available' ? '' : timeslot.info || 'Ei varattavissa';
         return {
-          ...timeslot, id: timeslot.id.toString(), groupId: 'timeslots', display, color: '#2C2C44',
+          ...timeslot, id: timeslot.id.toString(), groupId: 'timeslots', display, color, title, editable: false,
         };
       });
 
@@ -79,7 +81,7 @@ function ReservationCalendar() {
   const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
 
   const clickReservation = async (event: EventImpl): Promise<void> => {
-    if (event.end && isTimeInPast(event.end)) {
+    if ((event.end && isTimeInPast(event.end)) || event.groupId === 'timeslots') {
       return;
     }
 
@@ -170,7 +172,7 @@ function ReservationCalendar() {
         clickEventFn={clickReservation}
         removeEventFn={removeReservation}
         granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
-        eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFF' }}
+        eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFFF' }}
         selectConstraint="timeslots"
         maxConcurrentLimit={airfield?.maxConcurrentFlights}
         checkIfTimeInFuture

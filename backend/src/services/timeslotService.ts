@@ -64,16 +64,20 @@ const deleteById = async (id: number) => {
 const createPeriod = async (
   id: number,
   period: { periodEnd: Date, name: string },
-  timeslot: { start: Date, end: Date, type: TimeslotType },
+  timeslot: { start: Date, end: Date, type: TimeslotType, info: string | null },
 ): Promise<Timeslot[]> => {
   const oneWeekInMillis = 7 * 24 * 60 * 60 * 1000;
   const { periodEnd } = period;
-  const timeslotGroup: { start: Date, end: Date, type: TimeslotType }[] = [];
-  const { start, end, type } = timeslot;
+  const timeslotGroup: { start: Date, end: Date, type: TimeslotType, info: string | null }[] = [];
+  const {
+    start, end, type, info,
+  } = timeslot;
   start.setTime(start.getTime() + oneWeekInMillis);
   end.setTime(end.getTime() + oneWeekInMillis);
   while (end <= periodEnd) {
-    timeslotGroup.push({ start: new Date(start.getTime()), end: new Date(end.getTime()), type });
+    timeslotGroup.push({
+      start: new Date(start.getTime()), end: new Date(end.getTime()), type, info,
+    });
     start.setTime(start.getTime() + oneWeekInMillis);
     end.setTime(end.getTime() + oneWeekInMillis);
   }
@@ -101,7 +105,7 @@ const createPeriod = async (
 
 const updateById = async (
   id: number,
-  timeslot: { start: Date, end: Date, type: TimeslotType },
+  timeslot: { start: Date, end: Date, type: TimeslotType, info: string | null },
 ): Promise<void> => {
   if (await timeslotsAreConsecutive(timeslot, id)) {
     throw new Error('Timeslot can\'t be consecutive');
@@ -128,6 +132,7 @@ const createTimeslot = async (newTimeSlot: {
   start: Date;
   end: Date;
   type: TimeslotType;
+  info: string | null;
 }): Promise<TimeslotEntry> => {
   if (await timeslotsAreConsecutive(newTimeSlot)) {
     throw new Error('Timeslot can\'t be consecutive');

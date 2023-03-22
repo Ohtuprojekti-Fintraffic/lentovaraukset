@@ -36,7 +36,7 @@ function TimeSlotCalendar() {
           id: timeslot.id.toString(),
           editable: !isTimeInPast(timeslot.start),
           color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
-          title: timeslot.type === 'available' ? 'Vapaa' : 'Suljettu',
+          title: timeslot.type === 'available' ? 'Vapaa' : timeslot.info || 'Suljettu',
         };
         return timeslot.group ? { ...timeslotEvent, groupId: timeslot.group } : timeslotEvent;
       });
@@ -105,10 +105,18 @@ function TimeSlotCalendar() {
   };
 
   const modifyTimeslotFn = async (
-    event: { id: string, start: Date, end: Date, extendedProps: { type: TimeslotType } },
+    event: {
+      id: string,
+      start: Date,
+      end: Date,
+      extendedProps: { type: TimeslotType, info: string | null },
+    },
   ) => {
     await modifyTimeSlot({
-      ...event, id: Number(event.id), type: event.extendedProps.type,
+      ...event,
+      id: Number(event.id),
+      type: event.extendedProps.type,
+      info: event.extendedProps.info,
     });
   };
 
