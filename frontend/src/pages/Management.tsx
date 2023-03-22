@@ -10,8 +10,7 @@ function Management() {
       ? <p>Ladataan...</p>
       : (
         <div className="flex flex-col space-y-2">
-          <h1 className="text-3xl">Hallinta</h1>
-          <AirfieldForm airfield={airfield!} airfieldMutation={modifyAirfieldMutation} />
+          <AirfieldForm title="Lentokenttäkohtaiset asetukset" airfield={airfield!} airfieldMutation={modifyAirfieldMutation} />
         </div>
       )
   );

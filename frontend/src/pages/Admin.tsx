@@ -6,10 +6,8 @@ import { createAirfieldMutation } from '../queries/airfields';
 function Admin() {
   return (
     <div className="flex flex-col space-y-2">
-      <h1 className="text-3xl">Globaalit asetukset</h1>
-      <AdminForm />
-      <h1 className="text-3xl">Lisää lentokenttä</h1>
-      <AirfieldForm airfield={undefined} airfieldMutation={createAirfieldMutation} />
+      <AdminForm title="Globaalit asetukset" />
+      <AirfieldForm title="Lisää lentokenttä" airfield={undefined} airfieldMutation={createAirfieldMutation} />
     </div>
   );
 }

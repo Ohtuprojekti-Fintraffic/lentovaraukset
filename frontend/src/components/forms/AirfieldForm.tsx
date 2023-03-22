@@ -5,8 +5,9 @@ import Button from '../Button';
 import InputField from '../InputField';
 
 type FormProps = {
+  title: string;
   airfield: AirfieldEntry | undefined;
-  airfieldMutation: any;
+  airfieldMutation: Function;
 };
 
 type Inputs = {
@@ -16,6 +17,7 @@ type Inputs = {
 };
 
 function AirfieldForm({
+  title,
   airfield,
   airfieldMutation,
 }: FormProps) {
@@ -33,13 +35,15 @@ function AirfieldForm({
 
   return (
     <div>
-      <div className="p-8">
-        <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <div className="p-8 space-y-4">
+        <h1 className="text-3xl">{title}</h1>
+        <form className="flex flex-col w-full space-y-2" onSubmit={handleSubmit(onSubmit)}>
           <InputField
             labelText="Nimi:"
             type="string"
             registerReturn={register('name')}
             defaultValue={airfield?.name}
+            required
           />
           <InputField
             labelText="Varausikkunan minimikoko minuutteina:"
@@ -48,6 +52,8 @@ function AirfieldForm({
               valueAsNumber: true,
             })}
             defaultValue={airfield?.eventGranularityMinutes.toString()}
+            step={10}
+            min={10}
           />
           <InputField
             labelText="Samanaikaisten varausten maksimimäärä:"
@@ -56,6 +62,8 @@ function AirfieldForm({
               valueAsNumber: true,
             })}
             defaultValue={airfield?.maxConcurrentFlights.toString()}
+            step={1}
+            min={1}
           />
           <Button type="submit" variant="primary"> Submit</Button>
         </form>
