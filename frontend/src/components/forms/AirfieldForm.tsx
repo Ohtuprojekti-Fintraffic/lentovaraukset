@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import Button from '../Button';
-import { InputField } from '../InputField';
+import InputField from '../InputField';
 import { useAirfieldMutation } from '../../queries/airfields';
 
 type FormProps = {

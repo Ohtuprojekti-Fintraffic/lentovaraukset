@@ -5,7 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 import { useAirfield } from '../../queries/airfields';
-import { InputField, DatePicker } from '../InputField';
+import InputField from '../InputField';
+import DatePicker from '../DatePicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { HTMLDateTimeConvert } from '../../util';
 import ModalAlert from '../ModalAlert';
@@ -72,18 +73,6 @@ function ReservationInfoForm({
     setFormWarning((errors as FieldErrors<Inputs & { '': string }>)['']?.message);
   }, [errors]);
 
-  // step is relative to min: https://stackoverflow.com/a/75353708
-  const stepSeconds = reservationGranularity * 60;
-  const stepMillis = stepSeconds * 1000;
-  const nowMillis = new Date().getTime();
-  // round up to nearest even whatever minutes
-  const roundedDate = new Date(Math.ceil(nowMillis / stepMillis) * stepMillis);
-  const min = HTMLDateTimeConvert(roundedDate);
-
-  // important detail: the browser GUI doesn't give a damn and will show
-  // whatever minutes it wants, but at least Chrome checks the field on submit
-  // and shows a popover with the nearest acceptable divisible values
-
   // TODO: add max future time
   // const max =
 
@@ -113,6 +102,7 @@ function ReservationInfoForm({
                 labelText="Varaus alkaa:"
                 name="start"
                 timeGranularityMinutes={reservationGranularity}
+                error={errors.start}
               />
               <InputField
                 labelText="Koneen rekisteritunnus:"
@@ -122,19 +112,12 @@ function ReservationInfoForm({
               />
             </div>
             <div className="flex flex-col">
-              <InputField
-                labelText="Varaus päättyy:"
-                type="datetime-local"
-                registerReturn={register('end')}
-                step={stepSeconds}
-                min={min}
-                error={errors.end}
-              />
               <DatePicker
                 control={control}
                 labelText="Varays päättyy:"
                 name="end"
                 timeGranularityMinutes={reservationGranularity}
+                error={errors.end}
               />
               <InputField
                 labelText="Puhelinnumero:"

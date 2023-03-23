@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
-import { DatePicker, InputField } from '../InputField';
+import InputField from '../InputField';
+import DatePicker from '../DatePicker';
 import { HTMLDateTimeConvert } from '../../util';
 import { useAirfield } from '../../queries/airfields';
 
