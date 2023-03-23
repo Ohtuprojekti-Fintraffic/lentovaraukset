@@ -14,7 +14,7 @@ import {
   getReservations,
 } from '../queries/reservations';
 import {
-  getTimeSlots, modifyTimeSlot, deleteTimeslot,
+  getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup,
 } from '../queries/timeSlots';
 import { usePopupContext } from '../contexts/PopupContext';
 
@@ -137,9 +137,19 @@ function TimeSlotCalendar() {
       id: string,
       start: Date,
       end: Date,
-      extendedProps: { type: TimeslotType, info: string | null },
+      extendedProps: { type: TimeslotType, info: string | null, group: string | null },
     },
   ) => {
+    if (event.extendedProps.group) {
+      // eslint-disable-next-line no-restricted-globals, no-alert
+      if (confirm('Muokaat toistuvaa varausikkunaa. Muokataanko kaikkia varausikkunoita?')) {
+        await modifyGroup(event.extendedProps.group, {
+          startTimeOfDay: { hours: event.start.getHours(), minutes: event.start.getMinutes() },
+          endTimeOfDay: { hours: event.end.getHours(), minutes: event.end.getMinutes() },
+        });
+        return;
+      }
+    }
     await modifyTimeSlot({
       ...event,
       id: Number(event.id),
