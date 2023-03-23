@@ -120,6 +120,12 @@ const updateById = async (
     }
     await oldTimeslot?.removeReservations(oldReservations);
     await oldTimeslot?.addReservations(newReservations);
+  } else {
+    const reservations = await reservationService
+      .getInTimeRange(timeslot.start, timeslot.end);
+    reservations.forEach(async (r) => {
+      await reservationService.deleteById(r.id);
+    });
   }
   await Timeslot.upsert({ ...timeslot, id });
 };
@@ -133,10 +139,14 @@ const createTimeslot = async (newTimeSlot: {
     throw new Error('Timeslot can\'t be consecutive');
   }
   const timeslot: Timeslot = await Timeslot.create(newTimeSlot);
+  const reservations = await reservationService
+    .getInTimeRange(newTimeSlot.start, newTimeSlot.end);
   if (newTimeSlot.type === 'available') {
-    const reservations = await reservationService
-      .getInTimeRange(newTimeSlot.start, newTimeSlot.end);
     await timeslot.addReservations(reservations);
+  } else {
+    reservations.forEach(async (r) => {
+      await reservationService.deleteById(r.id);
+    });
   }
   return timeslot.dataValues;
 };
