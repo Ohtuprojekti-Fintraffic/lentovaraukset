@@ -56,9 +56,9 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
   // Reservation start time cannot be later than the end time
   const startNotLessThanEndErrorMessage = 'Varauksen alkuaika ei voi olla myöhempi kuin loppuaika';
   // Aircraft ID cannot be empty
-  const aircraftIdEmptyErrorMessage = 'Vaadittu kenttä';
+  const aircraftIdEmptyErrorMessage = 'Lentokentän tunnus vaaditaan';
   // Phone number cannot be empty
-  const phoneNumberEmptyErrorMessage = 'Vaadittu kenttä';
+  const phoneNumberEmptyErrorMessage = 'Puhelinnumero vaaditaan';
 
   const Reservation = z.object({
     start: z.coerce

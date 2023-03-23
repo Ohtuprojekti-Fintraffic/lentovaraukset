@@ -358,9 +358,7 @@ describe('Calls to api', () => {
     const startTimes = timeslots.map((o: { start: String; }) => o.start);
 
     expect(timeslots.length).toEqual(timeslotData.length);
-    expect(startTimes.includes(timeslotData[0].start));
-    expect(startTimes.includes(timeslotData[1].start));
-    expect(startTimes.includes(timeslotData[2].start));
+    expect(startTimes).toEqual(timeslotData.map((ts) => ts.start.toISOString()));
   });
 
   test('return empty list if no timeslots in range', async () => {
