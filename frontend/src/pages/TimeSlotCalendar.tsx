@@ -14,10 +14,12 @@ import {
 import {
   getTimeSlots, modifyTimeSlot, deleteTimeslot,
 } from '../queries/timeSlots';
+import { usePopupContext } from '../contexts/PopupContext';
 
 function TimeSlotCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
+  const { showPopup, clearPopup } = usePopupContext();
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const selectedTimeslotRef = useRef<EventImpl | null>(null);
@@ -80,8 +82,26 @@ function TimeSlotCalendar() {
 
   const removeTimeSlot = async (removeInfo: EventRemoveArg) => {
     const { event } = removeInfo;
-    await deleteTimeslot(Number(event.id));
-    setShowInfoModal(false);
+
+    const onConfirmRemove = async () => {
+      await deleteTimeslot(Number(event.id));
+      setShowInfoModal(false);
+      clearPopup();
+      calendarRef.current?.getApi().refetchEvents();
+    };
+
+    const onCancelRemove = () => {
+      clearPopup();
+    };
+
+    showPopup({
+      popupTitle: 'Varauksen Poisto',
+      popupText: 'Haluatko varmasti poistaa varausikkunan?',
+      primaryText: 'Poista',
+      primaryOnClick: onConfirmRemove,
+      secondaryText: 'Peruuta',
+      secondaryOnClick: onCancelRemove,
+    });
   };
 
   const isSameType = (
