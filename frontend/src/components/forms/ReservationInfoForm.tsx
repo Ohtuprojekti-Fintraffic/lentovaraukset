@@ -48,6 +48,7 @@ function ReservationInfoForm({
       info: reservation?.extendedProps.info,
     },
     resolver: zodResolver(createReservationValidator(reservationGranularity, 7)),
+    mode: 'all',
   });
 
   const [formWarning, setFormWarning] = useState<string | undefined>(undefined);
@@ -103,6 +104,7 @@ function ReservationInfoForm({
                 name="start"
                 timeGranularityMinutes={reservationGranularity}
                 error={errors.start}
+                showTimeSelect
               />
               <InputField
                 labelText="Koneen rekisteritunnus:"
@@ -118,6 +120,7 @@ function ReservationInfoForm({
                 name="end"
                 timeGranularityMinutes={reservationGranularity}
                 error={errors.end}
+                showTimeSelect
               />
               <InputField
                 labelText="Puhelinnumero:"

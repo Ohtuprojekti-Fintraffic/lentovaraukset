@@ -1,5 +1,7 @@
 import React, {
-  MutableRefObject, useEffect, useId, useRef,
+  useId,
+  useEffect,
+  useState,
 } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import { Control, Controller, FieldError } from 'react-hook-form';
@@ -7,7 +9,6 @@ import { fieldBaseClass, fieldStateClasses, InputStates } from './InputField';
 
 type DatePickerProps = {
   control: Control<any>;
-  state?: InputStates;
   name: React.InputHTMLAttributes<HTMLInputElement>['name'];
   placeholder?: string;
   labelText?: string;
@@ -19,12 +20,12 @@ type DatePickerProps = {
   labelClassName?: string;
   inputClassName?: string;
   helperTextClassName?: string;
+  showTimeSelect?: boolean;
 };
 
 function DatePicker({
   control,
   error,
-  state = 'default',
   name = '',
   placeholder,
   labelText,
@@ -33,14 +34,14 @@ function DatePicker({
   inputClassName = '',
   helperTextClassName = '',
   timeGranularityMinutes,
+  showTimeSelect,
 }: DatePickerProps) {
   const id = useId();
 
-  const inputRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
+  const [state, setState] = useState<InputStates>('default');
 
   useEffect(() => {
-    inputRef.current?.setCustomValidity(error?.message || '');
-    inputRef.current?.reportValidity();
+    setState(error ? 'error' : 'default');
   }, [error]);
 
   return (
@@ -64,7 +65,7 @@ function DatePicker({
           <div className="flex flex-col items-start flex-wrap">
             <ReactDatePicker
               className={`${fieldBaseClass} ${fieldStateClasses[state]} ${inputClassName}`}
-              dateFormat="dd.MM.yyyy HH:mm"
+              dateFormat={showTimeSelect ? 'dd.MM.yyyy HH:mm' : 'dd.MM.yyyy'}
               dropdownMode="select"
               minDate={new Date()}
               onBlur={onBlur}
@@ -72,7 +73,7 @@ function DatePicker({
               placeholderText={placeholder}
               selected={value ? new Date(value) : null}
               shouldCloseOnSelect
-              showTimeSelect
+              showTimeSelect={showTimeSelect}
               timeIntervals={timeGranularityMinutes}
             />
           </div>

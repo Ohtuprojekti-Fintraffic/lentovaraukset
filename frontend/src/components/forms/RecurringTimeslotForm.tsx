@@ -36,7 +36,7 @@ function RecurringTimeslotForm({
   const end = timeslot?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
 
   const {
-    register, handleSubmit, reset, watch, control,
+    register, handleSubmit, reset, watch, control, formState: { errors },
   } = useForm<Inputs>({
     values: {
       start,
@@ -101,6 +101,8 @@ function RecurringTimeslotForm({
                 labelText="Aikaikkuna alkaa:"
                 name="start"
                 timeGranularityMinutes={timeslotGranularity}
+                error={errors.start}
+                showTimeSelect
               />
             </div>
             <div className="flex flex-col">
@@ -109,6 +111,8 @@ function RecurringTimeslotForm({
                 labelText="Aikaikkuna päättyy:"
                 name="end"
                 timeGranularityMinutes={timeslotGranularity}
+                error={errors.end}
+                showTimeSelect
               />
             </div>
           </div>
@@ -120,12 +124,13 @@ function RecurringTimeslotForm({
               registerReturn={register('isRecurring')}
             />
             {showRecurring && (
-            <InputField
-              labelText="Päättyy:"
-              type="date"
-              inputClassName="w-full"
-              registerReturn={register('periodEnds')}
-            />
+              <DatePicker
+                control={control}
+                labelText="Päättyy:"
+                name="periodEnds"
+                timeGranularityMinutes={timeslotGranularity}
+                error={errors.periodEnds}
+              />
             )}
             {showRecurring && (
             <InputField
