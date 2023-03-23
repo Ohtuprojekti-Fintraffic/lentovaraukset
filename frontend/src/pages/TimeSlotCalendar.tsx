@@ -66,22 +66,29 @@ function TimeSlotCalendar() {
 
   const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
 
-  const clickTimeslot = async (event: EventImpl): Promise<void> => {
-    if (event.end && isTimeInPast(event.end)) {
-      return;
-    }
+  const showTimeslotModalFn = (event: EventImpl | null) => {
     selectedTimeslotRef.current = event;
     setShowInfoModal(true);
   };
 
   const closeTimeslotModalFn = () => {
+    selectedTimeslotRef.current = null;
     setShowInfoModal(false);
+  };
+
+  const clickTimeslot = async (event: EventImpl): Promise<void> => {
+    if (event.end && isTimeInPast(event.end)) {
+      return;
+    }
+
+    showTimeslotModalFn(event);
   };
 
   const removeTimeSlot = async (removeInfo: EventRemoveArg) => {
     const { event } = removeInfo;
     await deleteTimeslot(Number(event.id));
-    setShowInfoModal(false);
+
+    closeTimeslotModalFn();
   };
 
   const isSameType = (
@@ -127,7 +134,7 @@ function TimeSlotCalendar() {
 
   const showModalAfterDrag = (times: { start: Date, end: Date }) => {
     draggedTimesRef.current = times;
-    setShowInfoModal(true);
+    showTimeslotModalFn(null);
   };
 
   return (
@@ -142,7 +149,6 @@ function TimeSlotCalendar() {
         }}
         closeTimeslotModal={() => {
           closeTimeslotModalFn();
-          selectedTimeslotRef.current = null;
           calendarRef.current?.getApi().refetchEvents();
         }}
       />
