@@ -132,7 +132,23 @@ const airfieldValidator = () => {
   return base;
 };
 
+const createTimeOfDayValidator = (slotGranularityMinutes: number) => z.object({
+  hours: z.coerce.number().min(0).max(23),
+  minutes: z.coerce.number().min(0).max(59)
+    .refine((value) => value % slotGranularityMinutes === 0),
+});
+
+const createGroupUpdateValidator = (slotGranularityMinutes: number) => {
+  const times = z.object({
+    startTimeOfDay: createTimeOfDayValidator(slotGranularityMinutes),
+    endTimeOfDay: createTimeOfDayValidator(slotGranularityMinutes),
+  });
+
+  return times;
+};
+
 export {
+  createGroupUpdateValidator,
   createTimeSlotValidator,
   createReservationValidator,
   reservationIsWithinTimeslot,

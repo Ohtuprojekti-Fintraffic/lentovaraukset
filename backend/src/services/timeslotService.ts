@@ -183,10 +183,26 @@ const createTimeslot = async (newTimeSlot: {
   return timeslot.dataValues;
 };
 
+const updateByGroup = async (group: string, updates: {
+  startTimeOfDay: { hours: number, minutes: number };
+  endTimeOfDay: { hours: number, minutes: number };
+}): Promise<TimeslotEntry[]> => {
+  const timeslots = await Timeslot.findAll({ where: { group } });
+  const editedTimeslots = timeslots.map(({ dataValues: timeslot }) => {
+    timeslot.start.setHours(updates.startTimeOfDay.hours, updates.startTimeOfDay.minutes);
+    timeslot.end.setHours(updates.endTimeOfDay.hours, updates.endTimeOfDay.minutes);
+    return timeslot;
+  });
+
+  const updatedTimeslots = await Timeslot.bulkCreate(editedTimeslots, { updateOnDuplicate: ['start', 'end'] });
+  return updatedTimeslots.map((ts) => ts.dataValues);
+};
+
 export default {
   getInTimeRange,
   deleteById,
   updateById,
   createTimeslot,
   createPeriod,
+  updateByGroup,
 };
