@@ -1,4 +1,4 @@
-import { TimeslotEntry } from '@lentovaraukset/shared/src';
+import { TimeslotEntry, WeekInDays } from '@lentovaraukset/shared/src';
 import { errorIfNotOk } from './util';
 
 const getTimeSlots = async (from: Date, until: Date): Promise<TimeslotEntry[]> => {
@@ -23,15 +23,7 @@ const modifyTimeSlot = async (
   period?: {
     end: Date,
     name: string,
-    days: {
-      monday: boolean,
-      tuesday: boolean,
-      wednesday: boolean,
-      thursday: boolean,
-      friday: boolean,
-      saturday: boolean,
-      sunday: boolean,
-    }
+    days: WeekInDays
   },
 ): Promise<void> => {
   const modifiedTimeSlot = {
