@@ -6,6 +6,7 @@ import {
 } from '@lentovaraukset/shared/src';
 import { usePopupContext } from '../../contexts/PopupContext';
 import InputField from '../InputField';
+import DatePicker from '../DatePicker';
 import { HTMLDateTimeConvert } from '../../util';
 import { useAirfield } from '../../queries/airfields';
 import { getReservations } from '../../queries/reservations';
@@ -58,7 +59,7 @@ function RecurringTimeslotForm({
   const end = timeslot?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
 
   const {
-    register, handleSubmit, reset, watch, getValues,
+    register, handleSubmit, reset, watch, control, formState: { errors }, getValues,
   } = useForm<Inputs>({
     values: {
       start,
@@ -133,12 +134,7 @@ function RecurringTimeslotForm({
   }, [timeslot]);
 
   // step is relative to min: https://stackoverflow.com/a/75353708
-  const stepSeconds = timeslotGranularity * 60;
-  const stepMillis = stepSeconds * 1000;
-  const nowMillis = new Date().getTime();
   // round up to nearest even whatever minutes
-  const roundedDate = new Date(Math.ceil(nowMillis / stepMillis) * stepMillis);
-  const min = HTMLDateTimeConvert(roundedDate);
 
   // important detail: the browser GUI doesn't give a damn and will show
   // whatever minutes it wants, but at least Chrome checks the field on submit
@@ -185,21 +181,23 @@ function RecurringTimeslotForm({
         <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
           <div className="flex flex-row space-x-6">
             <div className="flex flex-col">
-              <InputField
+              <DatePicker
+                control={control}
                 labelText="Aikaikkuna alkaa:"
-                type="datetime-local"
-                registerReturn={register('start')}
-                step={stepSeconds}
-                min={min}
+                name="start"
+                timeGranularityMinutes={timeslotGranularity}
+                error={errors.start}
+                showTimeSelect
               />
             </div>
             <div className="flex flex-col">
-              <InputField
+              <DatePicker
+                control={control}
                 labelText="Aikaikkuna päättyy:"
-                type="datetime-local"
-                registerReturn={register('end')}
-                step={stepSeconds}
-                min={min}
+                name="end"
+                timeGranularityMinutes={timeslotGranularity}
+                error={errors.end}
+                showTimeSelect
               />
             </div>
           </div>
@@ -233,12 +231,13 @@ function RecurringTimeslotForm({
               </div>
             )}
             {showRecurring && (
-            <InputField
-              labelText="Päättyy:"
-              type="date"
-              inputClassName="w-full"
-              registerReturn={register('periodEnds')}
-            />
+              <DatePicker
+                control={control}
+                labelText="Päättyy:"
+                name="periodEnds"
+                timeGranularityMinutes={timeslotGranularity}
+                error={errors.periodEnds}
+              />
             )}
             {showRecurring && (
             <InputField
