@@ -1,5 +1,5 @@
 import { EventImpl } from '@fullcalendar/core/internal';
-import { TimeslotEntry } from '@lentovaraukset/shared/src';
+import { TimeslotEntry, WeekInDays } from '@lentovaraukset/shared/src';
 import React, { useContext } from 'react';
 import Button from '../components/Button';
 import Card from '../components/Card';
@@ -31,15 +31,7 @@ function TimeslotInfoModal({
     period?: {
       end: Date,
       periodName: string,
-      days: {
-        monday: boolean,
-        tuesday: boolean,
-        wednesday: boolean,
-        thursday: boolean,
-        friday: boolean,
-        saturday: boolean,
-        sunday: boolean,
-      }
+      days: WeekInDays,
     },
   ) => {
     try {
@@ -55,15 +47,7 @@ function TimeslotInfoModal({
           ? {
             end: period.end,
             name: period.periodName,
-            days: {
-              monday: period.days.monday,
-              tuesday: period.days.tuesday,
-              wednesday: period.days.wednesday,
-              thursday: period.days.thursday,
-              friday: period.days.friday,
-              saturday: period.days.saturday,
-              sunday: period.days.sunday,
-            },
+            days: period.days,
           }
           : undefined,
       );

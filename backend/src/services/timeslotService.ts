@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import type { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src/index';
+import type { TimeslotEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src/index';
 import reservationService from '@lentovaraukset/backend/src/services/reservationService';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import { Timeslot } from '../models';
@@ -65,16 +65,8 @@ const createPeriod = async (
   id: number,
   period: {
     periodEnd: Date,
-    name: string
-    days: {
-      monday: boolean,
-      tuesday: boolean,
-      wednesday: boolean,
-      thursday: boolean,
-      friday: boolean,
-      saturday: boolean,
-      sunday: boolean,
-    }
+    name: string,
+    days: WeekInDays,
   },
   timeslot: { start: Date, end: Date, type: TimeslotType, info: string | null },
 ): Promise<Timeslot[]> => {

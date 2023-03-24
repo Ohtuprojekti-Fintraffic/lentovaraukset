@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
+import { TimeslotEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
 import InputField from '../InputField';
 import { HTMLDateTimeConvert } from '../../util';
 import { useAirfield } from '../../queries/airfields';
@@ -15,15 +15,7 @@ type RecurringTimeslotProps = {
     period?:
     { end: Date,
       periodName: string,
-      days: {
-        monday: boolean,
-        tuesday: boolean,
-        wednesday: boolean,
-        thursday: boolean,
-        friday: boolean,
-        saturday: boolean,
-        sunday: boolean,
-      }
+      days: WeekInDays
     }) => void
   id?: string
 };
@@ -37,7 +29,7 @@ type Inputs = {
   periodEnds: string | null
   periodName: string
   days: {
-    maanatai: boolean
+    maanantai: boolean
     tiistai: boolean
     keskiviikko: boolean
     torstai: boolean
@@ -70,7 +62,7 @@ function RecurringTimeslotForm({
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
       periodName: timeslot?.extendedProps.periodName,
       days: {
-        maanatai: true,
+        maanantai: true,
         tiistai: true,
         keskiviikko: true,
         torstai: true,
@@ -95,7 +87,7 @@ function RecurringTimeslotForm({
         end: new Date(periodEnds),
         periodName: formData.periodName,
         days: {
-          monday: formData.days.maanatai,
+          monday: formData.days.maanantai,
           tuesday: formData.days.tiistai,
           wednesday: formData.days.keskiviikko,
           thursday: formData.days.torstai,
@@ -181,7 +173,7 @@ function RecurringTimeslotForm({
             />
             {showRecurring && (
               <div className="grid grid-cols-4 gap-2">
-                {['maanatai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai'].map(
+                {['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai'].map(
                   (day) => (
                     <InputField
                       key={day}
