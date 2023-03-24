@@ -145,7 +145,7 @@ const updateById = async (
     const reservations = await reservationService
       .getInTimeRange(timeslot.start, timeslot.end);
     reservations.forEach(async (r) => {
-      await reservationService.deleteById(r.id);
+      await reservationService.deleteById(r.dataValues.id);
     });
   }
   await Timeslot.upsert({ ...timeslot, id });
@@ -167,7 +167,7 @@ const createTimeslot = async (newTimeSlot: {
     await timeslot.addReservations(reservations);
   } else {
     reservations.forEach(async (r) => {
-      await reservationService.deleteById(r.id);
+      await reservationService.deleteById(r.dataValues.id);
     });
   }
   return timeslot.dataValues;
