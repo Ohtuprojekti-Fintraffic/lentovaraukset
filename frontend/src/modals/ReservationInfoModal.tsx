@@ -82,7 +82,14 @@ function ReservationInfoModal({
         />
       )}
       actionSheet={(
-        <ActionSheet>
+        <ActionSheet handleClose={closeReservationModal}>
+          <Button
+            form="reservation_info_form"
+            type="submit"
+            variant="primary"
+          >
+            Tallenna
+          </Button>
           {reservation && (
             <Button
               variant="danger"
@@ -91,13 +98,6 @@ function ReservationInfoModal({
               Poista
             </Button>
           )}
-          <Button
-            form="reservation_info_form"
-            type="submit"
-            variant="primary"
-          >
-            Tallenna
-          </Button>
         </ActionSheet>
       )}
     />
