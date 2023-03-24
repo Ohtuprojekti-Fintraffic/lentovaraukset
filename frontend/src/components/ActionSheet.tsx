@@ -28,30 +28,25 @@ function ActionSheet({
     .filter((child) => React.isValidElement(child) && child.props.variant === variant);
 
   return (
-    <div>
-
-      <div className="flex flex-row  justify-between p-4 bg-gray-100 border-t border-gray-200 w-full">
-        <div className="flex flex-row flex-end space-x-2">
-          {filterChildrenByVariant('danger')}
-        </div>
-        <div className="flex flex-row flex-end space-x-2">
-          {
-            cancelButton
-            && (
-              <div>
-                <Button
-                  variant="tertiary"
-                  onClick={() => handleClose!()}
-                >
-                  {cancelButtonText}
-                </Button>
-              </div>
-            )
-          }
-          {filterChildrenByVariant('tertiary')}
-          {filterChildrenByVariant('secondary')}
-          {filterChildrenByVariant('primary')}
-        </div>
+    <div className="flex flex-row justify-between">
+      <div className="flex flex-row space-x-2 mr-8">
+        {filterChildrenByVariant('danger')}
+      </div>
+      <div className="flex flex-row space-x-2">
+        {
+          cancelButton
+          && (
+            <Button
+              variant="tertiary"
+              onClick={() => handleClose!()}
+            >
+              {cancelButtonText}
+            </Button>
+          )
+        }
+        {filterChildrenByVariant('tertiary')}
+        {filterChildrenByVariant('secondary')}
+        {filterChildrenByVariant('primary')}
       </div>
     </div>
   );

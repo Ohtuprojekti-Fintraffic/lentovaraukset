@@ -21,7 +21,9 @@ function Card({
         className=" flex flex-col max-w-fit h-fit bg-white rounded-lg shadow-2xl overflow-hidden"
       >
         {form}
-        {actionSheet}
+        <div className="bg-gray-100 border-t border-gray-200 p-4 w-full">
+          {actionSheet}
+        </div>
       </div>
     </Modal>
   );
