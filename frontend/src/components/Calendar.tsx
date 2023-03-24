@@ -16,11 +16,7 @@ type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>
   eventSources: EventSourceInput[];
   addEventFn: (event: { start: Date; end: Date; }) => void;
-  modifyEventFn: (event: {
-    id: string;
-    start: Date;
-    end: Date,
-    extendedProps: any }) => Promise<any>;
+  modifyEventFn: (event: EventImpl) => Promise<any>;
   clickEventFn: (event: EventImpl) => Promise<void>;
   removeEventFn: (event: EventRemoveArg) => Promise<void>;
   granularity: { minutes: number } | undefined;
@@ -124,12 +120,7 @@ function Calendar({
       event.end || new Date(),
       event.extendedProps.type,
     )) {
-      await modifyEventFn({
-        id: event.id,
-        start: event.start || new Date(),
-        end: event.end || new Date(),
-        extendedProps: event.extendedProps,
-      });
+      await modifyEventFn(event);
     }
     calendarRef.current?.getApi().refetchEvents();
   };

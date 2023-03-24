@@ -84,9 +84,9 @@ function RecurringTimeslotForm({
         clearPopup();
       };
       showPopup({
-        popupTitle: 'Lisää varausikkuna',
-        popupText: `Haluatko varmasti lisätä varausikkunan? \n Lisääminen poistaa seuraavat varaukset: ${reservations.map((r) => r.id).join()}`,
-        primaryText: 'Lisää',
+        popupTitle: 'Oletko varma?',
+        popupText: `Vuoron ${timeslot ? 'muokkaaminen' : 'lisääminen'} poistaa seuraavat varaukset: ${reservations.map((r) => r.id).join()}`,
+        primaryText: timeslot ? 'Muokkaa' : 'Lisää',
         primaryOnClick: onConfirmSubmit,
         secondaryText: 'Peruuta',
         secondaryOnClick: onCancelSubmit,
@@ -120,12 +120,8 @@ function RecurringTimeslotForm({
   useEffect(() => {
     const startTime = getValues('start');
     const endTime = getValues('end');
-    if (isBlocked) getReservationsWithinTimeslot(new Date(startTime)!, new Date(endTime)!);
-  }, [watch('end'), watch('start')]);
-
-  useEffect(() => {
-    if (start && end && timeslot?.extendedProps.type === 'blocked') getReservationsWithinTimeslot(new Date(start), new Date(end));
-  }, [draggedTimes]);
+    if (isBlocked || timeslot?.extendedProps.type === 'blocked') getReservationsWithinTimeslot(new Date(startTime)!, new Date(endTime)!);
+  }, [watch('end'), watch('start'), draggedTimes]);
 
   useEffect(() => {
     if (reservations.length > 0) {
