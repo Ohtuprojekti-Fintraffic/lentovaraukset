@@ -3,6 +3,7 @@ import React, { useState, useRef, useContext } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
+import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -14,7 +15,6 @@ import ReservationInfoModal from '../modals/ReservationInfoModal';
 import { useAirfield } from '../queries/airfields';
 import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
-import { usePopupContext } from '../contexts/PopupContext';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -22,7 +22,6 @@ function ReservationCalendar() {
   const draggedTimesRef = useRef<{ start: Date, end: Date } | null>(null);
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
-  const { showPopup, clearPopup } = usePopupContext();
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
   const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
@@ -98,34 +97,14 @@ function ReservationCalendar() {
 
   const removeReservation = async (removeInfo: EventRemoveArg) => {
     const { event } = removeInfo;
-    removeInfo.revert();
-
-    const onConfirmRemove = async () => {
-      const res = await deleteReservation(Number(event.id));
-      if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
-        closeReservationModalFn();
-        selectedReservationRef.current = null;
-        event.remove();
-      } else {
-        removeInfo.revert();
-        throw new Error('Removing reservation failed');
-      }
-      clearPopup();
-    };
-
-    const onCancelRemove = () => {
+    const res = await deleteReservation(Number(event.id));
+    if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
+      closeReservationModalFn();
+      selectedReservationRef.current = null;
+    } else {
       removeInfo.revert();
-      clearPopup();
-    };
-
-    showPopup({
-      popupTitle: 'Varauksen Poisto',
-      popupText: 'Haluatko varmasti poistaa varauksen?',
-      primaryText: 'Poista',
-      primaryOnClick: onConfirmRemove,
-      secondaryText: 'Peruuta',
-      secondaryOnClick: onCancelRemove,
-    });
+      throw new Error('Removing reservation failed');
+    }
   };
 
   const modifyReservationFn = async (event: {
@@ -153,13 +132,19 @@ function ReservationCalendar() {
     }
   };
 
-  const allowEvent: AllowFunc = (span) => {
+  const allowEvent: AllowFunc = (span, movingEvent) => {
     const eventsByType = calendarRef.current?.getApi().getEvents()
-      .filter((e) => e.start && e.end
-      && e.start < span.end && e.end > span.start
-      && e.extendedProps.type === 'blocked');
+      // .filter((e) => e.extendedProps.type === 'blocked');
+      .filter((e) => e.id !== movingEvent?.id && !e.display.includes('background')
+        && e.start && e.end
+        && e.start < span.end && e.end > span.start);
 
-    return eventsByType ? !(eventsByType.length > 0) : true;
+    if (eventsByType?.some((e) => e.extendedProps.type === 'blocked')) return false;
+    const mostConcurrent = countMostConcurrent(eventsByType as { start: Date, end: Date }[]);
+
+    return eventsByType && airfield
+      ? mostConcurrent < airfield.maxConcurrentFlights
+      : true;
   };
 
   const showModalAfterDrag = (times: { start: Date, end: Date }) => {
@@ -196,7 +181,7 @@ function ReservationCalendar() {
         granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
         eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFFF' }}
         selectConstraint="timeslots"
-        maxConcurrentLimit={airfield?.maxConcurrentFlights}
+        // maxConcurrentLimit={airfield?.maxConcurrentFlights}
         checkIfTimeInFuture
         allowEventRef={allowEvent}
       />

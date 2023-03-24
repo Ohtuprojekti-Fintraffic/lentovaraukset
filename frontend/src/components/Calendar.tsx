@@ -7,7 +7,6 @@ import interactionPlugin from '@fullcalendar/interaction';
 import {
   AllowFunc, DateSelectArg, EventChangeArg, EventClickArg, EventRemoveArg, EventSourceInput,
 } from '@fullcalendar/core';
-import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast, isTimeAtMostInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import AlertContext from '../contexts/AlertContext';
@@ -30,7 +29,6 @@ type CalendarProps = {
     textColor?: string;
   } | undefined;
   selectConstraint: string | undefined;
-  maxConcurrentLimit?: number;
   allowEventRef?: AllowFunc;
   checkIfTimeInFuture?: boolean;
   blocked?: boolean;
@@ -46,7 +44,7 @@ function Calendar({
   granularity = { minutes: 20 },
   eventColors,
   selectConstraint,
-  maxConcurrentLimit = 1,
+  // maxConcurrentLimit = 1,
   allowEventRef = () => true,
   checkIfTimeInFuture = false,
   blocked = false,
@@ -62,17 +60,17 @@ function Calendar({
     return ((stillEventType === 'available' && !blocked) || (stillEventType === 'blocked' && blocked));
   };
 
-  const allowEvent: AllowFunc = (span, movingEvent) => {
-    const events = calendarRef.current?.getApi().getEvents().filter(
-      (e) => e.id !== movingEvent?.id
-        && e.start && e.end
-        && !e.display.includes('background')
-        && e.start < span.end && e.end > span.start,
-    );
-    return events
-      ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
-      : true;
-  };
+  // const allowEvent: AllowFunc = (span, movingEvent) => {
+  //   const events = calendarRef.current?.getApi().getEvents().filter(
+  //     (e) => e.id !== movingEvent?.id
+  //       && e.start && e.end
+  //       && !e.display.includes('background')
+  //       && e.start < span.end && e.end > span.start,
+  //   );
+  //   return events
+  //     ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
+  //     : true;
+  // };
 
   const timeIsConsecutive = (start: Date, end: Date, type?: string) => {
     const consecutive = calendarRef.current?.getApi().getEvents().some(
@@ -159,8 +157,6 @@ function Calendar({
     calendarRef.current?.getApi().unselect();
   };
 
-  const handleAllow: AllowFunc = (s, m) => allowEventRef(s, m) ?? allowEvent(s, m);
-
   return (
     <FullCalendar
       ref={calendarRef}
@@ -199,8 +195,8 @@ function Calendar({
       selectConstraint={selectConstraint}
       eventSources={eventSources}
       slotEventOverlap={false}
-      selectAllow={handleAllow}
-      eventAllow={handleAllow}
+      selectAllow={allowEventRef}
+      eventAllow={allowEventRef}
     />
   );
 }
