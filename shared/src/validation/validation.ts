@@ -32,15 +32,27 @@ const createTimeSlotValidator = (slotGranularityMinutes: number) => {
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
     type: z.enum(['available', 'blocked']),
+    info: z.string().nullable(),
   }).refine((res) => res.start < res.end, { message: startNotLessThanEndErrorMessage });
 
   return TimeSlot;
 };
 
+const daysValidation = z.object({
+  monday: z.coerce.boolean(),
+  tuesday: z.coerce.boolean(),
+  wednesday: z.coerce.boolean(),
+  thursday: z.coerce.boolean(),
+  friday: z.coerce.boolean(),
+  saturday: z.coerce.boolean(),
+  sunday: z.coerce.boolean(),
+});
+
 const createPeriodValidation = () => {
   const period = z.object({
     periodEnd: z.coerce.date(),
     name: z.coerce.string(),
+    days: daysValidation,
   });
   return period;
 };

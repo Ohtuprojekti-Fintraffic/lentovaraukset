@@ -17,6 +17,7 @@ export interface TimeslotEntry {
   end: Date;
   type: TimeslotType;
   group?: string | null;
+  info: string | null;
 }
 
 export interface AirfieldEntry {
@@ -28,4 +29,14 @@ export interface AirfieldEntry {
 
 export enum ServiceErrorCode {
   ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
+}
+
+export interface WeekInDays {
+  monday: boolean;
+  tuesday: boolean;
+  wednesday: boolean;
+  thursday: boolean;
+  friday: boolean;
+  saturday: boolean;
+  sunday: boolean;
 }

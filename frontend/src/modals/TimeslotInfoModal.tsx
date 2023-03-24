@@ -1,5 +1,5 @@
 import { EventImpl } from '@fullcalendar/core/internal';
-import { TimeslotEntry } from '@lentovaraukset/shared/src';
+import { TimeslotEntry, WeekInDays } from '@lentovaraukset/shared/src';
 import React, { useContext } from 'react';
 import Button from '../components/Button';
 import Card from '../components/Card';
@@ -26,7 +26,14 @@ function TimeslotInfoModal({
 }: InfoModalProps) {
   const { addNewAlert } = useContext(AlertContext);
 
-  const onModifySubmitHandler = async (updatedTimeslot: Omit<TimeslotEntry, 'id'>, period?: { end: Date, periodName: string }) => {
+  const onModifySubmitHandler = async (
+    updatedTimeslot: Omit<TimeslotEntry, 'id'>,
+    period?: {
+      end: Date,
+      periodName: string,
+      days: WeekInDays,
+    },
+  ) => {
     try {
       await modifyTimeSlot(
         {
@@ -34,8 +41,15 @@ function TimeslotInfoModal({
           start: updatedTimeslot.start,
           end: updatedTimeslot.end,
           type: updatedTimeslot.type,
+          info: updatedTimeslot.info,
         },
-        period ? { end: period.end, name: period.periodName } : undefined,
+        period
+          ? {
+            end: period.end,
+            name: period.periodName,
+            days: period.days,
+          }
+          : undefined,
       );
       addNewAlert('Aikaikkuna päivitetty!', 'success');
     } catch (exception) {

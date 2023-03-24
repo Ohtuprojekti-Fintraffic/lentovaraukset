@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
+import { TimeslotEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
 import InputField from '../InputField';
 import DatePicker from '../DatePicker';
 import { HTMLDateTimeConvert } from '../../util';
@@ -11,7 +11,13 @@ type RecurringTimeslotProps = {
   timeslot?: EventImpl
   isBlocked: boolean
   draggedTimes?: { start: Date, end: Date }
-  onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>, period?: { end: Date, periodName: string }) => void
+  onSubmit: (
+    formData: Omit<TimeslotEntry, 'id' | 'user'>,
+    period?:
+    { end: Date,
+      periodName: string,
+      days: WeekInDays
+    }) => void
   id?: string
 };
 
@@ -19,9 +25,19 @@ type Inputs = {
   start: string
   end: string
   type: TimeslotType
+  info: string | null
   isRecurring: boolean
   periodEnds: string | null
   periodName: string
+  days: {
+    maanantai: boolean
+    tiistai: boolean
+    keskiviikko: boolean
+    torstai: boolean
+    perjantai: boolean
+    lauantai: boolean
+    sunnuntai: boolean
+  }
 };
 
 function RecurringTimeslotForm({
@@ -42,24 +58,44 @@ function RecurringTimeslotForm({
       start,
       end,
       type: timeslot?.extendedProps.type,
+      info: null,
       isRecurring: false,
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
       periodName: timeslot?.extendedProps.periodName,
+      days: {
+        maanantai: true,
+        tiistai: true,
+        keskiviikko: true,
+        torstai: true,
+        perjantai: true,
+        lauantai: true,
+        sunnuntai: true,
+      },
     },
   });
 
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
-    const type: TimeslotType = formData.type ?? isBlocked ? 'blocked' : 'available';
+    const type: TimeslotType = formData.type ?? (isBlocked ? 'blocked' : 'available');
     const updatedTimeslot = {
       start: new Date(formData.start),
       end: new Date(formData.end),
       type,
+      info: formData.info,
     };
     const { isRecurring, periodEnds } = formData;
     if (isRecurring && periodEnds) {
       const period = {
         end: new Date(periodEnds),
         periodName: formData.periodName,
+        days: {
+          monday: formData.days.maanantai,
+          tuesday: formData.days.tiistai,
+          wednesday: formData.days.keskiviikko,
+          thursday: formData.days.torstai,
+          friday: formData.days.perjantai,
+          saturday: formData.days.lauantai,
+          sunday: formData.days.sunnuntai,
+        },
       };
       onSubmit(updatedTimeslot, period);
     } else {
@@ -80,6 +116,8 @@ function RecurringTimeslotForm({
   // and shows a popover with the nearest acceptable divisible values
 
   const showRecurring = watch('isRecurring');
+
+  const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
   return (
     <div>
@@ -116,6 +154,14 @@ function RecurringTimeslotForm({
               />
             </div>
           </div>
+          {isBlocked && (
+            <InputField
+              labelText="Lisätietoja:"
+              type="text"
+              registerReturn={register('info')}
+              inputClassName="w-full"
+            />
+          )}
           {timeslot && (
           <div className="flex flex-col">
             <InputField
@@ -123,6 +169,20 @@ function RecurringTimeslotForm({
               type="checkbox"
               registerReturn={register('isRecurring')}
             />
+            {showRecurring && (
+              <div className="grid grid-cols-4 gap-2">
+                {['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai'].map(
+                  (day) => (
+                    <InputField
+                      key={day}
+                      labelText={capitalizeFirstLetter(day)}
+                      type="checkbox"
+                      registerReturn={register(`days.${day}` as keyof Inputs)}
+                    />
+                  ),
+                )}
+              </div>
+            )}
             {showRecurring && (
               <DatePicker
                 control={control}

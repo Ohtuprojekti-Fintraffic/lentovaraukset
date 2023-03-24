@@ -66,7 +66,6 @@ function Popup() {
             {tertiaryText && <Button variant="tertiary" onClick={tertiaryOnClick}>{tertiaryText}</Button>}
             {secondaryText && <Button variant="secondary" onClick={secondaryOnClick}>{secondaryText}</Button>}
             {primaryText && <Button variant="primary" onClick={primaryOnClick}>{primaryText}</Button>}
-
           </div>
         </div>
       </div>
