@@ -128,19 +128,30 @@ const updateById = async (
     throw new Error('Timeslot can\'t be consecutive');
   }
   const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
-  if (oldTimeslot && isTimeInPast(oldTimeslot.start)) {
+
+  if (oldTimeslot === null) {
+    throw new Error('No timeslot with id exists');
+  }
+
+  // if the timeslot has started, its start time can't be edited
+  // and if timeslot has ended it's no longer editable at all
+  if (
+    (oldTimeslot.start.getTime() !== timeslot.start.getTime()
+      && isTimeInPast(oldTimeslot.start))
+    || isTimeInPast(oldTimeslot.end)) {
     throw new Error('Timeslot in past cannot be modified');
   }
+
   if (timeslot.type === 'available') {
-    const oldReservations = await oldTimeslot?.getReservations();
-    const newReservations = oldReservations?.filter(
+    const oldReservations = await oldTimeslot.getReservations();
+    const newReservations = oldReservations.filter(
       (reservation) => reservation.start >= timeslot.start && reservation.end <= timeslot.end,
     );
-    if (oldReservations?.length !== newReservations?.length) {
+    if (oldReservations.length !== newReservations.length) {
       throw new Error('Timeslot has reservations');
     }
-    await oldTimeslot?.removeReservations(oldReservations);
-    await oldTimeslot?.addReservations(newReservations);
+    await oldTimeslot.removeReservations(oldReservations);
+    await oldTimeslot.addReservations(newReservations);
   }
   await Timeslot.upsert({ ...timeslot, id });
 };

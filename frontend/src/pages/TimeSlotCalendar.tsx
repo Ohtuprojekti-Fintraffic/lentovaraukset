@@ -1,4 +1,6 @@
-import { EventRemoveArg, EventSourceFunc, AllowFunc } from '@fullcalendar/core';
+import {
+  EventRemoveArg, EventSourceFunc, AllowFunc, EventInput,
+} from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
@@ -32,11 +34,11 @@ function TimeSlotCalendar() {
   ) => {
     try {
       const timeslots = await getTimeSlots(start, end);
-      const timeslotsMapped = timeslots.map((timeslot) => {
-        const timeslotEvent = {
+      const timeslotsMapped = timeslots.map((timeslot): EventInput => {
+        const timeslotEvent: EventInput = {
           ...timeslot,
           id: timeslot.id.toString(),
-          editable: !isTimeInPast(timeslot.start),
+          editable: !isTimeInPast(timeslot.end),
           color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
           title: timeslot.type === 'available' ? 'Vapaa' : timeslot.info || 'Suljettu',
         };
