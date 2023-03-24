@@ -1,4 +1,4 @@
-import { TimeslotEntry } from '@lentovaraukset/shared/src';
+import { TimeslotEntry, WeekInDays } from '@lentovaraukset/shared/src';
 import { errorIfNotOk } from './util';
 
 const getTimeSlots = async (from: Date, until: Date): Promise<TimeslotEntry[]> => {
@@ -20,12 +20,17 @@ const addTimeSlot = async (newTimeSlot: { start: Date, end: Date, type: 'availab
 
 const modifyTimeSlot = async (
   timeSlot: TimeslotEntry,
-  period?: { end: Date, name: string },
+  period?: {
+    end: Date,
+    name: string,
+    days: WeekInDays
+  },
 ): Promise<void> => {
   const modifiedTimeSlot = {
     ...timeSlot,
     periodEnd: period?.end,
     name: period?.name,
+    days: period?.days,
   };
 
   const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/${timeSlot.id}`, {
