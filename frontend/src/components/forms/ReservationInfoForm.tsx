@@ -82,10 +82,10 @@ function ReservationInfoForm({
       <div className="bg-black p-3">
         <p className="text-white">
           {
-        reservation
-          ? `Varaus #${reservation.id}`
-          : 'Uusi varaus'
-        }
+            reservation
+              ? `Varaus #${reservation.id}`
+              : 'Uusi varaus'
+          }
         </p>
       </div>
       <ModalAlert
@@ -95,40 +95,38 @@ function ReservationInfoForm({
         removalDelaySecs={10}
       />
       <div className="p-8">
-        <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler)}>
-          <div className="flex flex-row space-x-6 w-fit">
-            <div className="flex flex-col">
-              <DatePicker
-                control={control}
-                labelText="Varaus alkaa:"
-                name="start"
-                timeGranularityMinutes={reservationGranularity}
-                error={errors.start}
-                showTimeSelect
-              />
-              <InputField
-                labelText="Koneen rekisteritunnus:"
-                type="text"
-                registerReturn={register('aircraftId')}
-                error={errors.aircraftId}
-              />
-            </div>
-            <div className="flex flex-col">
-              <DatePicker
-                control={control}
-                labelText="Varays päättyy:"
-                name="end"
-                timeGranularityMinutes={reservationGranularity}
-                error={errors.end}
-                showTimeSelect
-              />
-              <InputField
-                labelText="Puhelinnumero:"
-                type="tel"
-                registerReturn={register('phone')}
-                error={errors.phone}
-              />
-            </div>
+        <form id={id} className="flex flex-col w-full" onSubmit={handleSubmit(submitHandler)}>
+          <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
+            <DatePicker
+              control={control}
+              labelText="Varaus alkaa:"
+              name="start"
+              timeGranularityMinutes={reservationGranularity}
+              error={errors.start}
+              showTimeSelect
+            />
+            <DatePicker
+              control={control}
+              labelText="Varaus päättyy:"
+              name="end"
+              timeGranularityMinutes={reservationGranularity}
+              error={errors.end}
+              showTimeSelect
+            />
+          </div>
+          <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
+            <InputField
+              labelText="Koneen rekisteritunnus:"
+              type="text"
+              registerReturn={register('aircraftId')}
+              error={errors.aircraftId}
+            />
+            <InputField
+              labelText="Puhelinnumero:"
+              type="tel"
+              registerReturn={register('phone')}
+              error={errors.phone}
+            />
           </div>
           <InputField
             labelText="Lisätietoja:"

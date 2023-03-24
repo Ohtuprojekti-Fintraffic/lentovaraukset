@@ -131,28 +131,24 @@ function RecurringTimeslotForm({
         </p>
       </div>
       <div className="p-8">
-        <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
-          <div className="flex flex-row space-x-6">
-            <div className="flex flex-col">
-              <DatePicker
-                control={control}
-                labelText="Aikaikkuna alkaa:"
-                name="start"
-                timeGranularityMinutes={timeslotGranularity}
-                error={errors.start}
-                showTimeSelect
-              />
-            </div>
-            <div className="flex flex-col">
-              <DatePicker
-                control={control}
-                labelText="Aikaikkuna päättyy:"
-                name="end"
-                timeGranularityMinutes={timeslotGranularity}
-                error={errors.end}
-                showTimeSelect
-              />
-            </div>
+        <form id={id} className="flex flex-col" onSubmit={handleSubmit(submitHandler, onError)}>
+          <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
+            <DatePicker
+              control={control}
+              labelText="Aikaikkuna alkaa:"
+              name="start"
+              timeGranularityMinutes={timeslotGranularity}
+              error={errors.start}
+              showTimeSelect
+            />
+            <DatePicker
+              control={control}
+              labelText="Aikaikkuna päättyy:"
+              name="end"
+              timeGranularityMinutes={timeslotGranularity}
+              error={errors.end}
+              showTimeSelect
+            />
           </div>
           {isBlocked && (
             <InputField
@@ -170,7 +166,7 @@ function RecurringTimeslotForm({
               registerReturn={register('isRecurring')}
             />
             {showRecurring && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="flex flex-row space-x-2 flex-wrap">
                 {['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai'].map(
                   (day) => (
                     <InputField

@@ -29,7 +29,7 @@ function ActionSheet({
 
   return (
     <div>
-      <div className="hidden md:flex flex-row justify-between">
+      <div className="hidden sm:flex flex-row justify-between">
         <div className="flex flex-row space-x-2 mr-8">
           {filterChildrenByVariant('danger')}
         </div>
@@ -50,7 +50,7 @@ function ActionSheet({
           {filterChildrenByVariant('primary')}
         </div>
       </div>
-      <div className="flex md:hidden flex-col">
+      <div className="flex sm:hidden flex-col space-y-8">
         <div className="flex flex-col space-y-2">
           {filterChildrenByVariant('primary')}
           {filterChildrenByVariant('secondary')}
@@ -67,9 +67,13 @@ function ActionSheet({
             )
           }
         </div>
-        <div className="flex flex-col space-y-2 mt-8">
-          {filterChildrenByVariant('danger')}
-        </div>
+        {
+          filterChildrenByVariant('danger').length > 0 && (
+            <div className="flex flex-col space-y-2">
+              {filterChildrenByVariant('danger')}
+            </div>
+          )
+        }
       </div>
     </div>
   );

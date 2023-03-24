@@ -50,7 +50,7 @@ export interface RHFFieldProps extends Omit<FieldProps, 'registerReturn' | 'valu
   registerReturn: UseFormRegisterReturn<any>;
 }
 
-export const fieldBaseClass = 'border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
+export const fieldBaseClass = 'w-full border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
                        + 'placeholder:text-ft-text-300 mb-4';
 
 export const fieldInvalidClass = 'invalid:bg-ft-warning-100 invalid:text-ft-warning-300'
