@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { ReservationEntry, TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
+import {
+  ReservationEntry, TimeslotEntry, TimeslotType, WeekInDays,
+} from '@lentovaraukset/shared/src';
 import { usePopupContext } from '../../contexts/PopupContext';
 import InputField from '../InputField';
 import { HTMLDateTimeConvert } from '../../util';
@@ -13,7 +15,13 @@ type RecurringTimeslotProps = {
   timeslot?: EventImpl
   isBlocked: boolean
   draggedTimes?: { start: Date, end: Date }
-  onSubmit: (formData: Omit<TimeslotEntry, 'id' | 'user'>, period?: { end: Date, periodName: string }) => void
+  onSubmit: (
+    formData: Omit<TimeslotEntry, 'id' | 'user'>,
+    period?:
+    { end: Date,
+      periodName: string,
+      days: WeekInDays
+    }) => void
   id?: string
 };
 
@@ -25,6 +33,15 @@ type Inputs = {
   isRecurring: boolean
   periodEnds: string | null
   periodName: string
+  days: {
+    maanantai: boolean
+    tiistai: boolean
+    keskiviikko: boolean
+    torstai: boolean
+    perjantai: boolean
+    lauantai: boolean
+    sunnuntai: boolean
+  }
 };
 
 function RecurringTimeslotForm({
@@ -51,6 +68,15 @@ function RecurringTimeslotForm({
       isRecurring: false,
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
       periodName: timeslot?.extendedProps.periodName,
+      days: {
+        maanantai: true,
+        tiistai: true,
+        keskiviikko: true,
+        torstai: true,
+        perjantai: true,
+        lauantai: true,
+        sunnuntai: true,
+      },
     },
   });
 
@@ -70,6 +96,15 @@ function RecurringTimeslotForm({
         const period = {
           end: new Date(periodEnds),
           periodName: formData.periodName,
+          days: {
+            monday: formData.days.maanantai,
+            tuesday: formData.days.tiistai,
+            wednesday: formData.days.keskiviikko,
+            thursday: formData.days.torstai,
+            friday: formData.days.perjantai,
+            saturday: formData.days.lauantai,
+            sunday: formData.days.sunnuntai,
+          },
         };
         onSubmit(updatedTimeslot, period);
       } else {
@@ -78,21 +113,16 @@ function RecurringTimeslotForm({
     };
     if (removesReservations(updatedTimeslot.type)) {
       const onConfirmSubmit = async () => {
-        if (isRecurring && periodEnds) {
-          submit();
-          clearPopup();
-        }
-      };
-      const onCancelSubmit = () => {
+        submit();
         clearPopup();
       };
       showPopup({
         popupTitle: 'Oletko varma?',
         popupText: `Vuoron ${timeslot ? 'muokkaaminen' : 'lisääminen'} poistaa seuraavat varaukset: ${reservations.map((r) => r.id).join()}`,
-        primaryText: timeslot ? 'Muokkaa' : 'Lisää',
+        primaryText: 'Vahvista',
         primaryOnClick: onConfirmSubmit,
         secondaryText: 'Peruuta',
-        secondaryOnClick: onCancelSubmit,
+        secondaryOnClick: () => clearPopup(),
       });
     } else submit();
   };
@@ -115,6 +145,8 @@ function RecurringTimeslotForm({
   // and shows a popover with the nearest acceptable divisible values
 
   const showRecurring = watch('isRecurring');
+
+  const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
   const getReservationsWithinTimeslot = async (startTime:Date, endTime: Date) => {
     setReservations(await getReservations(startTime, endTime));
@@ -186,6 +218,20 @@ function RecurringTimeslotForm({
               type="checkbox"
               registerReturn={register('isRecurring')}
             />
+            {showRecurring && (
+              <div className="grid grid-cols-4 gap-2">
+                {['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai'].map(
+                  (day) => (
+                    <InputField
+                      key={day}
+                      labelText={capitalizeFirstLetter(day)}
+                      type="checkbox"
+                      registerReturn={register(`days.${day}` as keyof Inputs)}
+                    />
+                  ),
+                )}
+              </div>
+            )}
             {showRecurring && (
             <InputField
               labelText="Päättyy:"
