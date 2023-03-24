@@ -1,6 +1,7 @@
 import { EventImpl } from '@fullcalendar/core/internal';
 import { ReservationEntry, ServiceErrorCode } from '@lentovaraukset/shared/src';
 import React, { useContext } from 'react';
+import ActionSheet from '../components/ActionSheet';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import ReservationInfoForm from '../components/forms/ReservationInfoForm';
@@ -69,29 +70,37 @@ function ReservationInfoModal({
   };
 
   return (
-    <Card show={showInfoModal} handleClose={closeReservationModal}>
-      <ReservationInfoForm
-        id="reservation_info_form"
-        reservation={reservation}
-        draggedTimes={draggedTimes}
-        onSubmit={reservation ? onSubmitModifyHandler : onSubmitAddHandler}
-      />
-      {reservation && (
-      <Button
-        variant="danger"
-        onClick={() => removeReservation()}
-      >
-        Poista
-      </Button>
+    <Card
+      show={showInfoModal}
+      handleClose={closeReservationModal}
+      form={(
+        <ReservationInfoForm
+          id="reservation_info_form"
+          reservation={reservation}
+          draggedTimes={draggedTimes}
+          onSubmit={reservation ? onSubmitModifyHandler : onSubmitAddHandler}
+        />
       )}
-      <Button
-        form="reservation_info_form"
-        type="submit"
-        variant="primary"
-      >
-        Tallenna
-      </Button>
-    </Card>
+      actionSheet={(
+        <ActionSheet>
+          {reservation && (
+            <Button
+              variant="danger"
+              onClick={() => removeReservation()}
+            >
+              Poista
+            </Button>
+          )}
+          <Button
+            form="reservation_info_form"
+            type="submit"
+            variant="primary"
+          >
+            Tallenna
+          </Button>
+        </ActionSheet>
+      )}
+    />
   );
 }
 
