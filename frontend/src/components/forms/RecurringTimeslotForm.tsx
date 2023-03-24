@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { ReservationEntry, TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
+import { usePopupContext } from '../../contexts/PopupContext';
 import InputField from '../InputField';
 import { HTMLDateTimeConvert } from '../../util';
 import { useAirfield } from '../../queries/airfields';
@@ -32,6 +33,7 @@ function RecurringTimeslotForm({
 }: RecurringTimeslotProps) {
   const [reservations, setReservations] = useState<ReservationEntry[]>([]);
   const [formWarning, setFormWarning] = useState<string | undefined>(undefined);
+  const { showPopup, clearPopup } = usePopupContext();
   const { data: airfield } = useAirfield(1);
   const timeslotGranularity = airfield?.eventGranularityMinutes || 20;
   const start = timeslot?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
@@ -50,23 +52,46 @@ function RecurringTimeslotForm({
     },
   });
 
+  const removesReservations = (type: TimeslotType) => type === 'blocked' && reservations.length > 0;
+
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
-    const type: TimeslotType = formData.type ?? isBlocked ? 'blocked' : 'available';
+    const type: TimeslotType = formData.type ?? (isBlocked ? 'blocked' : 'available');
     const updatedTimeslot = {
       start: new Date(formData.start),
       end: new Date(formData.end),
       type,
     };
     const { isRecurring, periodEnds } = formData;
-    if (isRecurring && periodEnds) {
-      const period = {
-        end: new Date(periodEnds),
-        periodName: formData.periodName,
+    const submit = () => {
+      if (isRecurring && periodEnds) {
+        const period = {
+          end: new Date(periodEnds),
+          periodName: formData.periodName,
+        };
+        onSubmit(updatedTimeslot, period);
+      } else {
+        onSubmit(updatedTimeslot);
+      }
+    };
+    if (removesReservations(updatedTimeslot.type)) {
+      const onConfirmSubmit = async () => {
+        if (isRecurring && periodEnds) {
+          submit();
+          clearPopup();
+        }
       };
-      onSubmit(updatedTimeslot, period);
-    } else {
-      onSubmit(updatedTimeslot);
-    }
+      const onCancelSubmit = () => {
+        clearPopup();
+      };
+      showPopup({
+        popupTitle: 'Lisää varausikkuna',
+        popupText: `Haluatko varmasti lisätä varausikkunan? \n Lisääminen poistaa seuraavat varaukset: ${reservations.map((r) => r.id).join()}`,
+        primaryText: 'Lisää',
+        primaryOnClick: onConfirmSubmit,
+        secondaryText: 'Peruuta',
+        secondaryOnClick: onCancelSubmit,
+      });
+    } else submit();
   };
   const onError = (e: any) => console.error(e);
 
@@ -104,7 +129,7 @@ function RecurringTimeslotForm({
 
   useEffect(() => {
     if (reservations.length > 0) {
-      setFormWarning(`Poistaa varaukset: ${reservations.map((r) => r.id)}`);
+      setFormWarning(`Poistaa varaukset: ${reservations.map((r) => r.id).join()}`);
     } else setFormWarning(undefined);
   }, [reservations]);
 
