@@ -21,6 +21,7 @@ type Inputs = {
   start: string
   end: string
   type: TimeslotType
+  info: string | null
   isRecurring: boolean
   periodEnds: string | null
   periodName: string
@@ -46,6 +47,7 @@ function RecurringTimeslotForm({
       start,
       end,
       type: timeslot?.extendedProps.type,
+      info: null,
       isRecurring: false,
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
       periodName: timeslot?.extendedProps.periodName,
@@ -60,6 +62,7 @@ function RecurringTimeslotForm({
       start: new Date(formData.start),
       end: new Date(formData.end),
       type,
+      info: formData.info,
     };
     const { isRecurring, periodEnds } = formData;
     const submit = () => {
@@ -168,6 +171,14 @@ function RecurringTimeslotForm({
               />
             </div>
           </div>
+          {isBlocked && (
+            <InputField
+              labelText="Lisätietoja:"
+              type="text"
+              registerReturn={register('info')}
+              inputClassName="w-full"
+            />
+          )}
           {timeslot && (
           <div className="flex flex-col">
             <InputField

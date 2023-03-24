@@ -14,6 +14,7 @@ import ReservationInfoModal from '../modals/ReservationInfoModal';
 import { useAirfield } from '../queries/airfields';
 import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
+import { usePopupContext } from '../contexts/PopupContext';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -21,6 +22,7 @@ function ReservationCalendar() {
   const draggedTimesRef = useRef<{ start: Date, end: Date } | null>(null);
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
+  const { showPopup, clearPopup } = usePopupContext();
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
   const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
@@ -60,9 +62,11 @@ function ReservationCalendar() {
     try {
       const timeslots = await getTimeSlots(start, end);
       const timeslotsMapped = timeslots.map((timeslot) => {
-        const display = timeslot.type === 'available' ? 'inverse-background' : 'background';
+        const display = timeslot.type === 'available' ? 'inverse-background' : 'block';
+        const color = timeslot.type === 'available' ? '#2C2C44' : '#B40000';
+        const title = timeslot.type === 'available' ? '' : timeslot.info || 'Ei varattavissa';
         return {
-          ...timeslot, id: timeslot.id.toString(), groupId: 'timeslots', display, color: '#2C2C44',
+          ...timeslot, id: timeslot.id.toString(), groupId: 'timeslots', display, color, title, editable: false,
         };
       });
 
@@ -79,7 +83,7 @@ function ReservationCalendar() {
   const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
 
   const clickReservation = async (event: EventImpl): Promise<void> => {
-    if (event.end && isTimeInPast(event.end)) {
+    if ((event.end && isTimeInPast(event.end)) || event.groupId === 'timeslots') {
       return;
     }
 
@@ -94,14 +98,34 @@ function ReservationCalendar() {
 
   const removeReservation = async (removeInfo: EventRemoveArg) => {
     const { event } = removeInfo;
-    const res = await deleteReservation(Number(event.id));
-    if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
-      closeReservationModalFn();
-      selectedReservationRef.current = null;
-    } else {
+    removeInfo.revert();
+
+    const onConfirmRemove = async () => {
+      const res = await deleteReservation(Number(event.id));
+      if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
+        closeReservationModalFn();
+        selectedReservationRef.current = null;
+        event.remove();
+      } else {
+        removeInfo.revert();
+        throw new Error('Removing reservation failed');
+      }
+      clearPopup();
+    };
+
+    const onCancelRemove = () => {
       removeInfo.revert();
-      throw new Error('Removing reservation failed');
-    }
+      clearPopup();
+    };
+
+    showPopup({
+      popupTitle: 'Varauksen Poisto',
+      popupText: 'Haluatko varmasti poistaa varauksen?',
+      primaryText: 'Poista',
+      primaryOnClick: onConfirmRemove,
+      secondaryText: 'Peruuta',
+      secondaryOnClick: onCancelRemove,
+    });
   };
 
   const modifyReservationFn = async (event: EventImpl): Promise<void> => {
@@ -165,7 +189,7 @@ function ReservationCalendar() {
         clickEventFn={clickReservation}
         removeEventFn={removeReservation}
         granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
-        eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFF' }}
+        eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFFF' }}
         selectConstraint="timeslots"
         maxConcurrentLimit={airfield?.maxConcurrentFlights}
         checkIfTimeInFuture
