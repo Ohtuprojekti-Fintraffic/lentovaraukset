@@ -6,6 +6,8 @@ import { createReservationValidator } from '@lentovaraukset/shared/src/validatio
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 import { useAirfield } from '../../queries/airfields';
 import InputField from '../InputField';
+import DatePicker from '../DatePicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { HTMLDateTimeConvert } from '../../util';
 import ModalAlert from '../ModalAlert';
 
@@ -36,7 +38,7 @@ function ReservationInfoForm({
   const end = reservation?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
 
   const {
-    register, handleSubmit, reset, formState: { errors },
+    register, handleSubmit, reset, control, formState: { errors },
   } = useForm<Inputs>({
     values: {
       start,
@@ -46,6 +48,7 @@ function ReservationInfoForm({
       info: reservation?.extendedProps.info,
     },
     resolver: zodResolver(createReservationValidator(reservationGranularity, 7)),
+    mode: 'all',
   });
 
   const [formWarning, setFormWarning] = useState<string | undefined>(undefined);
@@ -71,18 +74,6 @@ function ReservationInfoForm({
     setFormWarning((errors as FieldErrors<Inputs & { '': string }>)['']?.message);
   }, [errors]);
 
-  // step is relative to min: https://stackoverflow.com/a/75353708
-  const stepSeconds = reservationGranularity * 60;
-  const stepMillis = stepSeconds * 1000;
-  const nowMillis = new Date().getTime();
-  // round up to nearest even whatever minutes
-  const roundedDate = new Date(Math.ceil(nowMillis / stepMillis) * stepMillis);
-  const min = HTMLDateTimeConvert(roundedDate);
-
-  // important detail: the browser GUI doesn't give a damn and will show
-  // whatever minutes it wants, but at least Chrome checks the field on submit
-  // and shows a popover with the nearest acceptable divisible values
-
   // TODO: add max future time
   // const max =
 
@@ -107,13 +98,13 @@ function ReservationInfoForm({
         <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler)}>
           <div className="flex flex-row space-x-6">
             <div className="flex flex-col">
-              <InputField
+              <DatePicker
+                control={control}
                 labelText="Varaus alkaa:"
-                type="datetime-local"
-                registerReturn={register('start')}
-                step={stepSeconds}
-                min={min}
+                name="start"
+                timeGranularityMinutes={reservationGranularity}
                 error={errors.start}
+                showTimeSelect
               />
               <InputField
                 labelText="Koneen rekisteritunnus:"
@@ -123,13 +114,13 @@ function ReservationInfoForm({
               />
             </div>
             <div className="flex flex-col">
-              <InputField
-                labelText="Varaus päättyy:"
-                type="datetime-local"
-                registerReturn={register('end')}
-                step={stepSeconds}
-                min={min}
+              <DatePicker
+                control={control}
+                labelText="Varays päättyy:"
+                name="end"
+                timeGranularityMinutes={reservationGranularity}
                 error={errors.end}
+                showTimeSelect
               />
               <InputField
                 labelText="Puhelinnumero:"

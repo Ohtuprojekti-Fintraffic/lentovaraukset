@@ -58,7 +58,6 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
     if (req.body.periodEnd) {
       const period = createPeriodValidation().parse(req.body);
       const createdPeriod = await timeslotService.createPeriod(id, period, modifiedTimeslot);
-      console.log(createdPeriod);
       res.json(createdPeriod);
     } else {
       await timeslotService.updateById(id, modifiedTimeslot);

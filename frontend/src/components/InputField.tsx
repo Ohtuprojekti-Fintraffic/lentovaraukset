@@ -1,9 +1,11 @@
 import React, {
   MutableRefObject, useEffect, useId, useRef,
 } from 'react';
-import { UseFormRegisterReturn, FieldError } from 'react-hook-form';
+import {
+  UseFormRegisterReturn, FieldError,
+} from 'react-hook-form';
 
-type InputStates = 'default' | 'error' | 'disabled';
+export type InputStates = 'default' | 'error' | 'disabled';
 
 export interface FieldProps {
   state?: InputStates;
@@ -48,6 +50,19 @@ export interface RHFFieldProps extends Omit<FieldProps, 'registerReturn' | 'valu
   registerReturn: UseFormRegisterReturn<any>;
 }
 
+export const fieldBaseClass = 'border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
+                       + 'placeholder:text-ft-text-300 mb-4';
+
+export const fieldInvalidClass = 'invalid:bg-ft-warning-100 invalid:text-ft-warning-300'
+                            + 'invalid:border-ft-warning-300';
+
+export const fieldStateClasses = {
+  default: 'border-ft-neutral-200',
+  error: 'border-[3px] border-ft-danger-200 text-ft-danger-200',
+  disabled: 'border-ft-neutral-200 text-ft-text-300 bg-ft-input-placeholder',
+  invalid: fieldInvalidClass,
+};
+
 function InputField({
   state = 'default',
   type,
@@ -61,19 +76,6 @@ function InputField({
   helperTextClassName = '',
   defaultValue = '',
 }: FieldProps | RHFFieldProps) {
-  const fieldBaseClass = 'border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
-                       + 'placeholder:text-ft-text-300 mb-4';
-
-  const fieldInvalidClass = 'invalid:bg-ft-warning-100 invalid:text-ft-warning-300'
-                            + 'invalid:border-ft-warning-300';
-
-  const fieldStateClasses = {
-    default: 'border-ft-neutral-200',
-    error: 'border-[3px] border-ft-danger-200 text-ft-danger-200',
-    disabled: 'border-ft-neutral-200 text-ft-text-300 bg-ft-input-placeholder',
-    invalid: fieldInvalidClass,
-  };
-
   const id = useId();
 
   const inputRef: MutableRefObject<HTMLInputElement | null> = useRef(null);

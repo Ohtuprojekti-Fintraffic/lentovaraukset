@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import type { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src/index';
+import type { TimeslotEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src/index';
 import reservationService from '@lentovaraukset/backend/src/services/reservationService';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import { Timeslot } from '../models';
@@ -63,24 +63,41 @@ const deleteById = async (id: number) => {
 
 const createPeriod = async (
   id: number,
-  period: { periodEnd: Date, name: string },
+  period: {
+    periodEnd: Date,
+    name: string,
+    days: WeekInDays,
+  },
   timeslot: { start: Date, end: Date, type: TimeslotType, info: string | null },
 ): Promise<Timeslot[]> => {
-  const oneWeekInMillis = 7 * 24 * 60 * 60 * 1000;
-  const { periodEnd } = period;
+  const { periodEnd, days } = period;
+  const dayInMillis = 24 * 60 * 60 * 1000;
+  const weekdays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
   const timeslotGroup: { start: Date, end: Date, type: TimeslotType, info: string | null }[] = [];
   const {
-    start, end, type, info,
+    start,
+    end,
+    type,
+    info,
   } = timeslot;
-  start.setTime(start.getTime() + oneWeekInMillis);
-  end.setTime(end.getTime() + oneWeekInMillis);
-  while (end <= periodEnd) {
-    timeslotGroup.push({
-      start: new Date(start.getTime()), end: new Date(end.getTime()), type, info,
-    });
-    start.setTime(start.getTime() + oneWeekInMillis);
-    end.setTime(end.getTime() + oneWeekInMillis);
+  const currentDate = new Date(start.getTime() + dayInMillis);
+
+  while (currentDate <= periodEnd) {
+    const dayOfWeek = weekdays[currentDate.getDay()];
+    if (days[dayOfWeek as keyof typeof days]) {
+      const startTime = new Date(currentDate.getTime());
+      const endTime = new Date(currentDate.getTime() + (end.getTime() - start.getTime()));
+      timeslotGroup.push({
+        start: startTime,
+        end: endTime,
+        type,
+        info,
+      });
+    }
+    currentDate.setTime(currentDate.getTime() + dayInMillis);
   }
+
   const consecutivesFound = await Promise.all(
     timeslotGroup.map((ts) => timeslotsAreConsecutive(ts)),
   );

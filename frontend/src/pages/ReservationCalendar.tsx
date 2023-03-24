@@ -14,6 +14,7 @@ import ReservationInfoModal from '../modals/ReservationInfoModal';
 import { useAirfield } from '../queries/airfields';
 import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
+import { usePopupContext } from '../contexts/PopupContext';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -21,6 +22,7 @@ function ReservationCalendar() {
   const draggedTimesRef = useRef<{ start: Date, end: Date } | null>(null);
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
+  const { showPopup, clearPopup } = usePopupContext();
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
   const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
@@ -100,13 +102,32 @@ function ReservationCalendar() {
 
   const removeReservation = async (removeInfo: EventRemoveArg) => {
     const { event } = removeInfo;
-    const res = await deleteReservation(Number(event.id));
-    if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
-      closeReservationModalFn();
-    } else {
+
+    const onConfirmRemove = async () => {
+      const res = await deleteReservation(Number(event.id));
+      if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
+        closeReservationModalFn();
+        event.remove();
+      } else {
+        removeInfo.revert();
+        throw new Error('Removing reservation failed');
+      }
+      clearPopup();
+    };
+
+    const onCancelRemove = () => {
       removeInfo.revert();
-      throw new Error('Removing reservation failed');
-    }
+      clearPopup();
+    };
+
+    showPopup({
+      popupTitle: 'Varauksen Poisto',
+      popupText: 'Haluatko varmasti poistaa varauksen?',
+      primaryText: 'Poista',
+      primaryOnClick: onConfirmRemove,
+      secondaryText: 'Peruuta',
+      secondaryOnClick: onCancelRemove,
+    });
   };
 
   const modifyReservationFn = async (event: {
