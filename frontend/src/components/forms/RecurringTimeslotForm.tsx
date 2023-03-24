@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
+import { ReservationEntry, TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
 import InputField from '../InputField';
 import { HTMLDateTimeConvert } from '../../util';
 import { useAirfield } from '../../queries/airfields';
+import { getReservations } from '../../queries/reservations';
+import ModalAlert from '../ModalAlert';
 
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
@@ -28,14 +30,15 @@ function RecurringTimeslotForm({
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
+  const [reservations, setReservations] = useState<ReservationEntry[]>([]);
+  const [formWarning, setFormWarning] = useState<string | undefined>(undefined);
   const { data: airfield } = useAirfield(1);
   const timeslotGranularity = airfield?.eventGranularityMinutes || 20;
-
   const start = timeslot?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
   const end = timeslot?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
 
   const {
-    register, handleSubmit, reset, watch,
+    register, handleSubmit, reset, watch, getValues,
   } = useForm<Inputs>({
     values: {
       start,
@@ -85,6 +88,26 @@ function RecurringTimeslotForm({
 
   const showRecurring = watch('isRecurring');
 
+  const getReservationsWithinTimeslot = async (startTime:Date, endTime: Date) => {
+    setReservations(await getReservations(startTime, endTime));
+  };
+
+  useEffect(() => {
+    const startTime = getValues('start');
+    const endTime = getValues('end');
+    if (isBlocked) getReservationsWithinTimeslot(new Date(startTime)!, new Date(endTime)!);
+  }, [watch('end'), watch('start')]);
+
+  useEffect(() => {
+    if (start && end && timeslot?.extendedProps.type === 'blocked') getReservationsWithinTimeslot(new Date(start), new Date(end));
+  }, [draggedTimes]);
+
+  useEffect(() => {
+    if (reservations.length > 0) {
+      setFormWarning(`Poistaa varaukset: ${reservations.map((r) => r.id)}`);
+    } else setFormWarning(undefined);
+  }, [reservations]);
+
   return (
     <div>
       <div className="bg-black p-3">
@@ -96,6 +119,12 @@ function RecurringTimeslotForm({
         }
         </p>
       </div>
+      <ModalAlert
+        message={formWarning}
+        variant="warning"
+        clearAlert={() => setFormWarning(undefined)}
+        removalDelaySecs={10}
+      />
       <div className="p-8">
         <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler, onError)}>
           <div className="flex flex-row space-x-6">
