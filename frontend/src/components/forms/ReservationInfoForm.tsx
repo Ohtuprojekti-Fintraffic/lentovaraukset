@@ -96,7 +96,7 @@ function ReservationInfoForm({
       />
       <div className="p-8">
         <form id={id} className="flex flex-col w-fit" onSubmit={handleSubmit(submitHandler)}>
-          <div className="flex flex-row space-x-6">
+          <div className="flex flex-row space-x-6 w-fit">
             <div className="flex flex-col">
               <DatePicker
                 control={control}

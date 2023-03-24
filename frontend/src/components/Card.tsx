@@ -17,12 +17,12 @@ function Card({
 }: CardProps) {
   return (
     <Modal show={show} handleClose={handleClose}>
-      <div
-        className=" flex flex-col max-w-fit h-fit bg-white rounded-lg shadow-2xl overflow-hidden"
-      >
-        {form}
-        <div className="bg-gray-100 border-t border-gray-200 p-4 w-full">
-          {actionSheet}
+      <div className=" flex flex-col w-screen max-w-xl h-fit p-4">
+        <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
+          {form}
+          <div className="bg-gray-100 border-t border-gray-200 p-4 w-full">
+            {actionSheet}
+          </div>
         </div>
       </div>
     </Modal>

@@ -23,7 +23,7 @@ function Modal({
         className="fixed w-full h-full bg-black bg-opacity-40"
         onClick={() => handleClose()}
       />
-      <div className="z-50">
+      <div className="z-50 overflow-y-auto">
         {children}
       </div>
     </div>

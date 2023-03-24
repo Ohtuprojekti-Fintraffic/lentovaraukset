@@ -28,25 +28,48 @@ function ActionSheet({
     .filter((child) => React.isValidElement(child) && child.props.variant === variant);
 
   return (
-    <div className="flex flex-row justify-between">
-      <div className="flex flex-row space-x-2 mr-8">
-        {filterChildrenByVariant('danger')}
+    <div>
+      <div className="hidden md:flex flex-row justify-between">
+        <div className="flex flex-row space-x-2 mr-8">
+          {filterChildrenByVariant('danger')}
+        </div>
+        <div className="flex flex-row space-x-2">
+          {
+            cancelButton
+            && (
+              <Button
+                variant="tertiary"
+                onClick={() => handleClose!()}
+              >
+                {cancelButtonText}
+              </Button>
+            )
+          }
+          {filterChildrenByVariant('tertiary')}
+          {filterChildrenByVariant('secondary')}
+          {filterChildrenByVariant('primary')}
+        </div>
       </div>
-      <div className="flex flex-row space-x-2">
-        {
-          cancelButton
-          && (
-            <Button
-              variant="tertiary"
-              onClick={() => handleClose!()}
-            >
-              {cancelButtonText}
-            </Button>
-          )
-        }
-        {filterChildrenByVariant('tertiary')}
-        {filterChildrenByVariant('secondary')}
-        {filterChildrenByVariant('primary')}
+      <div className="flex md:hidden flex-col">
+        <div className="flex flex-col space-y-2">
+          {filterChildrenByVariant('primary')}
+          {filterChildrenByVariant('secondary')}
+          {filterChildrenByVariant('tertiary')}
+          {
+            cancelButton
+            && (
+              <Button
+                variant="tertiary"
+                onClick={() => handleClose!()}
+              >
+                {cancelButtonText}
+              </Button>
+            )
+          }
+        </div>
+        <div className="flex flex-col space-y-2 mt-8">
+          {filterChildrenByVariant('danger')}
+        </div>
       </div>
     </div>
   );
