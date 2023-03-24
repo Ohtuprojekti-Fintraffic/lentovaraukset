@@ -166,7 +166,7 @@ function RecurringTimeslotForm({
               registerReturn={register('isRecurring')}
             />
             {showRecurring && (
-              <div className="flex flex-row space-x-2 flex-wrap">
+              <div className="flex flex-row flex-wrap flex-start gap-x-6 gap-y-4 border-[1px] rounded-ft-normal p-4 border-ft-neutral-200 mb-4">
                 {['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai'].map(
                   (day) => (
                     <InputField
@@ -174,6 +174,7 @@ function RecurringTimeslotForm({
                       labelText={capitalizeFirstLetter(day)}
                       type="checkbox"
                       registerReturn={register(`days.${day}` as keyof Inputs)}
+                      inputClassName="mb-0"
                     />
                   ),
                 )}
