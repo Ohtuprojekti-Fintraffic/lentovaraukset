@@ -109,8 +109,6 @@ const getTimeRangeValidator = () => {
 };
 
 const airfieldValidator = () => {
-  const idWrongErrorMessage = `Airfield ID must be ICAO airport code`;
-  const idEmptyErrorMessage = 'Airfield ID cannot be empty';
   const nameEmptyErrorMessage = 'Airfield name cannot be empty';
 
   const Airfield = z.object({

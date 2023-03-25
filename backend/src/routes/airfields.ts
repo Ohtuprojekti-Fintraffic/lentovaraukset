@@ -28,7 +28,7 @@ router.get('/:id', async (req: express.Request, res: express.Response, next: exp
 router.put('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const id = Number(req.params.id);
   try {
-    const airfieldEntry: AirfieldEntry = airfieldValidator.parse(req.body);
+    const airfieldEntry: AirfieldEntry = airfieldValidator().parse(req.body);
     const airfield = await airfieldService.updateById(id, airfieldEntry);
     res.json(airfield);
   } catch (error: unknown) {
@@ -38,7 +38,7 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
 
 router.post('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const airfieldEntry: AirfieldEntry = airfieldValidator.parse(req.body);
+    const airfieldEntry: AirfieldEntry = airfieldValidator().parse(req.body);
     const airfield = await airfieldService.createAirfield(airfieldEntry);
     res.json(airfield);
   } catch (error: unknown) {

@@ -48,6 +48,7 @@ function AirfieldForm({
             type="string"
             registerReturn={register('name')}
             defaultValue={airfield?.name}
+            error={errors.name}
           />
           <InputField
             labelText="Varausikkunan minimikoko minuutteina:"
@@ -58,6 +59,7 @@ function AirfieldForm({
             defaultValue={airfield?.eventGranularityMinutes.toString()}
             step={10}
             min={10}
+            error={errors.eventGranularityMinutes}
           />
           <InputField
             labelText="Samanaikaisten varausten maksimimäärä:"
@@ -68,8 +70,9 @@ function AirfieldForm({
             defaultValue={airfield?.maxConcurrentFlights.toString()}
             step={1}
             min={1}
+            error={errors.maxConcurrentFlights}
           />
-          <Button type="submit" variant="primary"> Tallenna</Button>
+          <Button type="submit" variant="primary">Lisää</Button>
         </form>
       </div>
     </div>

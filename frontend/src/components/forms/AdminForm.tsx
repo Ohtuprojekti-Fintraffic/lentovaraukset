@@ -68,7 +68,7 @@ function AdminForm({ title }: FormProps) {
             step={1}
             min={1}
           />
-          <Button type="submit" variant="primary"> Submit</Button>
+          <Button type="submit" variant="primary">Tallenna</Button>
         </form>
       </div>
     </div>
