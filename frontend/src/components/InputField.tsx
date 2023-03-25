@@ -17,7 +17,6 @@ export interface FieldProps {
   step?: React.InputHTMLAttributes<HTMLInputElement>['step'];
   min?: React.InputHTMLAttributes<HTMLInputElement>['min'];
   max?: React.InputHTMLAttributes<HTMLInputElement>['max'];
-  required?: boolean;
 
   placeholder?: string;
 
@@ -56,7 +55,6 @@ function InputField({
   inputClassName = '',
   helperTextClassName = '',
   defaultValue = '',
-  required = false,
 }: FieldProps | RHFFieldProps) {
   const fieldBaseClass = 'border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
                        + 'placeholder:text-ft-text-300 mb-4';
@@ -93,7 +91,6 @@ function InputField({
         step={step}
         min={min}
         max={max}
-        required={required}
         // This is the only way to use RHF without requiring input
         // types for the Hook Form inputs and whatever which
         // are complicated to do

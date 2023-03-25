@@ -1,5 +1,7 @@
 import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { airfieldValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import Button from '../Button';
 import InputField from '../InputField';
@@ -22,8 +24,11 @@ function AirfieldForm({
   airfieldMutation,
 }: FormProps) {
   const {
-    register, handleSubmit,
-  } = useForm<Inputs>();
+    register, handleSubmit, formState: { errors },
+  } = useForm<Inputs>({
+    resolver: zodResolver(airfieldValidator()),
+    mode: 'all',
+  });
 
   const airfieldMutator = airfieldMutation();
 
@@ -43,7 +48,6 @@ function AirfieldForm({
             type="string"
             registerReturn={register('name')}
             defaultValue={airfield?.name}
-            required
           />
           <InputField
             labelText="Varausikkunan minimikoko minuutteina:"
@@ -65,7 +69,7 @@ function AirfieldForm({
             step={1}
             min={1}
           />
-          <Button type="submit" variant="primary"> Submit</Button>
+          <Button type="submit" variant="primary"> Tallenna</Button>
         </form>
       </div>
     </div>
