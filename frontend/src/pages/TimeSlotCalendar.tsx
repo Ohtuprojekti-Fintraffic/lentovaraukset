@@ -14,10 +14,12 @@ import {
 import {
   getTimeSlots, modifyTimeSlot, deleteTimeslot,
 } from '../queries/timeSlots';
+import { usePopupContext } from '../contexts/PopupContext';
 
 function TimeSlotCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
   const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
+  const { showPopup, clearPopup } = usePopupContext();
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const selectedTimeslotRef = useRef<EventImpl | null>(null);
@@ -36,7 +38,7 @@ function TimeSlotCalendar() {
           id: timeslot.id.toString(),
           editable: !isTimeInPast(timeslot.start),
           color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
-          title: timeslot.type === 'available' ? 'Vapaa' : 'Suljettu',
+          title: timeslot.type === 'available' ? 'Vapaa' : timeslot.info || 'Suljettu',
         };
         return timeslot.group ? { ...timeslotEvent, groupId: timeslot.group } : timeslotEvent;
       });
@@ -80,8 +82,26 @@ function TimeSlotCalendar() {
 
   const removeTimeSlot = async (removeInfo: EventRemoveArg) => {
     const { event } = removeInfo;
-    await deleteTimeslot(Number(event.id));
-    setShowInfoModal(false);
+
+    const onConfirmRemove = async () => {
+      await deleteTimeslot(Number(event.id));
+      setShowInfoModal(false);
+      clearPopup();
+      calendarRef.current?.getApi().refetchEvents();
+    };
+
+    const onCancelRemove = () => {
+      clearPopup();
+    };
+
+    showPopup({
+      popupTitle: 'Varausikkunan Poisto',
+      popupText: 'Haluatko varmasti poistaa varausikkunan?',
+      primaryText: 'Poista',
+      primaryOnClick: onConfirmRemove,
+      secondaryText: 'Peruuta',
+      secondaryOnClick: onCancelRemove,
+    });
   };
 
   const isSameType = (
@@ -105,10 +125,18 @@ function TimeSlotCalendar() {
   };
 
   const modifyTimeslotFn = async (
-    event: { id: string, start: Date, end: Date, extendedProps: { type: TimeslotType } },
+    event: {
+      id: string,
+      start: Date,
+      end: Date,
+      extendedProps: { type: TimeslotType, info: string | null },
+    },
   ) => {
     await modifyTimeSlot({
-      ...event, id: Number(event.id), type: event.extendedProps.type,
+      ...event,
+      id: Number(event.id),
+      type: event.extendedProps.type,
+      info: event.extendedProps.info,
     });
   };
 
