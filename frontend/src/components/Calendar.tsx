@@ -3,10 +3,10 @@ import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
-import interactionPlugin, { EventResizeDoneArg } from '@fullcalendar/interaction';
-import {
+import interactionPlugin from '@fullcalendar/interaction';
+import type {
   AllowFunc,
-  DateSelectArg, EventChangeArg, EventClickArg, EventDropArg, EventRemoveArg,
+  DateSelectArg, EventChangeArg, EventClickArg, EventRemoveArg,
   EventSourceInput,
 } from '@fullcalendar/core';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
@@ -89,9 +89,8 @@ function Calendar({
     return consecutive;
   };
 
-  const isTimeAllowed = (start: Date, end: Date, type?: string, aircraftId?: 'string') => {
-    const isReservation = aircraftId !== undefined;
-    if ((isReservation && isTimeInPast(start)) || isTimeInPast(end)) {
+  const isTimeAllowed = (start: Date, end: Date, type?: string, ignoreStart?: boolean) => {
+    if ((!ignoreStart && isTimeInPast(start)) || isTimeInPast(end)) {
       calendarRef.current?.getApi().unselect();
       addNewAlert('Aikaa ei voi lisätä menneisyyteen', 'warning');
       return false;
@@ -110,32 +109,62 @@ function Calendar({
     return true;
   };
 
-  // When a event box is clicked
+  // When an event box is clicked
   const handleEventClick = async (clickData: EventClickArg) => {
     if (clickData.event.display.includes('background')) return;
     const { event } = clickData;
     await clickEventFn(event);
   };
 
-  // When a event box is moved or resized
+  // When an event box is moved or resized
   const handleEventChange = async (changeData: EventChangeArg) => {
     // Open confirmation popup here
-    const { event } = changeData;
+    const { event, oldEvent } = changeData;
 
-    if (isTimeAllowed(
-      event.start || new Date(),
-      event.end || new Date(),
-      event.extendedProps.type,
-      event.extendedProps?.aircraftId,
-    )) {
-      await modifyEventFn({
-        id: event.id,
-        start: event.start || new Date(),
-        end: event.end || new Date(),
-        extendedProps: event.extendedProps,
-      });
+    const eventHasMoved = changeData.oldEvent.start?.getTime() !== event.start?.getTime();
+    const isReservation = event.extendedProps.aircraftId !== undefined;
+
+    if (isReservation
+      && oldEvent.start && isTimeInPast(oldEvent.start)) {
+      changeData.revert();
+      addNewAlert('Alkanutta tai mennyttä varausta ei voi muokata', 'warning');
+      return;
     }
-    calendarRef.current?.getApi().refetchEvents();
+
+    if (!isReservation && eventHasMoved
+      && oldEvent.start && isTimeInPast(oldEvent.start)) {
+      changeData.revert();
+      addNewAlert('Alkanutta tai mennyttä aikaikkunaa ei voi siirtää', 'warning');
+      return;
+    }
+
+    if (eventHasMoved && event.start && isTimeInPast(event.start)) {
+      changeData.revert();
+      addNewAlert('Alkamisaikaa ei voi siirtää menneisyyteen', 'warning');
+      return;
+    }
+
+    try {
+      if (isTimeAllowed(
+        event.start || new Date(),
+        event.end || new Date(),
+        event.extendedProps.type,
+        true,
+      )) {
+        await modifyEventFn({
+          id: event.id,
+          start: event.start || new Date(),
+          end: event.end || new Date(),
+          extendedProps: event.extendedProps,
+        });
+      }
+    } catch (exception) {
+      changeData.revert();
+      addNewAlert('Virhe tapahtui varausta muokatessa', 'warning');
+      throw exception;
+    } finally {
+      calendarRef.current?.getApi().refetchEvents();
+    }
   };
 
   // When a new event is selected (dragged) in the calendar.
@@ -163,22 +192,6 @@ function Calendar({
     calendarRef.current?.getApi().unselect();
   };
 
-  const handleEventDropped = (info: EventDropArg): void => {
-    const startBefore = info.oldEvent.start;
-    const startAfter = info.event.start;
-    if (startBefore && isTimeInPast(startBefore) && (startBefore !== startAfter)) {
-      info.revert();
-      addNewAlert('Mennyttä alkamisaikaa ei voi muokata', 'warning');
-    }
-  };
-
-  const handleEventResized = (info: EventResizeDoneArg): void => {
-    const startBefore = info.oldEvent.start;
-    if (startBefore && isTimeInPast(startBefore) && info.startDelta.milliseconds > 1000) {
-      info.revert();
-      addNewAlert('Mennyttä alkamisaikaa ei voi muokata', 'warning');
-    }
-  };
   const handleAllow: AllowFunc = (s, m) => allowEventRef(s, m) ?? allowEvent(s, m);
 
   return (
@@ -214,9 +227,7 @@ function Calendar({
       eventTextColor={eventColors?.textColor || '#000000'}
       eventClick={handleEventClick}
       eventChange={handleEventChange}
-      eventDrop={handleEventDropped}
       eventRemove={handleEventRemove}
-      eventResize={handleEventResized}
       select={handleEventCreate}
       selectConstraint={selectConstraint}
       eventSources={eventSources}

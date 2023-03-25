@@ -133,13 +133,21 @@ const updateById = async (
     throw new Error('No timeslot with id exists');
   }
 
+  const slotHasMoved = oldTimeslot.start.getTime() !== timeslot.start.getTime();
   // if the timeslot has started, its start time can't be edited
   // and if timeslot has ended it's no longer editable at all
   if (
-    (oldTimeslot.start.getTime() !== timeslot.start.getTime()
+    (slotHasMoved
       && isTimeInPast(oldTimeslot.start))
     || isTimeInPast(oldTimeslot.end)) {
     throw new Error('Timeslot in past cannot be modified');
+  }
+
+  // prevent from being able to move start to past
+  if (
+    slotHasMoved && isTimeInPast(timeslot.start)
+  ) {
+    throw new Error('Timeslot cannot be moved to the past');
   }
 
   if (timeslot.type === 'available') {
@@ -153,6 +161,7 @@ const updateById = async (
     await oldTimeslot.removeReservations(oldReservations);
     await oldTimeslot.addReservations(newReservations);
   }
+
   await Timeslot.upsert({ ...timeslot, id });
 };
 
