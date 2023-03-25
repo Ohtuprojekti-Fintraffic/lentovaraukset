@@ -134,7 +134,6 @@ function ReservationCalendar() {
 
   const allowEvent: AllowFunc = (span, movingEvent) => {
     const eventsByType = calendarRef.current?.getApi().getEvents()
-      // .filter((e) => e.extendedProps.type === 'blocked');
       .filter((e) => e.id !== movingEvent?.id && !e.display.includes('background')
         && e.start && e.end
         && e.start < span.end && e.end > span.start);
@@ -142,9 +141,7 @@ function ReservationCalendar() {
     if (eventsByType?.some((e) => e.extendedProps.type === 'blocked')) return false;
     const mostConcurrent = countMostConcurrent(eventsByType as { start: Date, end: Date }[]);
 
-    return eventsByType && airfield
-      ? mostConcurrent < airfield.maxConcurrentFlights
-      : true;
+    return airfield ? mostConcurrent < airfield.maxConcurrentFlights : false;
   };
 
   const showModalAfterDrag = (times: { start: Date, end: Date }) => {
@@ -181,7 +178,6 @@ function ReservationCalendar() {
         granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
         eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFFF' }}
         selectConstraint="timeslots"
-        // maxConcurrentLimit={airfield?.maxConcurrentFlights}
         checkIfTimeInFuture
         allowEventRef={allowEvent}
       />

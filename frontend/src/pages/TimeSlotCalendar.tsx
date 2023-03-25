@@ -193,7 +193,6 @@ function TimeSlotCalendar() {
         granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
         eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}
         selectConstraint={undefined}
-        // maxConcurrentLimit={1}
         blocked={blocked}
         allowEventRef={allowEvent}
       />

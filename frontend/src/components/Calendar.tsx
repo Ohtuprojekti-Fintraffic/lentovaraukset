@@ -44,7 +44,6 @@ function Calendar({
   granularity = { minutes: 20 },
   eventColors,
   selectConstraint,
-  // maxConcurrentLimit = 1,
   allowEventRef = () => true,
   checkIfTimeInFuture = false,
   blocked = false,
@@ -59,18 +58,6 @@ function Calendar({
     if (movingEventType) return stillEventType === movingEventType;
     return ((stillEventType === 'available' && !blocked) || (stillEventType === 'blocked' && blocked));
   };
-
-  // const allowEvent: AllowFunc = (span, movingEvent) => {
-  //   const events = calendarRef.current?.getApi().getEvents().filter(
-  //     (e) => e.id !== movingEvent?.id
-  //       && e.start && e.end
-  //       && !e.display.includes('background')
-  //       && e.start < span.end && e.end > span.start,
-  //   );
-  //   return events
-  //     ? countMostConcurrent(events as { start: Date, end: Date }[]) < maxConcurrentLimit
-  //     : true;
-  // };
 
   const timeIsConsecutive = (start: Date, end: Date, type?: string) => {
     const consecutive = calendarRef.current?.getApi().getEvents().some(
