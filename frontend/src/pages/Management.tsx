@@ -4,7 +4,7 @@ import AirfieldForm from '../components/forms/AirfieldForm';
 import { useAirfield } from '../queries/airfields';
 
 function Management() {
-  const { isLoading, data: airfield } = useAirfield(1); // TODO: get id from airfield selection
+  const { isLoading, data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
   return (
     isLoading
       ? <p>Ladataan...</p>

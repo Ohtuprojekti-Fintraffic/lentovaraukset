@@ -45,7 +45,7 @@ function RecurringTimeslotForm({
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
-  const { data: airfield } = useAirfield(1);
+  const { data: airfield } = useAirfield('EFHK');
   const timeslotGranularity = airfield?.eventGranularityMinutes || 20;
 
   const start = timeslot?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';

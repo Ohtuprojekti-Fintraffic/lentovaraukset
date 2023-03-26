@@ -2,11 +2,7 @@ import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import { Airfield } from '../models';
 
 const getAirfield = async (code: string): Promise<AirfieldEntry> => {
-  const airfield = await Airfield.findOne({
-    where: {
-      code,
-    },
-  });
+  const airfield = await Airfield.findByPk(code);
 
   if (!airfield) {
     throw new Error('Airfield not found');

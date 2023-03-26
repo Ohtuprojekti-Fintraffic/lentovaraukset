@@ -15,7 +15,7 @@ router.get('/', async (req: express.Request, res: express.Response, next: expres
   }
 });
 
-router.get('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.get('/:code', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const { code } = req.params;
   try {
     const airfield = await airfieldService.getAirfield(code);
@@ -25,7 +25,7 @@ router.get('/:id', async (req: express.Request, res: express.Response, next: exp
   }
 });
 
-router.put('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.put('/:code', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const { code } = req.params;
   try {
     const airfieldEntry: AirfieldEntry = airfieldValidator.parse(req.body);

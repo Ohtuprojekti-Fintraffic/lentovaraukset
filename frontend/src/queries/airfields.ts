@@ -5,21 +5,21 @@ import {
 import QueryKeys from './queryKeys';
 import { errorIfNotOk } from './util';
 
-const getAirfields = async (airfieldId: number): Promise<AirfieldEntry> => {
-  const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${airfieldId}`);
+const getAirfields = async (airfieldCode: string): Promise<AirfieldEntry> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${airfieldCode}`);
   errorIfNotOk(res);
   return res.json();
 };
 
-const useAirfield = (airfieldId: number) => useQuery(
-  [QueryKeys.Airfield, airfieldId],
-  () => getAirfields(airfieldId),
+const useAirfield = (airfieldCode: string) => useQuery(
+  [QueryKeys.Airfield, airfieldCode],
+  () => getAirfields(airfieldCode),
 );
 
 const modifyAirfield = async (
   modifiedAirfield: AirfieldEntry,
 ): Promise<AirfieldEntry> => {
-  const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${modifiedAirfield.id}`, {
+  const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${modifiedAirfield.code}`, {
     method: 'PUT',
     body: JSON.stringify(modifiedAirfield),
     headers: {

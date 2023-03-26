@@ -27,7 +27,7 @@ function AirfieldForm(
 
   const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => {
     airfieldMutator.mutate({
-      ...data, id: airfield.id,
+      ...data, code: airfield.code,
     });
   };
 
@@ -36,7 +36,7 @@ function AirfieldForm(
       <div className="p-8">
         <form className="flex flex-col w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <p>
-            {`Id: ${airfield.id}`}
+            {`Kentän tunnus: ${airfield.code}`}
           </p>
           <InputField
             labelText="Nimi:"
