@@ -29,7 +29,7 @@ router.delete('/:id', async (req: express.Request, res: express.Response, next: 
 
 router.post('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const airfield = await airfieldService.getAirfield(1); // TODO: get airfieldId from request
+    const airfield = await airfieldService.getAirfield('EGLL'); // TODO: get airfieldId from request
     const newTimeSlot = createTimeSlotValidator(airfield.eventGranularityMinutes).parse(req.body);
     // TODO: check if timeslot overlaps with existing timeslots
     if (req.body.periodEnd) {
@@ -49,7 +49,7 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
 
 router.put('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const airfield = await airfieldService.getAirfield(1); // TODO: get airfieldId from request
+    const airfield = await airfieldService.getAirfield('EGLL'); // TODO: get airfieldId from request
     const modifiedTimeslot = createTimeSlotValidator(airfield.eventGranularityMinutes)
       .parse(req.body);
     // TODO: check if timeslot overlaps with existing timeslots

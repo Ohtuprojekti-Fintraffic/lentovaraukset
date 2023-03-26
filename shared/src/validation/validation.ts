@@ -110,11 +110,19 @@ const getTimeRangeValidator = () => {
 
 const airfieldValidator = () => {
   const nameEmptyErrorMessage = 'Airfield name cannot be empty';
+  const concurrentFlightsMessage = 'Concurrent flights must be minimum 1';
+  const multipleErrorMessage = 'Time must be multiple of 10';
+  const idErrorMessage = 'Id must be ICAO airport code';
+  const regex = /[A-Z]{4}$/;
 
   const Airfield = z.object({
+    id: z.string()
+      .refine((value) => regex.test(value), { message: idErrorMessage }),
     name: z.string().min(1, { message: nameEmptyErrorMessage }),
-    eventGranularityMinutes: z.coerce.number(),
-    maxConcurrentFlights: z.coerce.number(),
+    eventGranularityMinutes: z.coerce
+      .number()
+      .multipleOf(10, { message: multipleErrorMessage }),
+    maxConcurrentFlights: z.coerce.number().min(1, { message: concurrentFlightsMessage }),
   });
 
   return Airfield;

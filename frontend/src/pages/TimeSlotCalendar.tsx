@@ -18,7 +18,7 @@ import { usePopupContext } from '../contexts/PopupContext';
 
 function TimeSlotCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
-  const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
+  const { data: airfield } = useAirfield('EGLL'); // TODO: get id from airfield selection
   const { showPopup, clearPopup } = usePopupContext();
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [blocked, setBlocked] = useState(false);

@@ -1,7 +1,7 @@
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import { Airfield } from '../models';
 
-const getAirfield = async (id: number): Promise<AirfieldEntry> => {
+const getAirfield = async (id: string): Promise<AirfieldEntry> => {
   const airfield = await Airfield.findOne({
     where: {
       id,
@@ -21,7 +21,7 @@ const getAirfields = async (): Promise<AirfieldEntry[]> => {
 };
 
 const updateById = async (
-  id: number,
+  id: string,
   airfield: AirfieldEntry,
 ): Promise<AirfieldEntry> => {
   const [updatedAirfield] = await Airfield.upsert(
@@ -40,7 +40,7 @@ const createAirfield = async (
 const createTestAirfield = async () => {
   // TODO: Remove this when we have a proper admin interface for creating airfields
   await Airfield.upsert({
-    id: 1,
+    id: 'EGLL',
     name: 'Test Airfield',
     maxConcurrentFlights: 3,
     eventGranularityMinutes: 20,

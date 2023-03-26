@@ -13,6 +13,7 @@ type FormProps = {
 };
 
 type Inputs = {
+  id: string;
   maxConcurrentFlights: number;
   name: string;
   eventGranularityMinutes: number;
@@ -33,9 +34,7 @@ function AirfieldForm({
   const airfieldMutator = airfieldMutation();
 
   const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => {
-    airfieldMutator.mutate({
-      ...data, id: airfield?.id,
-    });
+    airfieldMutator.mutate(data);
   };
 
   return (
@@ -43,6 +42,13 @@ function AirfieldForm({
       <div className="p-8 space-y-4">
         <h1 className="text-3xl">{title}</h1>
         <form className="flex flex-col w-full" onSubmit={handleSubmit(onSubmit)}>
+          <InputField
+            labelText="Id:"
+            type="string"
+            registerReturn={register('id')}
+            defaultValue={airfield?.id}
+            error={errors.id}
+          />
           <InputField
             labelText="Nimi:"
             type="string"
@@ -72,7 +78,7 @@ function AirfieldForm({
             min={1}
             error={errors.maxConcurrentFlights}
           />
-          <Button type="submit" variant="primary">Lisää</Button>
+          <Button type="submit" variant="primary">Tallenna</Button>
         </form>
       </div>
     </div>

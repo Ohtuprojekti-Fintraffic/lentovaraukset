@@ -43,7 +43,7 @@ router.delete('/:id', async (req: express.Request, res: express.Response, next: 
 
 router.post('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const airfield = await airfieldService.getAirfield(1); // TODO: get airfieldId from request
+    const airfield = await airfieldService.getAirfield('EGLL'); // TODO: get airfieldId from request
     // TODO: get maxDaysInFuture from airfield
     const newReservation = createReservationValidator(airfield.eventGranularityMinutes, 7)
       .parse(req.body);
@@ -67,7 +67,7 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
 router.put('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const id = Number(req.params.id);
-    const airfield = await airfieldService.getAirfield(1); // TODO: get airfieldId from request
+    const airfield = await airfieldService.getAirfield('EGLL'); // TODO: get airfieldId from request
     const validReservationUpdate = createReservationValidator(airfield.eventGranularityMinutes, 7)
       .parse(req.body);
 

@@ -5,13 +5,13 @@ import {
 import QueryKeys from './queryKeys';
 import { errorIfNotOk } from './util';
 
-const getAirfields = async (airfieldId: number): Promise<AirfieldEntry> => {
+const getAirfields = async (airfieldId: string): Promise<AirfieldEntry> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${airfieldId}`);
   errorIfNotOk(res);
   return res.json();
 };
 
-const useAirfield = (airfieldId: number) => useQuery(
+const useAirfield = (airfieldId: string) => useQuery(
   [QueryKeys.Airfield, airfieldId],
   () => getAirfields(airfieldId),
 );

@@ -31,7 +31,7 @@ function ReservationInfoForm({
   onSubmit,
   id,
 }: ReservationInfoProps) {
-  const { data: airfield } = useAirfield(1);
+  const { data: airfield } = useAirfield('EGLL');
   const reservationGranularity = airfield?.eventGranularityMinutes || 20;
 
   const start = reservation?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
