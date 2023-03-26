@@ -21,7 +21,7 @@ export interface TimeslotEntry {
 }
 
 export interface AirfieldEntry {
-  id?: number;
+  code?: string;
   name: string;
   maxConcurrentFlights: number;
   eventGranularityMinutes: number;
@@ -29,6 +29,7 @@ export interface AirfieldEntry {
 
 export enum ServiceErrorCode {
   ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
+  InvalidAirfield = 'InvalidAirfield',
 }
 
 export interface WeekInDays {
