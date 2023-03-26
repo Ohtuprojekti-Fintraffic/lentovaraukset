@@ -19,7 +19,7 @@ const useAirfield = (airfieldId: string) => useQuery(
 const modifyAirfield = async (
   modifiedAirfield: AirfieldEntry,
 ): Promise<AirfieldEntry> => {
-  const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${modifiedAirfield.id}`, {
+  const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${modifiedAirfield.code}`, {
     method: 'PUT',
     body: JSON.stringify(modifiedAirfield),
     headers: {

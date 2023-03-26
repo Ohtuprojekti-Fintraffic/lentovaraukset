@@ -7,13 +7,13 @@ const api = request(app);
 
 const airfields = [
   {
-    id: 'EFHK', name: 'Helsinki-Vantaa', maxConcurrentFlights: 2, eventGranularityMinutes: 20,
+    code: 'EFHK', name: 'Helsinki-Vantaa', maxConcurrentFlights: 2, eventGranularityMinutes: 20,
   },
   {
-    id: 'EFTU', name: 'Tampere', maxConcurrentFlights: 1, eventGranularityMinutes: 20,
+    code: 'EFTU', name: 'Tampere', maxConcurrentFlights: 1, eventGranularityMinutes: 20,
   },
   {
-    id: 'EFOU', name: 'Oulu', maxConcurrentFlights: 1, eventGranularityMinutes: 20,
+    code: 'EFOU', name: 'Oulu', maxConcurrentFlights: 1, eventGranularityMinutes: 20,
   },
 ];
 
@@ -37,11 +37,11 @@ describe('Calls to api', () => {
     const res = await api.post('/api/airfields/')
       .set('Content-type', 'application/json')
       .send({
-        id: 'EFKK', name: 'Malmi', maxConcurrentFlights: 1, eventGranularityMinutes: 10,
+        code: 'EFKK', name: 'Malmi', maxConcurrentFlights: 1, eventGranularityMinutes: 10,
       });
 
     const createdAirfield: Airfield | null = await Airfield.findOne(
-      { where: { id: 'EFKK' } },
+      { where: { code: 'EFKK' } },
     );
     const numberOfAirfields: Number = await Airfield.count();
 
@@ -55,10 +55,10 @@ describe('Calls to api', () => {
   test('dont create an airfield if all fields not provided', async () => {
     const res = await api.post('/api/airfields/')
       .set('Content-type', 'application/json')
-      .send({ id: 'EFKK' });
+      .send({ code: 'EFKK' });
 
     const createdAirfield: Airfield | null = await Airfield.findOne(
-      { where: { id: 'EFKK' } },
+      { where: { code: 'EFKK' } },
     );
     const numberOfAirfields: Number = await Airfield.count();
 
@@ -71,7 +71,7 @@ describe('Calls to api', () => {
     const res = await api.post('/api/airfields/')
       .set('Content-type', 'application/json')
       .send({
-        id: 'EFHK', name: 'Malmi', maxConcurrentFlights: 2, eventGranularityMinutes: 20,
+        code: 'EFHK', name: 'Malmi', maxConcurrentFlights: 2, eventGranularityMinutes: 20,
       });
 
     const numberOfAirfields: Number = await Airfield.count();

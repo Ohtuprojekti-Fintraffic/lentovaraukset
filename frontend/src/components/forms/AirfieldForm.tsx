@@ -14,7 +14,7 @@ type FormProps = {
 };
 
 type Inputs = {
-  id: string;
+  code: string;
   maxConcurrentFlights: number;
   name: string;
   eventGranularityMinutes: number;
@@ -36,8 +36,8 @@ function AirfieldForm({
   const airfieldMutator = airfieldMutation();
 
   const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => {
-    const id = data.id ? data.id : airfield?.id;
-    airfieldMutator.mutate({ ...data, id });
+    const code = data.code ? data.code : airfield?.code;
+    airfieldMutator.mutate({ ...data, code });
   };
 
   return (
@@ -49,9 +49,9 @@ function AirfieldForm({
           <InputField
             labelText="Id:"
             type="string"
-            registerReturn={register('id')}
-            defaultValue={airfield?.id}
-            error={errors.id}
+            registerReturn={register('code')}
+            defaultValue={airfield?.code}
+            error={errors.code}
           />
           )}
           <InputField

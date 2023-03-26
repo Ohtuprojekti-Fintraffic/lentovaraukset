@@ -11,7 +11,7 @@ class Airfield extends Model<
 InferAttributes<Airfield>,
 InferCreationAttributes<Airfield>
 > {
-  declare id: string;
+  declare code: string;
 
   declare name: string;
 
@@ -22,7 +22,7 @@ InferCreationAttributes<Airfield>
 
 Airfield.init(
   {
-    id: {
+    code: {
       type: DataTypes.STRING,
       primaryKey: true,
     },

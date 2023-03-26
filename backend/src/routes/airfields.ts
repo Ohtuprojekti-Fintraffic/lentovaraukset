@@ -14,19 +14,19 @@ router.get('/', async (req: express.Request, res: express.Response, next: expres
   }
 });
 
-router.get('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.get('/:code', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const airfield = await airfieldService.getAirfield(req.params.id);
+    const airfield = await airfieldService.getAirfield(req.params.code);
     res.json(airfield);
   } catch (error: unknown) {
     next(error);
   }
 });
 
-router.put('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.put('/:code', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const airfieldEntry: AirfieldEntry = airfieldValidator().parse(req.body);
-    const airfield = await airfieldService.updateById(req.params.id, airfieldEntry);
+    const airfield = await airfieldService.updateById(req.params.code, airfieldEntry);
     res.json(airfield);
   } catch (error: unknown) {
     next(error);
@@ -36,9 +36,9 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
 router.post('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const validatedAirfield = airfieldValidator().parse(req.body);
-    if (!validatedAirfield.id) throw new Error('Airfield id not specified');
+    if (!validatedAirfield.code) throw new Error('Airfield id not specified');
     const airfield = await airfieldService.createAirfield({
-      id: validatedAirfield.id!,
+      code: validatedAirfield.code!,
       ...validatedAirfield,
     });
     res.json(airfield);
