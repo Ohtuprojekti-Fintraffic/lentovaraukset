@@ -115,7 +115,7 @@ const airfieldValidator = () => {
   const idErrorMessage = 'Id must be ICAO airport code';
   const regex = /[A-Z]{4}$/;
 
-  const Airfield = z.object({
+  const base = z.object({
     id: z.string()
       .refine((value) => regex.test(value), { message: idErrorMessage })
       .optional(),
@@ -126,7 +126,7 @@ const airfieldValidator = () => {
     maxConcurrentFlights: z.coerce.number().min(1, { message: concurrentFlightsMessage }),
   });
 
-  return Airfield;
+  return base;
 };
 
 export {

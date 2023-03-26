@@ -27,6 +27,10 @@ export interface AirfieldEntry {
   eventGranularityMinutes: number;
 }
 
+export interface AirfieldEntryWithId extends AirfieldEntry {
+  id: string;
+}
+
 export enum ServiceErrorCode {
   ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
 }

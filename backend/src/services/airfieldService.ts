@@ -1,4 +1,4 @@
-import { AirfieldEntry } from '@lentovaraukset/shared/src';
+import { AirfieldEntry, AirfieldEntryWithId } from '@lentovaraukset/shared/src';
 import { Airfield } from '../models';
 
 const getAirfield = async (id: string): Promise<AirfieldEntry> => {
@@ -31,7 +31,7 @@ const updateById = async (
 };
 
 const createAirfield = async (
-  newAirfield: AirfieldEntry,
+  newAirfield: AirfieldEntryWithId,
 ): Promise<AirfieldEntry> => {
   const airfield: Airfield = await Airfield.create(newAirfield);
   return airfield.dataValues;
