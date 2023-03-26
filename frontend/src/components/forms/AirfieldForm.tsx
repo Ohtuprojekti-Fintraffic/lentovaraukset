@@ -7,6 +7,7 @@ import Button from '../Button';
 import InputField from '../InputField';
 
 type FormProps = {
+  showIdField?: boolean;
   title: string;
   airfield: AirfieldEntry | undefined;
   airfieldMutation: Function;
@@ -20,6 +21,7 @@ type Inputs = {
 };
 
 function AirfieldForm({
+  showIdField = false,
   title,
   airfield,
   airfieldMutation,
@@ -34,7 +36,8 @@ function AirfieldForm({
   const airfieldMutator = airfieldMutation();
 
   const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => {
-    airfieldMutator.mutate(data);
+    const id = data.id ? data.id : airfield?.id;
+    airfieldMutator.mutate({ ...data, id });
   };
 
   return (
@@ -42,6 +45,7 @@ function AirfieldForm({
       <div className="p-8 space-y-4">
         <h1 className="text-3xl">{title}</h1>
         <form className="flex flex-col w-full" onSubmit={handleSubmit(onSubmit)}>
+          {showIdField && (
           <InputField
             labelText="Id:"
             type="string"
@@ -49,6 +53,7 @@ function AirfieldForm({
             defaultValue={airfield?.id}
             error={errors.id}
           />
+          )}
           <InputField
             labelText="Nimi:"
             type="string"

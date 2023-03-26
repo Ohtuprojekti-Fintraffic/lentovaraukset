@@ -117,7 +117,8 @@ const airfieldValidator = () => {
 
   const Airfield = z.object({
     id: z.string()
-      .refine((value) => regex.test(value), { message: idErrorMessage }),
+      .refine((value) => regex.test(value), { message: idErrorMessage })
+      .optional(),
     name: z.string().min(1, { message: nameEmptyErrorMessage }),
     eventGranularityMinutes: z.coerce
       .number()

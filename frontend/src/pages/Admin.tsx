@@ -7,7 +7,7 @@ function Admin() {
   return (
     <div className="flex flex-col">
       <AdminForm title="Globaalit asetukset" />
-      <AirfieldForm title="Lisää lentokenttä" airfield={undefined} airfieldMutation={createAirfieldMutation} />
+      <AirfieldForm title="Lisää lentokenttä" airfield={undefined} airfieldMutation={createAirfieldMutation} showIdField />
     </div>
   );
 }

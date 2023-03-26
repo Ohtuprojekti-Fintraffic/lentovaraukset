@@ -10,7 +10,6 @@ router.get('/', async (req: express.Request, res: express.Response, next: expres
     const airfields = await airfieldService.getAirfields();
     res.json(airfields);
   } catch (error: unknown) {
-    console.log(error);
     next(error);
   }
 });

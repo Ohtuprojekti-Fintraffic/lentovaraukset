@@ -6,9 +6,15 @@ import { connectToDatabase, sequelize } from '../src/util/db';
 const api = request(app);
 
 const airfields = [
-  { name: 'EFHK', maxConcurrentFlights: 2, eventGranularityMinutes: 20 },
-  { name: 'EFTU', maxConcurrentFlights: 1, eventGranularityMinutes: 20 },
-  { name: 'EFOU', maxConcurrentFlights: 1, eventGranularityMinutes: 20 },
+  {
+    id: 'EFHK', name: 'Helsinki-Vantaa', maxConcurrentFlights: 2, eventGranularityMinutes: 20,
+  },
+  {
+    id: 'EFTU', name: 'Tampere', maxConcurrentFlights: 1, eventGranularityMinutes: 20,
+  },
+  {
+    id: 'EFOU', name: 'Oulu', maxConcurrentFlights: 1, eventGranularityMinutes: 20,
+  },
 ];
 
 beforeAll(async () => {
@@ -30,10 +36,12 @@ describe('Calls to api', () => {
   test('can create an airfield', async () => {
     const res = await api.post('/api/airfields/')
       .set('Content-type', 'application/json')
-      .send({ name: 'EFKK', maxConcurrentFlights: 1, eventGranularityMinutes: 10 });
+      .send({
+        id: 'EFKK', name: 'Malmi', maxConcurrentFlights: 1, eventGranularityMinutes: 10,
+      });
 
     const createdAirfield: Airfield | null = await Airfield.findOne(
-      { where: { name: 'EFKK' } },
+      { where: { id: 'EFKK' } },
     );
     const numberOfAirfields: Number = await Airfield.count();
 
@@ -47,10 +55,10 @@ describe('Calls to api', () => {
   test('dont create an airfield if all fields not provided', async () => {
     const res = await api.post('/api/airfields/')
       .set('Content-type', 'application/json')
-      .send({ name: 'EFKK' });
+      .send({ id: 'EFKK' });
 
     const createdAirfield: Airfield | null = await Airfield.findOne(
-      { where: { name: 'EFKK' } },
+      { where: { id: 'EFKK' } },
     );
     const numberOfAirfields: Number = await Airfield.count();
 
@@ -62,7 +70,9 @@ describe('Calls to api', () => {
   test('dont create an airfield if name already exists', async () => {
     const res = await api.post('/api/airfields/')
       .set('Content-type', 'application/json')
-      .send({ name: 'EFHK', maxConcurrentFlights: 2, eventGranularityMinutes: 20 });
+      .send({
+        id: 'EFHK', name: 'Malmi', maxConcurrentFlights: 2, eventGranularityMinutes: 20,
+      });
 
     const numberOfAirfields: Number = await Airfield.count();
 
