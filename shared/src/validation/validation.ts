@@ -16,7 +16,10 @@ const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => {
   return time <= max;
 };
 
-const createTimeSlotValidator = (slotGranularityMinutes: number) => {
+const createTimeSlotValidator = (
+  slotGranularityMinutes: number,
+  ignoreStartInPast: boolean = false,
+) => {
   // Time must be a multiple of ${slotGranularityMinutes} minutes
   const minuteMultipleMessage = `Ajan tulee olla jokin ${slotGranularityMinutes} minuutin moninkerta`;
   const pastErrorMessage = 'Timeslot cannot be in past';
@@ -26,7 +29,7 @@ const createTimeSlotValidator = (slotGranularityMinutes: number) => {
     start: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
-      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
+      .refine((value) => ignoreStartInPast || !isTimeInPast(value), { message: pastErrorMessage }),
     end: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
@@ -67,9 +70,9 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
   // Reservation start time cannot be later than the end time
   const startNotLessThanEndErrorMessage = 'Varauksen alkuaika ei voi olla myöhempi kuin loppuaika';
   // Aircraft ID cannot be empty
-  const aircraftIdEmptyErrorMessage = 'Vaadittu kenttä';
+  const aircraftIdEmptyErrorMessage = 'Lentokentän tunnus vaaditaan';
   // Phone number cannot be empty
-  const phoneNumberEmptyErrorMessage = 'Vaadittu kenttä';
+  const phoneNumberEmptyErrorMessage = 'Puhelinnumero vaaditaan';
 
   const Reservation = z.object({
     start: z.coerce

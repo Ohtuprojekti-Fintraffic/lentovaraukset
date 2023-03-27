@@ -114,9 +114,9 @@ describe('Calls to api', () => {
       .send({
         start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: ' ',
       });
-    console.log(result.body);
     expect(result.statusCode).toEqual(400);
-    expect(result.body.error.message.includes('Phone number cannot be empty'));
+    expect(result.body.error.validationIssues.fieldErrors.phone[0].code).toBe('too_small');
+    expect(result.body.error.message).toContain('vaaditaan');
   });
 
   test('cannot create a reservation with empty aircraft ID', async () => {
@@ -126,7 +126,8 @@ describe('Calls to api', () => {
         start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: ' ', info: 'Training flight', phone: '11104040',
       });
     expect(result.statusCode).toEqual(400);
-    expect(result.body.error.message.includes('Aircraft ID cannot be empty'));
+    expect(result.body.error.validationIssues.fieldErrors.aircraftId[0].message).toBe('Lentokentän tunnus vaaditaan');
+    expect(result.body.error.message).toContain('vaaditaan');
   });
 
   test('cannot create a reservation on top of blocked timeslot', async () => {
@@ -141,7 +142,7 @@ describe('Calls to api', () => {
         start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
       });
     expect(result.statusCode).toEqual(400);
-    expect(result.body.error.message.includes('Reservation cannot be created on top of blocked timeslot'));
+    expect(result.body.error.message).toContain('Varaus ei voi ajoittua menneisyyteen');
   });
 
   test('can delete a reservation', async () => {
@@ -205,7 +206,7 @@ describe('Calls to api', () => {
       });
 
     expect(updatedReservation.statusCode).toEqual(400);
-    expect(updatedReservation.body.error.message.includes('Phone number cannot be empty'));
+    expect(updatedReservation.body.error.message).toContain('Puhelinnumero vaaditaan');
 
     const reservationAfterUpdate: Reservation | null = await Reservation.findByPk(id);
     expect(reservationAfterUpdate?.dataValues.phone).not.toEqual('');
@@ -225,7 +226,7 @@ describe('Calls to api', () => {
         start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
       });
     expect(result.statusCode).toEqual(400);
-    expect(result.body.error.message.includes('Reservation cannot be created on top of blocked timeslot'));
+    expect(result.body.error.message).toContain('Varaus ei voi ajoittua menneisyyteen');
   });
 
   test('cannot modify a reservation to have an empty aircraft ID', async () => {
@@ -239,7 +240,7 @@ describe('Calls to api', () => {
       });
 
     expect(updatedReservation.statusCode).toEqual(400);
-    expect(updatedReservation.body.error.message.includes('Aircraft ID cannot be empty'));
+    expect(updatedReservation.body.error.message).toContain('Lentokentän tunnus vaaditaan');
 
     const reservationAfterUpdate: Reservation | null = await Reservation.findByPk(id);
     expect(reservationAfterUpdate?.dataValues.aircraftId).not.toEqual('');
@@ -254,8 +255,11 @@ describe('Calls to api', () => {
       .get(`/api/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
 
     expect(response.body.length).toEqual(2);
-    expect(response.body.includes(reservations[1]));
-    expect(response.body.includes(reservations[2]));
+    expect(response.body).toMatchObject([{
+      aircraftId: 'DK-ASD', id: 41, info: null, phone: '0401111111', start: '2023-02-14T14:00:00.000Z', timeslotId: null, updatedAt: '2023-02-13T08:00:02.680Z', userId: null,
+    }, {
+      aircraftId: 'RF-SDR', id: 42, info: 'First time landing!', phone: '0401111111', start: '2023-02-14T16:00:00.000Z', timeslotId: null, updatedAt: '2023-02-13T08:00:02.680Z', userId: null,
+    }]);
   });
 
   test('return an empty list if no reservation in range', async () => {

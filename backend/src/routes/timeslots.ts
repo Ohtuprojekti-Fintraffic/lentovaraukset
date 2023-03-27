@@ -50,7 +50,7 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
 router.put('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const airfield = await airfieldService.getAirfield('EGLL'); // TODO: get airfieldId from request
-    const modifiedTimeslot = createTimeSlotValidator(airfield.eventGranularityMinutes)
+    const modifiedTimeslot = createTimeSlotValidator(airfield.eventGranularityMinutes, true)
       .parse(req.body);
     // TODO: check if timeslot overlaps with existing timeslots
 
