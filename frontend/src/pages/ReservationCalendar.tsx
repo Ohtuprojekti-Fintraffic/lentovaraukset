@@ -23,7 +23,7 @@ function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { showPopup, clearPopup } = usePopupContext();
-  const { data: airfield } = useAirfield(1); // TODO: get id from airfield selection
+  const { data: airfield } = useAirfield('EGLL'); // TODO: get id from airfield selection
   const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -82,29 +82,31 @@ function ReservationCalendar() {
 
   const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
 
+  const showReservationModalFn = (reservation: EventImpl | null) => {
+    selectedReservationRef.current = reservation;
+    setShowInfoModal(true);
+  };
+
+  const closeReservationModalFn = () => {
+    selectedReservationRef.current = null;
+    setShowInfoModal(false);
+  };
+
   const clickReservation = async (event: EventImpl): Promise<void> => {
     if ((event.end && isTimeInPast(event.end)) || event.groupId === 'timeslots') {
       return;
     }
 
-    selectedReservationRef.current = event;
-
-    setShowInfoModal(true);
-  };
-
-  const closeReservationModalFn = () => {
-    setShowInfoModal(false);
+    showReservationModalFn(event);
   };
 
   const removeReservation = async (removeInfo: EventRemoveArg) => {
     const { event } = removeInfo;
-    removeInfo.revert();
 
     const onConfirmRemove = async () => {
       const res = await deleteReservation(Number(event.id));
       if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
         closeReservationModalFn();
-        selectedReservationRef.current = null;
         event.remove();
       } else {
         removeInfo.revert();
@@ -159,7 +161,7 @@ function ReservationCalendar() {
 
   const showModalAfterDrag = (times: { start: Date, end: Date }) => {
     draggedTimesRef.current = times;
-    setShowInfoModal(true);
+    showReservationModalFn(null);
   };
 
   return (
@@ -173,7 +175,6 @@ function ReservationCalendar() {
         }}
         closeReservationModal={() => {
           closeReservationModalFn();
-          selectedReservationRef.current = null;
           calendarRef.current?.getApi().refetchEvents();
         }}
       />

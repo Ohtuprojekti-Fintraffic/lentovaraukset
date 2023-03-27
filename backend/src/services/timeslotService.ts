@@ -128,19 +128,38 @@ const updateById = async (
     throw new Error('Timeslot can\'t be consecutive');
   }
   const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
-  if (oldTimeslot && isTimeInPast(oldTimeslot.start)) {
+
+  if (oldTimeslot === null) {
+    throw new Error('No timeslot with id exists');
+  }
+
+  const slotHasMoved = oldTimeslot.start.getTime() !== timeslot.start.getTime();
+  // if the timeslot has started, its start time can't be edited
+  // and if timeslot has ended it's no longer editable at all
+  if (
+    (slotHasMoved
+      && isTimeInPast(oldTimeslot.start))
+    || isTimeInPast(oldTimeslot.end)) {
     throw new Error('Timeslot in past cannot be modified');
   }
+
+  // prevent from being able to move start to past
+  if (
+    slotHasMoved && isTimeInPast(timeslot.start)
+  ) {
+    throw new Error('Timeslot cannot be moved to the past');
+  }
+
   if (timeslot.type === 'available') {
-    const oldReservations = await oldTimeslot?.getReservations();
-    const newReservations = oldReservations?.filter(
+    const oldReservations = await oldTimeslot.getReservations();
+    const newReservations = oldReservations.filter(
       (reservation) => reservation.start >= timeslot.start && reservation.end <= timeslot.end,
     );
-    if (oldReservations?.length !== newReservations?.length) {
+    if (oldReservations.length !== newReservations.length) {
       throw new Error('Timeslot has reservations');
     }
-    await oldTimeslot?.removeReservations(oldReservations);
-    await oldTimeslot?.addReservations(newReservations);
+    await oldTimeslot.removeReservations(oldReservations);
+    await oldTimeslot.addReservations(newReservations);
   } else {
     const reservations = await reservationService
       .getInTimeRange(timeslot.start, timeslot.end);
@@ -148,6 +167,7 @@ const updateById = async (
       await reservationService.deleteById(r.dataValues.id);
     });
   }
+
   await Timeslot.upsert({ ...timeslot, id });
 };
 

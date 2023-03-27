@@ -1,10 +1,10 @@
-import { AirfieldEntry } from '@lentovaraukset/shared/src';
+import { AirfieldEntry, AirfieldEntryWithId } from '@lentovaraukset/shared/src';
 import { Airfield } from '../models';
 
-const getAirfield = async (id: number): Promise<AirfieldEntry> => {
+const getAirfield = async (code: string): Promise<AirfieldEntry> => {
   const airfield = await Airfield.findOne({
     where: {
-      id,
+      code,
     },
   });
 
@@ -21,19 +21,26 @@ const getAirfields = async (): Promise<AirfieldEntry[]> => {
 };
 
 const updateById = async (
-  id: number,
+  code: string,
   airfield: AirfieldEntry,
 ): Promise<AirfieldEntry> => {
   const [updatedAirfield] = await Airfield.upsert(
-    { ...airfield, id },
+    { ...airfield, code },
   );
   return updatedAirfield.dataValues;
+};
+
+const createAirfield = async (
+  newAirfield: AirfieldEntryWithId,
+): Promise<AirfieldEntry> => {
+  const airfield: Airfield = await Airfield.create(newAirfield);
+  return airfield.dataValues;
 };
 
 const createTestAirfield = async () => {
   // TODO: Remove this when we have a proper admin interface for creating airfields
   await Airfield.upsert({
-    id: 1,
+    code: 'EGLL',
     name: 'Test Airfield',
     maxConcurrentFlights: 3,
     eventGranularityMinutes: 20,
@@ -44,5 +51,6 @@ export default {
   getAirfield,
   getAirfields,
   updateById,
+  createAirfield,
   createTestAirfield,
 };

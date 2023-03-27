@@ -34,6 +34,14 @@ function Navigation() {
         >
           Hallinta
         </NavLink>
+        <NavLink
+          to="/yllapito"
+          className={({ isActive }) => (isActive
+            ? 'active font-bold'
+            : '')}
+        >
+          Ylläpito
+        </NavLink>
       </nav>
     </div>
   );

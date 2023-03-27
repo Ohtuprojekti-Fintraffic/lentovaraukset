@@ -53,7 +53,7 @@ function RecurringTimeslotForm({
   const [reservations, setReservations] = useState<ReservationEntry[]>([]);
   const [formWarning, setFormWarning] = useState<string | undefined>(undefined);
   const { showPopup, clearPopup } = usePopupContext();
-  const { data: airfield } = useAirfield(1);
+  const { data: airfield } = useAirfield('EGLL');
   const timeslotGranularity = airfield?.eventGranularityMinutes || 20;
   const start = timeslot?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
   const end = timeslot?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
