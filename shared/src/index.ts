@@ -21,10 +21,14 @@ export interface TimeslotEntry {
 }
 
 export interface AirfieldEntry {
-  id?: number;
+  code?: string;
   name: string;
   maxConcurrentFlights: number;
   eventGranularityMinutes: number;
+}
+
+export interface AirfieldEntryWithId extends AirfieldEntry {
+  code: string;
 }
 
 export enum ServiceErrorCode {

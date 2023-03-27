@@ -3,7 +3,6 @@ import {
   DataTypes,
   InferAttributes,
   InferCreationAttributes,
-  CreationOptional,
 } from 'sequelize';
 
 import { sequelize } from '../util/db';
@@ -12,7 +11,7 @@ class Airfield extends Model<
 InferAttributes<Airfield>,
 InferCreationAttributes<Airfield>
 > {
-  declare id: CreationOptional<number>;
+  declare code: string;
 
   declare name: string;
 
@@ -23,10 +22,9 @@ InferCreationAttributes<Airfield>
 
 Airfield.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
+    code: {
+      type: DataTypes.STRING,
       primaryKey: true,
-      autoIncrement: true,
     },
     name: {
       type: DataTypes.STRING,

@@ -5,13 +5,13 @@ import {
 import QueryKeys from './queryKeys';
 import { errorIfNotOk } from './util';
 
-const getAirfields = async (airfieldId: number): Promise<AirfieldEntry> => {
+const getAirfields = async (airfieldId: string): Promise<AirfieldEntry> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${airfieldId}`);
   errorIfNotOk(res);
   return res.json();
 };
 
-const useAirfield = (airfieldId: number) => useQuery(
+const useAirfield = (airfieldId: string) => useQuery(
   [QueryKeys.Airfield, airfieldId],
   () => getAirfields(airfieldId),
 );
@@ -19,7 +19,7 @@ const useAirfield = (airfieldId: number) => useQuery(
 const modifyAirfield = async (
   modifiedAirfield: AirfieldEntry,
 ): Promise<AirfieldEntry> => {
-  const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${modifiedAirfield.id}`, {
+  const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${modifiedAirfield.code}`, {
     method: 'PUT',
     body: JSON.stringify(modifiedAirfield),
     headers: {
@@ -30,7 +30,21 @@ const modifyAirfield = async (
   return res.json();
 };
 
-const useAirfieldMutation = () => {
+const createAirfield = async (
+  newAirfield: AirfieldEntry,
+): Promise<AirfieldEntry> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/airfields/`, {
+    method: 'POST',
+    body: JSON.stringify(newAirfield),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  errorIfNotOk(res);
+  return res.json();
+};
+
+const modifyAirfieldMutation = () => {
   const queryClient = useQueryClient();
   return useMutation(modifyAirfield, {
     onSuccess: () => {
@@ -39,4 +53,13 @@ const useAirfieldMutation = () => {
   });
 };
 
-export { useAirfield, useAirfieldMutation };
+const createAirfieldMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation(createAirfield, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryKeys.Airfield);
+    },
+  });
+};
+
+export { useAirfield, modifyAirfieldMutation, createAirfieldMutation };

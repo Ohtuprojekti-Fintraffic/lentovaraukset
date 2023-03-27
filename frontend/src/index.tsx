@@ -9,8 +9,8 @@ import App from './App';
 import ReservationCalendar from './pages/ReservationCalendar';
 import TimeSlotCalendar from './pages/TimeSlotCalendar';
 import Error from './pages/Error';
-
 import Management from './pages/Management';
+import Admin from './pages/Admin';
 
 const router = createBrowserRouter(
   [
@@ -30,6 +30,10 @@ const router = createBrowserRouter(
         {
           path: 'hallinta',
           element: <Management />,
+        },
+        {
+          path: 'yllapito',
+          element: <Admin />,
         },
       ],
     },
