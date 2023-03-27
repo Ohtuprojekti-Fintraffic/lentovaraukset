@@ -55,6 +55,7 @@ const deleteTimeslot = async (id: Number): Promise<string> => {
 };
 
 const modifyGroup = async (group: string, updates: {
+  startingFrom: Date,
   startTimeOfDay: { hours: number, minutes: number },
   endTimeOfDay: { hours: number, minutes: number }
 }): Promise<void> => {

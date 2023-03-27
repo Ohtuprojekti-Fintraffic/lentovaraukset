@@ -74,7 +74,7 @@ const createPeriod = async (
   const dayInMillis = 24 * 60 * 60 * 1000;
   const weekdays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-  const timeslotGroup: { start: Date, end: Date, type: TimeslotType, info: string | null }[] = [];
+  const timeslotGroup: Omit<TimeslotEntry, 'id'>[] = [];
   const {
     start,
     end,
@@ -93,6 +93,7 @@ const createPeriod = async (
         end: endTime,
         type,
         info,
+        group: period.name,
       });
     }
     currentDate.setTime(currentDate.getTime() + dayInMillis);
@@ -184,10 +185,14 @@ const createTimeslot = async (newTimeSlot: {
 };
 
 const updateByGroup = async (group: string, updates: {
+  startingFrom: Date;
   startTimeOfDay: { hours: number, minutes: number };
   endTimeOfDay: { hours: number, minutes: number };
 }): Promise<TimeslotEntry[]> => {
-  const timeslots = await Timeslot.findAll({ where: { group } });
+  const timeslots = await Timeslot.findAll({
+    where: { group, start: { [Op.gte]: updates.startingFrom } },
+  });
+
   const editedTimeslots = timeslots.map(({ dataValues: timeslot }) => {
     timeslot.start.setHours(updates.startTimeOfDay.hours, updates.startTimeOfDay.minutes);
     timeslot.end.setHours(updates.endTimeOfDay.hours, updates.endTimeOfDay.minutes);

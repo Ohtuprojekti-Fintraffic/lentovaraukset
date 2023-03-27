@@ -5,7 +5,7 @@ import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
-import { TimeslotType } from '@lentovaraukset/shared/src';
+import { TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
 import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
@@ -42,7 +42,7 @@ function TimeSlotCalendar() {
           color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
           title: timeslot.type === 'available' ? 'Vapaa' : timeslot.info || 'Suljettu',
         };
-        return timeslot.group ? { ...timeslotEvent, groupId: timeslot.group } : timeslotEvent;
+        return timeslotEvent;
       });
       successCallback(timeslotsMapped);
     } catch (error) {
@@ -133,29 +133,71 @@ function TimeSlotCalendar() {
   };
 
   const modifyTimeslotFn = async (
-    event: {
+    timeslot: {
       id: string,
       start: Date,
       end: Date,
       extendedProps: { type: TimeslotType, info: string | null, group: string | null },
     },
+    period?: {
+      end: Date,
+      periodName: string,
+      days: WeekInDays,
+    },
   ) => {
-    if (event.extendedProps.group) {
-      // eslint-disable-next-line no-restricted-globals, no-alert
-      if (confirm('Muokaat toistuvaa varausikkunaa. Muokataanko kaikkia varausikkunoita?')) {
-        await modifyGroup(event.extendedProps.group, {
-          startTimeOfDay: { hours: event.start.getHours(), minutes: event.start.getMinutes() },
-          endTimeOfDay: { hours: event.end.getHours(), minutes: event.end.getMinutes() },
+    const modifyOneEvent = async () => {
+      await modifyTimeSlot(
+        {
+          id: Number(timeslot!.id),
+          start: timeslot.start,
+          end: timeslot.end,
+          type: timeslot.extendedProps.type,
+          info: timeslot.extendedProps.info,
+        },
+        period
+          ? {
+            end: period.end,
+            name: period.periodName,
+            days: period.days,
+          }
+          : undefined,
+      );
+      closeTimeslotModalFn();
+      clearPopup();
+      calendarRef.current?.getApi().refetchEvents();
+    };
+
+    const modifyAllFutureEvents = async () => {
+      if (timeslot.extendedProps.group) {
+        const startingFrom = new Date(timeslot.start);
+        startingFrom.setHours(0, 0, 0, 0);
+        await modifyGroup(timeslot.extendedProps.group, {
+          startingFrom,
+          startTimeOfDay: {
+            hours: timeslot.start.getHours(), minutes: timeslot.start.getMinutes(),
+          },
+          endTimeOfDay: {
+            hours: timeslot.end.getHours(), minutes: timeslot.end.getMinutes(),
+          },
         });
-        return;
       }
+      closeTimeslotModalFn();
+      clearPopup();
+      calendarRef.current?.getApi().refetchEvents();
+    };
+
+    if (timeslot.extendedProps.group) {
+      showPopup({
+        popupTitle: 'Toistuvan varausikkunan muokkaus',
+        popupText: 'Muokkasit toistuvaa varausikkuuna. Muokataanko myös kaikkia tulevia varausikkunoita?',
+        primaryText: 'Muokkaa kaikkia',
+        primaryOnClick: modifyAllFutureEvents,
+        secondaryText: 'Muokkaa vain tätä',
+        secondaryOnClick: modifyOneEvent,
+      });
+    } else {
+      await modifyOneEvent();
     }
-    await modifyTimeSlot({
-      ...event,
-      id: Number(event.id),
-      type: event.extendedProps.type,
-      info: event.extendedProps.info,
-    });
   };
 
   const handleToggle = () => {
@@ -175,6 +217,7 @@ function TimeSlotCalendar() {
         timeslot={selectedTimeslotRef?.current || undefined}
         draggedTimes={draggedTimesRef?.current || undefined}
         isBlocked={blocked}
+        modifyTimeslotFn={modifyTimeslotFn}
         removeTimeslot={() => {
           selectedTimeslotRef.current?.remove();
         }}

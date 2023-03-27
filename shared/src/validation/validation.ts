@@ -140,6 +140,7 @@ const createTimeOfDayValidator = (slotGranularityMinutes: number) => z.object({
 
 const createGroupUpdateValidator = (slotGranularityMinutes: number) => {
   const times = z.object({
+    startingFrom: z.coerce.date(),
     startTimeOfDay: createTimeOfDayValidator(slotGranularityMinutes),
     endTimeOfDay: createTimeOfDayValidator(slotGranularityMinutes),
   });
