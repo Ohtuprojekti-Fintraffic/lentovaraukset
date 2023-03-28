@@ -30,7 +30,21 @@ const modifyAirfield = async (
   return res.json();
 };
 
-const useAirfieldMutation = () => {
+const createAirfield = async (
+  newAirfield: AirfieldEntry,
+): Promise<AirfieldEntry> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/airfields/`, {
+    method: 'POST',
+    body: JSON.stringify(newAirfield),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  errorIfNotOk(res);
+  return res.json();
+};
+
+const modifyAirfieldMutation = () => {
   const queryClient = useQueryClient();
   return useMutation(modifyAirfield, {
     onSuccess: () => {
@@ -39,4 +53,13 @@ const useAirfieldMutation = () => {
   });
 };
 
-export { useAirfield, useAirfieldMutation };
+const createAirfieldMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation(createAirfield, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryKeys.Airfield);
+    },
+  });
+};
+
+export { useAirfield, modifyAirfieldMutation, createAirfieldMutation };

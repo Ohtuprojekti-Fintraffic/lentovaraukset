@@ -166,6 +166,57 @@ describe('Calls to api', () => {
     expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-02-17T14:00:00.000Z'));
   });
 
+  test('can edit an available timeslot even if start time is in past', async () => {
+    const createdSlot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-13T07:00:00.000Z'),
+      end: new Date('2023-02-13T16:00:00.000Z'),
+      type: 'available',
+      info: null,
+    });
+
+    const res = await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        ...createdSlot.dataValues, end: '2023-02-13T20:00:00.000Z',
+      });
+
+    expect(res.body).toMatchObject({
+      end: '2023-02-13T20:00:00.000Z', info: null, start: '2023-02-13T07:00:00.000Z', type: 'available',
+    });
+    const updatedSlot: Timeslot | null = await Timeslot.findOne(
+      { where: { id: createdSlot.dataValues.id } },
+    );
+
+    expect(updatedSlot).toBeDefined();
+    expect(updatedSlot?.dataValues.start).toEqual(new Date('2023-02-13T07:00:00.000Z'));
+    expect(updatedSlot?.dataValues.end).toEqual(new Date('2023-02-13T20:00:00.000Z'));
+  });
+
+  test("cannot edit an available timeslot's start time if original is in past", async () => {
+    const createdSlot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-13T07:00:00.000Z'),
+      end: new Date('2023-02-13T16:00:00.000Z'),
+      type: 'available',
+      info: null,
+    });
+
+    const res = await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        ...createdSlot.dataValues, start: '2023-02-13T09:00:00.000Z',
+      });
+
+    expect(res.body.error.message).toContain('Timeslot in past cannot be modified');
+
+    const updatedSlot: Timeslot | null = await Timeslot.findOne(
+      { where: { id: createdSlot.dataValues.id } },
+    );
+
+    expect(updatedSlot).toBeDefined();
+    expect(updatedSlot?.dataValues.start).toEqual(createdSlot.start);
+    expect(updatedSlot?.dataValues.end).toEqual(createdSlot.end);
+  });
+
   test('can edit a blocked timeslot', async () => {
     const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'blocked' });
 

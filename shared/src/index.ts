@@ -27,9 +27,14 @@ export interface AirfieldEntry {
   eventGranularityMinutes: number;
 }
 
+export interface AirfieldEntryWithId extends AirfieldEntry {
+  code: string;
+}
+
 export enum ServiceErrorCode {
   ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
   InvalidAirfield = 'InvalidAirfield',
+  RouteNotFound = 'RouteNotFound',
 }
 
 export interface WeekInDays {

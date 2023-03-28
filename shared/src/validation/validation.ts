@@ -16,7 +16,10 @@ const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => {
   return time <= max;
 };
 
-const createTimeSlotValidator = (slotGranularityMinutes: number) => {
+const createTimeSlotValidator = (
+  slotGranularityMinutes: number,
+  ignoreStartInPast: boolean = false,
+) => {
   // Time must be a multiple of ${slotGranularityMinutes} minutes
   const minuteMultipleMessage = `Ajan tulee olla jokin ${slotGranularityMinutes} minuutin moninkerta`;
   const pastErrorMessage = 'Timeslot cannot be in past';
@@ -26,7 +29,7 @@ const createTimeSlotValidator = (slotGranularityMinutes: number) => {
     start: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
-      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
+      .refine((value) => ignoreStartInPast || !isTimeInPast(value), { message: pastErrorMessage }),
     end: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
@@ -108,11 +111,26 @@ const getTimeRangeValidator = () => {
   return TimeRange;
 };
 
-const airfieldValidator = z.object({
-  name: z.string(),
-  eventGranularityMinutes: z.coerce.number(),
-  maxConcurrentFlights: z.coerce.number(),
-});
+const airfieldValidator = () => {
+  const nameEmptyErrorMessage = 'Airfield name cannot be empty';
+  const concurrentFlightsMessage = 'Concurrent flights must be minimum 1';
+  const multipleErrorMessage = 'Time must be multiple of 10';
+  const idErrorMessage = 'Id must be ICAO airport code';
+  const regex = /[A-Z]{4}$/;
+
+  const base = z.object({
+    code: z.string()
+      .refine((value) => regex.test(value), { message: idErrorMessage })
+      .optional(),
+    name: z.string().min(1, { message: nameEmptyErrorMessage }),
+    eventGranularityMinutes: z.coerce
+      .number()
+      .multipleOf(10, { message: multipleErrorMessage }),
+    maxConcurrentFlights: z.coerce.number().min(1, { message: concurrentFlightsMessage }),
+  });
+
+  return base;
+};
 
 export {
   createTimeSlotValidator,

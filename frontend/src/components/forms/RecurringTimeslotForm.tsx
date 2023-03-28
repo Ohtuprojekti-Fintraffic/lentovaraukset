@@ -45,6 +45,8 @@ function RecurringTimeslotForm({
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
+  // this should probably be asserted to be defined
+  // if the airfield isn't available where are we creating timeslots?
   const { data: airfield } = useAirfield('EFHK');
   const timeslotGranularity = airfield?.eventGranularityMinutes || 20;
 
