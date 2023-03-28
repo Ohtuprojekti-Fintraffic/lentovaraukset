@@ -132,6 +132,15 @@ const airfieldValidator = () => {
   return base;
 };
 
+const configurationValidator = () => {
+  const base = z.object({
+    daysToStart: z.coerce.number(),
+    maxDaysInFuture: z.coerce.number(),
+  });
+
+  return base;
+};
+
 export {
   createTimeSlotValidator,
   createReservationValidator,
@@ -140,5 +149,6 @@ export {
   isTimeInPast,
   isTimeAtMostInFuture,
   airfieldValidator,
+  configurationValidator,
   createPeriodValidation,
 };

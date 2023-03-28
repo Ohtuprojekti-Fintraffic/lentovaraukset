@@ -31,6 +31,12 @@ export interface AirfieldEntryWithId extends AirfieldEntry {
   code: string;
 }
 
+export interface ConfigurationEntry {
+  id: number;
+  daysToStart: number;
+  maxDaysInFuture: number;
+}
+
 export enum ServiceErrorCode {
   ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
 }

@@ -2,6 +2,7 @@ import User from './user';
 import Airfield from './airfield';
 import Reservation from './reservation';
 import Timeslot from './timeslot';
+import Configuration from './configuration';
 
 User.hasMany(Reservation);
 Reservation.belongsTo(User);
@@ -17,4 +18,5 @@ export {
   Airfield,
   Reservation,
   Timeslot,
+  Configuration,
 };
