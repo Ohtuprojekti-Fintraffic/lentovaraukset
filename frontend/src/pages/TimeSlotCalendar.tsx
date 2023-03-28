@@ -105,8 +105,8 @@ function TimeSlotCalendar() {
     showPopup({
       popupTitle: 'Varausikkunan Poisto',
       popupText: 'Haluatko varmasti poistaa varausikkunan?',
-      primaryText: 'Poista',
-      primaryOnClick: onConfirmRemove,
+      dangerText: 'Poista',
+      dangerOnClick: onConfirmRemove,
       secondaryText: 'Peruuta',
       secondaryOnClick: onCancelRemove,
     });

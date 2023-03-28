@@ -124,8 +124,8 @@ function ReservationCalendar() {
     showPopup({
       popupTitle: 'Varauksen Poisto',
       popupText: 'Haluatko varmasti poistaa varauksen?',
-      primaryText: 'Poista',
-      primaryOnClick: onConfirmRemove,
+      dangerText: 'Poista',
+      dangerOnClick: onConfirmRemove,
       secondaryText: 'Peruuta',
       secondaryOnClick: onCancelRemove,
     });
