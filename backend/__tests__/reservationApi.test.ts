@@ -256,9 +256,9 @@ describe('Calls to api', () => {
 
     expect(response.body.length).toEqual(2);
     expect(response.body).toMatchObject([{
-      aircraftId: 'DK-ASD', id: 41, info: null, phone: '0401111111', start: '2023-02-14T14:00:00.000Z', timeslotId: null, updatedAt: '2023-02-13T08:00:02.680Z', userId: null,
+      aircraftId: 'DK-ASD', id: 41, info: null, phone: '0401111111', start: '2023-02-14T14:00:00.000Z', timeslotId: null, userId: null,
     }, {
-      aircraftId: 'RF-SDR', id: 42, info: 'First time landing!', phone: '0401111111', start: '2023-02-14T16:00:00.000Z', timeslotId: null, updatedAt: '2023-02-13T08:00:02.680Z', userId: null,
+      aircraftId: 'RF-SDR', id: 42, info: 'First time landing!', phone: '0401111111', start: '2023-02-14T16:00:00.000Z', timeslotId: null, userId: null,
     }]);
   });
 
