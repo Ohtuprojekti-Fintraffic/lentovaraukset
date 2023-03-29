@@ -57,7 +57,6 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
     const airfield = await airfieldService.getAirfield('EGLL'); // TODO: get airfieldId from request
     const modifiedTimeslot = createTimeSlotValidator(airfield.eventGranularityMinutes, true)
       .parse(req.body);
-    // TODO: check if timeslot overlaps with existing timeslots
 
     const id = Number(req.params.id);
     if (req.body.periodEnd) {
@@ -75,7 +74,7 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
 
 router.put('/group/:group', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const airfield = await airfieldService.getAirfield(1); // TODO: get airfieldId from request
+    const airfield = await airfieldService.getAirfield('EGLL'); // TODO: get airfieldId from request
     const { group } = req.params;
     const updatedTimes = createGroupUpdateValidator(airfield.eventGranularityMinutes)
       .parse(req.body);
