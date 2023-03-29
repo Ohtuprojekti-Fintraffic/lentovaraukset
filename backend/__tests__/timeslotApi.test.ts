@@ -97,7 +97,7 @@ describe('Calls to api', () => {
       aircraftId: 'ESA-111',
       phone: '0501102323',
     });
-    await api.post('/api/timeslots/')
+    await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T14:00:00.000Z'), type: 'blocked', info: 'Under maintenance',
@@ -120,7 +120,7 @@ describe('Calls to api', () => {
       aircraftId: 'ESA-111',
       phone: '0501102323',
     });
-    await api.put(`/api/timeslots/${timeslot.dataValues.id}`)
+    await api.put(`/api/EFHK/timeslots/${timeslot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-16T10:00:00.000Z'), end: new Date('2023-02-16T16:00:00.000Z'), type: 'blocked', info: 'Under maintenance',
