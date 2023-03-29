@@ -23,7 +23,7 @@ type ButtonProps = DisableableProps | UndisableableProps;
 function Button({
   variant, children, onClick, disabled, className, form, type = 'button',
 }: ButtonProps) {
-  const buttonBaseClass = 'mx-1 py-3 px-4 rounded-ft-large font-ft-button text-ft-button';
+  const buttonBaseClass = 'py-3 px-4 rounded-ft-large font-ft-button text-ft-button';
 
   const buttonVariantClasses = {
     primary: 'bg-black text-white hover:bg-ft-interactive-200',
@@ -58,3 +58,5 @@ function Button({
 }
 
 export default Button;
+
+export type { ButtonProps };

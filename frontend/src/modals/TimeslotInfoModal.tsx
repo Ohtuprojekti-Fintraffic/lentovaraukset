@@ -1,6 +1,7 @@
 import { EventImpl } from '@fullcalendar/core/internal';
 import { TimeslotEntry, WeekInDays } from '@lentovaraukset/shared/src';
 import React, { useContext } from 'react';
+import ActionSheet from '../components/ActionSheet';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import RecurringTimeslotForm from '../components/forms/RecurringTimeslotForm';
@@ -81,30 +82,38 @@ function TimeslotInfoModal({
   };
 
   return (
-    <Card show={showInfoModal} handleClose={closeTimeslotModal}>
-      <RecurringTimeslotForm
-        id="recurring_timeslot_form"
-        timeslot={timeslot}
-        isBlocked={isBlocked}
-        draggedTimes={draggedTimes}
-        onSubmit={timeslot ? onModifySubmitHandler : onSubmitAddHandler}
-      />
-      {timeslot && (
-      <Button
-        variant="danger"
-        onClick={() => removeTimeslot()}
-      >
-        Poista
-      </Button>
+    <Card
+      show={showInfoModal}
+      handleClose={closeTimeslotModal}
+      form={(
+        <RecurringTimeslotForm
+          id="recurring_timeslot_form"
+          timeslot={timeslot}
+          isBlocked={isBlocked}
+          draggedTimes={draggedTimes}
+          onSubmit={timeslot ? onModifySubmitHandler : onSubmitAddHandler}
+        />
       )}
-      <Button
-        form="recurring_timeslot_form"
-        type="submit"
-        variant="primary"
-      >
-        Tallenna
-      </Button>
-    </Card>
+      actionSheet={(
+        <ActionSheet handleClose={closeTimeslotModal}>
+          <Button
+            form="recurring_timeslot_form"
+            type="submit"
+            variant="primary"
+          >
+            Tallenna
+          </Button>
+          {timeslot && (
+            <Button
+              variant="danger"
+              onClick={() => removeTimeslot()}
+            >
+              Poista
+            </Button>
+          )}
+        </ActionSheet>
+      )}
+    />
   );
 }
 
