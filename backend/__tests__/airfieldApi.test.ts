@@ -79,4 +79,77 @@ describe('Calls to api', () => {
     expect(res.body.error.message).toContain('already exists');
     expect(numberOfAirfields).toEqual(airfields.length);
   });
+
+  test('can get all airfields', async () => {
+    const res = await api.get('/api/airfields/');
+
+    expect(res.status).toEqual(200);
+    expect(res.body.length).toEqual(airfields.length);
+    expect(res.body).toEqual(expect.arrayContaining(airfields));
+  });
+
+  test('can get an airfield by code', async () => {
+    const res = await api.get('/api/airfields/EFHK');
+
+    expect(res.status).toEqual(200);
+    expect(res.body).toMatchObject(airfields[0]);
+  });
+
+  test('fails to get an airfield with wrong code', async () => {
+    const res = await api.get('/api/airfields/WRONG_CODE');
+
+    expect(res.status).toEqual(500);
+    expect(res.body.error.message).toContain('Airfield not found');
+  });
+
+  test('can update an airfield by code', async () => {
+    const updatedData = {
+      name: 'Helsinki Airport',
+      maxConcurrentFlights: 3,
+      eventGranularityMinutes: 30,
+    };
+    const res = await api.put('/api/airfields/EFHK')
+      .set('Content-type', 'application/json')
+      .send(updatedData);
+
+    const updatedAirfield = await Airfield.findOne({ where: { code: 'EFHK' } });
+
+    expect(res.status).toEqual(200);
+    expect(updatedAirfield).toMatchObject({ ...airfields[0], ...updatedData });
+  });
+
+  test('fails to update an airfield with invalid data', async () => {
+    const invalidUpdatedData = {
+      name: 'Helsinki Airport',
+      maxConcurrentFlights: 0,
+      eventGranularityMinutes: 25,
+    };
+    const res = await api.put('/api/airfields/EFHK')
+      .set('Content-type', 'application/json')
+      .send(invalidUpdatedData);
+
+    const originalAirfield = await Airfield.findOne({ where: { code: 'EFHK' } });
+
+    expect(res.status).toEqual(400);
+    expect(res.body.error.message).toContain('Concurrent flights must be minimum 1');
+    expect(res.body.error.message).toContain('Time must be multiple of 10');
+    expect(originalAirfield).toMatchObject(airfields[0]);
+  });
+
+  test('when Airfield id is not specified test', async () => {
+    const airfieldDataWithoutCode = {
+      name: 'Missing Code Airport',
+      maxConcurrentFlights: 2,
+      eventGranularityMinutes: 20,
+    };
+    const res = await api.post('/api/airfields/')
+      .set('Content-type', 'application/json')
+      .send(airfieldDataWithoutCode);
+
+    const numberOfAirfields = await Airfield.count();
+
+    expect(res.status).toEqual(500);
+    expect(res.body.error.message).toContain('Airfield id not specified');
+    expect(numberOfAirfields).toEqual(airfields.length);
+  });
 });
