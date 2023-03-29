@@ -163,9 +163,7 @@ const updateById = async (
   } else {
     const reservations = await reservationService
       .getInTimeRange(timeslot.start, timeslot.end);
-    reservations.forEach(async (r) => {
-      await reservationService.deleteById(r.dataValues.id);
-    });
+    await Promise.all(reservations.map((r) => reservationService.deleteById(r.dataValues.id)));
   }
 
   await Timeslot.upsert({ ...timeslot, id });
@@ -186,9 +184,7 @@ const createTimeslot = async (newTimeSlot: {
   if (newTimeSlot.type === 'available') {
     await timeslot.addReservations(reservations);
   } else {
-    reservations.forEach(async (r) => {
-      await reservationService.deleteById(r.dataValues.id);
-    });
+    await Promise.all(reservations.map((r) => reservationService.deleteById(r.dataValues.id)));
   }
   return timeslot.dataValues;
 };
