@@ -1,11 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { TimeslotEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
+import {
+  ReservationEntry, TimeslotEntry, TimeslotType, WeekInDays,
+} from '@lentovaraukset/shared/src';
+import { usePopupContext } from '../../contexts/PopupContext';
 import InputField from '../InputField';
 import DatePicker from '../DatePicker';
 import { HTMLDateTimeConvert } from '../../util';
 import { useAirfield } from '../../queries/airfields';
+import { getReservations } from '../../queries/reservations';
+import ModalAlert from '../ModalAlert';
 
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
@@ -45,14 +50,16 @@ function RecurringTimeslotForm({
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
+  const [reservations, setReservations] = useState<ReservationEntry[]>([]);
+  const [formWarning, setFormWarning] = useState<string | undefined>(undefined);
+  const { showPopup, clearPopup } = usePopupContext();
   const { data: airfield } = useAirfield('EGLL');
   const timeslotGranularity = airfield?.eventGranularityMinutes || 20;
-
   const start = timeslot?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
   const end = timeslot?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
 
   const {
-    register, handleSubmit, reset, watch, control, formState: { errors },
+    register, handleSubmit, reset, watch, control, formState: { errors }, getValues,
   } = useForm<Inputs>({
     values: {
       start,
@@ -74,6 +81,8 @@ function RecurringTimeslotForm({
     },
   });
 
+  const removesReservations = (type: TimeslotType) => type === 'blocked' && reservations.length > 0;
+
   const submitHandler: SubmitHandler<Inputs> = async (formData) => {
     const type: TimeslotType = formData.type ?? (isBlocked ? 'blocked' : 'available');
     const updatedTimeslot = {
@@ -83,24 +92,40 @@ function RecurringTimeslotForm({
       info: formData.info,
     };
     const { isRecurring, periodEnds } = formData;
-    if (isRecurring && periodEnds) {
-      const period = {
-        end: new Date(periodEnds),
-        periodName: formData.periodName,
-        days: {
-          monday: formData.days.maanantai,
-          tuesday: formData.days.tiistai,
-          wednesday: formData.days.keskiviikko,
-          thursday: formData.days.torstai,
-          friday: formData.days.perjantai,
-          saturday: formData.days.lauantai,
-          sunday: formData.days.sunnuntai,
-        },
+    const submit = () => {
+      if (isRecurring && periodEnds) {
+        const period = {
+          end: new Date(periodEnds),
+          periodName: formData.periodName,
+          days: {
+            monday: formData.days.maanantai,
+            tuesday: formData.days.tiistai,
+            wednesday: formData.days.keskiviikko,
+            thursday: formData.days.torstai,
+            friday: formData.days.perjantai,
+            saturday: formData.days.lauantai,
+            sunday: formData.days.sunnuntai,
+          },
+        };
+        onSubmit(updatedTimeslot, period);
+      } else {
+        onSubmit(updatedTimeslot);
+      }
+    };
+    if (removesReservations(updatedTimeslot.type)) {
+      const onConfirmSubmit = async () => {
+        submit();
+        clearPopup();
       };
-      onSubmit(updatedTimeslot, period);
-    } else {
-      onSubmit(updatedTimeslot);
-    }
+      showPopup({
+        popupTitle: 'Oletko varma?',
+        popupText: `Vuoron ${timeslot ? 'muokkaaminen' : 'lisääminen'} poistaa seuraavat varaukset: ${reservations.map((r) => r.id).join()}`,
+        primaryText: 'Vahvista',
+        primaryOnClick: onConfirmSubmit,
+        secondaryText: 'Peruuta',
+        secondaryOnClick: () => clearPopup(),
+      });
+    } else submit();
   };
   const onError = (e: any) => console.error(e);
 
@@ -119,6 +144,22 @@ function RecurringTimeslotForm({
 
   const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
+  const getReservationsWithinTimeslot = async (startTime:Date, endTime: Date) => {
+    setReservations(await getReservations(startTime, endTime));
+  };
+
+  useEffect(() => {
+    const startTime = getValues('start');
+    const endTime = getValues('end');
+    if (isBlocked || timeslot?.extendedProps.type === 'blocked') getReservationsWithinTimeslot(new Date(startTime)!, new Date(endTime)!);
+  }, [watch('end'), watch('start'), draggedTimes]);
+
+  useEffect(() => {
+    if (reservations.length > 0) {
+      setFormWarning(`Poistaa varaukset: ${reservations.map((r) => r.id).join()}`);
+    } else setFormWarning(undefined);
+  }, [reservations]);
+
   return (
     <div>
       <div className="bg-black p-3">
@@ -130,6 +171,12 @@ function RecurringTimeslotForm({
         }
         </p>
       </div>
+      <ModalAlert
+        message={formWarning}
+        variant="warning"
+        clearAlert={() => setFormWarning(undefined)}
+        removalDelaySecs={10}
+      />
       <div className="p-8">
         <form id={id} className="flex flex-col" onSubmit={handleSubmit(submitHandler, onError)}>
           <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">

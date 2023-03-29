@@ -132,20 +132,21 @@ function TimeSlotCalendar() {
     return !overlap;
   };
 
-  const modifyTimeslotFn = async (
-    event: {
-      id: string,
-      start: Date,
-      end: Date,
-      extendedProps: { type: TimeslotType, info: string | null },
-    },
-  ) => {
-    await modifyTimeSlot({
-      ...event,
-      id: Number(event.id),
-      type: event.extendedProps.type,
-      info: event.extendedProps.info,
-    });
+  const modifyTimeslotFn = async (event: EventImpl) => {
+    const start = event.start ?? new Date();
+    const end = event.end ?? new Date();
+    if (event.extendedProps.type === 'blocked') {
+      selectedTimeslotRef.current = event;
+      setShowInfoModal(true);
+    } else {
+      await modifyTimeSlot({
+        start,
+        end,
+        id: Number(event.id),
+        type: event.extendedProps.type,
+        info: event.extendedProps.info,
+      });
+    }
   };
 
   const handleToggle = () => {

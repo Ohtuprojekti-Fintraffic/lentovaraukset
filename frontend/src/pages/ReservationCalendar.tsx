@@ -131,20 +131,15 @@ function ReservationCalendar() {
     });
   };
 
-  const modifyReservationFn = async (event: {
-    id: string;
-    start: Date;
-    end: Date,
-    extendedProps: any
-  }): Promise<void> => {
+  const modifyReservationFn = async (event: EventImpl): Promise<void> => {
     const {
       user, aircraftId, phone, email, info,
     } = event.extendedProps;
 
     const modifiedReservation = await modifyReservation({
       id: parseInt(event.id, 10),
-      start: event.start,
-      end: event.end,
+      start: event.start || new Date(),
+      end: event.end || new Date(),
       user,
       aircraftId,
       phone,
