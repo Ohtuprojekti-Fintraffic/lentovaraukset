@@ -6,7 +6,7 @@ import Button from '../components/Button';
 import Card from '../components/Card';
 import RecurringTimeslotForm from '../components/forms/RecurringTimeslotForm';
 import AlertContext from '../contexts/AlertContext';
-import { addTimeSlot, modifyTimeSlot } from '../queries/timeSlots';
+import { addTimeSlot } from '../queries/timeSlots';
 import { ApiError } from '../queries/util';
 
 type InfoModalProps = {
@@ -16,6 +16,14 @@ type InfoModalProps = {
   isBlocked: boolean
   draggedTimes?: { start: Date, end: Date }
   removeTimeslot: () => void
+  modifyTimeslotFn: (
+    timeslot: EventImpl,
+    period?: {
+      end: Date,
+      periodName: string,
+      days: WeekInDays,
+    },
+  ) => Promise<void>,
 };
 
 function TimeslotInfoModal({
@@ -24,6 +32,7 @@ function TimeslotInfoModal({
   closeTimeslotModal,
   timeslot, draggedTimes,
   removeTimeslot,
+  modifyTimeslotFn,
 }: InfoModalProps) {
   const { addNewAlert } = useContext(AlertContext);
 
@@ -36,21 +45,21 @@ function TimeslotInfoModal({
     },
   ) => {
     try {
-      await modifyTimeSlot(
+      if (!timeslot) return;
+      await modifyTimeslotFn(
+        /* TS does not recognize that the spread operator
+        will ensure that all properties of EventImpl are present */
         {
-          id: Number(timeslot!.id),
-          start: updatedTimeslot.start,
-          end: updatedTimeslot.end,
-          type: updatedTimeslot.type,
-          info: updatedTimeslot.info,
-        },
-        period
-          ? {
-            end: period.end,
-            name: period.periodName,
-            days: period.days,
-          }
-          : undefined,
+          ...timeslot,
+          ...updatedTimeslot,
+          id: timeslot!.id,
+          extendedProps: {
+            info: updatedTimeslot.info,
+            type: updatedTimeslot.type,
+            group: timeslot?.extendedProps.group ?? null,
+          },
+        } as unknown as EventImpl,
+        period,
       );
       addNewAlert('Aikaikkuna päivitetty!', 'success');
     } catch (exception) {
