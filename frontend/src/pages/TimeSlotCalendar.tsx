@@ -140,12 +140,6 @@ function TimeSlotCalendar() {
       days: WeekInDays,
     },
   ) => {
-    if (timeslot.extendedProps.type === 'blocked') {
-      selectedTimeslotRef.current = timeslot;
-      setShowInfoModal(true);
-      return;
-    }
-
     const start = timeslot.start ?? new Date();
     const end = timeslot.end ?? new Date();
     const modifyOneEvent = async () => {
