@@ -105,8 +105,8 @@ function TimeSlotCalendar() {
     showPopup({
       popupTitle: 'Varausikkunan Poisto',
       popupText: 'Haluatko varmasti poistaa varausikkunan?',
-      primaryText: 'Poista',
-      primaryOnClick: onConfirmRemove,
+      dangerText: 'Poista',
+      dangerOnClick: onConfirmRemove,
       secondaryText: 'Peruuta',
       secondaryOnClick: onCancelRemove,
     });
@@ -133,24 +133,27 @@ function TimeSlotCalendar() {
   };
 
   const modifyTimeslotFn = async (
-    timeslot: {
-      id: string,
-      start: Date,
-      end: Date,
-      extendedProps: { type: TimeslotType, info: string | null, group: string | null },
-    },
+    timeslot: EventImpl,
     period?: {
       end: Date,
       periodName: string,
       days: WeekInDays,
     },
   ) => {
+    if (timeslot.extendedProps.type === 'blocked') {
+      selectedTimeslotRef.current = timeslot;
+      setShowInfoModal(true);
+      return;
+    }
+
+    const start = timeslot.start ?? new Date();
+    const end = timeslot.end ?? new Date();
     const modifyOneEvent = async () => {
       await modifyTimeSlot(
         {
-          id: Number(timeslot!.id),
-          start: timeslot.start,
-          end: timeslot.end,
+          start,
+          end,
+          id: Number(timeslot.id),
           type: timeslot.extendedProps.type,
           info: timeslot.extendedProps.info,
         },
@@ -169,15 +172,15 @@ function TimeSlotCalendar() {
 
     const modifyAllFutureEvents = async () => {
       if (timeslot.extendedProps.group) {
-        const startingFrom = new Date(timeslot.start);
+        const startingFrom = new Date(start);
         startingFrom.setHours(0, 0, 0, 0);
         await modifyGroup(timeslot.extendedProps.group, {
           startingFrom,
           startTimeOfDay: {
-            hours: timeslot.start.getHours(), minutes: timeslot.start.getMinutes(),
+            hours: start.getHours(), minutes: start.getMinutes(),
           },
           endTimeOfDay: {
-            hours: timeslot.end.getHours(), minutes: timeslot.end.getMinutes(),
+            hours: end.getHours(), minutes: end.getMinutes(),
           },
         });
       }

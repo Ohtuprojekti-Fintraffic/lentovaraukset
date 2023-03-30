@@ -1,6 +1,7 @@
 import { EventImpl } from '@fullcalendar/core/internal';
-import { TimeslotEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
+import { TimeslotEntry, WeekInDays } from '@lentovaraukset/shared/src';
 import React, { useContext } from 'react';
+import ActionSheet from '../components/ActionSheet';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import RecurringTimeslotForm from '../components/forms/RecurringTimeslotForm';
@@ -16,12 +17,7 @@ type InfoModalProps = {
   draggedTimes?: { start: Date, end: Date }
   removeTimeslot: () => void
   modifyTimeslotFn: (
-    timeslot: {
-      id: string,
-      start: Date,
-      end: Date,
-      extendedProps: { type: TimeslotType, info: string | null, group: string | null },
-    },
+    timeslot: EventImpl,
     period?: {
       end: Date,
       periodName: string,
@@ -49,8 +45,12 @@ function TimeslotInfoModal({
     },
   ) => {
     try {
+      if (!timeslot) return;
       await modifyTimeslotFn(
+        /* TS does not recognize that the spread operator
+        will ensure that all properties of EventImpl are present */
         {
+          ...timeslot,
           ...updatedTimeslot,
           id: timeslot!.id,
           extendedProps: {
@@ -58,7 +58,7 @@ function TimeslotInfoModal({
             type: updatedTimeslot.type,
             group: timeslot?.extendedProps.group ?? null,
           },
-        },
+        } as unknown as EventImpl,
         period,
       );
       addNewAlert('Aikaikkuna päivitetty!', 'success');
@@ -91,30 +91,38 @@ function TimeslotInfoModal({
   };
 
   return (
-    <Card show={showInfoModal} handleClose={closeTimeslotModal}>
-      <RecurringTimeslotForm
-        id="recurring_timeslot_form"
-        timeslot={timeslot}
-        isBlocked={isBlocked}
-        draggedTimes={draggedTimes}
-        onSubmit={timeslot ? onModifySubmitHandler : onSubmitAddHandler}
-      />
-      {timeslot && (
-      <Button
-        variant="danger"
-        onClick={() => removeTimeslot()}
-      >
-        Poista
-      </Button>
+    <Card
+      show={showInfoModal}
+      handleClose={closeTimeslotModal}
+      form={(
+        <RecurringTimeslotForm
+          id="recurring_timeslot_form"
+          timeslot={timeslot}
+          isBlocked={isBlocked}
+          draggedTimes={draggedTimes}
+          onSubmit={timeslot ? onModifySubmitHandler : onSubmitAddHandler}
+        />
       )}
-      <Button
-        form="recurring_timeslot_form"
-        type="submit"
-        variant="primary"
-      >
-        Tallenna
-      </Button>
-    </Card>
+      actionSheet={(
+        <ActionSheet handleClose={closeTimeslotModal}>
+          <Button
+            form="recurring_timeslot_form"
+            type="submit"
+            variant="primary"
+          >
+            Tallenna
+          </Button>
+          {timeslot && (
+            <Button
+              variant="danger"
+              onClick={() => removeTimeslot()}
+            >
+              Poista
+            </Button>
+          )}
+        </ActionSheet>
+      )}
+    />
   );
 }
 

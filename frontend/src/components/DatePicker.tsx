@@ -62,7 +62,7 @@ function DatePicker({
             onChange, onBlur, value,
           },
         }) => (
-          <div className="flex flex-col items-start flex-wrap">
+          <div className="flex flex-col items-start flex-wrap w-full">
             <ReactDatePicker
               className={`${fieldBaseClass} ${fieldStateClasses[state]} ${inputClassName}`}
               dateFormat={showTimeSelect ? 'dd.MM.yyyy HH:mm' : 'dd.MM.yyyy'}
