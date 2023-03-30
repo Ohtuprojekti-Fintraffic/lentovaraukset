@@ -144,11 +144,6 @@ const updateById = async (
   }
 
   // prevent from being able to move start to past
-  if (
-    slotHasMoved && isTimeInPast(timeslot.start)
-  ) {
-    throw new Error('Timeslot cannot be moved to the past');
-  }
 
   if (timeslot.type === 'available') {
     const oldReservations = await oldTimeslot.getReservations();
