@@ -80,7 +80,7 @@ const errorIfLeadsToConsecutivesOrOverlaps = async (
     });
   });
 
-  if (timeslotsInRanges.length > 0) {
+  if (timeslotsInRanges.filter((ts) => ts.type === timeslots[0].type).length > 0) {
     throw new Error('Operation would result in ovarlapping timeslots');
   }
 };
