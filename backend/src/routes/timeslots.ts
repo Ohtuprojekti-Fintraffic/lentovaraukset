@@ -1,5 +1,10 @@
 import express from 'express';
-import { createTimeSlotValidator, getTimeRangeValidator, createPeriodValidation } from '@lentovaraukset/shared/src/validation/validation';
+import {
+  createTimeSlotValidator,
+  getTimeRangeValidator,
+  createPeriodValidation,
+  createGroupUpdateValidator,
+} from '@lentovaraukset/shared/src/validation/validation';
 import timeslotService from '../services/timeslotService';
 import { errorIfNoAirfield } from '../util/middleware';
 
@@ -58,7 +63,6 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
     const { airfield } = req;
     const modifiedTimeslot = createTimeSlotValidator(airfield.eventGranularityMinutes, true)
       .parse(req.body);
-    // TODO: check if timeslot overlaps with existing timeslots
 
     const id = Number(req.params.id);
     if (req.body.periodEnd) {
@@ -69,6 +73,19 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
       await timeslotService.updateById(id, modifiedTimeslot);
       res.status(200).json(modifiedTimeslot);
     }
+  } catch (error: unknown) {
+    next(error);
+  }
+});
+
+router.put('/group/:group', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const airfield = await airfieldService.getAirfield('EGLL'); // TODO: get airfieldId from request
+    const { group } = req.params;
+    const updatedTimes = createGroupUpdateValidator(airfield.eventGranularityMinutes)
+      .parse(req.body);
+    const updatedTimeslots = await timeslotService.updateByGroup(group, updatedTimes);
+    res.json(updatedTimeslots);
   } catch (error: unknown) {
     next(error);
   }
