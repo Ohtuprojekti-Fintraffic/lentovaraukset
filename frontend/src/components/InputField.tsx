@@ -2,7 +2,7 @@ import React, {
   type MutableRefObject, useId, useRef,
 } from 'react';
 import type {
-  UseFormRegisterReturn, FieldErrors, Message, MultipleFieldErrors,
+  UseFormRegisterReturn, FieldErrors,
 } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
 
