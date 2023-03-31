@@ -5,7 +5,7 @@ import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef } from 'react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
-import { TimeslotType } from '@lentovaraukset/shared/src';
+import { TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
 import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
@@ -14,7 +14,7 @@ import {
   getReservations,
 } from '../queries/reservations';
 import {
-  getTimeSlots, modifyTimeSlot, deleteTimeslot,
+  getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup,
 } from '../queries/timeSlots';
 import { usePopupContext } from '../contexts/PopupContext';
 
@@ -42,7 +42,7 @@ function TimeSlotCalendar() {
           color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
           title: timeslot.type === 'available' ? 'Vapaa' : timeslot.info || 'Suljettu',
         };
-        return timeslot.group ? { ...timeslotEvent, groupId: timeslot.group } : timeslotEvent;
+        return timeslotEvent;
       });
       successCallback(timeslotsMapped);
     } catch (error) {
@@ -105,8 +105,8 @@ function TimeSlotCalendar() {
     showPopup({
       popupTitle: 'Varausikkunan Poisto',
       popupText: 'Haluatko varmasti poistaa varausikkunan?',
-      primaryText: 'Poista',
-      primaryOnClick: onConfirmRemove,
+      dangerText: 'Poista',
+      dangerOnClick: onConfirmRemove,
       secondaryText: 'Peruuta',
       secondaryOnClick: onCancelRemove,
     });
@@ -133,19 +133,68 @@ function TimeSlotCalendar() {
   };
 
   const modifyTimeslotFn = async (
-    event: {
-      id: string,
-      start: Date,
+    timeslot: EventImpl,
+    period?: {
       end: Date,
-      extendedProps: { type: TimeslotType, info: string | null },
+      periodName: string,
+      days: WeekInDays,
     },
   ) => {
-    await modifyTimeSlot({
-      ...event,
-      id: Number(event.id),
-      type: event.extendedProps.type,
-      info: event.extendedProps.info,
-    });
+    const start = timeslot.start ?? new Date();
+    const end = timeslot.end ?? new Date();
+    const modifyOneEvent = async () => {
+      await modifyTimeSlot(
+        {
+          start,
+          end,
+          id: Number(timeslot.id),
+          type: timeslot.extendedProps.type,
+          info: timeslot.extendedProps.info,
+        },
+        period
+          ? {
+            end: period.end,
+            name: period.periodName,
+            days: period.days,
+          }
+          : undefined,
+      );
+      closeTimeslotModalFn();
+      clearPopup();
+      calendarRef.current?.getApi().refetchEvents();
+    };
+
+    const modifyAllFutureEvents = async () => {
+      if (timeslot.extendedProps.group) {
+        const startingFrom = new Date(start);
+        startingFrom.setHours(0, 0, 0, 0);
+        await modifyGroup(timeslot.extendedProps.group, {
+          startingFrom,
+          startTimeOfDay: {
+            hours: start.getHours(), minutes: start.getMinutes(),
+          },
+          endTimeOfDay: {
+            hours: end.getHours(), minutes: end.getMinutes(),
+          },
+        });
+      }
+      closeTimeslotModalFn();
+      clearPopup();
+      calendarRef.current?.getApi().refetchEvents();
+    };
+
+    if (timeslot.extendedProps.group) {
+      showPopup({
+        popupTitle: 'Toistuvan varausikkunan muokkaus',
+        popupText: `Muokkasit toistuvaa varausikkuuna. Muokataanko myös kaikkia tulevia ryhmän '${timeslot.extendedProps.group}' varausikkunoita?`,
+        primaryText: 'Muokkaa kaikkia',
+        primaryOnClick: modifyAllFutureEvents,
+        secondaryText: 'Muokkaa vain tätä',
+        secondaryOnClick: modifyOneEvent,
+      });
+    } else {
+      await modifyOneEvent();
+    }
   };
 
   const handleToggle = () => {
@@ -165,6 +214,7 @@ function TimeSlotCalendar() {
         timeslot={selectedTimeslotRef?.current || undefined}
         draggedTimes={draggedTimesRef?.current || undefined}
         isBlocked={blocked}
+        modifyTimeslotFn={modifyTimeslotFn}
         removeTimeslot={() => {
           selectedTimeslotRef.current?.remove();
         }}

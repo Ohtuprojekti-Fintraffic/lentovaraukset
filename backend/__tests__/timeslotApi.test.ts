@@ -90,6 +90,49 @@ describe('Calls to api', () => {
     expect(createdTimeslot?.dataValues.info).toEqual('Under maintenance');
   });
 
+  test('creating blocked timeslot removes reservations on same time range', async () => {
+    const reservation: Reservation = await Reservation.create({
+      start: new Date('2023-02-16T12:00:00.000Z'),
+      end: new Date('2023-02-16T13:00:00.000Z'),
+      aircraftId: 'ESA-111',
+      phone: '0501102323',
+    });
+    await api.post('/api/timeslots/')
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T14:00:00.000Z'), type: 'blocked', info: 'Under maintenance',
+      });
+    const numberOfTimeslots: Number = await Timeslot.count();
+    const createdReservation: Reservation | null = await Reservation.findByPk(
+      reservation.dataValues.id,
+    );
+    expect(numberOfTimeslots).toEqual(timeslotData.length + 1);
+    expect(createdReservation).toEqual(null);
+  });
+
+  test('modifying blocked timeslot removes reservations on same time range', async () => {
+    const timeslot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T14:00:00.000Z'), type: 'blocked', info: 'Under maintenance',
+    });
+    const reservation: Reservation = await Reservation.create({
+      start: new Date('2023-02-16T12:00:00.000Z'),
+      end: new Date('2023-02-16T13:00:00.000Z'),
+      aircraftId: 'ESA-111',
+      phone: '0501102323',
+    });
+    await api.put(`/api/timeslots/${timeslot.dataValues.id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-16T10:00:00.000Z'), end: new Date('2023-02-16T16:00:00.000Z'), type: 'blocked', info: 'Under maintenance',
+      });
+    const numberOfTimeslots: Number = await Timeslot.count();
+    const createdReservation: Reservation | null = await Reservation.findByPk(
+      reservation.dataValues.id,
+    );
+    expect(numberOfTimeslots).toEqual(timeslotData.length + 1);
+    expect(createdReservation).toEqual(null);
+  });
+
   test('dont create a timeslot if all fields not provided', async () => {
     await api.post('/api/timeslots/')
       .set('Content-type', 'application/json')

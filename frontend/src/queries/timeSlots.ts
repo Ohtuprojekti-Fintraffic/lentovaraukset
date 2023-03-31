@@ -54,6 +54,21 @@ const deleteTimeslot = async (id: Number): Promise<string> => {
   return res.text();
 };
 
+const modifyGroup = async (group: string, updates: {
+  startingFrom: Date,
+  startTimeOfDay: { hours: number, minutes: number },
+  endTimeOfDay: { hours: number, minutes: number }
+}): Promise<void> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/timeslots/group/${group}`, {
+    method: 'PUT',
+    body: JSON.stringify(updates),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  errorIfNotOk(res);
+};
+
 export {
-  getTimeSlots, addTimeSlot, modifyTimeSlot, deleteTimeslot,
+  getTimeSlots, addTimeSlot, modifyTimeSlot, deleteTimeslot, modifyGroup,
 };

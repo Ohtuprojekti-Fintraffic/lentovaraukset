@@ -50,11 +50,13 @@ export interface RHFFieldProps extends Omit<FieldProps, 'registerReturn' | 'valu
   registerReturn: UseFormRegisterReturn<any>;
 }
 
-export const fieldBaseClass = 'border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
-                       + 'placeholder:text-ft-text-300 mb-4';
+export const fieldBaseClass = 'w-full border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
+  + 'placeholder:text-ft-text-300 mb-4';
+
+export const checkboxBaseClass = 'mb-4';
 
 export const fieldInvalidClass = 'invalid:bg-ft-warning-100 invalid:text-ft-warning-300'
-                            + 'invalid:border-ft-warning-300';
+  + 'invalid:border-ft-warning-300';
 
 export const fieldStateClasses = {
   default: 'border-ft-neutral-200',
@@ -86,11 +88,14 @@ function InputField({
   }, [error]);
 
   return (
-    <div className="flex flex-col items-start flex-wrap">
-      { labelText ? (
+    <div className={type === 'checkbox'
+      ? 'flex flex-row justify-start items-baseline gap-x-2'
+      : 'flex flex-col items-start flex-wrap gap-y-1'}
+    >
+      {labelText ? (
         <label
           htmlFor={id}
-          className={`font-ft-label mb-1 ${labelClassName}`}
+          className={`font-ft-label ${labelClassName}`}
         >
           {labelText}
         </label>
@@ -104,7 +109,9 @@ function InputField({
         name={name}
         disabled={state === 'disabled'}
         placeholder={placeholder}
-        className={`${fieldBaseClass} ${fieldStateClasses[state]} ${fieldInvalidClass} ${inputClassName}`}
+        className={type === 'checkbox'
+          ? `${checkboxBaseClass} ${fieldStateClasses[state]} ${fieldInvalidClass} ${inputClassName}`
+          : `${fieldBaseClass} ${fieldStateClasses[state]} ${fieldInvalidClass} ${inputClassName}`}
         defaultValue={defaultValue}
         step={step}
         min={min}

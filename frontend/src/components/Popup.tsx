@@ -5,6 +5,7 @@ import Button from './Button';
 // and shouldn't be a problem
 // eslint-disable-next-line import/no-cycle
 import { usePopupContext } from '../contexts/PopupContext';
+import ActionSheet from './ActionSheet';
 
 export interface PopupProps {
   popupTitle: string;
@@ -47,7 +48,7 @@ function Popup() {
 
   const popupClassName = 'fixed justify-center items-center flex overflow-x-hidden overflow-y-auto inset-0 z-50';
 
-  const popupContentClassName = 'relative w-auto shadow-ft-elevation-400 bg-white p-8 rounded-ft-large max-w-prose';
+  const popupContentClassName = 'relative flex flex-col space-y-6 w-auto shadow-ft-elevation-400 bg-white p-8 rounded-ft-large max-w-prose';
 
   return (
     <div
@@ -59,15 +60,13 @@ function Popup() {
           <h4 className="text-ft-hs4 text-black font-ft-heading mr-4">{ popupTitle }</h4>
           {crossOnClick && <Button variant="glyph" onClick={crossOnClick}><Cross strokeWidth="1.5" /></Button>}
         </div>
-        {popupText && <p className="text-ft-popup-message text-black font-ft-body mt-4">{ popupText }</p>}
-        <div className="flex flex-row items-center justify-between pt-8">
-          {dangerText && <Button variant="danger" className="justify-self-start mr-[88px] ml-0" onClick={dangerOnClick}>{dangerText}</Button>}
-          <div className="flex flex-row justify-end">
-            {tertiaryText && <Button variant="tertiary" onClick={tertiaryOnClick}>{tertiaryText}</Button>}
-            {secondaryText && <Button variant="secondary" onClick={secondaryOnClick}>{secondaryText}</Button>}
-            {primaryText && <Button variant="primary" onClick={primaryOnClick}>{primaryText}</Button>}
-          </div>
-        </div>
+        {popupText && <p className="text-ft-popup-message text-black font-ft-body">{ popupText }</p>}
+        <ActionSheet cancelButton={false}>
+          {dangerText ? <Button variant="danger" onClick={dangerOnClick}>{dangerText}</Button> : undefined}
+          {tertiaryText ? <Button variant="tertiary" onClick={tertiaryOnClick}>{tertiaryText}</Button> : undefined}
+          {secondaryText ? <Button variant="secondary" onClick={secondaryOnClick}>{secondaryText}</Button> : undefined}
+          {primaryText ? <Button variant="primary" onClick={primaryOnClick}>{primaryText}</Button> : undefined}
+        </ActionSheet>
       </div>
 
     </div>
