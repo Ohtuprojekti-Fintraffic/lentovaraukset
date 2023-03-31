@@ -31,11 +31,6 @@ export enum ServiceErrorCode {
   ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
 }
 
-export enum AirfieldformType {
-  Create,
-  Modify,
-}
-
 export interface WeekInDays {
   monday: boolean;
   tuesday: boolean;
