@@ -1,4 +1,4 @@
-import { AirfieldEntry, AirfieldEntryWithId } from '@lentovaraukset/shared/src';
+import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import { Airfield } from '../models';
 
 const getAirfield = async (code: string): Promise<AirfieldEntry> => {
@@ -22,7 +22,7 @@ const getAirfields = async (): Promise<AirfieldEntry[]> => {
 
 const updateById = async (
   code: string,
-  airfield: AirfieldEntry,
+  airfield: Omit<AirfieldEntry, 'code'>,
 ): Promise<AirfieldEntry> => {
   const [updatedAirfield] = await Airfield.upsert(
     { ...airfield, code },
@@ -31,7 +31,7 @@ const updateById = async (
 };
 
 const createAirfield = async (
-  newAirfield: AirfieldEntryWithId,
+  newAirfield: AirfieldEntry,
 ): Promise<AirfieldEntry> => {
   const airfield: Airfield = await Airfield.create(newAirfield);
   return airfield.dataValues;

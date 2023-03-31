@@ -1,7 +1,6 @@
 import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { airfieldValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import Button from '../Button';
 import InputField from '../InputField';
@@ -11,10 +10,11 @@ type FormProps = {
   title: string;
   airfield: AirfieldEntry | undefined;
   airfieldMutation: Function;
+  validator: any;
 };
 
 type Inputs = {
-  code: string;
+  code?: string;
   maxConcurrentFlights: number;
   name: string;
   eventGranularityMinutes: number;
@@ -25,11 +25,12 @@ function AirfieldForm({
   title,
   airfield,
   airfieldMutation,
+  validator,
 }: FormProps) {
   const {
     register, handleSubmit, formState: { errors },
   } = useForm<Inputs>({
-    resolver: zodResolver(airfieldValidator()),
+    resolver: zodResolver(validator),
     mode: 'all',
   });
 
