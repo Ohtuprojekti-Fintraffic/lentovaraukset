@@ -16,6 +16,7 @@ import { useAirfield } from '../queries/airfields';
 import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
 import { usePopupContext } from '../contexts/PopupContext';
+import Accordion from '../components/Accordion';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -170,6 +171,7 @@ function ReservationCalendar() {
 
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
+      <Accordion section="Section" sections={['Sub-section', 'Sub-section', 'Sub-section', 'Sub-section', 'Sub-section']} />
       <ReservationInfoModal
         showInfoModal={showInfoModal}
         reservation={selectedReservationRef?.current || undefined}
