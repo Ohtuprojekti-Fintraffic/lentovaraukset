@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X as Cross } from 'lucide-react';
 import Button from './Button';
 // Dependency cycle is just because of a type import
@@ -32,6 +32,14 @@ function Popup() {
   // or true and the component's props
   const { popupState } = usePopupContext();
 
+  const ref: React.LegacyRef<HTMLDialogElement> = useRef(null);
+
+  useEffect(() => {
+    ref.current?.showModal();
+    return () => ref.current?.close();
+  }, [popupState.isPopupShown]);
+
+  // cleans up destructuring later, otherwise not necessary
   if (!popupState.isPopupShown) {
     return null;
   }
@@ -46,14 +54,16 @@ function Popup() {
     primaryText, primaryOnClick,
   }: PopupProps = popupState.popupProps;
 
-  const popupClassName = 'fixed justify-center items-center flex overflow-x-hidden overflow-y-auto inset-0 z-50';
+  const popupClassName = 'p-0 fixed justify-center items-center flex overflow-x-hidden overflow-y-auto rounded-ft-large shadow-ft-elevation-400 '
+                       + 'backdrop:bg-transparent';
 
-  const popupContentClassName = 'relative flex flex-col space-y-6 w-auto shadow-ft-elevation-400 bg-white p-8 rounded-ft-large max-w-prose';
+  const popupContentClassName = 'flex flex-col space-y-6 w-auto bg-white p-8 max-w-prose';
 
   return (
-    <div
+    <dialog
       className={popupClassName}
-      role="dialog"
+      role="alertdialog"
+      ref={ref}
     >
       <div className={popupContentClassName}>
         <div className="flex flex-row items-center justify-between">
@@ -69,7 +79,7 @@ function Popup() {
         </ActionSheet>
       </div>
 
-    </div>
+    </dialog>
   );
 }
 

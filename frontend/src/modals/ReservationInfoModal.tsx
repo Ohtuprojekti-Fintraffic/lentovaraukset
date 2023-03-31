@@ -70,37 +70,42 @@ function ReservationInfoModal({
   };
 
   return (
-    <Card
-      show={showInfoModal}
-      handleClose={closeReservationModal}
-      form={(
-        <ReservationInfoForm
-          id="reservation_info_form"
-          reservation={reservation}
-          draggedTimes={draggedTimes}
-          onSubmit={reservation ? onSubmitModifyHandler : onSubmitAddHandler}
-        />
+    (
+      <Card
+        show={showInfoModal}
+        handleClose={closeReservationModal}
+        title={reservation
+          ? `Varaus #${reservation.id}`
+          : 'Uusi varaus'}
+        form={(
+          <ReservationInfoForm
+            id="reservation_info_form"
+            reservation={reservation}
+            draggedTimes={draggedTimes}
+            onSubmit={reservation ? onSubmitModifyHandler : onSubmitAddHandler}
+          />
       )}
-      actionSheet={(
-        <ActionSheet handleClose={closeReservationModal}>
-          <Button
-            form="reservation_info_form"
-            type="submit"
-            variant="primary"
-          >
-            Tallenna
-          </Button>
-          {reservation && (
+        actionSheet={(
+          <ActionSheet handleClose={closeReservationModal}>
+            <Button
+              form="reservation_info_form"
+              type="submit"
+              variant="primary"
+            >
+              Tallenna
+            </Button>
+            {reservation && (
             <Button
               variant="danger"
               onClick={() => removeReservation()}
             >
               Poista
             </Button>
-          )}
-        </ActionSheet>
+            )}
+          </ActionSheet>
       )}
-    />
+      />
+    )
   );
 }
 

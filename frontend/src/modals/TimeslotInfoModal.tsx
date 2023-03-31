@@ -94,6 +94,9 @@ function TimeslotInfoModal({
     <Card
       show={showInfoModal}
       handleClose={closeTimeslotModal}
+      title={timeslot
+        ? `Aikaikkuna #${timeslot.id}`
+        : 'Uusi aikaikkuna'}
       form={(
         <RecurringTimeslotForm
           id="recurring_timeslot_form"
