@@ -14,7 +14,7 @@ type FormProps = {
 };
 
 type Inputs = {
-  code?: string;
+  code: string;
   maxConcurrentFlights: number;
   name: string;
   eventGranularityMinutes: number;

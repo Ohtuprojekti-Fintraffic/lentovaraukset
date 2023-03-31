@@ -33,11 +33,6 @@ export enum ServiceErrorCode {
   RouteNotFound = 'RouteNotFound',
 }
 
-export enum AirfieldformType {
-  Create,
-  Modify,
-}
-
 export interface WeekInDays {
   monday: boolean;
   tuesday: boolean;
