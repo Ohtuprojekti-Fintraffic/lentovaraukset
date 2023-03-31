@@ -15,12 +15,12 @@ function Accordion({ defaultSection, sections, onChange }: AccordionProps) {
       <div
         role="button"
         tabIndex={0}
-        className="flex flex-row justify-between items-baseline border-b border-ft-neutral-200 p-4"
+        className="group flex flex-row justify-between items-baseline border-b border-ft-neutral-200 p-4"
         onClick={() => setIsActive(!isActive)}
         onKeyDown={(e) => e.key === 'Enter' && setIsActive(!isActive)}
       >
-        <Subheader className="font-ft-emphasis">{defaultSection}</Subheader>
-        <div className="place-self-end">{isActive ? '-' : '+'}</div>
+        <Subheader className="font-ft-emphasis group-hover:text-ft-text-300">{defaultSection}</Subheader>
+        <div className="place-self-end group-hover:text-ft-text-300">{isActive ? '-' : '+'}</div>
       </div>
 
       {isActive && Array.from(new Set(sections)).map((section) => ( // Sections must be unique
@@ -28,11 +28,11 @@ function Accordion({ defaultSection, sections, onChange }: AccordionProps) {
           key={section}
           role="button"
           tabIndex={0}
-          className="border-b border-ft-neutral-200 bg-ft-neutral-100 bg-opacity-20 p-4"
+          className="group border-b border-ft-neutral-200 bg-ft-neutral-100 bg-opacity-20 p-4"
           onClick={() => onChange(section)}
           onKeyDown={(e) => e.key === 'Enter' && onChange(section)}
         >
-          <Subheader>{section}</Subheader>
+          <Subheader className="group-hover:text-ft-text-300">{section}</Subheader>
         </div>
       ))}
     </div>
