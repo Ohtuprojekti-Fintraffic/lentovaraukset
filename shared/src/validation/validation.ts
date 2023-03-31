@@ -126,8 +126,9 @@ const airfieldValidator = (validateId: boolean = true) => {
     maxConcurrentFlights: z.coerce.number().min(1, { message: concurrentFlightsMessage }),
   });
 
-  const validateWithId = base.extend({code: z.string()
-    .refine((value) => regex.test(value), { message: idErrorMessage }),
+  const validateWithId = base.extend({
+    code: z.string()
+      .refine((value) => regex.test(value), { message: idErrorMessage }),
   });
 
   if (!validateId) return base;
