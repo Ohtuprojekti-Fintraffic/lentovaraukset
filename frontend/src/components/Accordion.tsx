@@ -1,25 +1,38 @@
 import React, { useState } from 'react';
+import Subheader from './Subheader';
 
 type AccordionProps = {
-  section: string,
+  defaultSection: string,
   sections: string[],
+  onChange: (section: string) => void ;
 };
 
-function Accordion({ section, sections }: AccordionProps) {
+function Accordion({ defaultSection, sections, onChange }: AccordionProps) {
   const [isActive, setIsActive] = useState(false);
-  const [selectedSection, setSelectedSection] = useState<string | null>(null);
 
   return (
-    <div className="flex flex-col max-w-md align-top text-ft-label text-ft-text-1000">
-      <div role="button" tabIndex={0} className="border-b border-ft-neutral-200 p-4" onClick={() => setIsActive(!isActive)} onKeyDown={() => setIsActive(!isActive)}>
-        <div className="flex flex-row justify-between items-baseline font-ft-emphasis ">
-          <div className="">{selectedSection ?? section}</div>
-          <div className="place-self-end">{isActive ? '-' : '+'}</div>
-        </div>
+    <div className="flex flex-col max-w-md align-top">
+      <div
+        role="button"
+        tabIndex={0}
+        className="flex flex-row justify-between items-baseline border-b border-ft-neutral-200 p-4"
+        onClick={() => setIsActive(!isActive)}
+        onKeyDown={(e) => e.key === 'Enter' && setIsActive(!isActive)}
+      >
+        <Subheader className="font-ft-emphasis">{defaultSection}</Subheader>
+        <div className="place-self-end">{isActive ? '-' : '+'}</div>
       </div>
-      {isActive && sections.map((item) => (
-        <div key={item} role="button" tabIndex={0} className="border-b border-ft-neutral-200 bg-ft-neutral-100 bg-opacity-20 font-ft-label p-4" onClick={() => setSelectedSection(item)} onKeyDown={() => setSelectedSection(item)}>
-          {item}
+
+      {isActive && Array.from(new Set(sections)).map((section) => ( // Sections must be unique
+        <div
+          key={section}
+          role="button"
+          tabIndex={0}
+          className="border-b border-ft-neutral-200 bg-ft-neutral-100 bg-opacity-20 p-4"
+          onClick={() => onChange(section)}
+          onKeyDown={(e) => e.key === 'Enter' && onChange(section)}
+        >
+          <Subheader>{section}</Subheader>
         </div>
       ))}
     </div>
