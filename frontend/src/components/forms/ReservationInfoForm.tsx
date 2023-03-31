@@ -102,8 +102,8 @@ function ReservationInfoForm({
               labelText="Varaus alkaa:"
               name="start"
               timeGranularityMinutes={reservationGranularity}
-              error={errors.start}
               showTimeSelect
+              error={errors.start}
             />
             <DatePicker
               control={control}
@@ -119,13 +119,13 @@ function ReservationInfoForm({
               labelText="Koneen rekisteritunnus:"
               type="text"
               registerReturn={register('aircraftId')}
-              error={errors.aircraftId}
+              errors={errors}
             />
             <InputField
               labelText="Puhelinnumero:"
               type="tel"
               registerReturn={register('phone')}
-              error={errors.phone}
+              errors={errors}
             />
           </div>
           <InputField
@@ -133,7 +133,7 @@ function ReservationInfoForm({
             type="text"
             registerReturn={register('info')}
             inputClassName="w-full"
-            error={errors.info}
+            errors={errors}
           />
         </form>
       </div>

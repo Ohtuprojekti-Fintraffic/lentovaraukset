@@ -185,16 +185,16 @@ function RecurringTimeslotForm({
               labelText="Aikaikkuna alkaa:"
               name="start"
               timeGranularityMinutes={timeslotGranularity}
-              error={errors.start}
               showTimeSelect
+              error={errors.start}
             />
             <DatePicker
               control={control}
               labelText="Aikaikkuna päättyy:"
               name="end"
               timeGranularityMinutes={timeslotGranularity}
-              error={errors.end}
               showTimeSelect
+              error={errors.end}
             />
           </div>
           {isBlocked && (
@@ -203,6 +203,7 @@ function RecurringTimeslotForm({
               type="text"
               registerReturn={register('info')}
               inputClassName="w-full"
+              errors={errors}
             />
           )}
           {timeslot && (
@@ -211,6 +212,7 @@ function RecurringTimeslotForm({
               labelText="Määritä toistuvuus"
               type="checkbox"
               registerReturn={register('isRecurring')}
+              errors={errors}
             />
             {showRecurring && (
               <div className="flex flex-row flex-wrap flex-start gap-x-6 gap-y-4 border-[1px] rounded-ft-normal p-4 border-ft-neutral-200 mb-4 overflow-x-auto">
@@ -222,6 +224,7 @@ function RecurringTimeslotForm({
                       type="checkbox"
                       registerReturn={register(`days.${day}` as keyof Inputs)}
                       inputClassName="mb-0"
+                      errors={errors}
                     />
                   ),
                 )}
@@ -242,6 +245,7 @@ function RecurringTimeslotForm({
               type="text"
               registerReturn={register('periodName')}
               inputClassName="w-full"
+              errors={errors}
             />
             )}
           </div>

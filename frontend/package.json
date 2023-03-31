@@ -17,6 +17,7 @@
     "@fullcalendar/react": "^6.1.0",
     "@fullcalendar/timegrid": "^6.1.0",
     "@headlessui/react": "^1.7.7",
+    "@hookform/error-message": "^2.0.1",
     "@lentovaraukset/shared": "1.0.0",
     "core-js": "^3.27.1",
     "lucide-react": "^0.115.0",

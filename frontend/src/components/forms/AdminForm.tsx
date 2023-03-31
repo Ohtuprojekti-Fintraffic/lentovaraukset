@@ -16,7 +16,7 @@ type Inputs = {
 
 function AdminForm({ title }: FormProps) {
   const {
-    register, handleSubmit,
+    register, handleSubmit, formState: { errors },
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => {
@@ -37,6 +37,7 @@ function AdminForm({ title }: FormProps) {
             defaultValue="0"
             min={0}
             step={1}
+            errors={errors}
           />
           <InputField
             labelText="Kuinka monta päivää tulevaisuuteen varauksen voi tehdä:"
@@ -47,6 +48,7 @@ function AdminForm({ title }: FormProps) {
             defaultValue="7"
             min={1}
             step={1}
+            errors={errors}
           />
           <InputField
             labelText="Varausikkunan minimikoko minuutteina:"
@@ -57,6 +59,7 @@ function AdminForm({ title }: FormProps) {
             defaultValue="20"
             step={10}
             min={10}
+            errors={errors}
           />
           <InputField
             labelText="Samanaikaisten varausten maksimimäärä:"
@@ -67,6 +70,7 @@ function AdminForm({ title }: FormProps) {
             defaultValue="1"
             step={1}
             min={1}
+            errors={errors}
           />
           <Button type="submit" variant="primary">Tallenna</Button>
         </form>
