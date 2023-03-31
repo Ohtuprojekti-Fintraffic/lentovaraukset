@@ -4,19 +4,19 @@ import configurationService from '../services/configurationService';
 
 const router = express.Router();
 
-router.get('/latest', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.get('/1', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const configuration = await configurationService.getLatestConfiguration();
+    const configuration = await configurationService.getById(1);
     res.json(configuration);
   } catch (error: unknown) {
     next(error);
   }
 });
 
-router.post('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.put('/1', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const validatedConfiguration = configurationValidator().parse(req.body);
-    const configuration = await configurationService.createConfiguration(validatedConfiguration);
+    const configuration = await configurationService.updateById(1, validatedConfiguration);
     res.json(configuration);
   } catch (error: unknown) {
     next(error);

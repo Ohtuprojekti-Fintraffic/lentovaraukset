@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
 import Button from '../Button';
 import InputField from '../InputField';
-import { createConfigurationMutation } from '../../queries/configurations';
+import { updateConfigurationMutation } from '../../queries/configurations';
 
 type FormProps = {
   title: string;
@@ -26,7 +26,7 @@ function AdminForm({ title, configuration }: FormProps) {
     mode: 'all',
   });
 
-  const configurationMutator = createConfigurationMutation();
+  const configurationMutator = updateConfigurationMutation();
 
   const onSubmit: SubmitHandler<Inputs> = (data: Omit<Inputs, 'id'>) => {
     configurationMutator.mutate(data);

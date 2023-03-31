@@ -1,22 +1,22 @@
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
 import { Configuration } from '../models';
 
-const getLatestConfiguration = async (): Promise<ConfigurationEntry> => {
-  const configuration = await Configuration.findOne({
-    order: [['createdAt', 'DESC']],
-  });
+const getById = async (id: number): Promise<ConfigurationEntry> => {
+  const configuration = await Configuration.findByPk(id);
   if (!configuration) throw new Error('Configuration not found');
   return configuration.dataValues;
 };
 
-const createConfiguration = async (
+const updateById = async (
+  id: number,
   newConfiguration: Omit<ConfigurationEntry, 'id' >,
 ): Promise<ConfigurationEntry> => {
-  const configuration: Configuration = await Configuration.create(newConfiguration);
+  const [configuration]: [Configuration, boolean | null] = await Configuration
+    .upsert({ ...newConfiguration, id });
   return configuration.dataValues;
 };
 
 export default {
-  createConfiguration,
-  getLatestConfiguration,
+  getById,
+  updateById,
 };

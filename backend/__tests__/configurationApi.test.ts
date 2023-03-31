@@ -7,10 +7,7 @@ const api = request(app);
 
 const configurations = [
   {
-    daysToStart: 1, maxDaysInFuture: 7, createdAt: new Date('2023-02-12T08:00:00.000Z'), updatedAt: new Date('2023-02-12T08:00:00.000Z'),
-  },
-  {
-    daysToStart: 0, maxDaysInFuture: 6, createdAt: new Date('2023-02-12T09:00:00.000Z'), updatedAt: new Date('2023-02-12T09:00:00.000Z'),
+    id: 1, daysToStart: 1, maxDaysInFuture: 7, createdAt: new Date('2023-02-12T08:00:00.000Z'), updatedAt: new Date('2023-02-12T08:00:00.000Z'),
   },
 ];
 
@@ -30,26 +27,26 @@ afterAll(async () => {
 });
 
 describe('Calls to api', () => {
-  test('can create a configuration', async () => {
-    const res = await api.post('/api/configurations/')
+  test('can update a configuration', async () => {
+    const res = await api.put('/api/configurations/1')
       .set('Content-type', 'application/json')
       .send({
         daysToStart: 2, maxDaysInFuture: 5,
       });
 
     const createdConfiguration: Configuration | null = await Configuration.findOne(
-      { where: { daysToStart: 2 } },
+      { where: { id: 1 } },
     );
     const numberOfConfigurations: Number = await Configuration.count();
 
     expect(res.status).toEqual(200);
-    expect(numberOfConfigurations).toEqual(configurations.length + 1);
+    expect(numberOfConfigurations).toEqual(configurations.length);
     expect(createdConfiguration).not.toEqual(null);
     expect(createdConfiguration?.dataValues.maxDaysInFuture).toEqual(5);
   });
 
-  test('do not create configurations if fields empty', async () => {
-    const res = await api.post('/api/configurations/')
+  test('do not update configuration if fields empty', async () => {
+    const res = await api.put('/api/configurations/1')
       .set('Content-type', 'application/json')
       .send();
 
@@ -60,12 +57,12 @@ describe('Calls to api', () => {
     expect(numberOfConfigurations).toEqual(configurations.length);
   });
 
-  test('can get latest configuration', async () => {
-    const res = await api.get('/api/configurations/latest');
+  test('can get configuration', async () => {
+    const res = await api.get('/api/configurations/1');
 
     expect(res.status).toEqual(200);
-    expect(res.body.daysToStart).toEqual(0);
-    expect(res.body.maxDaysInFuture).toEqual(6);
-    expect(res.body.createdAt).toEqual('2023-02-12T09:00:00.000Z');
+    expect(res.body.daysToStart).toEqual(1);
+    expect(res.body.maxDaysInFuture).toEqual(7);
+    expect(res.body.createdAt).toEqual('2023-02-12T08:00:00.000Z');
   });
 });
