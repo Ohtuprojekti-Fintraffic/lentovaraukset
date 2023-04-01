@@ -13,6 +13,7 @@ import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast, isTimeAtMostInFuture, isTimeFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
 import AlertContext from '../contexts/AlertContext';
+import Tag from './Tag';
 
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>
@@ -228,6 +229,32 @@ function Calendar({
       eventColor={eventColors?.eventColor || '#000000'}
       eventTextColor={eventColors?.textColor || '#000000'}
       eventClick={handleEventClick}
+      // eslint-disable-next-line react/no-unstable-nested-components
+      eventContent={(arg) => arg.event.extendedProps?.aircraftId
+        && (
+        <div>
+          {/* this eslint formatting is so bad it's actually funny */}
+          <p>
+            {arg.event.start?.getHours()}
+            :
+            {arg.event.start?.getMinutes()}
+            {' '}
+            -
+            {' '}
+            {arg.event.end?.getHours()}
+            :
+            {arg.event.end?.getMinutes()}
+          </p>
+          <Tag
+            styleName="id"
+            bgColorClassName="bg-ft-neutral-100"
+            textColorClassName="text-ft-text-600"
+          >
+            {arg.event.extendedProps?.aircraftId}
+          </Tag>
+
+        </div>
+        )}
       eventChange={handleEventChange}
       eventRemove={handleEventRemove}
       select={handleEventCreate}
