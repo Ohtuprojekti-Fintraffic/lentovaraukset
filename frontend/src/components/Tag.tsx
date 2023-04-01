@@ -15,12 +15,12 @@ interface IdProps extends Omit<TagProps, 'styleName' | 'textColorClassName'> {
 function Tag({
   children, styleName, bgColorClassName, textColorClassName,
 }: TagProps | IdProps) {
-  const baseClassName = 'px-[8px] py-[3.5px] rounded-ft-normal max-w-fit';
+  const baseClassName = 'px-[8px] py-[3.5px] rounded-ft-normal';
   const idTagClassName = `font-mono font-ft-emphasis text-ft-id ${bgColorClassName} ${textColorClassName}`;
   const badgeTagClassName = 'font-sans font-ft-emphasis text-ft-tag text-white';
 
   const className = styleName === 'id' ? idTagClassName : badgeTagClassName;
-  return <p className={`${baseClassName} ${className}`}>{children}</p>;
+  return <span className={`${baseClassName} ${className}`}>{children}</span>;
 }
 
 export default Tag;
