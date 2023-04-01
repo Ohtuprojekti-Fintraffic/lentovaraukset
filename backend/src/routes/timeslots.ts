@@ -81,9 +81,8 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
 router.put('/group/:group', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     errorIfNoAirfield(req);
+    const { airfield, params: { group } } = req;
 
-    const { airfield } = req; // TODO: get airfieldId from request
-    const { group } = req.params;
     const updatedTimes = createGroupUpdateValidator(airfield.eventGranularityMinutes)
       .parse(req.body);
     const updatedTimeslots = await timeslotService.updateByGroup(group, updatedTimes);
