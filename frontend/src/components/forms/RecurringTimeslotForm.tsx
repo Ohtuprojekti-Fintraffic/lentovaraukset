@@ -50,10 +50,12 @@ function RecurringTimeslotForm({
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
+  // this should probably be asserted to be defined
+  // if the airfield isn't available where are we creating timeslots?
+  const { data: airfield } = useAirfield('EFHK');
   const [reservations, setReservations] = useState<ReservationEntry[]>([]);
   const [formWarning, setFormWarning] = useState<string | undefined>(undefined);
   const { showPopup, clearPopup } = usePopupContext();
-  const { data: airfield } = useAirfield('EGLL');
   const timeslotGranularity = airfield?.eventGranularityMinutes || 20;
   const start = timeslot?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
   const end = timeslot?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';

@@ -33,6 +33,8 @@ export interface AirfieldEntryWithId extends AirfieldEntry {
 
 export enum ServiceErrorCode {
   ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
+  InvalidAirfield = 'InvalidAirfield',
+  RouteNotFound = 'RouteNotFound',
 }
 
 export interface WeekInDays {
