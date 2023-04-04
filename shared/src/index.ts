@@ -29,6 +29,8 @@ export interface AirfieldEntry {
 
 export enum ServiceErrorCode {
   ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
+  InvalidAirfield = 'InvalidAirfield',
+  RouteNotFound = 'RouteNotFound',
 }
 
 export interface WeekInDays {
