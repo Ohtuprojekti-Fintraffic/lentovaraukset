@@ -25,7 +25,7 @@ function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { showPopup, clearPopup } = usePopupContext();
-  const { data: airfield } = useAirfield('EGLL'); // TODO: get id from airfield selection
+  const { data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
   const { data: configuration } = useConfiguration();
   const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
