@@ -72,8 +72,8 @@ const errorIfLeadsToConsecutivesOrOverlaps = async (
     timeslotsInRanges.forEach((otherTimeslot) => {
       if (
         timeslot.type === otherTimeslot.type
-        && (timeslot.start === otherTimeslot.end
-        || timeslot.end === otherTimeslot.start)
+        && (timeslot.start.getTime() === otherTimeslot.end.getTime()
+        || timeslot.end.getTime() === otherTimeslot.start.getTime())
       ) {
         throw new Error('Operation would result in consecutive timeslots');
       }

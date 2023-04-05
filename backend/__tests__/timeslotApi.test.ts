@@ -483,7 +483,7 @@ describe('Calls to api', () => {
   });
 
   test('can create a period', async () => {
-    const response = await api.post('/api/timeslots/')
+    const response = await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-18T12:00:00.000Z'),
@@ -528,7 +528,7 @@ describe('Calls to api', () => {
       info: null,
     });
 
-    const response = await api.post('/api/timeslots/')
+    const response = await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-18T11:00:00.000Z'),
@@ -548,7 +548,7 @@ describe('Calls to api', () => {
       });
 
     expect(response.status).toBe(500);
-    expect(response.body.error.message).toEqual("Timeslot can't be consecutive with another");
+    expect(response.body.error.message).toEqual('Operation would result in consecutive timeslots');
   });
 
   test('cannot update timeslot to make it consecutive', async () => {
@@ -569,7 +569,7 @@ describe('Calls to api', () => {
 
     const updatedStart = new Date('2023-02-19T10:00:00.000Z');
     const updatedEnd = new Date('2023-02-19T12:00:00.000Z');
-    const response = await api.put(`/api/timeslots/${timeslot1.id}`)
+    const response = await api.put(`/api/EFHK/timeslots/${timeslot1.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: updatedStart,
@@ -579,7 +579,7 @@ describe('Calls to api', () => {
       });
 
     expect(response.status).toEqual(500);
-    expect(response.body.error.message).toEqual("Timeslot can't be consecutive");
+    expect(response.body.error.message).toEqual('Operation would result in consecutive timeslots');
 
     const updatedTimeslot1 = await Timeslot.findByPk(timeslot1.id);
     expect(updatedTimeslot1?.start).toEqual(timeslot1.start);
@@ -591,7 +591,7 @@ describe('Calls to api', () => {
 
     const updatedStart = new Date('2023-02-19T08:00:00.000Z');
     const updatedEnd = new Date('2023-02-19T10:00:00.000Z');
-    const response = await api.put(`/api/timeslots/${nonExistentTimeslotId}`)
+    const response = await api.put(`/api/EFHK/timeslots/${nonExistentTimeslotId}`)
       .set('Content-type', 'application/json')
       .send({
         start: updatedStart,
@@ -614,7 +614,7 @@ describe('Calls to api', () => {
 
     const updatedStart = new Date('2023-01-20T12:00:00.000Z');
     const updatedEnd = new Date('2023-01-20T14:00:00.000Z');
-    const response = await api.put(`/api/timeslots/${timeslot.id}`)
+    const response = await api.put(`/api/EFHK/timeslots/${timeslot.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: updatedStart,
@@ -650,7 +650,7 @@ describe('Calls to api', () => {
     await timeslot.addReservations([reservation]);
 
     const updatedStart = new Date('2023-02-21T12:40:00.000Z');
-    const response = await api.put(`/api/timeslots/${timeslot.id}`)
+    const response = await api.put(`/api/EFHK/timeslots/${timeslot.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: updatedStart,
@@ -676,7 +676,7 @@ describe('Calls to api', () => {
     });
 
     const periodEnd = new Date('2023-03-21T16:00:00.000Z');
-    const response = await api.put(`/api/timeslots/${timeslot.id}`)
+    const response = await api.put(`/api/EFHK/timeslots/${timeslot.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: timeslot.start,
@@ -710,12 +710,12 @@ describe('Calls to api', () => {
       info: null,
     };
 
-    const response = await api.post('/api/timeslots/')
+    const response = await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send(consecutiveTimeslot);
 
     expect(response.status).toEqual(500);
-    expect(response.body.error.message).toEqual('Timeslot can\'t be consecutive');
+    expect(response.body.error.message).toEqual('Operation would result in consecutive timeslots');
 
     const createdTimeslot = await Timeslot.findOne({ where: { start: consecutiveTimeslot.start } });
     expect(createdTimeslot).toBeNull();
@@ -730,7 +730,7 @@ describe('Calls to api', () => {
   //     info: null,
   //   });
 
-  //   const response = await api.post('/api/timeslots/')
+  //   const response = await api.post('/api/EFHK/timeslots/')
   //     .set('Content-type', 'application/json')
   //     .send({
   //       start: new Date('2023-02-15T08:00:00.000Z'),

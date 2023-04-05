@@ -494,7 +494,7 @@ describe('Calls to api', () => {
       phone: '0402222222',
     };
 
-    const response = await api.put(`/api/reservations/${id}`)
+    const response = await api.put(`/api/EFHK/reservations/${id}`)
       .set('Content-type', 'application/json')
       .send(updatedReservationData)
       .expect(500);
@@ -517,7 +517,7 @@ describe('Calls to api', () => {
       phone: '11104040',
     };
 
-    const response = await api.post('/api/reservations/')
+    const response = await api.post('/api/EFHK/reservations/')
       .set('Content-type', 'application/json')
       .send(newReservationData)
       .expect(500);
@@ -546,7 +546,7 @@ describe('Calls to api', () => {
       },
     ]);
 
-    const response = await api.post('/api/reservations/')
+    const response = await api.post('/api/EFHK/reservations/')
       .set('Content-type', 'application/json')
       .send(newReservation);
 
@@ -576,7 +576,7 @@ describe('Calls to api', () => {
     expect(oldReservationInDB).toBeDefined();
 
     const id = oldReservationInDB?.dataValues.id;
-    const response = await api.put(`/api/reservations/${id}`)
+    const response = await api.put(`/api/EFHK/reservations/${id}`)
       .set('Content-type', 'application/json')
       .send(newReservationData)
       .expect(500);
@@ -615,7 +615,7 @@ describe('Calls to api', () => {
       phone: '11104040',
     };
 
-    const response = await api.put(`/api/reservations/${createdReservation.id}`)
+    const response = await api.put(`/api/EFHK/reservations/${createdReservation.id}`)
       .set('Content-type', 'application/json')
       .send(updatedReservationData)
       .expect(500);
@@ -655,7 +655,7 @@ describe('Calls to api', () => {
       phone: '11104040',
     };
 
-    await api.put(`/api/reservations/${createdReservation.id}`)
+    await api.put(`/api/EFHK/reservations/${createdReservation.id}`)
       .set('Content-type', 'application/json')
       .send(updatedReservationData)
       .expect(200);
