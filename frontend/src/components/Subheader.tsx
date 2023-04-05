@@ -1,0 +1,17 @@
+import React from 'react';
+
+interface SubheaderProps {
+  children: string;
+  className?: string;
+}
+const subheaderBaseClass = 'font-sans text-ft-text-1000 text-left text-top leading-[137.5%]';
+
+function Subheader({ children, className }: SubheaderProps) {
+  return (
+    <h2 className={`${subheaderBaseClass} ${className}`}>
+      {children}
+    </h2>
+  );
+}
+
+export default Subheader;

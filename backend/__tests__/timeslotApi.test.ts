@@ -52,7 +52,7 @@ afterAll(async () => {
 });
 describe('Calls to api', () => {
   test('can create an available timeslot', async () => {
-    await api.post('/api/timeslots/')
+    await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-18T12:00:00.000Z'), end: new Date('2023-02-18T14:00:00.000Z'), type: 'available', info: null,
@@ -71,7 +71,7 @@ describe('Calls to api', () => {
   });
 
   test('can create a blocked timeslot', async () => {
-    await api.post('/api/timeslots/')
+    await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-18T12:00:00.000Z'), end: new Date('2023-02-18T14:00:00.000Z'), type: 'blocked', info: 'Under maintenance',
@@ -97,7 +97,7 @@ describe('Calls to api', () => {
       aircraftId: 'ESA-111',
       phone: '0501102323',
     });
-    await api.post('/api/timeslots/')
+    await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T14:00:00.000Z'), type: 'blocked', info: 'Under maintenance',
@@ -120,7 +120,7 @@ describe('Calls to api', () => {
       aircraftId: 'ESA-111',
       phone: '0501102323',
     });
-    await api.put(`/api/timeslots/${timeslot.dataValues.id}`)
+    await api.put(`/api/EFHK/timeslots/${timeslot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-16T10:00:00.000Z'), end: new Date('2023-02-16T16:00:00.000Z'), type: 'blocked', info: 'Under maintenance',
@@ -134,7 +134,7 @@ describe('Calls to api', () => {
   });
 
   test('dont create a timeslot if all fields not provided', async () => {
-    await api.post('/api/timeslots/')
+    await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({ start: '2023-02-18T12:00:00.000Z', type: 'available', info: null });
 
@@ -148,7 +148,7 @@ describe('Calls to api', () => {
   });
 
   test('dont create a timeslot if type is not available or blocked', async () => {
-    await api.post('/api/timeslots/')
+    await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
         start: '2023-02-18T12:00:00.000Z', end: new Date('2023-02-18T14:00:00.000Z'), type: 'error', info: null,
@@ -164,7 +164,7 @@ describe('Calls to api', () => {
   });
 
   test('dont create a timeslot if granularity is wrong', async () => {
-    await api.post('/api/timeslots/')
+    await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-18T12:00:00.000Z'), end: new Date('2023-02-18T12:15:00.000Z'), type: 'available', info: null,
@@ -180,7 +180,7 @@ describe('Calls to api', () => {
   });
 
   test('dont create a timeslot if provided times are empty', async () => {
-    await api.post('/api/timeslots/')
+    await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
         start: '', end: '', type: 'available', info: null,
@@ -194,7 +194,7 @@ describe('Calls to api', () => {
   test('can edit an available timeslot', async () => {
     const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
 
-    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: '2023-02-17T12:00:00.000Z', end: '2023-02-17T14:00:00.000Z', type: 'available', info: null,
@@ -217,7 +217,7 @@ describe('Calls to api', () => {
       info: null,
     });
 
-    const res = await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+    const res = await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({
         ...createdSlot.dataValues, end: '2023-02-13T20:00:00.000Z',
@@ -243,7 +243,7 @@ describe('Calls to api', () => {
       info: null,
     });
 
-    const res = await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+    const res = await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({
         ...createdSlot.dataValues, start: '2023-02-13T09:00:00.000Z',
@@ -263,7 +263,7 @@ describe('Calls to api', () => {
   test('can edit a blocked timeslot', async () => {
     const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'blocked' });
 
-    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: '2023-02-17T12:00:00.000Z', end: '2023-02-17T14:00:00.000Z', type: 'blocked', info: null,
@@ -288,7 +288,7 @@ describe('Calls to api', () => {
     });
     createdSlot.addReservations([newReservation]);
 
-    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T14:00:00.000Z', type: 'available', info: null,
@@ -306,7 +306,7 @@ describe('Calls to api', () => {
   test('dont edit a timeslot if all fields not provided', async () => {
     const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
 
-    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({ start: '2023-02-17T12:00:00.000Z' });
 
@@ -322,7 +322,7 @@ describe('Calls to api', () => {
   test('dont edit a timeslot if granularity is wrong', async () => {
     const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
 
-    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-17T12:00:00.000Z'), end: new Date('2023-02-17T13:15:00.000Z'), type: 'available', info: null,
@@ -340,7 +340,7 @@ describe('Calls to api', () => {
   test('dont edit a timeslot if type is not available or blocked', async () => {
     const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
 
-    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: '2023-02-17T12:00:00.000Z', end: new Date('2023-02-17T13:15:00.000Z'), type: 'error', info: null,
@@ -365,7 +365,7 @@ describe('Calls to api', () => {
     });
     createdSlot.addReservations([newReservation]);
 
-    await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+    await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({ start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T13:00:00.000Z', type: 'available' });
 
@@ -381,7 +381,7 @@ describe('Calls to api', () => {
   test('dont edit a timeslot if it is in past', async () => {
     const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), type: 'available' });
 
-    const response = await api.put(`/api/timeslots/${createdSlot.dataValues.id}`)
+    const response = await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: '2023-02-16T12:00:00.000Z', end: '2023-02-16T13:00:00.000Z', type: 'available', info: null,
@@ -397,7 +397,7 @@ describe('Calls to api', () => {
 
   test('can delete a timeslot', async () => {
     const createdSlot: Timeslot | null = await Timeslot.findOne({});
-    await api.delete(`/api/timeslots/${createdSlot?.dataValues.id}`);
+    await api.delete(`/api/EFHK/timeslots/${createdSlot?.dataValues.id}`);
 
     const deletedSlot: Timeslot | null = await Timeslot.findByPk(createdSlot?.dataValues.id);
     const numberOfTimeslots: Number = await Timeslot.count();
@@ -407,7 +407,7 @@ describe('Calls to api', () => {
   });
 
   test('dont delete a timeslot if it doesnt exist', async () => {
-    await api.delete('/api/timeslots/-1');
+    await api.delete('/api/EFHK/timeslots/-1');
 
     const numberOfTimeslots: Number = await Timeslot.count();
 
@@ -421,7 +421,7 @@ describe('Calls to api', () => {
       type: 'available',
     });
 
-    await api.delete(`/api/timeslots/${newTimeslot.id}`);
+    await api.delete(`/api/EFHK/timeslots/${newTimeslot.id}`);
 
     expect(await Timeslot.count()).toEqual(timeslotData.length + 1);
   });
@@ -436,7 +436,7 @@ describe('Calls to api', () => {
     });
     await createdSlot?.addReservations([newReservation]);
 
-    await api.delete(`/api/timeslots/${createdSlot?.id}`);
+    await api.delete(`/api/EFHK/timeslots/${createdSlot?.id}`);
 
     const deletedSlot = await Timeslot.findByPk(createdSlot?.id);
     const numberOfTimeslots: Number = await Timeslot.count();
@@ -447,7 +447,7 @@ describe('Calls to api', () => {
   test('can get timeslots in a range', async () => {
     const from = new Date(timeslotDataBegin);
     const until = new Date(timeslotDataEnd);
-    const response = await api.get(`/api/timeslots?from=${from.toISOString()}&until=${until.toISOString()}`);
+    const response = await api.get(`/api/EFHK/timeslots?from=${from.toISOString()}&until=${until.toISOString()}`);
     const timeslots = response.body;
     const startTimes = timeslots.map((o: { start: String; }) => o.start);
 
@@ -460,7 +460,7 @@ describe('Calls to api', () => {
     const until = new Date(timeslotDataEnd);
     from.setDate(until.getDate() + 1);
     until.setDate(until.getDate() + 2);
-    const response = await api.get(`/api/timeslots?from=${from.toISOString()}&until=${until.toISOString()}`);
+    const response = await api.get(`/api/EFHK/timeslots?from=${from.toISOString()}&until=${until.toISOString()}`);
 
     expect(response.body).toEqual([]);
   });
@@ -469,7 +469,7 @@ describe('Calls to api', () => {
     const start = new Date('2023-02-24T08:00:00.000Z');
     const end = new Date('2023-02-24T06:00:00.000Z');
 
-    const newTimeslot: any = await api.post('/api/timeslots/').set('Content-type', 'application/json').send({
+    const newTimeslot: any = await api.post('/api/EFHK/timeslots/').set('Content-type', 'application/json').send({
       start, end, type: 'available', info: null,
     });
 
@@ -477,7 +477,7 @@ describe('Calls to api', () => {
     expect(newTimeslot.body.error.message).toContain('start time cannot be later than the end time');
 
     const response = await api
-      .get(`/api/timeslots?from=${start.toISOString()}&until=${end.toISOString()}`);
+      .get(`/api/EFHK/timeslots?from=${start.toISOString()}&until=${end.toISOString()}`);
 
     expect(response.body).toHaveLength(0);
   });

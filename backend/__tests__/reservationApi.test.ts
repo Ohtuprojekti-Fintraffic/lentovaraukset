@@ -71,7 +71,7 @@ afterAll(async () => {
 
 describe('Calls to api', () => {
   test('can add a reservation with info', async () => {
-    const newReservation: any = await api.post('/api/reservations/')
+    const newReservation: any = await api.post('/api/EFHK/reservations/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
@@ -90,7 +90,7 @@ describe('Calls to api', () => {
   });
 
   test('can add a reservation without info', async () => {
-    const newReservation: any = await api.post('/api/reservations/')
+    const newReservation: any = await api.post('/api/EFHK/reservations/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-QAA', phone: '11104040',
@@ -109,7 +109,7 @@ describe('Calls to api', () => {
   });
 
   test('cannot create a reservation with empty phone number', async () => {
-    const result: any = await api.post('/api/reservations/')
+    const result: any = await api.post('/api/EFHK/reservations/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: ' ',
@@ -120,7 +120,7 @@ describe('Calls to api', () => {
   });
 
   test('cannot create a reservation with empty aircraft ID', async () => {
-    const result: any = await api.post('/api/reservations/')
+    const result: any = await api.post('/api/EFHK/reservations/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: ' ', info: 'Training flight', phone: '11104040',
@@ -136,7 +136,7 @@ describe('Calls to api', () => {
       end: new Date('2023-02-12T16:00:00.000Z'),
       type: 'blocked',
     });
-    const result: any = await api.post('/api/reservations/')
+    const result: any = await api.post('/api/EFHK/reservations/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
@@ -148,7 +148,7 @@ describe('Calls to api', () => {
   test('can delete a reservation', async () => {
     const createdReservation: Reservation | null = await Reservation.findOne();
     const id = createdReservation?.dataValues.id;
-    await api.delete(`/api/reservations/${id}`);
+    await api.delete(`/api/EFHK/reservations/${id}`);
 
     const deletedReservation: Reservation | null = await Reservation.findByPk(id);
     expect(deletedReservation).toBe(null);
@@ -158,7 +158,7 @@ describe('Calls to api', () => {
   });
 
   test('can\'t delete a reservation when it doesn\'t exists', async () => {
-    await api.delete('/api/reservations/-1');
+    await api.delete('/api/EFHK/reservations/-1');
     expect(await Reservation.count()).toEqual(reservations.length);
   });
 
@@ -170,7 +170,7 @@ describe('Calls to api', () => {
       phone: '11104040',
     });
 
-    await api.delete(`/api/reservations/${newReservation.id}`);
+    await api.delete(`/api/EFHK/reservations/${newReservation.id}`);
 
     expect(await Reservation.count()).toEqual(reservations.length + 1);
   });
@@ -180,7 +180,7 @@ describe('Calls to api', () => {
     const id = createdReservation?.dataValues.id;
     const aircraftId = createdReservation?.dataValues.aircraftId;
     const phone = createdReservation?.dataValues.phone;
-    await api.put(`/api/reservations/${id}`)
+    await api.put(`/api/EFHK/reservations/${id}`)
       .set('Content-type', 'application/json')
       .send({
         start: '2023-02-14T02:00:00.000Z', end: '2023-02-14T16:00:00.000Z', aircraftId, phone,
@@ -199,7 +199,7 @@ describe('Calls to api', () => {
     const createdReservation: Reservation | null = await Reservation.findOne();
     const id = createdReservation?.dataValues.id;
 
-    const updatedReservation: any = await api.put(`/api/reservations/${id}`)
+    const updatedReservation: any = await api.put(`/api/EFHK/reservations/${id}`)
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: ' ',
@@ -220,7 +220,7 @@ describe('Calls to api', () => {
       end: new Date('2023-02-12T16:00:00.000Z'),
       type: 'blocked',
     });
-    const result: any = await api.put(`/api/reservations/${id}`)
+    const result: any = await api.put(`/api/EFHK/reservations/${id}`)
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
@@ -233,7 +233,7 @@ describe('Calls to api', () => {
     const createdReservation: Reservation | null = await Reservation.findOne();
     const id = createdReservation?.dataValues.id;
 
-    const updatedReservation: any = await api.put(`/api/reservations/${id}`)
+    const updatedReservation: any = await api.put(`/api/EFHK/reservations/${id}`)
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: ' ', info: 'Training flight', phone: '11104040',
@@ -246,6 +246,25 @@ describe('Calls to api', () => {
     expect(reservationAfterUpdate?.dataValues.aircraftId).not.toEqual('');
   });
 
+  test('can get reservations in a range', async () => {
+    const from = new Date(earliestReservation.end);
+    const until = new Date(latestReservation.end);
+
+    from.setHours(from.getHours() + 1);
+    const response = await api
+      .get(`/api/EFHK/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
+
+    expect(response.body.length).toEqual(2);
+    expect(response.body).toMatchObject([reservations[1], reservations[2]].map(
+    // API response has dates as strings not date objects
+      ({ start, end, ...rest }) => ({
+        start: start.toISOString(),
+        end: end.toISOString(),
+        ...rest,
+      }),
+    ));
+  });
+
   test('return an empty list if no reservation in range', async () => {
     const from = new Date(earliestReservation.start);
     const until = new Date(latestReservation.end);
@@ -254,7 +273,7 @@ describe('Calls to api', () => {
     until.setDate(until.getDate() + 2);
 
     const response = await api
-      .get(`/api/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
+      .get(`/api/EFHK/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
     expect(response.body).toEqual([]);
   });
 
@@ -262,14 +281,14 @@ describe('Calls to api', () => {
     const start = new Date('2023-02-13T06:00:00.000Z');
     const end = new Date('2023-02-13T08:00:00.000Z');
 
-    const newReservation: any = await api.post('/api/reservations/')
+    const newReservation: any = await api.post('/api/EFHK/reservations/')
       .set('Content-type', 'application/json')
       .send({
         start, end, aircraftId: 'OH-QAA', phone: '11104040',
       });
 
     const response = await api
-      .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
+      .get(`/api/EFHK/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
 
     expect(newReservation.status).toEqual(400);
     expect(response.body).toHaveLength(0);
@@ -282,7 +301,7 @@ describe('Calls to api', () => {
       aircraftId: 'OH-QAA',
       phone: '11104040',
     });
-    const response = await api.put(`/api/reservations/${newReservation.id}`)
+    const response = await api.put(`/api/EFHK/reservations/${newReservation.id}`)
       .set('Content-type', 'application/json')
       .send({
         start: '2023-02-15T02:00:00.000Z',
@@ -303,7 +322,7 @@ describe('Calls to api', () => {
     const start = new Date('2023-02-24T06:00:00.000Z');
     const end = new Date('2023-02-24T08:00:00.000Z');
 
-    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+    const newReservation: any = await api.post('/api/EFHK/reservations/').set('Content-type', 'application/json').send({
       start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
     });
 
@@ -311,7 +330,7 @@ describe('Calls to api', () => {
     expect(newReservation.body.error.message).toContain('Voit tehdä varauksen korkeintaan');
 
     const response = await api
-      .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
+      .get(`/api/EFHK/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
 
     expect(response.body).toHaveLength(0);
   });
@@ -320,7 +339,7 @@ describe('Calls to api', () => {
     const start = new Date('2023-02-24T08:00:00.000Z');
     const end = new Date('2023-02-24T06:00:00.000Z');
 
-    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+    const newReservation: any = await api.post('/api/EFHK/reservations/').set('Content-type', 'application/json').send({
       start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
     });
 
@@ -328,13 +347,13 @@ describe('Calls to api', () => {
     expect(newReservation.body.error.message).toContain('Varauksen alkuaika ei voi olla myöhempi kuin loppuaika');
 
     const response = await api
-      .get(`/api/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
+      .get(`/api/EFHK/reservations?from=${start.toISOString()}&until=${end.toISOString()}`);
 
     expect(response.body).toHaveLength(0);
   });
 
   test('Reservation has to be within a timeslot upon creation', async () => {
-    await api.post('/api/timeslots/')
+    await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-16T08:00:00.000Z'), end: new Date('2023-02-16T18:00:00.000Z'), type: 'available', info: null,
@@ -343,7 +362,7 @@ describe('Calls to api', () => {
     const start = new Date('2023-02-16T07:00:00.000Z');
     const end = new Date('2023-02-16T09:00:00.000Z');
 
-    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+    const newReservation: any = await api.post('/api/EFHK/reservations/').set('Content-type', 'application/json').send({
       start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
     });
 
@@ -355,23 +374,25 @@ describe('Calls to api', () => {
   });
 
   test('Reservation has to be within a timeslot when modified', async () => {
-    await api.post('/api/timeslots/')
+    const tsRes = await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
         start: new Date('2023-02-16T08:00:00.000Z'), end: new Date('2023-02-16T18:00:00.000Z'), type: 'available', info: null,
       });
 
+    expect(tsRes.body.error).not.toBeDefined();
+
     const start = new Date('2023-02-16T08:00:00.000Z');
     const newStart = new Date('2023-02-16T07:00:00.000Z');
     const end = new Date('2023-02-16T09:00:00.000Z');
 
-    const newReservation: any = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+    const newReservation: any = await api.post('/api/EFHK/reservations/').set('Content-type', 'application/json').send({
       start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
     });
 
     expect(newReservation.body.error).not.toBeDefined();
 
-    const modifiedReservation: any = await api.put(`/api/reservations/${newReservation.id}`).set('Content-type', 'application/json').send({
+    const modifiedReservation: any = await api.put(`/api/EFHK/reservations/${newReservation.id}`).set('Content-type', 'application/json').send({
       ...newReservation.body, start: newStart, info: undefined,
       // TODO: fix weirdness with interacting with API where null isnt undefined
     });
@@ -386,7 +407,7 @@ describe('Calls to api', () => {
     const start = new Date('2023-02-14T12:00:00.000Z');
     const end = new Date('2023-02-14T14:00:00.000Z');
 
-    const res = await Promise.all([...Array(3)].map(async () => api.post('/api/reservations/').set('Content-type', 'application/json').send({
+    const res = await Promise.all([...Array(3)].map(async () => api.post('/api/EFHK/reservations/').set('Content-type', 'application/json').send({
       start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
     })));
 
@@ -400,11 +421,11 @@ describe('Calls to api', () => {
     const start = new Date('2023-02-14T12:00:00.000Z');
     const end = new Date('2023-02-14T14:00:00.000Z');
 
-    await Promise.all([...Array(3)].map(async () => api.post('/api/reservations/').set('Content-type', 'application/json').send({
+    await Promise.all([...Array(3)].map(async () => api.post('/api/EFHK/reservations/').set('Content-type', 'application/json').send({
       start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
     })));
 
-    const res = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+    const res = await api.post('/api/EFHK/reservations/').set('Content-type', 'application/json').send({
       start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
     });
 
@@ -427,9 +448,9 @@ describe('Calls to api', () => {
       {
         start: new Date('2023-02-14T13:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-DFG', phone: '+358494678748',
       },
-    ].map(async (flight) => api.post('/api/reservations/').set('Content-type', 'application/json').send(flight)));
+    ].map(async (flight) => api.post('/api/EFHK/reservations/').set('Content-type', 'application/json').send(flight)));
 
-    const res = await api.post('/api/reservations/').set('Content-type', 'application/json').send({
+    const res = await api.post('/api/EFHK/reservations/').set('Content-type', 'application/json').send({
       start: new Date('2023-02-14T12:00:00.000Z'), end: new Date('2023-02-14T14:00:00.000Z'), aircraftId: 'OH-FGH', phone: '+358494678748',
     });
 

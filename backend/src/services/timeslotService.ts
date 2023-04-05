@@ -4,50 +4,85 @@ import reservationService from '@lentovaraukset/backend/src/services/reservation
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import { Timeslot } from '../models';
 
-const getInTimeRange = async (
-  rangeStartTime: Date,
-  rangeEndTime: Date,
-  id: number | null = null,
+const getInTimeRanges = async (
+  ranges: {
+    rangeStartTime: Date,
+    rangeEndTime: Date,
+    id: number | null,
+  }[],
 ): Promise<Timeslot[]> => {
   const timeslots: Timeslot[] = await Timeslot.findAll({
     where: {
-      [Op.and]: [
-        {
-          start: {
-            [Op.lt]: rangeEndTime,
-          },
-          end: {
-            [Op.gt]: rangeStartTime,
-          },
-        },
-        id
-          ? {
-            id: {
-              [Op.ne]: id,
+      [Op.or]: ranges.map((range) => ({
+        [Op.and]: [
+          {
+            start: {
+              [Op.lt]: range.rangeEndTime,
             },
-          }
-          : {},
-      ],
+            end: {
+              [Op.gt]: range.rangeStartTime,
+            },
+          },
+          range.id
+            ? {
+              id: {
+                [Op.ne]: range.id,
+              },
+            }
+            : {},
+        ],
+      })),
     },
   });
   return timeslots;
 };
 
-const timeslotsAreConsecutive = async (
-  timeslot: { start: Date, end: Date, type: TimeslotType },
+const getInTimeRange = async (
+  rangeStartTime: Date,
+  rangeEndTime: Date,
   id: number | null = null,
-): Promise<boolean> => {
-  const { start, end, type } = timeslot;
-  const newStart = new Date(start);
-  const newEnd = new Date(end);
-  newStart.setMinutes(newStart.getMinutes() - 1);
-  newEnd.setMinutes(newEnd.getMinutes() + 1);
-  if (id) {
-    const consecutiveTimeslots = await getInTimeRange(newStart, newEnd, id);
-    return consecutiveTimeslots.filter((t) => t.type === type).length > 0;
+): Promise<Timeslot[]> => {
+  const timeslots: Timeslot[] = await getInTimeRanges([{
+    rangeStartTime,
+    rangeEndTime,
+    id,
+  }]);
+  return timeslots;
+};
+
+type TimeslotEntryOptionalId = Partial<TimeslotEntry> & Omit<TimeslotEntry, 'id'>;
+const errorIfLeadsToConsecutivesOrOverlaps = async (
+  timeslots: TimeslotEntryOptionalId[],
+): Promise<void> => {
+  const timeslotsInRanges = await getInTimeRanges(
+    timeslots.map((t) => {
+      const newStart = new Date(t.start);
+      const newEnd = new Date(t.end);
+      newStart.setMinutes(newStart.getMinutes() - 1);
+      newEnd.setMinutes(newEnd.getMinutes() + 1);
+      return {
+        rangeStartTime: newStart,
+        rangeEndTime: newEnd,
+        id: t.id ?? null,
+      };
+    }),
+  );
+
+  timeslots.forEach((timeslot) => {
+    timeslotsInRanges.forEach((otherTimeslot) => {
+      if (
+        timeslot.type === otherTimeslot.type
+        && (timeslot.start === otherTimeslot.end
+        || timeslot.end === otherTimeslot.start)
+      ) {
+        throw new Error('Operation would result in consecutive timeslots');
+      }
+    });
+  });
+
+  if (timeslotsInRanges.filter((ts) => ts.type === timeslots[0].type).length > 0) {
+    throw new Error('Operation would result in ovarlapping timeslots');
   }
-  const consecutiveTimeslots = await getInTimeRange(newStart, newEnd);
-  return consecutiveTimeslots.filter((t) => t.type === type).length > 0;
 };
 
 const deleteById = async (id: number) => {
@@ -74,7 +109,7 @@ const createPeriod = async (
   const dayInMillis = 24 * 60 * 60 * 1000;
   const weekdays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-  const timeslotGroup: { start: Date, end: Date, type: TimeslotType, info: string | null }[] = [];
+  const timeslotGroup: Omit<TimeslotEntry, 'id'>[] = [];
   const {
     start,
     end,
@@ -93,23 +128,14 @@ const createPeriod = async (
         end: endTime,
         type,
         info,
+        group: period.name,
       });
     }
     currentDate.setTime(currentDate.getTime() + dayInMillis);
   }
 
-  const consecutivesFound = await Promise.all(
-    timeslotGroup.map((ts) => timeslotsAreConsecutive(ts)),
-  );
-  if (consecutivesFound.some((found) => found)) {
-    throw new Error("Timeslot can't be consecutive with another");
-  }
-  const overlaps = await Promise.all(
-    timeslotGroup.map((ts) => getInTimeRange(ts.start, ts.end)),
-  );
-  if (overlaps.some((foundSlots) => foundSlots.length > 0)) {
-    throw new Error('Period already has a timeslot');
-  }
+  await errorIfLeadsToConsecutivesOrOverlaps(timeslotGroup);
+
   const firstTimeslot: Timeslot | null = await Timeslot.findByPk(id);
   if (firstTimeslot) {
     firstTimeslot.group = period.name;
@@ -124,10 +150,8 @@ const updateById = async (
   id: number,
   timeslot: { start: Date, end: Date, type: TimeslotType, info: string | null },
 ): Promise<void> => {
-  if (await timeslotsAreConsecutive(timeslot, id)) {
-    throw new Error('Timeslot can\'t be consecutive');
-  }
   const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
+  await errorIfLeadsToConsecutivesOrOverlaps([{ ...timeslot, id }]);
 
   if (oldTimeslot === null) {
     throw new Error('No timeslot with id exists');
@@ -170,9 +194,8 @@ const createTimeslot = async (newTimeSlot: {
   type: TimeslotType;
   info: string | null;
 }): Promise<TimeslotEntry> => {
-  if (await timeslotsAreConsecutive(newTimeSlot)) {
-    throw new Error('Timeslot can\'t be consecutive');
-  }
+  await errorIfLeadsToConsecutivesOrOverlaps([newTimeSlot]);
+
   const timeslot: Timeslot = await Timeslot.create(newTimeSlot);
   const reservations = await reservationService
     .getInTimeRange(newTimeSlot.start, newTimeSlot.end);
@@ -184,10 +207,32 @@ const createTimeslot = async (newTimeSlot: {
   return timeslot.dataValues;
 };
 
+const updateByGroup = async (group: string, updates: {
+  startingFrom: Date;
+  startTimeOfDay: { hours: number, minutes: number };
+  endTimeOfDay: { hours: number, minutes: number };
+}): Promise<TimeslotEntry[]> => {
+  const timeslots = await Timeslot.findAll({
+    where: { group, start: { [Op.gte]: updates.startingFrom } },
+  });
+
+  const editedTimeslots = timeslots.map(({ dataValues: timeslot }) => {
+    timeslot.start.setHours(updates.startTimeOfDay.hours, updates.startTimeOfDay.minutes);
+    timeslot.end.setHours(updates.endTimeOfDay.hours, updates.endTimeOfDay.minutes);
+    return timeslot;
+  });
+
+  await errorIfLeadsToConsecutivesOrOverlaps(editedTimeslots);
+
+  const updatedTimeslots = await Timeslot.bulkCreate(editedTimeslots, { updateOnDuplicate: ['start', 'end'] });
+  return updatedTimeslots.map((ts) => ts.dataValues);
+};
+
 export default {
   getInTimeRange,
   deleteById,
   updateById,
   createTimeslot,
   createPeriod,
+  updateByGroup,
 };
