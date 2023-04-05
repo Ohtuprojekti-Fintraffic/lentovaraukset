@@ -58,7 +58,7 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
       throw new Error('Too many concurrent reservations');
     }
 
-    const reservation = await reservationService.createReservation(newReservation);
+    const reservation = await reservationService.createReservation(airfield.code, newReservation);
     res.json(reservation);
   } catch (error: unknown) {
     next(error);
@@ -84,7 +84,11 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
     }
 
     // TODO: get maxDaysInFuture from airfield
-    const modifiedReservation = await reservationService.updateById(id, validReservationUpdate);
+    const modifiedReservation = await reservationService.updateById(
+      airfield.code,
+      id,
+      validReservationUpdate,
+    );
     res.status(200).json(modifiedReservation);
   } catch (error: unknown) {
     next(error);

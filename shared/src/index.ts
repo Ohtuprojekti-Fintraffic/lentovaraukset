@@ -18,6 +18,7 @@ export interface TimeslotEntry {
   type: TimeslotType;
   group?: string | null;
   info: string | null;
+  airfieldCode: string;
 }
 
 export interface AirfieldEntry {
