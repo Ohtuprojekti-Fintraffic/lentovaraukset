@@ -116,7 +116,7 @@ const airfieldValidator = (validateId: boolean = true) => {
   const concurrentFlightsMessage = 'Concurrent flights must be minimum 1';
   const multipleErrorMessage = 'Time must be multiple of 10';
   const idErrorMessage = 'Id must be ICAO airport code';
-  const regex = /[A-Z]{4}$/;
+  const regex = /^[A-Z]{4}$/;
 
   const base = z.object({
     name: z.string().min(1, { message: nameEmptyErrorMessage }),
