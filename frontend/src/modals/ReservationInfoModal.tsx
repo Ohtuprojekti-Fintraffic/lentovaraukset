@@ -14,14 +14,12 @@ type InfoModalProps = {
   closeReservationModal: () => void
   reservation?: EventImpl
   draggedTimes?: { start: Date, end: Date }
-  removeReservation: () => void
 };
 
 function ReservationInfoModal({
   showInfoModal,
   closeReservationModal,
   reservation, draggedTimes,
-  removeReservation,
 }: InfoModalProps) {
   const { addNewAlert } = useContext(AlertContext);
 
@@ -69,11 +67,13 @@ function ReservationInfoModal({
     closeReservationModal();
   };
 
+  if (!showInfoModal) {
+    return null;
+  }
+
   return (
     (
       <Card
-        show={showInfoModal}
-        handleClose={closeReservationModal}
         title={reservation
           ? `Varaus #${reservation.id}`
           : 'Uusi varaus'}
@@ -97,7 +97,10 @@ function ReservationInfoModal({
             {reservation && (
             <Button
               variant="danger"
-              onClick={() => removeReservation()}
+              // This doesn't work: onClick={reservation.remove}
+              // Fullcalendar might be using a context or something
+              // that only works in React?
+              onClick={() => reservation.remove()}
             >
               Poista
             </Button>

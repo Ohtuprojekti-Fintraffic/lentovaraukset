@@ -2,28 +2,20 @@ import React, { ReactElement, useEffect, useRef } from 'react';
 import { ActionSheetProps } from './ActionSheet';
 
 type CardProps = {
-  show: boolean,
   title: string,
   form: React.ReactNode
   actionSheet?: ReactElement<ActionSheetProps>
-  handleClose: () => void,
 };
 
 function Card({
-  show,
   title, form, actionSheet,
-  handleClose,
 }: CardProps) {
   const ref: React.LegacyRef<HTMLDialogElement> = useRef(null);
 
   useEffect(() => {
-    if (show) {
-      ref.current?.showModal();
-    } else {
-      ref.current?.close();
-      handleClose();
-    }
-  }, [show]);
+    ref.current?.showModal();
+    return () => ref.current?.close();
+  }, []);
 
   return (
     <dialog
