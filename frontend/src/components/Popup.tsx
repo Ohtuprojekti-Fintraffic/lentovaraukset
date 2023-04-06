@@ -35,6 +35,13 @@ function Popup() {
   const ref: React.LegacyRef<HTMLDialogElement> = useRef(null);
 
   useEffect(() => {
+    // popups might not always be cancelable so disable the esc dialog cancel
+    ref.current?.addEventListener('cancel', (event) => {
+      event.preventDefault();
+    });
+  });
+
+  useEffect(() => {
     ref.current?.showModal();
     return () => ref.current?.close();
   }, [popupState.isPopupShown]);
