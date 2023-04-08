@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import {
   ReservationEntry, TimeslotEntry, TimeslotType, WeekInDays,
 } from '@lentovaraukset/shared/src';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createTimeSlotValidatorObject, refineTimeslotObject } from '@lentovaraukset/shared/src/validation/validation';
 import { usePopupContext } from '../../contexts/PopupContext';
 import InputField from '../InputField';
 import DatePicker from '../DatePicker';
@@ -81,6 +83,17 @@ function RecurringTimeslotForm({
         sunnuntai: true,
       },
     },
+    // TODO: Use Airfield context here from issue #256
+    // for now using default EFHK values
+    // TODO: issue #242 could also remove the need to omit type
+    resolver: zodResolver(
+      refineTimeslotObject(
+        createTimeSlotValidatorObject(20) // create object validation
+          .omit({ type: true }), // remove type
+        // add periods are not validated
+      ), // refine the object which confirms start < end
+    ),
+    mode: 'all',
   });
 
   const removesReservations = (type: TimeslotType) => type === 'blocked' && reservations.length > 0;
@@ -135,12 +148,11 @@ function RecurringTimeslotForm({
     reset();
   }, [timeslot]);
 
-  // step is relative to min: https://stackoverflow.com/a/75353708
-  // round up to nearest even whatever minutes
-
-  // important detail: the browser GUI doesn't give a damn and will show
-  // whatever minutes it wants, but at least Chrome checks the field on submit
-  // and shows a popover with the nearest acceptable divisible values
+  useEffect(() => {
+    // field '' is added to allow access to zod errors not related to a specific field
+    setFormWarning((errors as FieldErrors<Inputs & { general?: string }>).general?.message);
+    console.log(errors);
+  }, [errors]);
 
   const showRecurring = watch('isRecurring');
 
@@ -188,7 +200,7 @@ function RecurringTimeslotForm({
               name="start"
               timeGranularityMinutes={timeslotGranularity}
               showTimeSelect
-              error={errors.start}
+              errors={errors}
             />
             <DatePicker
               control={control}
@@ -196,7 +208,7 @@ function RecurringTimeslotForm({
               name="end"
               timeGranularityMinutes={timeslotGranularity}
               showTimeSelect
-              error={errors.end}
+              errors={errors}
             />
           </div>
           {isBlocked && (
@@ -238,7 +250,7 @@ function RecurringTimeslotForm({
                 labelText="Päättyy:"
                 name="periodEnds"
                 timeGranularityMinutes={timeslotGranularity}
-                error={errors.periodEnds}
+                errors={errors}
               />
             )}
             {showRecurring && (

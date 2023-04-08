@@ -16,16 +16,15 @@ const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => {
   return time <= max;
 };
 
-const createTimeSlotValidator = (
+const createTimeSlotValidatorObject = (
   slotGranularityMinutes: number,
   ignoreStartInPast: boolean = false,
 ) => {
   // Time must be a multiple of ${slotGranularityMinutes} minutes
   const minuteMultipleMessage = `Ajan tulee olla jokin ${slotGranularityMinutes} minuutin moninkerta`;
   const pastErrorMessage = 'Timeslot cannot be in past';
-  const startNotLessThanEndErrorMessage = 'Timeslot start time cannot be later than the end time';
 
-  const TimeSlot = z.object({
+  return z.object({
     start: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
@@ -36,10 +35,21 @@ const createTimeSlotValidator = (
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
     type: z.enum(['available', 'blocked']),
     info: z.string().nullable(),
-  }).refine((res) => res.start < res.end, { message: startNotLessThanEndErrorMessage });
-
-  return TimeSlot;
+  });
 };
+
+const refineTimeslotObject = (tsValidationObject: z.AnyZodObject) => {
+  const startNotLessThanEndErrorMessage = 'Timeslot start time cannot be later than the end time';
+  return tsValidationObject.refine((res) => res.start < res.end, {
+    message: startNotLessThanEndErrorMessage,
+    path: ['general'],
+  });
+};
+
+const createTimeSlotValidator = (
+  slotGranularityMinutes: number,
+  ignoreStartInPast: boolean = false,
+) => refineTimeslotObject(createTimeSlotValidatorObject(slotGranularityMinutes, ignoreStartInPast));
 
 const daysValidation = z.object({
   monday: z.coerce.boolean(),
@@ -91,7 +101,10 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
     info: z.string().optional(),
     phone: z.string().trim().min(1, { message: phoneNumberEmptyErrorMessage }),
   })
-    .refine((res) => res.start < res.end, { message: startNotLessThanEndErrorMessage });
+    .refine((res) => res.start < res.end, {
+      message: startNotLessThanEndErrorMessage,
+      path: ['general'],
+    });
 
   return Reservation;
 };
@@ -150,6 +163,8 @@ const createGroupUpdateValidator = (slotGranularityMinutes: number) => {
 
 export {
   createGroupUpdateValidator,
+  createTimeSlotValidatorObject,
+  refineTimeslotObject,
   createTimeSlotValidator,
   createReservationValidator,
   reservationIsWithinTimeslot,
