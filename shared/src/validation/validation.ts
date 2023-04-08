@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z, type ZodTypeAny } from 'zod';
 import { ReservationEntry, TimeslotEntry } from '..';
 
 const minutesToMilliseconds = (minutes: number) => minutes * 1000 * 60;
@@ -38,13 +38,13 @@ const createTimeSlotValidatorObject = (
   });
 };
 
-const refineTimeslotObject = (tsValidationObject: z.AnyZodObject) => {
+function refineTimeslotObject<T extends ZodTypeAny>(tsValidationObject: T) {
   const startNotLessThanEndErrorMessage = 'Timeslot start time cannot be later than the end time';
   return tsValidationObject.refine((res) => res.start < res.end, {
     message: startNotLessThanEndErrorMessage,
     path: ['general'],
   });
-};
+}
 
 const createTimeSlotValidator = (
   slotGranularityMinutes: number,
