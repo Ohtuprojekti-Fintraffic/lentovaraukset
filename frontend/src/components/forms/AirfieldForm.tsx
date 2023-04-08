@@ -30,6 +30,7 @@ function AirfieldForm({
   const {
     register, handleSubmit, formState: { errors },
   } = useForm<Inputs>({
+    defaultValues: airfield,
     resolver: zodResolver(validator),
     mode: 'all',
   });
@@ -51,7 +52,6 @@ function AirfieldForm({
             labelText="Id:"
             type="string"
             registerReturn={register('code')}
-            defaultValue={airfield?.code}
             errors={errors}
           />
           )}
@@ -59,7 +59,6 @@ function AirfieldForm({
             labelText="Nimi:"
             type="string"
             registerReturn={register('name')}
-            defaultValue={airfield?.name}
             errors={errors}
           />
           <InputField
@@ -68,7 +67,6 @@ function AirfieldForm({
             registerReturn={register('eventGranularityMinutes', {
               valueAsNumber: true,
             })}
-            defaultValue={airfield?.eventGranularityMinutes.toString()}
             step={10}
             min={10}
             errors={errors}
@@ -79,7 +77,6 @@ function AirfieldForm({
             registerReturn={register('maxConcurrentFlights', {
               valueAsNumber: true,
             })}
-            defaultValue={airfield?.maxConcurrentFlights.toString()}
             step={1}
             min={1}
             errors={errors}

@@ -17,7 +17,16 @@ type Inputs = {
 function AdminForm({ title }: FormProps) {
   const {
     register, handleSubmit, formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<Inputs>({
+    defaultValues: {
+      daysBeforeStart: 0,
+      maxDaysInFuture: 7,
+      eventGranularityMinutes: 20,
+      maxConcurrentFlights: 1,
+    },
+    mode: 'all',
+    // resolver: ,
+  });
 
   const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => {
     console.log(data);
@@ -34,7 +43,6 @@ function AdminForm({ title }: FormProps) {
             registerReturn={register('daysBeforeStart', {
               valueAsNumber: true,
             })}
-            defaultValue="0"
             min={0}
             step={1}
             errors={errors}
@@ -45,7 +53,6 @@ function AdminForm({ title }: FormProps) {
             registerReturn={register('maxDaysInFuture', {
               valueAsNumber: true,
             })}
-            defaultValue="7"
             min={1}
             step={1}
             errors={errors}
@@ -56,7 +63,6 @@ function AdminForm({ title }: FormProps) {
             registerReturn={register('eventGranularityMinutes', {
               valueAsNumber: true,
             })}
-            defaultValue="20"
             step={10}
             min={10}
             errors={errors}
@@ -67,7 +73,6 @@ function AdminForm({ title }: FormProps) {
             registerReturn={register('maxConcurrentFlights', {
               valueAsNumber: true,
             })}
-            defaultValue="1"
             step={1}
             min={1}
             errors={errors}
