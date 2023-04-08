@@ -30,7 +30,11 @@ function AirfieldForm({
   const {
     register, handleSubmit, formState: { errors },
   } = useForm<Inputs>({
-    defaultValues: airfield,
+    defaultValues: airfield || {
+      code: 'EF',
+      eventGranularityMinutes: 20,
+      maxConcurrentFlights: 1,
+    },
     resolver: zodResolver(validator),
     mode: 'all',
   });
@@ -49,7 +53,7 @@ function AirfieldForm({
         <form className="flex flex-col w-full" onSubmit={handleSubmit(onSubmit)}>
           {showIdField && (
           <InputField
-            labelText="Id:"
+            labelText="ICAO-tunnus:"
             type="string"
             registerReturn={register('code')}
             errors={errors}
