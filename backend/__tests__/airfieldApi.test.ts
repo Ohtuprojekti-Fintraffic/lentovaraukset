@@ -79,4 +79,30 @@ describe('Calls to api', () => {
     expect(res.body.error.message).toContain('already exists');
     expect(numberOfAirfields).toEqual(airfields.length);
   });
+
+  test('dont create an airfield if code too short', async () => {
+    const res = await api.post('/api/airfields/')
+      .set('Content-type', 'application/json')
+      .send({
+        code: 'EFH', name: 'Malmi', maxConcurrentFlights: 2, eventGranularityMinutes: 20,
+      });
+
+    const numberOfAirfields: Number = await Airfield.count();
+
+    expect(res.body.error.message).toContain('must be ICAO airport code');
+    expect(numberOfAirfields).toEqual(airfields.length);
+  });
+
+  test('dont create an airfield if code too long', async () => {
+    const res = await api.post('/api/airfields/')
+      .set('Content-type', 'application/json')
+      .send({
+        code: 'EFHKK', name: 'Malmi', maxConcurrentFlights: 2, eventGranularityMinutes: 20,
+      });
+
+    const numberOfAirfields: Number = await Airfield.count();
+
+    expect(res.body.error.message).toContain('must be ICAO airport code');
+    expect(numberOfAirfields).toEqual(airfields.length);
+  });
 });
