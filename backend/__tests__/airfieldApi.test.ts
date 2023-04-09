@@ -135,21 +135,4 @@ describe('Calls to api', () => {
     expect(res.body.error.message).toContain('Time must be multiple of 10');
     expect(originalAirfield).toMatchObject(airfields[0]);
   });
-
-  test('when Airfield id is not specified test', async () => {
-    const airfieldDataWithoutCode = {
-      name: 'Missing Code Airport',
-      maxConcurrentFlights: 2,
-      eventGranularityMinutes: 20,
-    };
-    const res = await api.post('/api/airfields/')
-      .set('Content-type', 'application/json')
-      .send(airfieldDataWithoutCode);
-
-    const numberOfAirfields = await Airfield.count();
-
-    expect(res.status).toEqual(500);
-    expect(res.body.error.message).toContain('Airfield id not specified');
-    expect(numberOfAirfields).toEqual(airfields.length);
-  });
 });
