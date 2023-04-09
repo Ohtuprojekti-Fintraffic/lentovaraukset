@@ -167,8 +167,6 @@ const updateById = async (
     throw new Error('Timeslot in past cannot be modified');
   }
 
-  // prevent from being able to move start to past
-
   if (timeslot.type === 'available') {
     const oldReservations = await oldTimeslot.getReservations();
     const newReservations = oldReservations.filter(
