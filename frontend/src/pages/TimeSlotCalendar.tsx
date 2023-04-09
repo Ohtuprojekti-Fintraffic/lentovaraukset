@@ -18,6 +18,11 @@ import {
 } from '../queries/timeSlots';
 import { usePopupContext } from '../contexts/PopupContext';
 
+type StartEndPair = {
+  start: Date;
+  end: Date;
+};
+
 function TimeSlotCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
   const { data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
@@ -70,22 +75,26 @@ function TimeSlotCalendar() {
 
   const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
 
-  const showTimeslotModalFn = (event: EventImpl | null) => {
+  // either or neither, but not both
+  function showTimeslotModalFn(event: EventImpl, times: StartEndPair): never;
+  function showTimeslotModalFn(event: EventImpl | null, times: StartEndPair | null): void;
+  function showTimeslotModalFn(
+    event: EventImpl | null,
+    times: StartEndPair | null,
+  ): void {
     selectedTimeslotRef.current = event;
+    draggedTimesRef.current = times;
     setShowInfoModal(true);
-  };
+  }
 
-  const closeTimeslotModalFn = () => {
-    selectedTimeslotRef.current = null;
-    setShowInfoModal(false);
-  };
+  const closeTimeslotModalFn = () => setShowInfoModal(false);
 
   const clickTimeslot = async (event: EventImpl): Promise<void> => {
     if (event.end && isTimeInPast(event.end)) {
       return;
     }
 
-    showTimeslotModalFn(event);
+    showTimeslotModalFn(event, null);
   };
 
   const removeTimeSlot = async (removeInfo: EventRemoveArg) => {
@@ -202,10 +211,7 @@ function TimeSlotCalendar() {
     calendarRef.current?.getApi().refetchEvents();
   };
 
-  const showModalAfterDrag = (times: { start: Date, end: Date }) => {
-    draggedTimesRef.current = times;
-    showTimeslotModalFn(null);
-  };
+  const showModalAfterDrag = (times: StartEndPair) => showTimeslotModalFn(null, times);
 
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
@@ -226,7 +232,7 @@ function TimeSlotCalendar() {
 
       <div className="flex flex-row justify-between">
         <h1 className="text-3xl">Vapaat varausikkunat</h1>
-        <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varausikkuna</Button>
+        <Button variant="primary" onClick={() => showTimeslotModalFn(null, null)}>Uusi varausikkuna</Button>
       </div>
       <div>
         <label htmlFor="checkbox" className="font-ft-label mb-1">
