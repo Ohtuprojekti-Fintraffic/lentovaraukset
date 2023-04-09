@@ -35,7 +35,7 @@ router.put('/:code', async (req: express.Request, res: express.Response, next: e
 
 router.post('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const validatedAirfield: any = airfieldValidator(true).parse(req.body);
+    const validatedAirfield: AirfieldEntry = airfieldValidator(true).parse(req.body);
     const airfield = await airfieldService.createAirfield(validatedAirfield);
     res.json(airfield);
   } catch (error: unknown) {

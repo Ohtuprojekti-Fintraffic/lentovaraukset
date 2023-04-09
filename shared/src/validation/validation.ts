@@ -124,29 +124,42 @@ const getTimeRangeValidator = () => {
   return TimeRange;
 };
 
-const airfieldValidator = (validateId: boolean = true) => {
+const createAirfieldWithoutCodeObject = () => {
   const nameEmptyErrorMessage = 'Airfield name cannot be empty';
   const concurrentFlightsMessage = 'Concurrent flights must be minimum 1';
   const multipleErrorMessage = 'Time must be multiple of 10';
-  const idErrorMessage = 'Id must be ICAO airport code';
-  const regex = /^[A-Z]{4}$/;
 
-  const base = z.object({
+  return z.object({
     name: z.string().min(1, { message: nameEmptyErrorMessage }),
     eventGranularityMinutes: z.coerce
       .number()
       .multipleOf(10, { message: multipleErrorMessage }),
     maxConcurrentFlights: z.coerce.number().min(1, { message: concurrentFlightsMessage }),
   });
+};
 
-  const validateWithId = base.extend({
+function extendAirfieldWithCode(
+  airfieldObject: ReturnType<typeof createAirfieldWithoutCodeObject>,
+) {
+  const idErrorMessage = 'Id must be ICAO airport code';
+  const regex = /^[A-Z]{4}$/;
+
+  return airfieldObject.extend({
     code: z.string()
       .refine((value) => regex.test(value), { message: idErrorMessage }),
   });
+}
 
-  if (!validateId) return base;
-  return validateWithId;
-};
+// Typescript can't automatically infer if code is there or not
+function airfieldValidator(validateId: false): ReturnType<typeof createAirfieldWithoutCodeObject>;
+function airfieldValidator(validateId: true): ReturnType<typeof extendAirfieldWithCode>;
+function airfieldValidator(validateId: boolean = true) {
+  const base = createAirfieldWithoutCodeObject();
+
+  const validateWithId = extendAirfieldWithCode(base);
+
+  return validateId ? validateWithId : base;
+}
 
 const createTimeOfDayValidator = (slotGranularityMinutes: number) => z.object({
   hours: z.coerce.number().min(0).max(23),

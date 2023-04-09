@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { ZodTypeAny } from 'zod';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import Button from '../Button';
 import InputField from '../InputField';
@@ -10,7 +11,7 @@ type FormProps = {
   title: string;
   airfield: AirfieldEntry | undefined;
   airfieldMutation: Function;
-  validator: any;
+  validator: ZodTypeAny;
 };
 
 type Inputs = {
