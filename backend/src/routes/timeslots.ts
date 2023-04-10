@@ -42,16 +42,8 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
 
     const newTimeSlot = createTimeSlotValidator(airfield.eventGranularityMinutes).parse(req.body);
     // TODO: check if timeslot overlaps with existing timeslots
-    if (req.body.periodEnd) {
-      const timeslot = await timeslotService.createTimeslot(newTimeSlot);
-      const period = createPeriodValidation().parse(req.body);
-      const createdPeriod = await timeslotService
-        .createPeriod(timeslot.id, period, newTimeSlot);
-      res.json(createdPeriod);
-    } else {
-      const timeslot = await timeslotService.createTimeslot(newTimeSlot);
-      res.json(timeslot);
-    }
+    const timeslot = await timeslotService.createTimeslot(newTimeSlot);
+    res.json(timeslot);
   } catch (error: unknown) {
     next(error);
   }
