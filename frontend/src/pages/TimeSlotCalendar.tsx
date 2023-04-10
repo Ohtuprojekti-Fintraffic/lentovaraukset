@@ -136,7 +136,6 @@ function TimeSlotCalendar() {
     timeslot: EventImpl,
     period?: {
       end: Date,
-      periodName: string,
       days: WeekInDays,
     },
   ) => {
@@ -154,7 +153,6 @@ function TimeSlotCalendar() {
         period
           ? {
             end: period.end,
-            name: period.periodName,
             days: period.days,
           }
           : undefined,
