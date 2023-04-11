@@ -14,14 +14,12 @@ type InfoModalProps = {
   closeReservationModal: () => void
   reservation?: EventImpl
   draggedTimes?: { start: Date, end: Date }
-  removeReservation: () => void
 };
 
 function ReservationInfoModal({
   showInfoModal,
   closeReservationModal,
   reservation, draggedTimes,
-  removeReservation,
 }: InfoModalProps) {
   const { addNewAlert } = useContext(AlertContext);
 
@@ -69,38 +67,49 @@ function ReservationInfoModal({
     closeReservationModal();
   };
 
+  if (!showInfoModal) {
+    return null;
+  }
+
   return (
-    <Card
-      show={showInfoModal}
-      handleClose={closeReservationModal}
-      form={(
-        <ReservationInfoForm
-          id="reservation_info_form"
-          reservation={reservation}
-          draggedTimes={draggedTimes}
-          onSubmit={reservation ? onSubmitModifyHandler : onSubmitAddHandler}
-        />
+    (
+      <Card
+        title={reservation
+          ? `Varaus #${reservation.id}`
+          : 'Uusi varaus'}
+        escHandler={closeReservationModal}
+        form={(
+          <ReservationInfoForm
+            id="reservation_info_form"
+            reservation={reservation}
+            draggedTimes={draggedTimes}
+            onSubmit={reservation ? onSubmitModifyHandler : onSubmitAddHandler}
+          />
       )}
-      actionSheet={(
-        <ActionSheet handleClose={closeReservationModal}>
-          <Button
-            form="reservation_info_form"
-            type="submit"
-            variant="primary"
-          >
-            Tallenna
-          </Button>
-          {reservation && (
+        actionSheet={(
+          <ActionSheet handleClose={closeReservationModal}>
+            <Button
+              form="reservation_info_form"
+              type="submit"
+              variant="primary"
+            >
+              Tallenna
+            </Button>
+            {reservation && (
             <Button
               variant="danger"
-              onClick={() => removeReservation()}
+              // This doesn't work: onClick={reservation.remove}
+              // Fullcalendar might be using a context or something
+              // that only works in React?
+              onClick={() => reservation.remove()}
             >
               Poista
             </Button>
-          )}
-        </ActionSheet>
+            )}
+          </ActionSheet>
       )}
-    />
+      />
+    )
   );
 }
 
