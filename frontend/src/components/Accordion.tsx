@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Plus, Minus } from 'lucide-react';
 import Subheader from './Subheader';
 
 type AccordionProps = {
@@ -20,7 +21,7 @@ function Accordion({ defaultSection, sections, onChange }: AccordionProps) {
         onKeyDown={(e) => e.key === 'Enter' && setIsActive(!isActive)}
       >
         <Subheader className="font-ft-emphasis group-hover:text-ft-text-300">{defaultSection}</Subheader>
-        <div className="place-self-end group-hover:text-ft-text-300">{isActive ? '-' : '+'}</div>
+        <div className="place-self-end group-hover:text-ft-text-300">{isActive ? <Minus /> : <Plus />}</div>
       </div>
 
       {isActive && Array.from(new Set(sections)).map((section) => ( // Sections must be unique
