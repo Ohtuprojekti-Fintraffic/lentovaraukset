@@ -20,6 +20,7 @@
     "@hookform/error-message": "^2.0.1",
     "@lentovaraukset/shared": "1.0.0",
     "core-js": "^3.27.1",
+    "date-fns": "^2.29.3",
     "lucide-react": "^0.115.0",
     "react": "^18.2.0",
     "react-datepicker": "^4.10.0",

@@ -4,9 +4,14 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import ReactDatePicker from 'react-datepicker';
+import ReactDatePicker, { registerLocale, setDefaultLocale } from 'react-datepicker';
+import fi from 'date-fns/locale/fi';
 import { Control, Controller, type FieldErrors } from 'react-hook-form';
 import { fieldBaseClass, fieldStateClasses, InputStates } from './InputField';
+
+// SUOMI
+registerLocale('fi', fi);
+setDefaultLocale('fi');
 
 type DatePickerProps = {
   control: Control<any>;
