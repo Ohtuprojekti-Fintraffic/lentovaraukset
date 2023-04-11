@@ -77,6 +77,7 @@ function ReservationInfoModal({
         title={reservation
           ? `Varaus #${reservation.id}`
           : 'Uusi varaus'}
+        escHandler={closeReservationModal}
         form={(
           <ReservationInfoForm
             id="reservation_info_form"

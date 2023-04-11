@@ -97,6 +97,7 @@ function TimeslotInfoModal({
       title={timeslot
         ? `Aikaikkuna #${timeslot.id}`
         : 'Uusi aikaikkuna'}
+      escHandler={closeTimeslotModal}
       form={(
         <RecurringTimeslotForm
           id="recurring_timeslot_form"

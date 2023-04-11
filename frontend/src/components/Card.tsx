@@ -4,11 +4,13 @@ import { ActionSheetProps } from './ActionSheet';
 type CardProps = {
   title: string,
   form: React.ReactNode
+  escHandler: () => void;
   actionSheet?: ReactElement<ActionSheetProps>
 };
 
 function Card({
-  title, form, actionSheet,
+  title, form, escHandler,
+  actionSheet,
 }: CardProps) {
   const ref: React.LegacyRef<HTMLDialogElement> = useRef(null);
 
@@ -20,6 +22,7 @@ function Card({
   return (
     <dialog
       ref={ref}
+      onCancel={escHandler}
       className="p-0 overflow-y-auto sm:overflow-visible w-[92%] max-w-xl h-fit bg-transparent rounded-ft-large backdrop:bg-opacity-40 backdrop:bg-black"
     >
       <div className="bg-white shadow-ft-elevation-300 rounded-ft-large overflow-hidden">
