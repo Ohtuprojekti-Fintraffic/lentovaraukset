@@ -1,9 +1,15 @@
 import { AllowFunc, EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
-import React, { useState, useRef, useContext } from 'react';
+import React, {
+  useState,
+  useRef,
+  useContext,
+  useEffect,
+} from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
+import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -12,10 +18,11 @@ import {
 } from '../queries/reservations';
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
-import { useAirfield } from '../queries/airfields';
+import { getAirfields } from '../queries/airfields';
 import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
 import { usePopupContext } from '../contexts/PopupContext';
+import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -24,7 +31,9 @@ function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { showPopup, clearPopup } = usePopupContext();
-  const { data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
+  const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
+  const [airfield, setAirfield] = useState<AirfieldEntry>();
+  // const { data: airfield } = useAirfield('EFHK); // TODO: get id from airfield selection
   const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -168,6 +177,13 @@ function ReservationCalendar() {
     showReservationModalFn(null);
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setAirfields(await getAirfields());
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <ReservationInfoModal
@@ -181,6 +197,11 @@ function ReservationCalendar() {
           closeReservationModalFn();
           calendarRef.current?.getApi().refetchEvents();
         }}
+      />
+      <AirfieldAccordion
+        airfield={airfield}
+        airfields={airfields}
+        onChange={setAirfield}
       />
       <div className="flex flex-row justify-between">
         <h1 className="text-3xl">Varauskalenteri</h1>

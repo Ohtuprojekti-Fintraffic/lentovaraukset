@@ -3,13 +3,13 @@ import {
 } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
-import { TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
+import { AirfieldEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
 import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
-import { useAirfield } from '../queries/airfields';
+import { getAirfields } from '../queries/airfields';
 import {
   getReservations,
 } from '../queries/reservations';
@@ -17,10 +17,13 @@ import {
   getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup,
 } from '../queries/timeSlots';
 import { usePopupContext } from '../contexts/PopupContext';
+import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
 
 function TimeSlotCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
-  const { data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
+  const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
+  const [airfield, setAirfield] = useState<AirfieldEntry>();
+  // const { data: airfield } = useAirfield('EFHK); // TODO: get id from airfield selection
   const { showPopup, clearPopup } = usePopupContext();
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [blocked, setBlocked] = useState(false);
@@ -207,6 +210,13 @@ function TimeSlotCalendar() {
     showTimeslotModalFn(null);
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setAirfields(await getAirfields());
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="flex flex-col space-y-2 h-full w-full">
       <TimeslotInfoModal
@@ -223,7 +233,11 @@ function TimeSlotCalendar() {
           calendarRef.current?.getApi().refetchEvents();
         }}
       />
-
+      <AirfieldAccordion
+        airfield={airfield}
+        airfields={airfields}
+        onChange={setAirfield}
+      />
       <div className="flex flex-row justify-between">
         <h1 className="text-3xl">Vapaat varausikkunat</h1>
         <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varausikkuna</Button>
