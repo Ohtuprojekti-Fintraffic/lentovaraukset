@@ -481,4 +481,280 @@ describe('Calls to api', () => {
 
     expect(response.body).toHaveLength(0);
   });
+
+  test('can create a period', async () => {
+    const response = await api.post('/api/EFHK/timeslots/')
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-18T12:00:00.000Z'),
+        end: new Date('2023-02-18T14:00:00.000Z'),
+        type: 'available',
+        info: null,
+        periodEnd: new Date('2023-02-23T10:00:00.000Z'),
+        days: {
+          monday: true,
+          tuesday: true,
+          wednesday: true,
+          thursday: true,
+          friday: true,
+          saturday: false,
+          sunday: false,
+        },
+      });
+
+    const createdPeriod = response.body;
+
+    expect(createdPeriod).toHaveLength(3);
+
+    const timeslotDates = [
+      '2023-02-20T12:00:00.000Z',
+      '2023-02-21T12:00:00.000Z',
+      '2023-02-22T12:00:00.000Z',
+    ];
+
+    createdPeriod.forEach((timeslot: any, index: number) => {
+      expect(timeslot.start).toEqual(timeslotDates[index]);
+      expect(new Date(timeslot.end).getTime())
+        .toEqual(new Date(timeslot.start).getTime() + (2 * 60 * 60 * 1000));
+      expect(timeslot.type).toEqual('available');
+    });
+  });
+
+  test('should not create a period if timeslots in the period are consecutive', async () => {
+    await Timeslot.create({
+      start: new Date('2023-02-20T10:00:00.000Z'),
+      end: new Date('2023-02-20T11:00:00.000Z'),
+      type: 'available',
+      info: null,
+    });
+
+    const response = await api.post('/api/EFHK/timeslots/')
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-18T11:00:00.000Z'),
+        end: new Date('2023-02-18T13:00:00.000Z'),
+        type: 'available',
+        info: null,
+        periodEnd: new Date('2023-02-23T10:00:00.000Z'),
+        days: {
+          monday: true,
+          tuesday: true,
+          wednesday: true,
+          thursday: true,
+          friday: true,
+          saturday: false,
+          sunday: false,
+        },
+      });
+
+    expect(response.status).toBe(500);
+    expect(response.body.error.message).toEqual('Operation would result in consecutive timeslots');
+  });
+
+  test('cannot update timeslot to make it consecutive', async () => {
+    // First, create two non-consecutive timeslots
+    const timeslot1 = await Timeslot.create({
+      start: new Date('2023-02-19T08:00:00.000Z'),
+      end: new Date('2023-02-19T10:00:00.000Z'),
+      type: 'available',
+      info: null,
+    });
+
+    await Timeslot.create({
+      start: new Date('2023-02-19T12:00:00.000Z'),
+      end: new Date('2023-02-19T14:00:00.000Z'),
+      type: 'available',
+      info: null,
+    });
+
+    const updatedStart = new Date('2023-02-19T10:00:00.000Z');
+    const updatedEnd = new Date('2023-02-19T12:00:00.000Z');
+    const response = await api.put(`/api/EFHK/timeslots/${timeslot1.id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: updatedStart,
+        end: updatedEnd,
+        type: 'available',
+        info: null,
+      });
+
+    expect(response.status).toEqual(500);
+    expect(response.body.error.message).toEqual('Operation would result in consecutive timeslots');
+
+    const updatedTimeslot1 = await Timeslot.findByPk(timeslot1.id);
+    expect(updatedTimeslot1?.start).toEqual(timeslot1.start);
+    expect(updatedTimeslot1?.end).toEqual(timeslot1.end);
+  });
+
+  test('cannot update non-existent timeslot', async () => {
+    const nonExistentTimeslotId = 9999;
+
+    const updatedStart = new Date('2023-02-19T08:00:00.000Z');
+    const updatedEnd = new Date('2023-02-19T10:00:00.000Z');
+    const response = await api.put(`/api/EFHK/timeslots/${nonExistentTimeslotId}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: updatedStart,
+        end: updatedEnd,
+        type: 'available',
+        info: null,
+      });
+
+    expect(response.status).toEqual(500);
+    expect(response.body.error.message).toEqual('No timeslot with id exists');
+  });
+
+  test('cannot move timeslot start time to the past', async () => {
+    const timeslot = await Timeslot.create({
+      start: new Date('2023-02-20T12:00:00.000Z'),
+      end: new Date('2023-02-20T14:00:00.000Z'),
+      type: 'available',
+      info: null,
+    });
+
+    const updatedStart = new Date('2023-01-20T12:00:00.000Z');
+    const updatedEnd = new Date('2023-01-20T14:00:00.000Z');
+    const response = await api.put(`/api/EFHK/timeslots/${timeslot.id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: updatedStart,
+        end: updatedEnd,
+        type: 'available',
+        info: null,
+      });
+
+    expect(response.status).toEqual(400);
+    expect(response.body.error.message).toContain('Timeslot cannot be in past');
+
+    const updatedTimeslot = await Timeslot.findByPk(timeslot.id);
+    expect(updatedTimeslot?.start).toEqual(timeslot.start);
+    expect(updatedTimeslot?.end).toEqual(timeslot.end);
+  });
+
+  test('cannot update an available timeslot with existing reservations', async () => {
+    const timeslot = await Timeslot.create({
+      start: new Date('2023-02-21T12:00:00.000Z'),
+      end: new Date('2023-02-21T14:00:00.000Z'),
+      type: 'available',
+      info: null,
+    });
+
+    const reservation = await Reservation.create({
+      start: new Date('2023-02-21T12:30:00.000Z'),
+      end: new Date('2023-02-21T13:30:00.000Z'),
+      aircraftId: 'OH-QAA',
+      info: 'Initial reservation',
+      phone: '11104040',
+    });
+
+    await timeslot.addReservations([reservation]);
+
+    const updatedStart = new Date('2023-02-21T12:40:00.000Z');
+    const response = await api.put(`/api/EFHK/timeslots/${timeslot.id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: updatedStart,
+        end: timeslot.end,
+        type: 'available',
+        info: null,
+      });
+
+    expect(response.status).toEqual(500);
+    expect(response.body.error.message).toEqual('Timeslot has reservations');
+
+    const updatedTimeslot = await Timeslot.findByPk(timeslot.id);
+    expect(updatedTimeslot?.start).toEqual(timeslot.start);
+    expect(updatedTimeslot?.end).toEqual(timeslot.end);
+  });
+
+  test('update timeslot with periodEnd creates a period', async () => {
+    const timeslot = await Timeslot.create({
+      start: new Date('2023-02-21T12:00:00.000Z'),
+      end: new Date('2023-02-21T14:00:00.000Z'),
+      type: 'available',
+      info: null,
+    });
+
+    const periodEnd = new Date('2023-03-21T16:00:00.000Z');
+    const response = await api.put(`/api/EFHK/timeslots/${timeslot.id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: timeslot.start,
+        end: timeslot.end,
+        type: 'available',
+        info: null,
+        periodEnd,
+        days: {
+          monday: true,
+          tuesday: true,
+          wednesday: true,
+          thursday: true,
+          friday: true,
+          saturday: true,
+          sunday: true,
+        },
+      });
+
+    expect(response.status).toEqual(200);
+    expect(response.body.length).toBeGreaterThan(10);
+
+    const allTimeslots = await Timeslot.findAll();
+    expect(allTimeslots.length).toBeGreaterThan(10);
+  });
+
+  test('cannot create a consecutive timeslot', async () => {
+    const consecutiveTimeslot = {
+      start: new Date('2023-02-14T10:00:00.000Z'),
+      end: new Date('2023-02-14T12:00:00.000Z'),
+      type: 'available',
+      info: null,
+    };
+
+    const response = await api.post('/api/EFHK/timeslots/')
+      .set('Content-type', 'application/json')
+      .send(consecutiveTimeslot);
+
+    expect(response.status).toEqual(500);
+    expect(response.body.error.message).toEqual('Operation would result in consecutive timeslots');
+
+    const createdTimeslot = await Timeslot.findOne({ where: { start: consecutiveTimeslot.start } });
+    expect(createdTimeslot).toBeNull();
+  });
+
+  // after fixing bug
+  // test('cannot create a period with overlapping timeslots', async () => {
+  //   await Timeslot.create({
+  //     start: new Date('2023-02-16T08:00:00.000Z'),
+  //     end: new Date('2023-02-16T10:00:00.000Z'),
+  //     type: 'available',
+  //     info: null,
+  //   });
+
+  //   const response = await api.post('/api/EFHK/timeslots/')
+  //     .set('Content-type', 'application/json')
+  //     .send({
+  //       start: new Date('2023-02-15T08:00:00.000Z'),
+  //       end: new Date('2023-02-15T10:00:00.000Z'),
+  //       type: 'available',
+  //       info: null,
+  //       periodEnd: new Date('2023-02-18T00:00:00.000Z'),
+  //       name: 'Overlapping period',
+  //       days: {
+  //         monday: true,
+  //         tuesday: true,
+  //         wednesday: true,
+  //         thursday: true,
+  //         friday: true,
+  //         saturday: true,
+  //         sunday: true,
+  //       },
+  //     });
+
+  //   expect(response.status).toEqual(500);
+  //   expect(response.body.error.message).toEqual('Period already has a timeslot');
+
+  //   const createdPeriodTimeslots = await Timeslot
+  //     .findAll({ where: { group: 'Overlapping period' } });
+  //   expect(createdPeriodTimeslots.length).toEqual(0);
+  // });
 });

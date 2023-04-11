@@ -63,14 +63,6 @@ Timeslot.init(
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'available',
-      validate: {
-        customValidator: (value: string) => {
-          const enums = ['available', 'blocked'];
-          if (!enums.includes(value)) {
-            throw new Error('not a valid option');
-          }
-        },
-      },
     },
     group: {
       type: DataTypes.STRING,

@@ -72,8 +72,8 @@ const errorIfLeadsToConsecutivesOrOverlaps = async (
     timeslotsInRanges.forEach((otherTimeslot) => {
       if (
         timeslot.type === otherTimeslot.type
-        && (timeslot.start === otherTimeslot.end
-        || timeslot.end === otherTimeslot.start)
+        && (timeslot.start.getTime() === otherTimeslot.end.getTime()
+        || timeslot.end.getTime() === otherTimeslot.start.getTime())
       ) {
         throw new Error('Operation would result in consecutive timeslots');
       }
@@ -165,13 +165,6 @@ const updateById = async (
       && isTimeInPast(oldTimeslot.start))
     || isTimeInPast(oldTimeslot.end)) {
     throw new Error('Timeslot in past cannot be modified');
-  }
-
-  // prevent from being able to move start to past
-  if (
-    slotHasMoved && isTimeInPast(timeslot.start)
-  ) {
-    throw new Error('Timeslot cannot be moved to the past');
   }
 
   if (timeslot.type === 'available') {
