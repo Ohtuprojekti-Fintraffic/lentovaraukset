@@ -24,6 +24,8 @@ Airfield.init(
   {
     code: {
       type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
       primaryKey: true,
     },
     name: {

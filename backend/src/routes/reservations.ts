@@ -2,7 +2,8 @@ import express from 'express';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { createReservationValidator, getTimeRangeValidator } from '@lentovaraukset/shared/src/validation/validation';
 import reservationService from '../services/reservationService';
-import airfieldService from '../services/airfieldService';
+import configurationService from '../services/configurationService';
+import { errorIfNoAirfield } from '../util/middleware';
 
 const allowReservation = async (
   startTime: Date,
@@ -43,10 +44,13 @@ router.delete('/:id', async (req: express.Request, res: express.Response, next: 
 
 router.post('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const airfield = await airfieldService.getAirfield('EGLL'); // TODO: get airfieldId from request
-    // TODO: get maxDaysInFuture from airfield
-    const newReservation = createReservationValidator(airfield.eventGranularityMinutes, 7)
-      .parse(req.body);
+    errorIfNoAirfield(req);
+    const { airfield } = req;
+    const configuration = await configurationService.getById(1);
+    const newReservation = createReservationValidator(
+      airfield.eventGranularityMinutes,
+      configuration.maxDaysInFuture,
+    ).parse(req.body);
 
     if (!await allowReservation(
       newReservation.start,
@@ -67,9 +71,13 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
 router.put('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const id = Number(req.params.id);
-    const airfield = await airfieldService.getAirfield('EGLL'); // TODO: get airfieldId from request
-    const validReservationUpdate = createReservationValidator(airfield.eventGranularityMinutes, 7)
-      .parse(req.body);
+    errorIfNoAirfield(req);
+    const { airfield } = req;
+    const configuration = await configurationService.getById(1);
+    const validReservationUpdate = createReservationValidator(
+      airfield.eventGranularityMinutes,
+      configuration.maxDaysInFuture,
+    ).parse(req.body);
 
     if (!await allowReservation(
       validReservationUpdate.start,
@@ -80,7 +88,6 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
       throw new Error('Too many concurrent reservations');
     }
 
-    // TODO: get maxDaysInFuture from airfield
     const modifiedReservation = await reservationService.updateById(id, validReservationUpdate);
     res.status(200).json(modifiedReservation);
   } catch (error: unknown) {

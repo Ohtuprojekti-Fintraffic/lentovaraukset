@@ -1,12 +1,8 @@
-import { AirfieldEntry, AirfieldEntryWithId } from '@lentovaraukset/shared/src';
+import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import { Airfield } from '../models';
 
 const getAirfield = async (code: string): Promise<AirfieldEntry> => {
-  const airfield = await Airfield.findOne({
-    where: {
-      code,
-    },
-  });
+  const airfield = await Airfield.findByPk(code);
 
   if (!airfield) {
     throw new Error('Airfield not found');
@@ -20,9 +16,9 @@ const getAirfields = async (): Promise<AirfieldEntry[]> => {
   return airfields.map((airfield) => airfield.dataValues);
 };
 
-const updateById = async (
+const updateByCode = async (
   code: string,
-  airfield: AirfieldEntry,
+  airfield: Omit<AirfieldEntry, 'code'>,
 ): Promise<AirfieldEntry> => {
   const [updatedAirfield] = await Airfield.upsert(
     { ...airfield, code },
@@ -31,7 +27,7 @@ const updateById = async (
 };
 
 const createAirfield = async (
-  newAirfield: AirfieldEntryWithId,
+  newAirfield: AirfieldEntry,
 ): Promise<AirfieldEntry> => {
   const airfield: Airfield = await Airfield.create(newAirfield);
   return airfield.dataValues;
@@ -40,8 +36,8 @@ const createAirfield = async (
 const createTestAirfield = async () => {
   // TODO: Remove this when we have a proper admin interface for creating airfields
   await Airfield.upsert({
-    code: 'EGLL',
-    name: 'Test Airfield',
+    code: 'EFHK',
+    name: 'Helsinki-Vantaan lentoasema',
     maxConcurrentFlights: 3,
     eventGranularityMinutes: 20,
   });
@@ -50,7 +46,7 @@ const createTestAirfield = async () => {
 export default {
   getAirfield,
   getAirfields,
-  updateById,
+  updateByCode,
   createAirfield,
   createTestAirfield,
 };

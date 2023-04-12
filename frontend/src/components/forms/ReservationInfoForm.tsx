@@ -31,7 +31,7 @@ function ReservationInfoForm({
   onSubmit,
   id,
 }: ReservationInfoProps) {
-  const { data: airfield } = useAirfield('EGLL');
+  const { data: airfield } = useAirfield('EFHK');
   const reservationGranularity = airfield?.eventGranularityMinutes || 20;
 
   const start = reservation?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
@@ -78,16 +78,7 @@ function ReservationInfoForm({
   // const max =
 
   return (
-    <div>
-      <div className="bg-black p-3">
-        <p className="text-white">
-          {
-            reservation
-              ? `Varaus #${reservation.id}`
-              : 'Uusi varaus'
-          }
-        </p>
-      </div>
+    <>
       <ModalAlert
         message={formWarning}
         variant="warning"
@@ -137,7 +128,7 @@ function ReservationInfoForm({
           />
         </form>
       </div>
-    </div>
+    </>
   );
 }
 

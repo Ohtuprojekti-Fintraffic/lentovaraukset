@@ -21,18 +21,22 @@ export interface TimeslotEntry {
 }
 
 export interface AirfieldEntry {
-  code?: string;
+  code: string;
   name: string;
   maxConcurrentFlights: number;
   eventGranularityMinutes: number;
 }
 
-export interface AirfieldEntryWithId extends AirfieldEntry {
-  code: string;
+export interface ConfigurationEntry {
+  id: number;
+  daysToStart: number;
+  maxDaysInFuture: number;
 }
 
 export enum ServiceErrorCode {
   ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
+  InvalidAirfield = 'InvalidAirfield',
+  RouteNotFound = 'RouteNotFound',
 }
 
 export interface WeekInDays {
