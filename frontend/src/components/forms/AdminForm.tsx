@@ -1,26 +1,35 @@
 import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { configurationValidator } from '@lentovaraukset/shared/src/validation/validation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ConfigurationEntry } from '@lentovaraukset/shared/src';
 import Button from '../Button';
 import InputField from '../InputField';
+import { updateConfigurationMutation } from '../../queries/configurations';
 
 type FormProps = {
   title: string;
+  configuration: ConfigurationEntry | undefined;
 };
 
 type Inputs = {
-  daysBeforeStart: number;
+  daysToStart: number;
   maxDaysInFuture: number;
-  maxConcurrentFlights: number;
-  eventGranularityMinutes: number;
 };
 
-function AdminForm({ title }: FormProps) {
+function AdminForm({ title, configuration }: FormProps) {
   const {
-    register, handleSubmit,
-  } = useForm<Inputs>();
+    register, handleSubmit, formState: { errors },
+  } = useForm<Inputs>({
+    values: configuration,
+    resolver: zodResolver(configurationValidator()),
+    mode: 'all',
+  });
 
-  const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => {
-    console.log(data);
+  const configurationMutator = updateConfigurationMutation();
+
+  const onSubmit: SubmitHandler<Inputs> = (data: Omit<Inputs, 'id'>) => {
+    configurationMutator.mutate(data);
   };
 
   return (
@@ -31,12 +40,12 @@ function AdminForm({ title }: FormProps) {
           <InputField
             labelText="Kuinka monta päivää vähintään pitää olla varauksen alkuun:"
             type="number"
-            registerReturn={register('daysBeforeStart', {
+            registerReturn={register('daysToStart', {
               valueAsNumber: true,
             })}
-            defaultValue="0"
             min={0}
             step={1}
+            error={errors.daysToStart}
           />
           <InputField
             labelText="Kuinka monta päivää tulevaisuuteen varauksen voi tehdä:"
@@ -44,29 +53,9 @@ function AdminForm({ title }: FormProps) {
             registerReturn={register('maxDaysInFuture', {
               valueAsNumber: true,
             })}
-            defaultValue="7"
             min={1}
             step={1}
-          />
-          <InputField
-            labelText="Varausikkunan minimikoko minuutteina:"
-            type="number"
-            registerReturn={register('eventGranularityMinutes', {
-              valueAsNumber: true,
-            })}
-            defaultValue="20"
-            step={10}
-            min={10}
-          />
-          <InputField
-            labelText="Samanaikaisten varausten maksimimäärä:"
-            type="number"
-            registerReturn={register('maxConcurrentFlights', {
-              valueAsNumber: true,
-            })}
-            defaultValue="1"
-            step={1}
-            min={1}
+            error={errors.maxDaysInFuture}
           />
           <Button type="submit" variant="primary">Tallenna</Button>
         </form>

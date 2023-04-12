@@ -15,6 +15,7 @@ import {
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
 import { useAirfield } from '../queries/airfields';
+import { useConfiguration } from '../queries/configurations';
 import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
 import { usePopupContext } from '../contexts/PopupContext';
@@ -27,6 +28,7 @@ function ReservationCalendar() {
 
   const { showPopup, clearPopup } = usePopupContext();
   const { data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
+  const { data: configuration } = useConfiguration();
   const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -199,6 +201,7 @@ function ReservationCalendar() {
           selectConstraint="timeslots"
           checkIfTimeInFuture
           allowEventRef={allowEvent}
+          configuration={configuration}
         />
       </div>
     </>
