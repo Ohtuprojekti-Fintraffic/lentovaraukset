@@ -5,6 +5,7 @@ import { ServiceErrorCode } from '@lentovaraukset/shared/src';
 import { connectToDatabase, sequelize } from '../src/util/db';
 import airfieldService from '../src/services/airfieldService';
 import reservationService from '../src/services/reservationService';
+import configurationService from '../src/services/configurationService';
 
 const api = request(app);
 
@@ -52,7 +53,10 @@ beforeAll(async () => {
 beforeEach(async () => {
   // wipe db before each test
   await sequelize.truncate({ cascade: true });
+
   await airfieldService.createTestAirfield();
+  await configurationService
+    .updateById(1, { maxDaysInFuture: 7, daysToStart: 0 });
   await Reservation.bulkCreate(reservations);
   await Timeslot.create({
     start: new Date('2023-02-12T08:00:00.000Z'),

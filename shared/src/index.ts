@@ -27,6 +27,12 @@ export interface AirfieldEntry {
   eventGranularityMinutes: number;
 }
 
+export interface ConfigurationEntry {
+  id: number;
+  daysToStart: number;
+  maxDaysInFuture: number;
+}
+
 export enum ServiceErrorCode {
   ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
   InvalidAirfield = 'InvalidAirfield',

@@ -19,6 +19,7 @@ import {
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
 import { getAirfields } from '../queries/airfields';
+import { useConfiguration } from '../queries/configurations';
 import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
 import { usePopupContext } from '../contexts/PopupContext';
@@ -34,6 +35,7 @@ function ReservationCalendar() {
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
   const [airfield, setAirfield] = useState<AirfieldEntry>();
   // const { data: airfield } = useAirfield('EFHK); // TODO: get id from airfield selection
+  const { data: configuration } = useConfiguration();
   const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
@@ -100,6 +102,7 @@ function ReservationCalendar() {
   const closeReservationModalFn = () => {
     selectedReservationRef.current = null;
     setShowInfoModal(false);
+    calendarRef.current?.getApi().refetchEvents();
   };
 
   const clickReservation = async (event: EventImpl): Promise<void> => {
@@ -111,6 +114,8 @@ function ReservationCalendar() {
   };
 
   const removeReservation = async (removeInfo: EventRemoveArg) => {
+    // fullcalendar removes the event early:
+    removeInfo.revert();
     const { event } = removeInfo;
 
     const onConfirmRemove = async () => {
@@ -185,42 +190,40 @@ function ReservationCalendar() {
   }, []);
 
   return (
-    <div className="flex flex-col space-y-2 h-full w-full">
+    <>
+      {/* This is outside the div because spacing affects it even though it's a modal */}
       <ReservationInfoModal
         showInfoModal={showInfoModal}
         reservation={selectedReservationRef?.current || undefined}
         draggedTimes={draggedTimesRef?.current || undefined}
-        removeReservation={() => {
-          selectedReservationRef.current?.remove();
-        }}
-        closeReservationModal={() => {
-          closeReservationModalFn();
-          calendarRef.current?.getApi().refetchEvents();
-        }}
+        closeReservationModal={closeReservationModalFn}
       />
-      <AirfieldAccordion
-        airfield={airfield}
-        airfields={airfields}
-        onChange={setAirfield}
-      />
-      <div className="flex flex-row justify-between">
-        <h1 className="text-3xl">Varauskalenteri</h1>
-        <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varaus</Button>
+      <div className="flex flex-col space-y-2 h-full w-full">
+        <AirfieldAccordion
+          airfield={airfield}
+          airfields={airfields}
+          onChange={setAirfield}
+        />
+        <div className="flex flex-row justify-between mt-0">
+          <h1 className="text-3xl">Varauskalenteri</h1>
+          <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varaus</Button>
+        </div>
+        <Calendar
+          calendarRef={calendarRef}
+          eventSources={eventsSourceRef.current}
+          addEventFn={showModalAfterDrag}
+          modifyEventFn={modifyReservationFn}
+          clickEventFn={clickReservation}
+          removeEventFn={removeReservation}
+          granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
+          eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFFF' }}
+          selectConstraint="timeslots"
+          checkIfTimeInFuture
+          allowEventRef={allowEvent}
+          configuration={configuration}
+        />
       </div>
-      <Calendar
-        calendarRef={calendarRef}
-        eventSources={eventsSourceRef.current}
-        addEventFn={showModalAfterDrag}
-        modifyEventFn={modifyReservationFn}
-        clickEventFn={clickReservation}
-        removeEventFn={removeReservation}
-        granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
-        eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFFF' }}
-        selectConstraint="timeslots"
-        checkIfTimeInFuture
-        allowEventRef={allowEvent}
-      />
-    </div>
+    </>
   );
 }
 

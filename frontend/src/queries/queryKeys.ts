@@ -4,6 +4,7 @@ enum QueryKeys {
   Reservations = 'reservations',
   TimeSlots = 'timeslots',
   Airfield = 'airfield',
+  Configuration = 'configuration',
 }
 
 export default QueryKeys;

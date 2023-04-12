@@ -135,6 +135,15 @@ const airfieldValidator = (validateId: boolean = true) => {
   return validateWithId;
 };
 
+const configurationValidator = () => {
+  const base = z.object({
+    daysToStart: z.coerce.number(),
+    maxDaysInFuture: z.coerce.number(),
+  });
+
+  return base;
+};
+
 const createTimeOfDayValidator = (slotGranularityMinutes: number) => z.object({
   hours: z.coerce.number().min(0).max(23),
   minutes: z.coerce.number().min(0).max(59)
@@ -160,5 +169,6 @@ export {
   isTimeInPast,
   isTimeAtMostInFuture,
   airfieldValidator,
+  configurationValidator,
   createPeriodValidation,
 };

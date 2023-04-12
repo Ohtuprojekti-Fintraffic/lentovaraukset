@@ -81,6 +81,7 @@ function TimeSlotCalendar() {
   const closeTimeslotModalFn = () => {
     selectedTimeslotRef.current = null;
     setShowInfoModal(false);
+    calendarRef.current?.getApi().refetchEvents();
   };
 
   const clickTimeslot = async (event: EventImpl): Promise<void> => {
@@ -92,6 +93,8 @@ function TimeSlotCalendar() {
   };
 
   const removeTimeSlot = async (removeInfo: EventRemoveArg) => {
+    // fullcalendar removes the event early:
+    removeInfo.revert();
     const { event } = removeInfo;
 
     const onConfirmRemove = async () => {
@@ -218,56 +221,53 @@ function TimeSlotCalendar() {
   }, []);
 
   return (
-    <div className="flex flex-col space-y-2 h-full w-full">
+    <>
+      {/* This is outside the div because spacing affects it even though it's a modal */}
       <TimeslotInfoModal
         showInfoModal={showInfoModal}
         timeslot={selectedTimeslotRef?.current || undefined}
         draggedTimes={draggedTimesRef?.current || undefined}
         isBlocked={blocked}
         modifyTimeslotFn={modifyTimeslotFn}
-        removeTimeslot={() => {
-          selectedTimeslotRef.current?.remove();
-        }}
-        closeTimeslotModal={() => {
-          closeTimeslotModalFn();
-          calendarRef.current?.getApi().refetchEvents();
-        }}
+        closeTimeslotModal={closeTimeslotModalFn}
       />
-      <AirfieldAccordion
-        airfield={airfield}
-        airfields={airfields}
-        onChange={setAirfield}
-      />
-      <div className="flex flex-row justify-between">
-        <h1 className="text-3xl">Vapaat varausikkunat</h1>
-        <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varausikkuna</Button>
+      <div className="flex flex-col space-y-2 h-full w-full">
+        <AirfieldAccordion
+          airfield={airfield}
+          airfields={airfields}
+          onChange={setAirfield}
+        />
+        <div className="flex flex-row justify-between mt-0">
+          <h1 className="text-3xl">Vapaat varausikkunat</h1>
+          <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varausikkuna</Button>
+        </div>
+        <div>
+          <label htmlFor="checkbox" className="font-ft-label mb-1">
+            <span>Lisää suljettuja vuoroja</span>
+            <input
+              type="checkbox"
+              id="checkbox"
+              checked={blocked}
+              onChange={handleToggle}
+              className="mx-2"
+            />
+          </label>
+        </div>
+        <Calendar
+          calendarRef={calendarRef}
+          eventSources={eventsSourceRef.current}
+          addEventFn={showModalAfterDrag}
+          modifyEventFn={modifyTimeslotFn}
+          clickEventFn={clickTimeslot}
+          removeEventFn={removeTimeSlot}
+          granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
+          eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}
+          selectConstraint={undefined}
+          blocked={blocked}
+          allowEventRef={allowEvent}
+        />
       </div>
-      <div>
-        <label htmlFor="checkbox" className="font-ft-label mb-1">
-          <span>Lisää suljettuja vuoroja</span>
-          <input
-            type="checkbox"
-            id="checkbox"
-            checked={blocked}
-            onChange={handleToggle}
-            className="mx-2"
-          />
-        </label>
-      </div>
-      <Calendar
-        calendarRef={calendarRef}
-        eventSources={eventsSourceRef.current}
-        addEventFn={showModalAfterDrag}
-        modifyEventFn={modifyTimeslotFn}
-        clickEventFn={clickTimeslot}
-        removeEventFn={removeTimeSlot}
-        granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
-        eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}
-        selectConstraint={undefined}
-        blocked={blocked}
-        allowEventRef={allowEvent}
-      />
-    </div>
+    </>
   );
 }
 
