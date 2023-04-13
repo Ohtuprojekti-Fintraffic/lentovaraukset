@@ -160,16 +160,7 @@ function RecurringTimeslotForm({
   }, [reservations]);
 
   return (
-    <div>
-      <div className="bg-black p-3">
-        <p className="text-white">
-          {
-        timeslot
-          ? `Aikaikkuna #${timeslot.id}`
-          : 'Uusi aikaikkuna'
-        }
-        </p>
-      </div>
+    <>
       <ModalAlert
         message={formWarning}
         variant="warning"
@@ -239,7 +230,7 @@ function RecurringTimeslotForm({
           )}
         </form>
       </div>
-    </div>
+    </>
   );
 }
 

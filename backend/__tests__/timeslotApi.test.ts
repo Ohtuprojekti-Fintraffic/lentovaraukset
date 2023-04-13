@@ -652,7 +652,7 @@ describe('Calls to api', () => {
     expect(createdTimeslot).toBeNull();
   });
 
-  test('cannot create a period with overlapping timeslots', async () => {
+test('cannot create a period with overlapping timeslots', async () => {
     const createdTimeslot = await Timeslot.create({
       start: new Date('2023-02-16T08:00:00.000Z'),
       end: new Date('2023-02-16T10:00:00.000Z'),

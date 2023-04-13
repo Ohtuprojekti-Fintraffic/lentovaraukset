@@ -1,31 +1,46 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect, useRef } from 'react';
 import { ActionSheetProps } from './ActionSheet';
-import Modal from './Modal';
 
 type CardProps = {
-  show: boolean,
+  title: string,
   form: React.ReactNode
-  actionSheet: ReactElement<ActionSheetProps>
-  handleClose: () => void,
+  escHandler: () => void;
+  actionSheet?: ReactElement<ActionSheetProps>
 };
 
 function Card({
-  show,
-  form,
+  title, form, escHandler,
   actionSheet,
-  handleClose,
 }: CardProps) {
+  const ref: React.LegacyRef<HTMLDialogElement> = useRef(null);
+
+  useEffect(() => {
+    ref.current?.showModal();
+    return () => ref.current?.close();
+  }, []);
+
   return (
-    <Modal show={show} handleClose={handleClose}>
-      <div className=" flex flex-col w-screen max-w-xl h-fit p-4">
-        <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
-          {form}
-          <div className="bg-gray-100 border-t border-gray-200 p-4 w-full">
-            {actionSheet}
-          </div>
+    <dialog
+      ref={ref}
+      onCancel={escHandler}
+      className="p-0 overflow-y-auto sm:overflow-visible w-[92%] max-w-xl h-fit bg-transparent rounded-ft-large backdrop:bg-opacity-40 backdrop:bg-black"
+    >
+      <div className="bg-white shadow-ft-elevation-300 rounded-ft-large overflow-hidden">
+        <div className="bg-black p-3">
+          <p className="text-white">
+            {title}
+          </p>
         </div>
+
+        {form}
+
+        {actionSheet && (
+        <div className="bg-gray-100 border-t border-gray-200 p-4 w-full">
+          { actionSheet }
+        </div>
+        )}
       </div>
-    </Modal>
+    </dialog>
   );
 }
 

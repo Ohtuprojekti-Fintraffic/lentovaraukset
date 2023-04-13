@@ -15,7 +15,6 @@ type InfoModalProps = {
   timeslot?: EventImpl
   isBlocked: boolean
   draggedTimes?: { start: Date, end: Date }
-  removeTimeslot: () => void
   modifyTimeslotFn: (
     timeslot: EventImpl,
     period?: {
@@ -30,7 +29,6 @@ function TimeslotInfoModal({
   isBlocked,
   closeTimeslotModal,
   timeslot, draggedTimes,
-  removeTimeslot,
   modifyTimeslotFn,
 }: InfoModalProps) {
   const { addNewAlert } = useContext(AlertContext);
@@ -88,10 +86,16 @@ function TimeslotInfoModal({
     closeTimeslotModal();
   };
 
+  if (!showInfoModal) {
+    return null;
+  }
+
   return (
     <Card
-      show={showInfoModal}
-      handleClose={closeTimeslotModal}
+      title={timeslot
+        ? `Aikaikkuna #${timeslot.id}`
+        : 'Uusi aikaikkuna'}
+      escHandler={closeTimeslotModal}
       form={(
         <RecurringTimeslotForm
           id="recurring_timeslot_form"
@@ -113,7 +117,10 @@ function TimeslotInfoModal({
           {timeslot && (
             <Button
               variant="danger"
-              onClick={() => removeTimeslot()}
+              // This doesn't work: onClick={timeslot.remove}
+              // Fullcalendar might be using a context or something
+              // that only works in React?
+              onClick={() => timeslot.remove()}
             >
               Poista
             </Button>
