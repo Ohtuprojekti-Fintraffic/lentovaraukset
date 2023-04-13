@@ -19,7 +19,6 @@ type InfoModalProps = {
     timeslot: EventImpl,
     period?: {
       end: Date,
-      periodName: string,
       days: WeekInDays,
     },
   ) => Promise<void>,
@@ -38,7 +37,6 @@ function TimeslotInfoModal({
     updatedTimeslot: Omit<TimeslotEntry, 'id'>,
     period?: {
       end: Date,
-      periodName: string,
       days: WeekInDays,
     },
   ) => {

@@ -142,7 +142,6 @@ function TimeSlotCalendar() {
     timeslot: EventImpl,
     period?: {
       end: Date,
-      periodName: string,
       days: WeekInDays,
     },
   ) => {
@@ -160,7 +159,6 @@ function TimeSlotCalendar() {
         period
           ? {
             end: period.end,
-            name: period.periodName,
             days: period.days,
           }
           : undefined,
@@ -192,7 +190,7 @@ function TimeSlotCalendar() {
     if (timeslot.extendedProps.group) {
       showPopup({
         popupTitle: 'Toistuvan varausikkunan muokkaus',
-        popupText: `Muokkasit toistuvaa varausikkuuna. Muokataanko myös kaikkia tulevia ryhmän '${timeslot.extendedProps.group}' varausikkunoita?`,
+        popupText: 'Muokkasit toistuvaa varausikkuuna. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?',
         primaryText: 'Muokkaa kaikkia',
         primaryOnClick: modifyAllFutureEvents,
         secondaryText: 'Muokkaa vain tätä',
