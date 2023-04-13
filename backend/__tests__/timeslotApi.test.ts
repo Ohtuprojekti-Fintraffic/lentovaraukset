@@ -1,21 +1,21 @@
 import request from 'supertest';
 import app from '@lentovaraukset/backend/src/app';
 import { Reservation, Timeslot } from '@lentovaraukset/backend/src/models';
-import { TimeslotType } from '@lentovaraukset/shared/src';
+import { TimeslotEntry } from '@lentovaraukset/shared/src';
 import { connectToDatabase, sequelize } from '../src/util/db';
 import airfieldService from '../src/services/airfieldService';
 
 const api = request(app);
 
-const timeslotData: { start: Date, end: Date, type: TimeslotType, info: string | null }[] = [
+const timeslotData: Omit<TimeslotEntry, 'id'>[] = [
   {
-    start: new Date('2023-02-14T08:00:00.000Z'), end: new Date('2023-02-14T10:00:00.000Z'), type: 'available', info: null,
+    start: new Date('2023-02-14T08:00:00.000Z'), end: new Date('2023-02-14T10:00:00.000Z'), type: 'available', info: null, airfieldCode: 'EFHK',
   },
   {
-    start: new Date('2023-02-14T14:00:00.000Z'), end: new Date('2023-02-14T16:00:00.000Z'), type: 'available', info: null,
+    start: new Date('2023-02-14T14:00:00.000Z'), end: new Date('2023-02-14T16:00:00.000Z'), type: 'available', info: null, airfieldCode: 'EFHK',
   },
   {
-    start: new Date('2023-02-14T16:00:00.000Z'), end: new Date('2023-02-14T18:00:00.000Z'), type: 'available', info: null,
+    start: new Date('2023-02-14T16:00:00.000Z'), end: new Date('2023-02-14T18:00:00.000Z'), type: 'available', info: null, airfieldCode: 'EFHK',
   },
 ];
 const timeslotDataBegin = timeslotData.reduce(
@@ -112,7 +112,11 @@ describe('Calls to api', () => {
 
   test('modifying blocked timeslot removes reservations on same time range', async () => {
     const timeslot: Timeslot = await Timeslot.create({
-      start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T14:00:00.000Z'), type: 'blocked', info: 'Under maintenance',
+      start: new Date('2023-02-16T12:00:00.000Z'),
+      end: new Date('2023-02-16T14:00:00.000Z'),
+      type: 'blocked',
+      info: 'Under maintenance',
+      airfieldCode: 'EFHK',
     });
     const reservation: Reservation = await Reservation.create({
       start: new Date('2023-02-16T12:00:00.000Z'),
@@ -192,7 +196,12 @@ describe('Calls to api', () => {
   });
 
   test('can edit an available timeslot', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
+    const createdSlot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-16T12:00:00.000Z'),
+      end: new Date('2023-02-16T13:00:00.000Z'),
+      type: 'available',
+      airfieldCode: 'EFHK',
+    });
 
     await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
@@ -215,6 +224,7 @@ describe('Calls to api', () => {
       end: new Date('2023-02-13T16:00:00.000Z'),
       type: 'available',
       info: null,
+      airfieldCode: 'EFHK',
     });
 
     const res = await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
@@ -241,6 +251,7 @@ describe('Calls to api', () => {
       end: new Date('2023-02-13T16:00:00.000Z'),
       type: 'available',
       info: null,
+      airfieldCode: 'EFHK',
     });
 
     const res = await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
@@ -261,7 +272,12 @@ describe('Calls to api', () => {
   });
 
   test('can edit a blocked timeslot', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'blocked' });
+    const createdSlot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-16T12:00:00.000Z'),
+      end: new Date('2023-02-16T13:00:00.000Z'),
+      type: 'blocked',
+      airfieldCode: 'EFHK',
+    });
 
     await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
@@ -279,7 +295,12 @@ describe('Calls to api', () => {
   });
 
   test('can edit an available timeslot with reservation', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
+    const createdSlot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-16T12:00:00.000Z'),
+      end: new Date('2023-02-16T13:00:00.000Z'),
+      type: 'available',
+      airfieldCode: 'EFHK',
+    });
     const newReservation: Reservation = await Reservation.create({
       start: new Date('2023-02-16T12:00:00.000Z'),
       end: new Date('2023-02-16T13:00:00.000Z'),
@@ -304,7 +325,12 @@ describe('Calls to api', () => {
   });
 
   test('dont edit a timeslot if all fields not provided', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
+    const createdSlot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-16T12:00:00.000Z'),
+      end: new Date('2023-02-16T13:00:00.000Z'),
+      type: 'available',
+      airfieldCode: 'EFHK',
+    });
 
     await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
@@ -320,7 +346,12 @@ describe('Calls to api', () => {
   });
 
   test('dont edit a timeslot if granularity is wrong', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
+    const createdSlot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-16T12:00:00.000Z'),
+      end: new Date('2023-02-16T13:00:00.000Z'),
+      type: 'available',
+      airfieldCode: 'EFHK',
+    });
 
     await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
@@ -338,7 +369,12 @@ describe('Calls to api', () => {
   });
 
   test('dont edit a timeslot if type is not available or blocked', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T13:00:00.000Z'), type: 'available' });
+    const createdSlot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-16T12:00:00.000Z'),
+      end: new Date('2023-02-16T13:00:00.000Z'),
+      type: 'available',
+      airfieldCode: 'EFHK',
+    });
 
     await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
@@ -356,7 +392,12 @@ describe('Calls to api', () => {
   });
 
   test('dont edit a timeslot with reservation  if it goes outside reservation range', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-16T12:00:00.000Z'), end: new Date('2023-02-16T14:00:00.000Z'), type: 'available' });
+    const createdSlot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-16T12:00:00.000Z'),
+      end: new Date('2023-02-16T14:00:00.000Z'),
+      type: 'available',
+      airfieldCode: 'EFHK',
+    });
     const newReservation: Reservation = await Reservation.create({
       start: new Date('2023-02-16T12:00:00.000Z'),
       end: new Date('2023-02-16T14:00:00.000Z'),
@@ -379,7 +420,12 @@ describe('Calls to api', () => {
   });
 
   test('dont edit a timeslot if it is in past', async () => {
-    const createdSlot: Timeslot = await Timeslot.create({ start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), type: 'available' });
+    const createdSlot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-12T12:00:00.000Z'),
+      end: new Date('2023-02-12T14:00:00.000Z'),
+      type: 'available',
+      airfieldCode: 'EFHK',
+    });
 
     const response = await api.put(`/api/EFHK/timeslots/${createdSlot.dataValues.id}`)
       .set('Content-type', 'application/json')
@@ -419,6 +465,7 @@ describe('Calls to api', () => {
       start: new Date('2022-02-13T08:00:00.000Z'),
       end: new Date('2022-02-13T09:00:00.000Z'),
       type: 'available',
+      airfieldCode: 'EFHK',
     });
 
     await api.delete(`/api/EFHK/timeslots/${newTimeslot.id}`);
