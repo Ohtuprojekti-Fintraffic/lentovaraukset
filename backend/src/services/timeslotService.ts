@@ -101,7 +101,6 @@ const createPeriod = async (
   id: number,
   period: {
     periodEnd: Date,
-    name: string,
     days: WeekInDays,
   },
   timeslot: { start: Date, end: Date, type: TimeslotType, info: string | null },
@@ -119,6 +118,8 @@ const createPeriod = async (
   } = timeslot;
   const currentDate = new Date(start.getTime() + dayInMillis);
 
+  const groupName = `group-${Date.now()}`;
+
   while (currentDate <= periodEnd) {
     const dayOfWeek = weekdays[currentDate.getDay()];
     if (days[dayOfWeek as keyof typeof days]) {
@@ -129,7 +130,7 @@ const createPeriod = async (
         end: endTime,
         type,
         info,
-        group: period.name,
+        group: groupName,
       });
     }
     currentDate.setTime(currentDate.getTime() + dayInMillis);
@@ -139,11 +140,11 @@ const createPeriod = async (
 
   const firstTimeslot: Timeslot | null = await Timeslot.findByPk(id);
   if (firstTimeslot) {
-    firstTimeslot.group = period.name;
+    firstTimeslot.group = groupName;
     await firstTimeslot.save();
   }
   const addedTimeslot = await Timeslot
-    .addGroupTimeslots(timeslotGroup.map((t) => ({ ...t, group: period.name })));
+    .addGroupTimeslots(timeslotGroup.map((t) => ({ ...t, group: groupName })));
   return addedTimeslot;
 };
 
