@@ -54,7 +54,6 @@ const daysValidation = z.object({
 const createPeriodValidation = () => {
   const period = z.object({
     periodEnd: z.coerce.date(),
-    name: z.coerce.string(),
     days: daysValidation,
   });
   return period;
