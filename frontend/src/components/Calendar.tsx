@@ -51,6 +51,24 @@ function Calendar({
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
   const { addNewAlert } = React.useContext(AlertContext);
+  const [viewMode, setViewMode] = React.useState(window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek');
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      const newViewMode = window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek';
+      setViewMode(newViewMode);
+
+      if (calendarRef.current) {
+        calendarRef.current.getApi().changeView(newViewMode);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [calendarRef]);
 
   const isSameType = (
     stillEventType: string,
@@ -183,7 +201,7 @@ function Calendar({
         right: 'dayGridMonth,timeGridWeek,listWeek',
       }}
       height="100%"
-      initialView="timeGridWeek"
+      initialView={viewMode}
       allDaySlot={false}
       nowIndicator
       scrollTime="08:00:00"
