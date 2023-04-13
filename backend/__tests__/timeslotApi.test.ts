@@ -652,40 +652,39 @@ describe('Calls to api', () => {
     expect(createdTimeslot).toBeNull();
   });
 
-  // after fixing bug
-  // test('cannot create a period with overlapping timeslots', async () => {
-  //   await Timeslot.create({
-  //     start: new Date('2023-02-16T08:00:00.000Z'),
-  //     end: new Date('2023-02-16T10:00:00.000Z'),
-  //     type: 'available',
-  //     info: null,
-  //   });
+  test('cannot create a period with overlapping timeslots', async () => {
+    const createdTimeslot = await Timeslot.create({
+      start: new Date('2023-02-16T08:00:00.000Z'),
+      end: new Date('2023-02-16T10:00:00.000Z'),
+      type: 'available',
+      info: null,
+    });
 
-  //   const response = await api.post('/api/EFHK/timeslots/')
-  //     .set('Content-type', 'application/json')
-  //     .send({
-  //       start: new Date('2023-02-15T08:00:00.000Z'),
-  //       end: new Date('2023-02-15T10:00:00.000Z'),
-  //       type: 'available',
-  //       info: null,
-  //       periodEnd: new Date('2023-02-18T00:00:00.000Z'),
-  //       name: 'Overlapping period',
-  //       days: {
-  //         monday: true,
-  //         tuesday: true,
-  //         wednesday: true,
-  //         thursday: true,
-  //         friday: true,
-  //         saturday: true,
-  //         sunday: true,
-  //       },
-  //     });
+    const response = await api.put(`/api/EFHK/timeslots/${createdTimeslot.id}`)
+      .set('Content-type', 'application/json')
+      .send({
+        start: new Date('2023-02-15T08:00:00.000Z'),
+        end: new Date('2023-02-15T10:00:00.000Z'),
+        type: 'available',
+        info: null,
+        periodEnd: new Date('2023-02-18T00:00:00.000Z'),
+        name: 'Overlapping period',
+        days: {
+          monday: true,
+          tuesday: true,
+          wednesday: true,
+          thursday: true,
+          friday: true,
+          saturday: true,
+          sunday: true,
+        },
+      });
 
-  //   expect(response.status).toEqual(500);
-  //   expect(response.body.error.message).toEqual('Period already has a timeslot');
+    expect(response.status).toEqual(500);
+    expect(response.body.error.message).toEqual('Operation would result in overlapping timeslots');
 
-  //   const createdPeriodTimeslots = await Timeslot
-  //     .findAll({ where: { group: 'Overlapping period' } });
-  //   expect(createdPeriodTimeslots.length).toEqual(0);
-  // });
+    const createdPeriodTimeslots = await Timeslot
+      .findAll({ where: { group: 'Overlapping period' } });
+    expect(createdPeriodTimeslots.length).toEqual(0);
+  });
 });
