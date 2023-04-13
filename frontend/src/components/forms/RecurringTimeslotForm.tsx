@@ -17,7 +17,7 @@ type RecurringTimeslotProps = {
   isBlocked: boolean
   draggedTimes?: { start: Date, end: Date }
   onSubmit: (
-    formData: Omit<TimeslotEntry, 'id' | 'user'>,
+    formData: Omit<TimeslotEntry, 'id' | 'user' | 'airfieldCode'>,
     period?:
     { end: Date,
       periodName: string,
