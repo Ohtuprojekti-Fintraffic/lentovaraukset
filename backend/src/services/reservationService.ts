@@ -34,10 +34,10 @@ const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | '
   const timeslots = await timeslotService
     .getInTimeRange(newReservation.start, newReservation.end);
   if (timeslots.some((timeslot) => timeslot.type === 'blocked')) {
-    throw new Error('Reservation cannot be created on top of blocked timeslot');
+    throw new ServiceError(ServiceErrorCode.BlockedTimeslot, 'Reservation cannot be created on top of blocked timeslot');
   }
   if (timeslots.length !== 1) {
-    throw new Error('Reservation should be created for one timeslot');
+    throw new ServiceError(ServiceErrorCode.ReservationInMultipleTimeslots, 'Reservation should be created for one timeslot');
   }
 
   const timeslot = timeslots[0];
@@ -62,10 +62,10 @@ const updateById = async (
   const newTimeslots = await timeslotService
     .getInTimeRange(reservation.start, reservation.end);
   if (newTimeslots.some((timeslot) => timeslot.type === 'blocked')) {
-    throw new Error('Reservation cannot be created on top of blocked timeslot');
+    throw new ServiceError(ServiceErrorCode.BlockedTimeslot, 'Reservation cannot be created on top of blocked timeslot');
   }
   if (newTimeslots.length !== 1) {
-    throw new Error('Reservation should be created for one timeslot');
+    throw new ServiceError(ServiceErrorCode.ReservationInMultipleTimeslots, 'Reservation should be created for one timeslot');
   }
 
   const newTimeslot = newTimeslots[0];

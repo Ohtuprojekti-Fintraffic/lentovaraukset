@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { UniqueConstraintError } from 'sequelize';
 import * as z from 'zod';
 import { Airfield } from '../models';
-import ServiceError, { isSpecificServiceError } from './errors';
+import ServiceError from './errors';
 
 const handleZodError = (zodError: z.ZodError): {
   validationIssues: z.typeToFlattenedError<any, { message: string, code: z.ZodIssueCode }>,
@@ -24,10 +24,8 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
   if (err instanceof z.ZodError) {
     const { message, statusCode, validationIssues } = handleZodError(err);
     res.status(statusCode).json({ error: { message, validationIssues } });
-  } else if (isSpecificServiceError(err, ServiceErrorCode.ReservationExceedsTimeslot)) {
-    res.status(400).json({ error: { code: err.errorCode, message: err.message } });
-  } else if (isSpecificServiceError(err, ServiceErrorCode.InvalidAirfield)) {
-    res.status(400).json({ error: { code: err.errorCode, message: err.message } });
+  } else if (err instanceof ServiceError) {
+    res.status(err.errorCode).json({ error: { code: err.errorCode, message: err.message } });
   } else if (err instanceof UniqueConstraintError) {
     const statusCode = 400;
     res.status(statusCode).json({ error: { message: 'Value already exists' } });
