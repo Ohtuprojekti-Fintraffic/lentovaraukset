@@ -18,7 +18,7 @@ import {
 } from '../queries/reservations';
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
-import { getAirfields } from '../queries/airfields';
+import { getAirfields, useAirfield } from '../queries/airfields';
 import { useConfiguration } from '../queries/configurations';
 import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
@@ -33,8 +33,7 @@ function ReservationCalendar() {
 
   const { showPopup, clearPopup } = usePopupContext();
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
-  const [airfield, setAirfield] = useState<AirfieldEntry>();
-  // const { data: airfield } = useAirfield('EFHK); // TODO: get id from airfield selection
+  const { data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
   const { data: configuration } = useConfiguration();
   const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
@@ -202,7 +201,7 @@ function ReservationCalendar() {
         <AirfieldAccordion
           airfield={airfield}
           airfields={airfields}
-          onChange={setAirfield}
+          onChange={(a:AirfieldEntry) => console.log(`${a.name} valittu`)}
         />
         <div className="flex flex-row justify-between mt-0">
           <h1 className="text-3xl">Varauskalenteri</h1>

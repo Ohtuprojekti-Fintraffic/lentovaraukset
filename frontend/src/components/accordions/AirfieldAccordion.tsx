@@ -9,16 +9,15 @@ type AirfieldAccordionProps = {
 };
 
 function AirfieldAccordion({ airfield, airfields, onChange }: AirfieldAccordionProps) {
-  const airfieldAsText = (a: AirfieldEntry) => `${a.name} (${a.code})`;
-
-  const handleSelect = (selectedAirfield: AirfieldEntry) => {
+  const handleSelect = (airfieldName: string) => {
+    const selectedAirfield = airfields.find((a) => a.name === airfieldName)!;
     onChange(selectedAirfield);
   };
 
   return (
     <Accordion
-      defaultSection={airfield ? airfieldAsText(airfield) : 'Valitse lentokenttä'}
-      sections={airfields.map((a) => ({ title: airfieldAsText(a), content: a }))}
+      defaultSection={airfield ? airfield.name : 'Valitse lentokenttä'}
+      sections={airfields.map((a) => a.name)}
       onChange={handleSelect}
     />
   );

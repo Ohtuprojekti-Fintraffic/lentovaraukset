@@ -4,8 +4,8 @@ import Subheader from './Subheader';
 
 type AccordionProps = {
   defaultSection: string,
-  sections: { title: string, content: any }[],
-  onChange: (content: any) => void ;
+  sections: string[],
+  onChange: (section: string) => void ;
 };
 
 function Accordion({ defaultSection, sections, onChange }: AccordionProps) {
@@ -26,14 +26,22 @@ function Accordion({ defaultSection, sections, onChange }: AccordionProps) {
 
       {isActive && Array.from(new Set(sections)).map((section) => ( // Sections must be unique
         <div
-          key={section.title}
+          key={section}
           role="button"
           tabIndex={0}
           className="group border-b border-ft-neutral-200 bg-ft-neutral-100 bg-opacity-20 p-4"
-          onClick={() => onChange(section.content)}
-          onKeyDown={(e) => e.key === 'Enter' && onChange(section.content)}
+          onClick={() => {
+            setIsActive(!isActive);
+            onChange(section);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              setIsActive(!isActive);
+              onChange(section);
+            }
+          }}
         >
-          <Subheader className="group-hover:text-ft-text-300">{section.title}</Subheader>
+          <Subheader className="group-hover:text-ft-text-300">{section}</Subheader>
         </div>
       ))}
     </div>

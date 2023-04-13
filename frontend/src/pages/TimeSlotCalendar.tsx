@@ -9,7 +9,7 @@ import { AirfieldEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/
 import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
-import { getAirfields } from '../queries/airfields';
+import { getAirfields, useAirfield } from '../queries/airfields';
 import {
   getReservations,
 } from '../queries/reservations';
@@ -22,8 +22,7 @@ import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
 function TimeSlotCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
-  const [airfield, setAirfield] = useState<AirfieldEntry>();
-  // const { data: airfield } = useAirfield('EFHK); // TODO: get id from airfield selection
+  const { data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
   const { showPopup, clearPopup } = usePopupContext();
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [blocked, setBlocked] = useState(false);
@@ -233,7 +232,7 @@ function TimeSlotCalendar() {
         <AirfieldAccordion
           airfield={airfield}
           airfields={airfields}
-          onChange={setAirfield}
+          onChange={(a:AirfieldEntry) => console.log(`${a.name} valittu`)}
         />
         <div className="flex flex-row justify-between mt-0">
           <h1 className="text-3xl">Vapaat varausikkunat</h1>
