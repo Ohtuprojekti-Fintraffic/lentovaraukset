@@ -184,7 +184,7 @@ function TimeSlotCalendar() {
     if (timeslot.extendedProps.group) {
       showPopup({
         popupTitle: 'Toistuvan varausikkunan muokkaus',
-        popupText: `Muokkasit toistuvaa varausikkuuna. Muokataanko myös kaikkia tulevia ryhmän '${timeslot.extendedProps.group}' varausikkunoita?`,
+        popupText: 'Muokkasit toistuvaa varausikkuuna. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?',
         primaryText: 'Muokkaa kaikkia',
         primaryOnClick: modifyAllFutureEvents,
         secondaryText: 'Muokkaa vain tätä',
