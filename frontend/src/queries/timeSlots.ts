@@ -24,14 +24,12 @@ const modifyTimeSlot = async (
   timeSlot: TimeslotEntry,
   period?: {
     end: Date,
-    name: string,
     days: WeekInDays
   },
 ): Promise<void> => {
   const modifiedTimeSlot = {
     ...timeSlot,
     periodEnd: period?.end,
-    name: period?.name,
     days: period?.days,
   };
 
