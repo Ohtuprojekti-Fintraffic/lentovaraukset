@@ -3,6 +3,7 @@ import cors from 'cors';
 import timeslotRouter from './routes/timeslots';
 import reservationRouter from './routes/reservations';
 import airfieldRouter from './routes/airfields';
+import configurationRouter from './routes/configurations';
 import { errorHandler, airfieldExtractor, notFoundHandler } from './util/middleware';
 import { Airfield } from './models';
 
@@ -30,6 +31,7 @@ app.use('/api/:airfieldCode/*', airfieldExtractor);
 app.use('/api/:airfieldCode/reservations', reservationRouter);
 app.use('/api/:airfieldCode/timeslots', timeslotRouter);
 app.use('/api/airfields', airfieldRouter);
+app.use('/api/configurations', configurationRouter);
 
 app.use(errorHandler);
 app.use('*', notFoundHandler);

@@ -11,6 +11,7 @@ import type {
 } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast, isTimeAtMostInFuture } from '@lentovaraukset/shared/src/validation/validation';
+import { ConfigurationEntry } from '@lentovaraukset/shared/src';
 import AlertContext from '../contexts/AlertContext';
 
 type CalendarProps = {
@@ -20,6 +21,7 @@ type CalendarProps = {
   modifyEventFn: (event: EventImpl) => Promise<any>;
   clickEventFn: (event: EventImpl) => Promise<void>;
   removeEventFn: (event: EventRemoveArg) => Promise<void>;
+  configuration?: ConfigurationEntry;
   granularity: { minutes: number } | undefined;
   eventColors: {
     backgroundColor?: string;
@@ -39,6 +41,7 @@ function Calendar({
   modifyEventFn,
   clickEventFn,
   removeEventFn,
+  configuration,
   granularity = { minutes: 20 },
   eventColors,
   selectConstraint,
@@ -48,6 +51,24 @@ function Calendar({
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
   const { addNewAlert } = React.useContext(AlertContext);
+  const [viewMode, setViewMode] = React.useState(window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek');
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      const newViewMode = window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek';
+      setViewMode(newViewMode);
+
+      if (calendarRef.current) {
+        calendarRef.current.getApi().changeView(newViewMode);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [calendarRef]);
 
   const isSameType = (
     stillEventType: string,
@@ -76,10 +97,10 @@ function Calendar({
       addNewAlert('Aikaa ei voi lisätä menneisyyteen', 'warning');
       return false;
     }
-    // TODO: Get timeAtMostInFuture from airfield
-    if (checkIfTimeInFuture && !isTimeAtMostInFuture(start, 7)) {
+    const maxDaysInFuture = configuration ? configuration.maxDaysInFuture : 7;
+    if (checkIfTimeInFuture && !isTimeAtMostInFuture(start, maxDaysInFuture)) {
       calendarRef.current?.getApi().unselect();
-      addNewAlert('Aikaa ei voi lisätä yli 7 päivän päähän', 'warning');
+      addNewAlert(`Aikaa ei voi lisätä yli ${maxDaysInFuture} päivän päähän`, 'warning');
       return false;
     }
     if (timeIsConsecutive(start, end, type)) {
@@ -180,7 +201,7 @@ function Calendar({
         right: 'dayGridMonth,timeGridWeek,listWeek',
       }}
       height="100%"
-      initialView="timeGridWeek"
+      initialView={viewMode}
       allDaySlot={false}
       nowIndicator
       scrollTime="08:00:00"

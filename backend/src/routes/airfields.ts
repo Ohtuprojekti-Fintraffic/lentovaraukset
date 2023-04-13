@@ -5,13 +5,9 @@ import airfieldService from '../services/airfieldService';
 
 const router = express.Router();
 
-router.get('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  try {
-    const airfields = await airfieldService.getAirfields();
-    res.json(airfields);
-  } catch (error: unknown) {
-    next(error);
-  }
+router.get('/', async (req: express.Request, res: express.Response) => {
+  const airfields = await airfieldService.getAirfields();
+  res.json(airfields);
 });
 
 router.get('/:code', async (req: express.Request, res: express.Response, next: express.NextFunction) => {

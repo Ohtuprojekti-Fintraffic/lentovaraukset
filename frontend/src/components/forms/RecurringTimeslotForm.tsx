@@ -19,8 +19,8 @@ type RecurringTimeslotProps = {
   onSubmit: (
     formData: Omit<TimeslotEntry, 'id' | 'user' | 'airfieldCode'>,
     period?:
-    { end: Date,
-      periodName: string,
+    {
+      end: Date,
       days: WeekInDays
     }) => void
   id?: string
@@ -33,7 +33,6 @@ type Inputs = {
   info: string | null
   isRecurring: boolean
   periodEnds: string | null
-  periodName: string
   days: {
     maanantai: boolean
     tiistai: boolean
@@ -70,7 +69,6 @@ function RecurringTimeslotForm({
       info: null,
       isRecurring: false,
       periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
-      periodName: timeslot?.extendedProps.periodName,
       days: {
         maanantai: true,
         tiistai: true,
@@ -98,7 +96,6 @@ function RecurringTimeslotForm({
       if (isRecurring && periodEnds) {
         const period = {
           end: new Date(periodEnds),
-          periodName: formData.periodName,
           days: {
             monday: formData.days.maanantai,
             tuesday: formData.days.tiistai,
@@ -163,16 +160,7 @@ function RecurringTimeslotForm({
   }, [reservations]);
 
   return (
-    <div>
-      <div className="bg-black p-3">
-        <p className="text-white">
-          {
-        timeslot
-          ? `Aikaikkuna #${timeslot.id}`
-          : 'Uusi aikaikkuna'
-        }
-        </p>
-      </div>
+    <>
       <ModalAlert
         message={formWarning}
         variant="warning"
@@ -238,19 +226,11 @@ function RecurringTimeslotForm({
                 error={errors.periodEnds}
               />
             )}
-            {showRecurring && (
-            <InputField
-              labelText="Toistuvuuden nimi"
-              type="text"
-              registerReturn={register('periodName')}
-              inputClassName="w-full"
-            />
-            )}
           </div>
           )}
         </form>
       </div>
-    </div>
+    </>
   );
 }
 

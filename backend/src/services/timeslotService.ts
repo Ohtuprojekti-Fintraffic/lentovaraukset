@@ -77,8 +77,8 @@ const errorIfLeadsToConsecutivesOrOverlaps = async (
     timeslotsInRanges.forEach((otherTimeslot) => {
       if (
         timeslot.type === otherTimeslot.type
-        && (timeslot.start === otherTimeslot.end
-        || timeslot.end === otherTimeslot.start)
+        && (timeslot.start.getTime() === otherTimeslot.end.getTime()
+        || timeslot.end.getTime() === otherTimeslot.start.getTime())
       ) {
         throw new Error('Operation would result in consecutive timeslots');
       }
@@ -86,7 +86,7 @@ const errorIfLeadsToConsecutivesOrOverlaps = async (
   });
 
   if (timeslotsInRanges.filter((ts) => ts.type === timeslots[0].type).length > 0) {
-    throw new Error('Operation would result in ovarlapping timeslots');
+    throw new Error('Operation would result in overlapping timeslots');
   }
 };
 
@@ -106,7 +106,6 @@ const createPeriod = async (
   id: number,
   period: {
     periodEnd: Date,
-    name: string,
     days: WeekInDays,
   },
   timeslot: Omit<TimeslotEntry, 'id'>,
@@ -124,6 +123,8 @@ const createPeriod = async (
   } = timeslot;
   const currentDate = new Date(start.getTime() + dayInMillis);
 
+  const groupName = `group-${Date.now()}`;
+
   while (currentDate <= periodEnd) {
     const dayOfWeek = weekdays[currentDate.getDay()];
     if (days[dayOfWeek as keyof typeof days]) {
@@ -135,7 +136,7 @@ const createPeriod = async (
         end: endTime,
         type,
         info,
-        group: period.name,
+        group: groupName,
       });
     }
     currentDate.setTime(currentDate.getTime() + dayInMillis);
@@ -145,11 +146,11 @@ const createPeriod = async (
 
   const firstTimeslot: Timeslot | null = await Timeslot.findByPk(id);
   if (firstTimeslot) {
-    firstTimeslot.group = period.name;
+    firstTimeslot.group = groupName;
     await firstTimeslot.save();
   }
   const addedTimeslot = await Timeslot
-    .addGroupTimeslots(timeslotGroup.map((t) => ({ ...t, group: period.name })));
+    .addGroupTimeslots(timeslotGroup.map((t) => ({ ...t, group: groupName })));
   return addedTimeslot;
 };
 
@@ -172,13 +173,6 @@ const updateById = async (
       && isTimeInPast(oldTimeslot.start))
     || isTimeInPast(oldTimeslot.end)) {
     throw new Error('Timeslot in past cannot be modified');
-  }
-
-  // prevent from being able to move start to past
-  if (
-    slotHasMoved && isTimeInPast(timeslot.start)
-  ) {
-    throw new Error('Timeslot cannot be moved to the past');
   }
 
   if (timeslot.type === 'available') {
