@@ -536,6 +536,7 @@ describe('Calls to api', () => {
       end: new Date('2023-02-19T10:00:00.000Z'),
       type: 'available',
       info: null,
+      airfieldCode: 'EFHK',
     });
 
     await Timeslot.create({
@@ -543,6 +544,7 @@ describe('Calls to api', () => {
       end: new Date('2023-02-19T14:00:00.000Z'),
       type: 'available',
       info: null,
+      airfieldCode: 'EFHK',
     });
 
     const updatedStart = new Date('2023-02-19T10:00:00.000Z');
@@ -588,6 +590,7 @@ describe('Calls to api', () => {
       end: new Date('2023-02-20T14:00:00.000Z'),
       type: 'available',
       info: null,
+      airfieldCode: 'EFHK',
     });
 
     const updatedStart = new Date('2023-01-20T12:00:00.000Z');
@@ -615,6 +618,7 @@ describe('Calls to api', () => {
       end: new Date('2023-02-21T14:00:00.000Z'),
       type: 'available',
       info: null,
+      airfieldCode: 'EFHK',
     });
 
     const reservation = await Reservation.create({
@@ -651,6 +655,7 @@ describe('Calls to api', () => {
       end: new Date('2023-02-21T14:00:00.000Z'),
       type: 'available',
       info: null,
+      airfieldCode: 'EFHK',
     });
 
     const periodEnd = new Date('2023-03-21T16:00:00.000Z');
@@ -705,6 +710,7 @@ describe('Calls to api', () => {
       end: new Date('2023-02-16T10:00:00.000Z'),
       type: 'available',
       info: null,
+      airfieldCode: 'EFHK',
     });
 
     const response = await api.put(`/api/EFHK/timeslots/${createdTimeslot.id}`)
