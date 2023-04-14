@@ -1,5 +1,7 @@
 import { Op } from 'sequelize';
-import { ServiceErrorCode, TimeslotEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src/index';
+import {
+  ServiceErrorCode, TimeslotEntry, TimeslotType, WeekInDays,
+} from '@lentovaraukset/shared/src/index';
 import reservationService from '@lentovaraukset/backend/src/services/reservationService';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import { Timeslot } from '../models';
