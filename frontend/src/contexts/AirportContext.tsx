@@ -6,15 +6,7 @@ import { getAirfield } from '../queries/airfields';
 
 const AirportContext = createContext<AirfieldEntry | undefined>(undefined);
 
-export const useAirportContext = () => {
-  const context = useContext(AirportContext);
-  if (context === undefined) {
-    throw new Error('useAirportContext must be used within a AirportContext');
-  }
-  return context;
-};
-
-const useAirport = () => {
+function useAirport() {
   const [airport, setAirport] = useState<AirfieldEntry | undefined>(undefined);
 
   useEffect(() => {
@@ -31,13 +23,21 @@ const useAirport = () => {
   }, []);
 
   return airport;
-};
+}
+
+function useAirportContext() {
+  const context = useContext(AirportContext);
+  if (context === undefined) {
+    throw new Error('useAirportContext must be used within a AirportContext');
+  }
+  return context;
+}
 
 type AirportProviderProps = {
   children?: React.ReactNode;
 };
 
-export function AirportProvider({ children }: AirportProviderProps) {
+function AirportProvider({ children }: AirportProviderProps) {
   const airport = useAirport();
 
   return (
@@ -46,3 +46,5 @@ export function AirportProvider({ children }: AirportProviderProps) {
     </AirportContext.Provider>
   );
 }
+
+export { AirportProvider, useAirportContext };
