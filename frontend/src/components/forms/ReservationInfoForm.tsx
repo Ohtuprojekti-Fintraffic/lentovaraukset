@@ -34,19 +34,9 @@ function ReservationInfoForm({
   const { data: airfield } = useAirfield('EFHK');
   const reservationGranularity = airfield?.eventGranularityMinutes || 20;
 
-  const start = reservation?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
-  const end = reservation?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
-
   const {
     register, handleSubmit, reset, control, formState: { errors },
   } = useForm<Inputs>({
-    values: {
-      start,
-      end,
-      aircraftId: reservation?.extendedProps.aircraftId,
-      phone: reservation?.extendedProps.phone,
-      info: reservation?.extendedProps.info,
-    },
     resolver: zodResolver(createReservationValidator(reservationGranularity, 7)),
     mode: 'all',
   });
@@ -66,8 +56,16 @@ function ReservationInfoForm({
   };
 
   useEffect(() => {
-    reset();
-  }, [reservation]);
+    const start = reservation?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
+    const end = reservation?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
+    reset({
+      start,
+      end,
+      aircraftId: reservation?.extendedProps.aircraftId || '',
+      phone: reservation?.extendedProps.phone || '',
+      info: reservation?.extendedProps.info || '',
+    });
+  }, [reset, reservation, draggedTimes]);
 
   useEffect(() => {
     // field '' is added to allow access to zod errors not related to a specific field
