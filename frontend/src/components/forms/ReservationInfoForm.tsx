@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
+import { type FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { ReservationEntry } from '@lentovaraukset/shared/src';
@@ -71,9 +71,8 @@ function ReservationInfoForm({
 
   useEffect(() => {
     // field '' is added to allow access to zod errors not related to a specific field
-    setFormWarning((errors as FieldErrors<Inputs & { '': string }>)['']?.message);
+    setFormWarning((errors as FieldErrors<Inputs & { general?: string }>).general?.message);
   }, [errors]);
-
   // TODO: add max future time
   // const max =
 
@@ -93,16 +92,16 @@ function ReservationInfoForm({
               labelText="Varaus alkaa:"
               name="start"
               timeGranularityMinutes={reservationGranularity}
-              error={errors.start}
               showTimeSelect
+              errors={errors}
             />
             <DatePicker
               control={control}
               labelText="Varaus päättyy:"
               name="end"
               timeGranularityMinutes={reservationGranularity}
-              error={errors.end}
               showTimeSelect
+              errors={errors}
             />
           </div>
           <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
@@ -110,13 +109,13 @@ function ReservationInfoForm({
               labelText="Koneen rekisteritunnus:"
               type="text"
               registerReturn={register('aircraftId')}
-              error={errors.aircraftId}
+              errors={errors}
             />
             <InputField
               labelText="Puhelinnumero:"
               type="tel"
               registerReturn={register('phone')}
-              error={errors.phone}
+              errors={errors}
             />
           </div>
           <InputField
@@ -124,7 +123,7 @@ function ReservationInfoForm({
             type="text"
             registerReturn={register('info')}
             inputClassName="w-full"
-            error={errors.info}
+            errors={errors}
           />
         </form>
       </div>

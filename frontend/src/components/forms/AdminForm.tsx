@@ -45,7 +45,7 @@ function AdminForm({ title, configuration }: FormProps) {
             })}
             min={0}
             step={1}
-            error={errors.daysToStart}
+            errors={errors}
           />
           <InputField
             labelText="Kuinka monta päivää tulevaisuuteen varauksen voi tehdä:"
@@ -55,7 +55,7 @@ function AdminForm({ title, configuration }: FormProps) {
             })}
             min={1}
             step={1}
-            error={errors.maxDaysInFuture}
+            errors={errors}
           />
           <Button type="submit" variant="primary">Tallenna</Button>
         </form>
