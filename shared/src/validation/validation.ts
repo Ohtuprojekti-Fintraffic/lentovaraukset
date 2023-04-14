@@ -175,6 +175,23 @@ const createTimeOfDayValidator = (slotGranularityMinutes: number) => z.object({
     .refine((value) => value % slotGranularityMinutes === 0),
 });
 
+const createTimeslotFormGroupShape = () => {
+  const days = z.object({
+    maanantai: z.coerce.boolean(),
+    tiistai: z.coerce.boolean(),
+    keskiviikko: z.coerce.boolean(),
+    torstai: z.coerce.boolean(),
+    perjantai: z.coerce.boolean(),
+    lauantai: z.coerce.boolean(),
+    sunnuntai: z.coerce.boolean(),
+  });
+  return {
+    isRecurring: z.coerce.boolean().optional(),
+    periodEnds: z.coerce.string().optional(),
+    days: days.optional(),
+  };
+};
+
 const createGroupUpdateValidator = (slotGranularityMinutes: number) => {
   const times = z.object({
     startingFrom: z.coerce.date(),
@@ -188,6 +205,7 @@ const createGroupUpdateValidator = (slotGranularityMinutes: number) => {
 export {
   createGroupUpdateValidator,
   createTimeSlotValidatorObject,
+  createTimeslotFormGroupShape,
   refineTimeslotObject,
   createTimeSlotValidator,
   createReservationValidator,

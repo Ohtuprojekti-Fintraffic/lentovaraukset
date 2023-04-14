@@ -5,7 +5,7 @@ import {
   ReservationEntry, TimeslotEntry, TimeslotType, WeekInDays,
 } from '@lentovaraukset/shared/src';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createTimeSlotValidatorObject, refineTimeslotObject } from '@lentovaraukset/shared/src/validation/validation';
+import { createTimeslotFormGroupShape, createTimeSlotValidatorObject, refineTimeslotObject } from '@lentovaraukset/shared/src/validation/validation';
 import { usePopupContext } from '../../contexts/PopupContext';
 import InputField from '../InputField';
 import DatePicker from '../DatePicker';
@@ -84,10 +84,12 @@ function RecurringTimeslotForm({
     // TODO: Use Airfield context here from issue #256
     // for now using default EFHK values
     // TODO: issue #242 could also remove the need to omit type
+    // TODO: make this use the same validation as backend
     resolver: zodResolver(
       refineTimeslotObject(
         createTimeSlotValidatorObject(20) // create object validation
-          .omit({ type: true }), // remove type
+          .omit({ type: true }) // remove type
+          .extend(createTimeslotFormGroupShape()), // add group things
         // add periods are not validated
       ), // refine the object which confirms start < end
     ),
@@ -171,6 +173,8 @@ function RecurringTimeslotForm({
     } else setFormWarning(undefined);
   }, [reservations]);
 
+  const dayLiterals = ['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai'] as const;
+
   return (
     <>
       <ModalAlert
@@ -209,39 +213,39 @@ function RecurringTimeslotForm({
             />
           )}
           {timeslot && (
-          <div className="flex flex-col">
-            <InputField
-              labelText="Määritä toistuvuus"
-              type="checkbox"
-              registerReturn={register('isRecurring')}
-              errors={errors}
-            />
-            {showRecurring && (
-              <div className="flex flex-row flex-wrap flex-start gap-x-6 gap-y-4 border-[1px] rounded-ft-normal p-4 border-ft-neutral-200 mb-4 overflow-x-auto">
-                {['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai'].map(
-                  (day) => (
-                    <InputField
-                      key={day}
-                      labelText={capitalizeFirstLetter(day)}
-                      type="checkbox"
-                      registerReturn={register(`days.${day}` as keyof Inputs)}
-                      inputClassName="mb-0"
-                      errors={errors}
-                    />
-                  ),
-                )}
-              </div>
-            )}
-            {showRecurring && (
-              <DatePicker
-                control={control}
-                labelText="Päättyy:"
-                name="periodEnds"
-                timeGranularityMinutes={timeslotGranularity}
+            <div className="flex flex-col">
+              <InputField
+                labelText="Määritä toistuvuus"
+                type="checkbox"
+                registerReturn={register('isRecurring')}
                 errors={errors}
               />
-            )}
-          </div>
+              {showRecurring && (
+                <div className="flex flex-row flex-wrap flex-start gap-x-6 gap-y-4 border-[1px] rounded-ft-normal p-4 border-ft-neutral-200 mb-4 overflow-x-auto">
+                  {dayLiterals.map(
+                    (day) => (
+                      <InputField
+                        key={day}
+                        labelText={capitalizeFirstLetter(day)}
+                        type="checkbox"
+                        registerReturn={register(`days.${day}`)}
+                        inputClassName="mb-0"
+                        errors={errors}
+                      />
+                    ),
+                  )}
+                </div>
+              )}
+              {showRecurring && (
+                <DatePicker
+                  control={control}
+                  labelText="Päättyy:"
+                  name="periodEnds"
+                  timeGranularityMinutes={timeslotGranularity}
+                  errors={errors}
+                />
+              )}
+            </div>
           )}
         </form>
       </div>
