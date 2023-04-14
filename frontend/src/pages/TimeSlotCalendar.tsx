@@ -222,7 +222,10 @@ function TimeSlotCalendar() {
         draggedTimes={draggedTimesRef?.current || undefined}
         isBlocked={blocked}
         modifyTimeslotFn={modifyTimeslotFn}
-        closeTimeslotModal={closeTimeslotModalFn}
+        closeTimeslotModal={() => {
+          closeTimeslotModalFn();
+          calendarRef.current?.getApi().refetchEvents();
+        }}
       />
       <div className="flex flex-col space-y-2 h-full w-full">
 
