@@ -1,10 +1,11 @@
+import { ErrorMessage } from '@hookform/error-message';
 import React, {
   useId,
   useEffect,
   useState,
 } from 'react';
 import ReactDatePicker from 'react-datepicker';
-import { Control, Controller, FieldError } from 'react-hook-form';
+import { Control, Controller, type FieldErrors } from 'react-hook-form';
 import { fieldBaseClass, fieldStateClasses, InputStates } from './InputField';
 
 type DatePickerProps = {
@@ -14,7 +15,7 @@ type DatePickerProps = {
   labelText?: string;
   helperText?: string;
   timeGranularityMinutes: number;
-  error?: Partial<FieldError>
+  errors: FieldErrors;
 
   // CSS class extensions for the elems
   labelClassName?: string;
@@ -25,7 +26,7 @@ type DatePickerProps = {
 
 function DatePicker({
   control,
-  error,
+  errors,
   name = '',
   placeholder,
   labelText,
@@ -40,9 +41,11 @@ function DatePicker({
 
   const [state, setState] = useState<InputStates>('default');
 
+  const errorsExist = errors !== undefined && errors?.[name] !== undefined;
+
   useEffect(() => {
-    setState(error ? 'error' : 'default');
-  }, [error]);
+    setState(errorsExist ? 'error' : 'default');
+  }, [errorsExist]);
 
   return (
     <div className="flex flex-col items-start flex-wrap">
@@ -79,7 +82,14 @@ function DatePicker({
           </div>
         )}
       />
-      {helperText ? <p className={`text-ft-text-300 -mt-4 ${helperTextClassName}`}>{helperText}</p> : null}
+      <ErrorMessage
+        errors={errors}
+        name={name}
+        render={({ message }) => (
+          <p className={`text-ft-danger-300 -mt-4 mb-1 ${helperTextClassName}`}>{message}</p>
+        )}
+      />
+      {helperText && !errorsExist ? <p className={`text-ft-text-300 -mt-4 mb-1 ${helperTextClassName}`}>{helperText}</p> : null}
     </div>
   );
 }

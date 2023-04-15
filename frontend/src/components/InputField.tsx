@@ -1,9 +1,10 @@
 import React, {
-  MutableRefObject, useEffect, useId, useRef,
+  type MutableRefObject, useId, useRef,
 } from 'react';
-import {
-  UseFormRegisterReturn, FieldError,
+import type {
+  UseFormRegisterReturn, FieldErrors,
 } from 'react-hook-form';
+import { ErrorMessage } from '@hookform/error-message';
 
 export type InputStates = 'default' | 'error' | 'disabled';
 
@@ -11,10 +12,10 @@ export interface FieldProps {
   state?: InputStates;
   type: React.InputHTMLAttributes<HTMLInputElement>['type'];
 
-  value?: React.InputHTMLAttributes<HTMLInputElement>['value'];
-  name?: React.InputHTMLAttributes<HTMLInputElement>['name'];
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
-  onBlur?: React.FocusEventHandler<HTMLInputElement>;
+  value: React.InputHTMLAttributes<HTMLInputElement>['value'];
+  name: React.InputHTMLAttributes<HTMLInputElement>['name'];
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur: React.FocusEventHandler<HTMLInputElement>;
 
   // only applicable to field types:
   // 'datetime-local' | 'date' | 'month' | 'week' | 'time' | 'number' | 'range'
@@ -27,30 +28,30 @@ export interface FieldProps {
   labelText?: string;
   helperText?: string;
 
-  error?: Partial<FieldError>
-
   // CSS class extensions for the elems
   labelClassName?: string;
   inputClassName?: string;
   helperTextClassName?: string;
 
   // used in separate type below
-  registerReturn: undefined;
+  registerReturn?: undefined;
+  errors?: undefined;
   defaultValue?: string;
 }
 
-export interface RHFFieldProps extends Omit<FieldProps, 'registerReturn' | 'value' | 'onChange' | 'onBlur'> {
+export interface RHFFieldProps extends Omit<FieldProps, 'registerReturn' | 'value' | 'onChange' | 'onBlur' | 'name' | 'errors'> {
   // RHF's register provides these
   value?: undefined;
   onChange?: undefined;
   name?: undefined;
   onBlur?: undefined;
 
-  // React Hook Form register return value
+  // React Hook Form register return value and errors
   registerReturn: UseFormRegisterReturn<any>;
+  errors: FieldErrors<any>;
 }
 
-export const fieldBaseClass = 'w-full border-[1px] rounded-ft-normal px-4 py-[13px] text-ft-button font-ft-label '
+export const fieldBaseClass = 'w-full border-[1px] rounded-ft-normal px-[16px] py-[13px] text-ft-button font-ft-label '
   + 'placeholder:text-ft-text-300 mb-4';
 
 export const checkboxBaseClass = 'mb-4';
@@ -60,7 +61,7 @@ export const fieldInvalidClass = 'invalid:bg-ft-warning-100 invalid:text-ft-warn
 
 export const fieldStateClasses = {
   default: 'border-ft-neutral-200',
-  error: 'border-[3px] border-ft-danger-200 text-ft-danger-200',
+  error: 'border-[3px] py-[11px] px-[14px] border-ft-danger-200 text-ft-danger-200',
   disabled: 'border-ft-neutral-200 text-ft-text-300 bg-ft-input-placeholder',
   invalid: fieldInvalidClass,
 };
@@ -71,7 +72,7 @@ function InputField({
   value, name, onChange, onBlur,
   step, min, max,
   placeholder, labelText, helperText,
-  error,
+  errors,
   registerReturn,
   labelClassName = '',
   inputClassName = '',
@@ -82,10 +83,9 @@ function InputField({
 
   const inputRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
 
-  useEffect(() => {
-    inputRef.current?.setCustomValidity(error?.message || '');
-    inputRef.current?.reportValidity();
-  }, [error]);
+  const errorsExist = errors !== undefined && errors?.[registerReturn.name] !== undefined;
+
+  const fieldState = errorsExist ? 'error' : state;
 
   return (
     <div className={type === 'checkbox'
@@ -110,8 +110,8 @@ function InputField({
         disabled={state === 'disabled'}
         placeholder={placeholder}
         className={type === 'checkbox'
-          ? `${checkboxBaseClass} ${fieldStateClasses[state]} ${fieldInvalidClass} ${inputClassName}`
-          : `${fieldBaseClass} ${fieldStateClasses[state]} ${fieldInvalidClass} ${inputClassName}`}
+          ? `${checkboxBaseClass} ${fieldStateClasses[fieldState]} ${fieldInvalidClass} ${inputClassName}`
+          : `${fieldBaseClass} ${fieldStateClasses[fieldState]} ${fieldInvalidClass} ${inputClassName}`}
         defaultValue={defaultValue}
         step={step}
         min={min}
@@ -126,7 +126,17 @@ function InputField({
           inputRef.current = e;
         }}
       />
-      {helperText ? <p className={`text-ft-text-300 -mt-4 ${helperTextClassName}`}>{helperText}</p> : null}
+      {registerReturn && (
+      // ErrorMessage is only used for react hook form fields
+      <ErrorMessage
+        errors={errors}
+        name={registerReturn?.name}
+        render={({ message }) => (
+          <p className={`text-ft-danger-300 -mt-4 mb-1 ${helperTextClassName}`}>{message}</p>
+        )}
+      />
+      )}
+      {helperText && !errorsExist ? <p className={`text-ft-text-300 -mt-4 mb-1 ${helperTextClassName}`}>{helperText}</p> : null}
     </div>
   );
 }
