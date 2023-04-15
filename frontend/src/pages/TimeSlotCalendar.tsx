@@ -9,7 +9,6 @@ import { TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
 import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
-import { useAirfield } from '../queries/airfields';
 import {
   getReservations,
 } from '../queries/reservations';
@@ -17,10 +16,11 @@ import {
   getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup,
 } from '../queries/timeSlots';
 import { usePopupContext } from '../contexts/PopupContext';
+import { useAirportContext } from '../contexts/AirportContext';
 
 function TimeSlotCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
-  const { data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
+  const { airport } = useAirportContext(); // TODO: get id from airfield selection
   const { showPopup, clearPopup } = usePopupContext();
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [blocked, setBlocked] = useState(false);
@@ -244,7 +244,7 @@ function TimeSlotCalendar() {
           modifyEventFn={modifyTimeslotFn}
           clickEventFn={clickTimeslot}
           removeEventFn={removeTimeSlot}
-          granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
+          granularity={airport && { minutes: airport.eventGranularityMinutes }}
           eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}
           selectConstraint={undefined}
           blocked={blocked}

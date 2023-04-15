@@ -1,19 +1,22 @@
 import React, {
-  createContext, useContext, useEffect, useState,
+  createContext, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import { getAirfield } from '../queries/airfields';
 
-const AirportContext = createContext<AirfieldEntry | undefined>(undefined);
+type AirportContextType = {
+  airport: AirfieldEntry | undefined,
+  setAirportICAO: (icao: string) => void,
+};
 
-function useAirport() {
+const AirportContext = createContext<AirportContextType>({} as AirportContextType);
+
+function useAirport(icao: string | undefined) {
   const [airport, setAirport] = useState<AirfieldEntry | undefined>(undefined);
 
   useEffect(() => {
-    const icao = window.location.pathname.split('/')[1];
-
     const fetchAirport = async () => {
-      const airfield = await getAirfield(icao);
+      const airfield = await getAirfield(icao!);
       setAirport(airfield);
     };
 
@@ -38,10 +41,28 @@ type AirportProviderProps = {
 };
 
 function AirportProvider({ children }: AirportProviderProps) {
-  const airport = useAirport();
+  const [icao, setIcao] = useState<string | undefined>('EFHK');
+
+  if (!icao) {
+    const storedIcao = localStorage.getItem('icao');
+    if (storedIcao) {
+      setIcao(storedIcao);
+    }
+  }
+
+  const airport = useAirport(icao);
+
+  const setAirportICAO = (new_icao: string) => {
+    setIcao(new_icao);
+    localStorage.setItem('icao', new_icao);
+  };
+
+  const contextValues = useMemo(() => ({
+    airport, setAirportICAO,
+  }), [airport, setAirportICAO]);
 
   return (
-    <AirportContext.Provider value={airport}>
+    <AirportContext.Provider value={contextValues}>
       {children}
     </AirportContext.Provider>
   );

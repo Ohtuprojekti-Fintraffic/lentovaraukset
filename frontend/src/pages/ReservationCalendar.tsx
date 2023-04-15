@@ -14,11 +14,11 @@ import {
 } from '../queries/reservations';
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
-import { useAirfield } from '../queries/airfields';
 import { useConfiguration } from '../queries/configurations';
 import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
 import { usePopupContext } from '../contexts/PopupContext';
+import { useAirportContext } from '../contexts/AirportContext';
 
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -27,7 +27,7 @@ function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { showPopup, clearPopup } = usePopupContext();
-  const { data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
+  const { airport } = useAirportContext(); // TODO: get id from airfield selection
   const { data: configuration } = useConfiguration();
   const { addNewAlert } = useContext(AlertContext);
   const reservationsSourceFn: EventSourceFunc = async (
@@ -167,7 +167,7 @@ function ReservationCalendar() {
     if (eventsByType?.some((e) => e.extendedProps.type === 'blocked')) return false;
     const mostConcurrent = countMostConcurrent(eventsByType as { start: Date, end: Date }[]);
 
-    return airfield ? mostConcurrent < airfield.maxConcurrentFlights : false;
+    return airport ? mostConcurrent < airport.maxConcurrentFlights : false;
   };
 
   const showModalAfterDrag = (times: { start: Date, end: Date }) => {
@@ -196,7 +196,7 @@ function ReservationCalendar() {
           modifyEventFn={modifyReservationFn}
           clickEventFn={clickReservation}
           removeEventFn={removeReservation}
-          granularity={airfield && { minutes: airfield.eventGranularityMinutes }}
+          granularity={airport && { minutes: airport.eventGranularityMinutes }}
           eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFFF' }}
           selectConstraint="timeslots"
           checkIfTimeInFuture

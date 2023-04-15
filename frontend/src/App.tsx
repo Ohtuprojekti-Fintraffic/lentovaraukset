@@ -9,6 +9,7 @@ import { AlertContextProvider } from './contexts/AlertContext';
 import AlertContainer from './components/AlertContainer';
 import { PopupProvider } from './contexts/PopupContext';
 import Popup from './components/Popup';
+import { AirportProvider } from './contexts/AirportContext';
 
 const queryClient = new QueryClient();
 
@@ -23,11 +24,13 @@ function App() {
         <Navigation />
         <PopupProvider>
           <AlertContextProvider>
-            <AlertContainer />
-            <Popup />
-            <main className="flex flex-row flex-grow p-10 overflow-y-auto">
-              <Outlet />
-            </main>
+            <AirportProvider>
+              <AlertContainer />
+              <Popup />
+              <main className="flex flex-row flex-grow p-10 overflow-y-auto">
+                <Outlet />
+              </main>
+            </AirportProvider>
           </AlertContextProvider>
         </PopupProvider>
       </div>
