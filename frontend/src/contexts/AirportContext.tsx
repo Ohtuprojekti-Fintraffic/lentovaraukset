@@ -41,6 +41,7 @@ type AirportProviderProps = {
 };
 
 function AirportProvider({ children }: AirportProviderProps) {
+  // TODO: set default airport as undefined and show a landing page to select one
   const [icao, setIcao] = useState<string | undefined>('EFHK');
 
   if (!icao) {
