@@ -13,7 +13,7 @@ const isTimeNotFarEnoughInFuture = (time: Date, offsetDays: number): boolean => 
   const futureDate = new Date();
   futureDate.setDate(futureDate.getDate() + offsetDays);
   return new Date(time) < futureDate;
-}
+};
 
 const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => {
   const max = new Date();
