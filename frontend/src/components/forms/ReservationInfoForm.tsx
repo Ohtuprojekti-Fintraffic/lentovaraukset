@@ -87,7 +87,7 @@ function ReservationInfoForm({
           <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
             <DatePicker
               control={control}
-              labelText="Varaus alkaa:"
+              labelText="Varaus alkaa (UTC):"
               name="start"
               timeGranularityMinutes={reservationGranularity}
               showTimeSelect
@@ -95,7 +95,7 @@ function ReservationInfoForm({
             />
             <DatePicker
               control={control}
-              labelText="Varaus päättyy:"
+              labelText="Varaus päättyy (UTC):"
               name="end"
               timeGranularityMinutes={reservationGranularity}
               showTimeSelect

@@ -187,7 +187,7 @@ function RecurringTimeslotForm({
           <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
             <DatePicker
               control={control}
-              labelText="Aikaikkuna alkaa:"
+              labelText="Aikaikkuna alkaa (UTC):"
               name="start"
               timeGranularityMinutes={timeslotGranularity}
               showTimeSelect
@@ -195,7 +195,7 @@ function RecurringTimeslotForm({
             />
             <DatePicker
               control={control}
-              labelText="Aikaikkuna päättyy:"
+              labelText="Aikaikkuna päättyy (UTC):"
               name="end"
               timeGranularityMinutes={timeslotGranularity}
               showTimeSelect
@@ -238,7 +238,7 @@ function RecurringTimeslotForm({
               {showRecurring && (
                 <DatePicker
                   control={control}
-                  labelText="Päättyy:"
+                  labelText="Päättyy (UTC):"
                   name="periodEnds"
                   timeGranularityMinutes={timeslotGranularity}
                   errors={errors}
