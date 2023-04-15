@@ -9,6 +9,12 @@ const isMultipleOfMinutes = (minutes: number) => (dateToCheck: Date) => (
 
 const isTimeInPast = (time: Date): boolean => new Date(time) < new Date();
 
+const isTimeNotFarEnoughInFuture = (time: Date, offsetDays: number): boolean => {
+  const futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + offsetDays);
+  return new Date(time) < futureDate;
+}
+
 const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => {
   const max = new Date();
   max.setDate(max.getDate() + maxDaysInFuture);
@@ -73,7 +79,7 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
   // Time must be a multiple of ${slotGranularityMinutes} minutes
   const minuteMultipleMessage = `Ajan tulee olla jokin ${slotGranularityMinutes} minuutin moninkerta`;
   // Reservation cannot be in past
-  const pastErrorMessage = 'Varaus ei voi ajoittua menneisyyteen';
+  const pastErrorMessage = 'Varaus tulee tehdä vähintään 1 päivää etukäteen';
   // Reservation start time cannot be further than ${maxDaysInFuture} days away
   const tooFarInFutureErrorMessage = `Voit tehdä varauksen korkeintaan ${maxDaysInFuture} päivän päähän`;
   // Reservation start time cannot be later than the end time
@@ -87,7 +93,7 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
     start: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
-      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage })
+      .refine((value) => !isTimeNotFarEnoughInFuture(value, 1), { message: pastErrorMessage })
       .refine(
         (value) => isTimeAtMostInFuture(value, maxDaysInFuture),
         { message: tooFarInFutureErrorMessage },
@@ -95,7 +101,7 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
     end: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
-      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
+      .refine((value) => !isTimeNotFarEnoughInFuture(value, 1), { message: pastErrorMessage }),
     aircraftId: z.string().trim().min(1, { message: aircraftIdEmptyErrorMessage }),
     info: z.string().optional(),
     phone: z.string().trim().min(1, { message: phoneNumberEmptyErrorMessage }),
@@ -213,6 +219,7 @@ export {
   getTimeRangeValidator,
   isTimeInPast,
   isTimeAtMostInFuture,
+  isTimeNotFarEnoughInFuture,
   airfieldValidator,
   configurationValidator,
   createPeriodValidation,

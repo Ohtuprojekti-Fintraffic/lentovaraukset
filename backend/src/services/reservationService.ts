@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
 import { ReservationEntry, ServiceErrorCode } from '@lentovaraukset/shared/src';
 import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
-import { isTimeInPast, reservationIsWithinTimeslot } from '@lentovaraukset/shared/src/validation/validation';
+import { isTimeInPast, isTimeNotFarEnoughInFuture, reservationIsWithinTimeslot } from '@lentovaraukset/shared/src/validation/validation';
 import { Reservation } from '../models';
 import ServiceError from '../util/errors';
 
@@ -76,7 +76,7 @@ const updateById = async (
 
   const oldReservation: Reservation | null = await Reservation.findByPk(id);
 
-  if (oldReservation && isTimeInPast(oldReservation.start)) {
+  if (oldReservation && isTimeNotFarEnoughInFuture(oldReservation.start, 1)) {
     throw new Error('Reservation in past cannot be modified');
   }
   const oldTimeslot = await oldReservation?.getTimeslot();
