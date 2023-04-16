@@ -25,10 +25,12 @@
   "dependencies": {
     "@hookform/resolvers": "^2.9.11",
     "dotenv": "^16.0.3",
+    "luxon": "^3.3.0",
     "react-hook-form": "^7.43.3"
   },
   "devDependencies": {
     "@types/jest": "^29.2.6",
+    "@types/luxon": "^3.3.0",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
     "cypress": "^12.5.1",

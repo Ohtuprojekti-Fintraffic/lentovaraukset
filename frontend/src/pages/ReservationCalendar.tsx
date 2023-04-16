@@ -20,6 +20,11 @@ import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
 import { usePopupContext } from '../contexts/PopupContext';
 
+type StartEndPair = {
+  start: Date;
+  end: Date;
+};
+
 function ReservationCalendar() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const selectedReservationRef = useRef<EventImpl | null>(null);
@@ -87,23 +92,26 @@ function ReservationCalendar() {
 
   const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
 
-  const showReservationModalFn = (reservation: EventImpl | null) => {
-    selectedReservationRef.current = reservation;
+  // either or neither, but not both
+  function showReservationModalFn(event: EventImpl, times: StartEndPair): never;
+  function showReservationModalFn(event: EventImpl | null, times: StartEndPair | null): void;
+  function showReservationModalFn(
+    event: EventImpl | null,
+    times: StartEndPair | null,
+  ): void {
+    selectedReservationRef.current = event;
+    draggedTimesRef.current = times;
     setShowInfoModal(true);
-  };
+  }
 
-  const closeReservationModalFn = () => {
-    selectedReservationRef.current = null;
-    setShowInfoModal(false);
-    calendarRef.current?.getApi().refetchEvents();
-  };
+  const closeReservationModalFn = () => setShowInfoModal(false);
 
   const clickReservation = async (event: EventImpl): Promise<void> => {
     if ((event.end && isTimeInPast(event.end)) || event.groupId === 'timeslots') {
       return;
     }
 
-    showReservationModalFn(event);
+    showReservationModalFn(event, null);
   };
 
   const removeReservation = async (removeInfo: EventRemoveArg) => {
@@ -170,10 +178,7 @@ function ReservationCalendar() {
     return airfield ? mostConcurrent < airfield.maxConcurrentFlights : false;
   };
 
-  const showModalAfterDrag = (times: { start: Date, end: Date }) => {
-    draggedTimesRef.current = times;
-    showReservationModalFn(null);
-  };
+  const showModalAfterDrag = (times: StartEndPair) => showReservationModalFn(null, times);
 
   return (
     <>
@@ -182,12 +187,15 @@ function ReservationCalendar() {
         showInfoModal={showInfoModal}
         reservation={selectedReservationRef?.current || undefined}
         draggedTimes={draggedTimesRef?.current || undefined}
-        closeReservationModal={closeReservationModalFn}
+        closeReservationModal={() => {
+          closeReservationModalFn();
+          calendarRef.current?.getApi().refetchEvents();
+        }}
       />
       <div className="flex flex-col space-y-2 h-full w-full">
         <div className="flex flex-row justify-between mt-0">
           <h1 className="text-3xl">Varauskalenteri</h1>
-          <Button variant="primary" onClick={() => setShowInfoModal(true)}>Uusi varaus</Button>
+          <Button variant="primary" onClick={() => showReservationModalFn(null, null)}>Uusi varaus</Button>
         </div>
         <Calendar
           calendarRef={calendarRef}
