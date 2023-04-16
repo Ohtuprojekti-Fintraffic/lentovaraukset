@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
 import { ReservationEntry, ServiceErrorCode } from '@lentovaraukset/shared/src';
 import timeslotService from '@lentovaraukset/backend/src/services/timeslotService';
-import { isTimeInPast, isTimeNotFarEnoughInFuture, reservationIsWithinTimeslot } from '@lentovaraukset/shared/src/validation/validation';
+import { isTimeInPast, reservationIsWithinTimeslot } from '@lentovaraukset/shared/src/validation/validation';
 import { Reservation } from '../models';
 import ServiceError from '../util/errors';
 

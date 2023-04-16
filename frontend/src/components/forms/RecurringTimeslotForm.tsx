@@ -58,29 +58,10 @@ function RecurringTimeslotForm({
   const [formWarning, setFormWarning] = useState<string | undefined>(undefined);
   const { showPopup, clearPopup } = usePopupContext();
   const timeslotGranularity = airfield?.eventGranularityMinutes || 20;
-  const start = timeslot?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
-  const end = timeslot?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
 
   const {
     register, handleSubmit, reset, watch, control, formState: { errors }, getValues,
   } = useForm<Inputs>({
-    values: {
-      start,
-      end,
-      type: timeslot?.extendedProps.type,
-      info: null,
-      isRecurring: false,
-      periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
-      days: {
-        maanantai: true,
-        tiistai: true,
-        keskiviikko: true,
-        torstai: true,
-        perjantai: true,
-        lauantai: true,
-        sunnuntai: true,
-      },
-    },
     // TODO: Use Airfield context here from issue #256
     // for now using default EFHK values
     // TODO: issue #242 could also remove the need to omit type
@@ -144,13 +125,31 @@ function RecurringTimeslotForm({
   const onError = (e: any) => console.error(e);
 
   useEffect(() => {
-    reset();
-  }, [timeslot]);
+    const start = timeslot?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
+    const end = timeslot?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
+
+    reset({
+      start,
+      end,
+      type: timeslot?.extendedProps.type || '',
+      info: null,
+      isRecurring: false,
+      periodEnds: timeslot?.endStr.replace(/T.*/, '') || '',
+      days: {
+        maanantai: true,
+        tiistai: true,
+        keskiviikko: true,
+        torstai: true,
+        perjantai: true,
+        lauantai: true,
+        sunnuntai: true,
+      },
+    });
+  }, [reset, timeslot, draggedTimes]);
 
   useEffect(() => {
     // field '' is added to allow access to zod errors not related to a specific field
     setFormWarning((errors as FieldErrors<Inputs & { general?: string }>).general?.message);
-    console.log(errors);
   }, [errors]);
 
   const showRecurring = watch('isRecurring');
@@ -188,7 +187,7 @@ function RecurringTimeslotForm({
           <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
             <DatePicker
               control={control}
-              labelText="Aikaikkuna alkaa:"
+              labelText="Aikaikkuna alkaa (UTC):"
               name="start"
               timeGranularityMinutes={timeslotGranularity}
               showTimeSelect
@@ -196,7 +195,7 @@ function RecurringTimeslotForm({
             />
             <DatePicker
               control={control}
-              labelText="Aikaikkuna päättyy:"
+              labelText="Aikaikkuna päättyy (UTC):"
               name="end"
               timeGranularityMinutes={timeslotGranularity}
               showTimeSelect
@@ -239,7 +238,7 @@ function RecurringTimeslotForm({
               {showRecurring && (
                 <DatePicker
                   control={control}
-                  labelText="Päättyy:"
+                  labelText="Päättyy (UTC):"
                   name="periodEnds"
                   timeGranularityMinutes={timeslotGranularity}
                   errors={errors}
