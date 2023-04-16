@@ -3,13 +3,13 @@ import {
 } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
-import { TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
+import { AirfieldEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
 import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
-import { useAirfield } from '../queries/airfields';
+import { getAirfields, useAirfield } from '../queries/airfields';
 import {
   getReservations,
 } from '../queries/reservations';
@@ -17,6 +17,7 @@ import {
   getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup,
 } from '../queries/timeSlots';
 import { usePopupContext } from '../contexts/PopupContext';
+import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
 
 type StartEndPair = {
   start: Date;
@@ -25,6 +26,7 @@ type StartEndPair = {
 
 function TimeSlotCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
+  const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
   const { data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
   const { showPopup, clearPopup } = usePopupContext();
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -213,6 +215,13 @@ function TimeSlotCalendar() {
 
   const showModalAfterDrag = (times: StartEndPair) => showTimeslotModalFn(null, times);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setAirfields(await getAirfields());
+    };
+    fetchData();
+  }, []);
+
   return (
     <>
       {/* This is outside the div because spacing affects it even though it's a modal */}
@@ -228,7 +237,11 @@ function TimeSlotCalendar() {
         }}
       />
       <div className="flex flex-col space-y-2 h-full w-full">
-
+        <AirfieldAccordion
+          airfield={airfield}
+          airfields={airfields}
+          onChange={(a:AirfieldEntry) => console.log(`${a.name} valittu`)}
+        />
         <div className="flex flex-row justify-between mt-0">
           <h1 className="text-3xl">Vapaat varausikkunat</h1>
           <Button variant="primary" onClick={() => showTimeslotModalFn(null, null)}>Uusi varausikkuna</Button>

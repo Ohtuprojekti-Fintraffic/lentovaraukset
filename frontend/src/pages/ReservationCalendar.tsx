@@ -1,11 +1,15 @@
 import { AllowFunc, EventRemoveArg, EventSourceFunc } from '@fullcalendar/core';
 import React, {
-  useState, useRef, useContext,
+  useState,
+  useRef,
+  useContext,
+  useEffect,
 } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
+import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -14,11 +18,12 @@ import {
 } from '../queries/reservations';
 import { getTimeSlots } from '../queries/timeSlots';
 import ReservationInfoModal from '../modals/ReservationInfoModal';
-import { useAirfield } from '../queries/airfields';
+import { getAirfields, useAirfield } from '../queries/airfields';
 import { useConfiguration } from '../queries/configurations';
 import Button from '../components/Button';
 import AlertContext from '../contexts/AlertContext';
 import { usePopupContext } from '../contexts/PopupContext';
+import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
 
 type StartEndPair = {
   start: Date;
@@ -32,6 +37,7 @@ function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { showPopup, clearPopup } = usePopupContext();
+  const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
   const { data: airfield } = useAirfield('EFHK'); // TODO: get id from airfield selection
   const { data: configuration } = useConfiguration();
   const { addNewAlert } = useContext(AlertContext);
@@ -180,6 +186,13 @@ function ReservationCalendar() {
 
   const showModalAfterDrag = (times: StartEndPair) => showReservationModalFn(null, times);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setAirfields(await getAirfields());
+    };
+    fetchData();
+  }, []);
+
   return (
     <>
       {/* This is outside the div because spacing affects it even though it's a modal */}
@@ -193,6 +206,11 @@ function ReservationCalendar() {
         }}
       />
       <div className="flex flex-col space-y-2 h-full w-full">
+        <AirfieldAccordion
+          airfield={airfield}
+          airfields={airfields}
+          onChange={(a:AirfieldEntry) => console.log(`${a.name} valittu`)}
+        />
         <div className="flex flex-row justify-between mt-0">
           <h1 className="text-3xl">Varauskalenteri</h1>
           <Button variant="primary" onClick={() => showReservationModalFn(null, null)}>Uusi varaus</Button>
