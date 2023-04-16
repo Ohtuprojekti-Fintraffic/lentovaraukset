@@ -183,6 +183,7 @@ function ReservationCalendar() {
         reservation={selectedReservationRef?.current || undefined}
         draggedTimes={draggedTimesRef?.current || undefined}
         closeReservationModal={closeReservationModalFn}
+        configuration={configuration}
       />
       <div className="flex flex-col space-y-2 h-full w-full">
         <div className="flex flex-row justify-between mt-0">

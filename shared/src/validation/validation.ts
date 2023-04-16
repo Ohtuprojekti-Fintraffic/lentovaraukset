@@ -75,11 +75,15 @@ const createPeriodValidation = () => {
   return period;
 };
 
-const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFuture: number) => {
+const createReservationValidator = (
+  slotGranularityMinutes: number,
+  maxDaysInFuture: number,
+  daysToStart: number,
+) => {
   // Time must be a multiple of ${slotGranularityMinutes} minutes
   const minuteMultipleMessage = `Ajan tulee olla jokin ${slotGranularityMinutes} minuutin moninkerta`;
   // Reservation cannot be in past
-  const pastErrorMessage = 'Varaus ei voi olla menneisyydessä';
+  const pastErrorMessage = 'Varaus ei voi ajoittua menneisyyteen';
   const farEnoughErrorMessage = 'Varaus tulee tehdä vähintään 1 päivää etukäteen';
   // Reservation start time cannot be further than ${maxDaysInFuture} days away
   const tooFarInFutureErrorMessage = `Voit tehdä varauksen korkeintaan ${maxDaysInFuture} päivän päähän`;
@@ -95,7 +99,10 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage })
-      .refine((value) => !isTimeNotFarEnoughInFuture(value, 1), { message: farEnoughErrorMessage })
+      .refine(
+        (value) => !isTimeNotFarEnoughInFuture(value, daysToStart),
+        { message: farEnoughErrorMessage },
+      )
       .refine(
         (value) => isTimeAtMostInFuture(value, maxDaysInFuture),
         { message: tooFarInFutureErrorMessage },
@@ -104,7 +111,10 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage })
-      .refine((value) => !isTimeNotFarEnoughInFuture(value, 1), { message: farEnoughErrorMessage }),
+      .refine(
+        (value) => !isTimeNotFarEnoughInFuture(value, daysToStart),
+        { message: farEnoughErrorMessage },
+      ),
     aircraftId: z.string().trim().min(1, { message: aircraftIdEmptyErrorMessage }),
     info: z.string().optional(),
     phone: z.string().trim().min(1, { message: phoneNumberEmptyErrorMessage }),

@@ -50,6 +50,7 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
     const newReservation = createReservationValidator(
       airfield.eventGranularityMinutes,
       configuration.maxDaysInFuture,
+      configuration.daysToStart,
     ).parse(req.body);
 
     if (!await allowReservation(
@@ -77,6 +78,7 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
     const validReservationUpdate = createReservationValidator(
       airfield.eventGranularityMinutes,
       configuration.maxDaysInFuture,
+      configuration.daysToStart,
     ).parse(req.body);
 
     if (!await allowReservation(

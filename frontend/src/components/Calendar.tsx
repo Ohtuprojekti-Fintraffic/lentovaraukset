@@ -103,9 +103,10 @@ function Calendar({
       addNewAlert(`Aikaa ei voi lisätä yli ${maxDaysInFuture} päivän päähän`, 'warning');
       return false;
     }
-    if (checkIfTimeInFuture && isTimeNotFarEnoughInFuture(start, 1)) {
+    const daysToStart = configuration ? configuration.daysToStart : 0;
+    if (checkIfTimeInFuture && isTimeNotFarEnoughInFuture(start, daysToStart)) {
       calendarRef.current?.getApi().unselect();
-      addNewAlert(`Aika pitää varata vähintään ${1} päivää etukäteen`, 'warning');
+      addNewAlert(`Aika pitää varata vähintään ${daysToStart} päivää etukäteen`, 'warning');
       return false;
     }
     if (timeIsConsecutive(start, end, type)) {
