@@ -10,7 +10,7 @@ import type {
   EventSourceInput,
 } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { isTimeInPast, isTimeAtMostInFuture } from '@lentovaraukset/shared/src/validation/validation';
+import { isTimeInPast, isTimeAtMostInFuture, isTimeNotFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
 import AlertContext from '../contexts/AlertContext';
 
@@ -101,6 +101,11 @@ function Calendar({
     if (checkIfTimeInFuture && !isTimeAtMostInFuture(start, maxDaysInFuture)) {
       calendarRef.current?.getApi().unselect();
       addNewAlert(`Aikaa ei voi lisätä yli ${maxDaysInFuture} päivän päähän`, 'warning');
+      return false;
+    }
+    if (checkIfTimeInFuture && isTimeNotFarEnoughInFuture(start, 1)) {
+      calendarRef.current?.getApi().unselect();
+      addNewAlert(`Aika pitää varata vähintään ${1} päivää etukäteen`, 'warning');
       return false;
     }
     if (timeIsConsecutive(start, end, type)) {
