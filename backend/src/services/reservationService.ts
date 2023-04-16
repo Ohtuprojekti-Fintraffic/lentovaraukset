@@ -76,7 +76,7 @@ const updateById = async (
 
   const oldReservation: Reservation | null = await Reservation.findByPk(id);
 
-  if (oldReservation && isTimeNotFarEnoughInFuture(oldReservation.start, 1)) {
+  if (oldReservation && isTimeInPast(oldReservation.start)) {
     throw new Error('Reservation in past cannot be modified');
   }
   const oldTimeslot = await oldReservation?.getTimeslot();
