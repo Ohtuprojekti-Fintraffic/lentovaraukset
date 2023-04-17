@@ -1,4 +1,5 @@
 import { z, type ZodTypeAny } from 'zod';
+import { DateTime } from 'luxon';
 import { ReservationEntry, TimeslotEntry } from '..';
 
 const minutesToMilliseconds = (minutes: number) => minutes * 1000 * 60;
@@ -9,18 +10,13 @@ const isMultipleOfMinutes = (minutes: number) => (dateToCheck: Date) => (
 
 const isTimeInPast = (time: Date): boolean => new Date(time) < new Date();
 
-const isTimeNotFarEnoughInFuture = (time: Date, offsetDays: number): boolean => {
-  const futureDate = new Date();
-  futureDate.setDate(futureDate.getDate() + offsetDays);
-  return new Date(time) < futureDate;
-};
+const isTimeFarEnoughInFuture = (time: Date, offsetDays: number): boolean => (
+  DateTime.now().plus({ days: offsetDays }) < DateTime.fromJSDate(time)
+);
 
-const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => {
-  const max = new Date();
-  max.setDate(max.getDate() + maxDaysInFuture);
-
-  return time <= max;
-};
+const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => (
+  DateTime.fromJSDate(time) <= DateTime.now().plus({ days: maxDaysInFuture })
+);
 
 const createTimeSlotValidatorObject = (
   slotGranularityMinutes: number,
@@ -100,7 +96,7 @@ const createReservationValidator = (
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage })
       .refine(
-        (value) => !isTimeNotFarEnoughInFuture(value, daysToStart),
+        (value) => isTimeFarEnoughInFuture(value, daysToStart),
         { message: farEnoughErrorMessage },
       )
       .refine(
@@ -112,7 +108,7 @@ const createReservationValidator = (
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage })
       .refine(
-        (value) => !isTimeNotFarEnoughInFuture(value, daysToStart),
+        (value) => isTimeFarEnoughInFuture(value, daysToStart),
         { message: farEnoughErrorMessage },
       ),
     aircraftId: z.string().trim().min(1, { message: aircraftIdEmptyErrorMessage }),
@@ -232,7 +228,7 @@ export {
   getTimeRangeValidator,
   isTimeInPast,
   isTimeAtMostInFuture,
-  isTimeNotFarEnoughInFuture,
+  isTimeFarEnoughInFuture,
   airfieldValidator,
   configurationValidator,
   createPeriodValidation,

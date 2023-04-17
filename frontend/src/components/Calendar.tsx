@@ -10,7 +10,7 @@ import type {
   EventSourceInput,
 } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { isTimeInPast, isTimeAtMostInFuture, isTimeNotFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
+import { isTimeInPast, isTimeAtMostInFuture, isTimeFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
 import AlertContext from '../contexts/AlertContext';
 
@@ -104,7 +104,7 @@ function Calendar({
       return false;
     }
     const daysToStart = configuration ? configuration.daysToStart : 0;
-    if (checkIfTimeInFuture && isTimeNotFarEnoughInFuture(start, daysToStart)) {
+    if (checkIfTimeInFuture && !isTimeFarEnoughInFuture(start, daysToStart)) {
       calendarRef.current?.getApi().unselect();
       addNewAlert(`Aika pitää varata vähintään ${daysToStart} päivää etukäteen`, 'warning');
       return false;
