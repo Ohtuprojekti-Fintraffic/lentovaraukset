@@ -17,20 +17,18 @@ import {
   getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup,
 } from '../queries/timeSlots';
 import { usePopupContext } from '../contexts/PopupContext';
-import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
 import { useAirportContext } from '../contexts/AirportContext';
+
+import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
+
+  type StartEndPair = {
+    start: Date;
+    end: Date;
+  };
 
 function TimeSlotCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
   const { airport } = useAirportContext(); // TODO: get id from airfield selection
-
-type StartEndPair = {
-  start: Date;
-  end: Date;
-};
-
-function TimeSlotCalendar() {
-  const calendarRef = useRef<FullCalendar>(null);
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
   const { showPopup, clearPopup } = usePopupContext();
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -242,7 +240,7 @@ function TimeSlotCalendar() {
       />
       <div className="flex flex-col space-y-2 h-full w-full">
         <AirfieldAccordion
-          airfield={airfield}
+          airfield={airport}
           airfields={airfields}
           onChange={(a:AirfieldEntry) => console.log(`${a.name} valittu`)}
         />

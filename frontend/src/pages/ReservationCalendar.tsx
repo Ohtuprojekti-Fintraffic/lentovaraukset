@@ -208,7 +208,7 @@ function ReservationCalendar() {
       />
       <div className="flex flex-col space-y-2 h-full w-full">
         <AirfieldAccordion
-          airfield={airfield}
+          airfield={airport}
           airfields={airfields}
           onChange={(a:AirfieldEntry) => console.log(`${a.name} valittu`)}
         />
