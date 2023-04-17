@@ -11,7 +11,7 @@ function Navigation() {
       </div>
       <nav className="flex flex-row space-x-10 text-l">
         <NavLink
-          to="/"
+          to="/varaukset"
           className={({ isActive }) => (isActive
             ? 'active font-bold'
             : '')}

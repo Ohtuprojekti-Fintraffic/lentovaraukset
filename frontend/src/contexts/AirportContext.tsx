@@ -11,23 +11,6 @@ type AirportContextType = {
 
 const AirportContext = createContext<AirportContextType>({} as AirportContextType);
 
-function useAirport(icao: string | undefined) {
-  const [airport, setAirport] = useState<AirfieldEntry | undefined>(undefined);
-
-  useEffect(() => {
-    const fetchAirport = async () => {
-      const airfield = await getAirfield(icao!);
-      setAirport(airfield);
-    };
-
-    if (icao) {
-      fetchAirport();
-    }
-  }, []);
-
-  return airport;
-}
-
 function useAirportContext() {
   const context = useContext(AirportContext);
   if (context === undefined) {
@@ -41,8 +24,8 @@ type AirportProviderProps = {
 };
 
 function AirportProvider({ children }: AirportProviderProps) {
-  // TODO: set default airport as undefined and show a landing page to select one
-  const [icao, setIcao] = useState<string | undefined>('EFHK');
+  const [icao, setIcao] = useState<string | undefined>(undefined);
+  const [airport, setAirport] = useState<AirfieldEntry | undefined>(undefined);
 
   if (!icao) {
     const storedIcao = localStorage.getItem('icao');
@@ -51,7 +34,16 @@ function AirportProvider({ children }: AirportProviderProps) {
     }
   }
 
-  const airport = useAirport(icao);
+  useEffect(() => {
+    const fetchAirport = async () => {
+      const airfield = await getAirfield(icao!);
+      setAirport(airfield);
+    };
+
+    if (icao) {
+      fetchAirport();
+    }
+  }, [icao]);
 
   const setAirportICAO = (new_icao: string) => {
     setIcao(new_icao);
