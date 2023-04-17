@@ -238,41 +238,44 @@ function TimeSlotCalendar() {
           calendarRef.current?.getApi().refetchEvents();
         }}
       />
-      <div className="flex flex-col space-y-2 h-full w-full">
+      <div className="flex flex-col w-full">
+
         <AirfieldAccordion
           airfield={airport}
           airfields={airfields}
           onChange={(a:AirfieldEntry) => console.log(`${a.name} valittu`)}
         />
-        <div className="flex flex-row justify-between mt-0">
-          <h1 className="text-3xl">Vapaat varausikkunat</h1>
-          <Button variant="primary" onClick={() => showTimeslotModalFn(null, null)}>Uusi varausikkuna</Button>
+        <div className="flex flex-col space-y-2 h-full w-full p-8">
+          <div className="flex flex-row justify-between mt-0">
+            <h1 className="text-3xl">Vapaat varausikkunat</h1>
+            <Button variant="primary" onClick={() => showTimeslotModalFn(null, null)}>Uusi varausikkuna</Button>
+          </div>
+          <div>
+            <label htmlFor="checkbox" className="font-ft-label mb-1">
+              <span>Lisää suljettuja vuoroja</span>
+              <input
+                type="checkbox"
+                id="checkbox"
+                checked={blocked}
+                onChange={handleToggle}
+                className="mx-2"
+              />
+            </label>
+          </div>
+          <Calendar
+            calendarRef={calendarRef}
+            eventSources={eventsSourceRef.current}
+            addEventFn={showModalAfterDrag}
+            modifyEventFn={modifyTimeslotFn}
+            clickEventFn={clickTimeslot}
+            removeEventFn={removeTimeSlot}
+            granularity={airport && { minutes: airport.eventGranularityMinutes }}
+            eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}
+            selectConstraint={undefined}
+            blocked={blocked}
+            allowEventRef={allowEvent}
+          />
         </div>
-        <div>
-          <label htmlFor="checkbox" className="font-ft-label mb-1">
-            <span>Lisää suljettuja vuoroja</span>
-            <input
-              type="checkbox"
-              id="checkbox"
-              checked={blocked}
-              onChange={handleToggle}
-              className="mx-2"
-            />
-          </label>
-        </div>
-        <Calendar
-          calendarRef={calendarRef}
-          eventSources={eventsSourceRef.current}
-          addEventFn={showModalAfterDrag}
-          modifyEventFn={modifyTimeslotFn}
-          clickEventFn={clickTimeslot}
-          removeEventFn={removeTimeSlot}
-          granularity={airport && { minutes: airport.eventGranularityMinutes }}
-          eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}
-          selectConstraint={undefined}
-          blocked={blocked}
-          allowEventRef={allowEvent}
-        />
       </div>
     </>
   );

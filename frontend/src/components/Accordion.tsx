@@ -12,7 +12,7 @@ function Accordion({ defaultSection, sections, onChange }: AccordionProps) {
   const [isActive, setIsActive] = useState(false);
 
   return (
-    <div className="flex flex-col max-w-md align-top">
+    <div className="flex flex-col w-full align-top">
       <div
         role="button"
         tabIndex={0}

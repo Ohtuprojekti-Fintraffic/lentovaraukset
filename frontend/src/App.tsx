@@ -27,7 +27,7 @@ function App() {
             <AirportProvider>
               <AlertContainer />
               <Popup />
-              <main className="flex flex-row flex-grow p-10 overflow-y-auto">
+              <main className="flex flex-row flex-grow overflow-y-auto">
                 <Outlet />
               </main>
             </AirportProvider>
