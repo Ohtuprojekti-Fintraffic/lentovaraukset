@@ -5,6 +5,12 @@ import {
 import QueryKeys from './queryKeys';
 import { errorIfNotOk } from './util';
 
+const getAirfields = async (): Promise<AirfieldEntry[]> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/airfields`);
+  errorIfNotOk(res);
+  return res.json();
+};
+
 const getAirfield = async (airfieldCode: string): Promise<AirfieldEntry> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/airfields/${airfieldCode}`);
   errorIfNotOk(res);
@@ -63,5 +69,9 @@ const createAirfieldMutation = () => {
 };
 
 export {
-  getAirfield, useAirfield, modifyAirfieldMutation, createAirfieldMutation,
+  getAirfields,
+  getAirfield,
+  useAirfield,
+  modifyAirfieldMutation,
+  createAirfieldMutation,
 };

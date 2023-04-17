@@ -34,7 +34,7 @@ function TimeslotInfoModal({
   const { addNewAlert } = useContext(AlertContext);
 
   const onModifySubmitHandler = async (
-    updatedTimeslot: Omit<TimeslotEntry, 'id'>,
+    updatedTimeslot: Omit<TimeslotEntry, 'id' | 'airfieldCode'>,
     period?: {
       end: Date,
       days: WeekInDays,
@@ -70,9 +70,9 @@ function TimeslotInfoModal({
     closeTimeslotModal();
   };
 
-  const onSubmitAddHandler = async (reservationDetails: Omit<TimeslotEntry, 'id'>) => {
+  const onSubmitAddHandler = async (timeslotDetails: Omit<TimeslotEntry, 'id' | 'airfieldCode'>) => {
     try {
-      await addTimeSlot(reservationDetails);
+      await addTimeSlot(timeslotDetails);
       addNewAlert('Aikaikkuna lisätty!', 'success');
     } catch (exception) {
       if (exception instanceof ApiError) {

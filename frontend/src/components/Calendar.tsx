@@ -194,6 +194,7 @@ function Calendar({
       ref={calendarRef}
       plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
       locale="fi"
+      timeZone="UTC"
       weekNumberCalculation="ISO"
       headerToolbar={{
         left: 'prev,next today',
