@@ -9,7 +9,7 @@ import {
   HasManyRemoveAssociationsMixin,
   ForeignKey,
 } from 'sequelize';
-import { TimeslotType } from '@lentovaraukset/shared/src';
+import { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
 import { Airfield, Reservation } from '@lentovaraukset/backend/src/models';
 import { sequelize } from '../util/db';
 
@@ -38,14 +38,7 @@ InferCreationAttributes<Timeslot>
   declare removeReservations: HasManyRemoveAssociationsMixin<Reservation, number>;
 
   static async addGroupTimeslots(
-    timeslots: {
-      group:string,
-      start: Date,
-      end: Date,
-      type: TimeslotType,
-      info: string | null,
-      airfieldCode: string
-    }[],
+    timeslots: Omit<TimeslotEntry, 'id'>[],
   ) {
     return sequelize.transaction(async (transaction) => Timeslot
       .bulkCreate(timeslots, { transaction }));
