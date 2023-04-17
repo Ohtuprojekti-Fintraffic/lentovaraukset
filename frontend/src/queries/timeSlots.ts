@@ -21,7 +21,7 @@ const addTimeSlot = async (newTimeSlot: { start: Date, end: Date, type: 'availab
 };
 
 const modifyTimeSlot = async (
-  timeSlot: TimeslotEntry,
+  timeSlot: Omit<TimeslotEntry, 'airfieldCode'>,
   period?: {
     end: Date,
     days: WeekInDays

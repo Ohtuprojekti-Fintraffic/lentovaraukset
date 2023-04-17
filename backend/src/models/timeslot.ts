@@ -7,9 +7,10 @@ import {
   HasManyAddAssociationsMixin,
   HasManyGetAssociationsMixin,
   HasManyRemoveAssociationsMixin,
+  ForeignKey,
 } from 'sequelize';
-import { TimeslotType } from '@lentovaraukset/shared/src';
-import { Reservation } from '@lentovaraukset/backend/src/models';
+import { TimeslotEntry, TimeslotType } from '@lentovaraukset/shared/src';
+import { Airfield, Reservation } from '@lentovaraukset/backend/src/models';
 import { sequelize } from '../util/db';
 
 class Timeslot extends Model<
@@ -28,6 +29,8 @@ InferCreationAttributes<Timeslot>
 
   declare info: string | null;
 
+  declare airfieldCode: ForeignKey<Airfield['code']>;
+
   declare addReservations: HasManyAddAssociationsMixin<Reservation, number>;
 
   declare getReservations: HasManyGetAssociationsMixin<Reservation>;
@@ -35,7 +38,7 @@ InferCreationAttributes<Timeslot>
   declare removeReservations: HasManyRemoveAssociationsMixin<Reservation, number>;
 
   static async addGroupTimeslots(
-    timeslots: { group:string, start: Date, end: Date, type: TimeslotType, info: string | null }[],
+    timeslots: Omit<TimeslotEntry, 'id'>[],
   ) {
     return sequelize.transaction(async (transaction) => Timeslot
       .bulkCreate(timeslots, { transaction }));

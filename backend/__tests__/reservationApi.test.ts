@@ -62,6 +62,7 @@ beforeEach(async () => {
     start: new Date('2023-02-12T08:00:00.000Z'),
     end: new Date('2023-02-15T08:00:00.000Z'),
     type: 'available',
+    airfieldCode: 'EFHK',
   });
 });
 
@@ -139,6 +140,7 @@ describe('Calls to api', () => {
       start: new Date('2023-02-12T08:00:00.000Z'),
       end: new Date('2023-02-12T16:00:00.000Z'),
       type: 'blocked',
+      airfieldCode: 'EFHK',
     });
     const result: any = await api.post('/api/EFHK/reservations/')
       .set('Content-type', 'application/json')
@@ -223,6 +225,7 @@ describe('Calls to api', () => {
       start: new Date('2023-02-12T08:00:00.000Z'),
       end: new Date('2023-02-12T16:00:00.000Z'),
       type: 'blocked',
+      airfieldCode: 'EFHK',
     });
     const result: any = await api.put(`/api/EFHK/reservations/${id}`)
       .set('Content-type', 'application/json')
@@ -511,6 +514,7 @@ describe('Calls to api', () => {
       start: new Date('2023-02-14T12:00:00.000Z'),
       end: new Date('2023-02-14T14:00:00.000Z'),
       type: 'blocked',
+      airfieldCode: 'EFHK',
     });
 
     const newReservationData = {
@@ -542,11 +546,13 @@ describe('Calls to api', () => {
         start: new Date('2023-02-14T10:00:00.000Z'),
         end: new Date('2023-02-14T12:00:00.000Z'),
         type: 'available',
+        airfieldCode: 'EFHK',
       },
       {
         start: new Date('2023-02-14T12:00:00.000Z'),
         end: new Date('2023-02-14T14:00:00.000Z'),
         type: 'available',
+        airfieldCode: 'EFHK',
       },
     ]);
 
@@ -563,6 +569,7 @@ describe('Calls to api', () => {
       start: new Date('2023-02-14T12:00:00.000Z'),
       end: new Date('2023-02-14T14:00:00.000Z'),
       type: 'blocked',
+      airfieldCode: 'EFHK',
     });
 
     const newReservationData = {
@@ -594,11 +601,13 @@ describe('Calls to api', () => {
         start: new Date('2023-02-14T10:00:00.000Z'),
         end: new Date('2023-02-14T12:00:00.000Z'),
         type: 'available',
+        airfieldCode: 'EFHK',
       },
       {
         start: new Date('2023-02-14T12:00:00.000Z'),
         end: new Date('2023-02-14T14:00:00.000Z'),
         type: 'available',
+        airfieldCode: 'EFHK',
       },
     ]);
 
@@ -632,12 +641,14 @@ describe('Calls to api', () => {
       start: new Date('2023-02-15T10:00:00.000Z'),
       end: new Date('2023-02-15T12:00:00.000Z'),
       type: 'available',
+      airfieldCode: 'EFHK',
     });
 
     const availableTimeslot2 = await Timeslot.create({
       start: new Date('2023-02-15T12:00:00.000Z'),
       end: new Date('2023-02-15T14:00:00.000Z'),
       type: 'available',
+      airfieldCode: 'EFHK',
     });
 
     const newReservationData = {
