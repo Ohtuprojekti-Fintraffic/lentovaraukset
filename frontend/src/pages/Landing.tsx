@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
-import { NavLink } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAirportContext } from '../contexts/AirportContext';
 import { getAirfields } from '../queries/airfields';
 import Dropdown from '../components/Dropdown';
@@ -10,9 +10,12 @@ type AirfieldDropdownProps = {
   airfield?: AirfieldEntry,
   airfields: AirfieldEntry[],
   onChange: (a: AirfieldEntry) => void ;
+  error?: { message: string }
 };
 
-function AirfieldDropdown({ airfield, airfields, onChange }: AirfieldDropdownProps) {
+function AirfieldDropdown({
+  airfield, airfields, onChange, error,
+}: AirfieldDropdownProps) {
   const handleSelect = (airfieldName: string) => {
     const selectedAirfield = airfields.find((a) => a.name === airfieldName)!;
     onChange(selectedAirfield);
@@ -21,16 +24,21 @@ function AirfieldDropdown({ airfield, airfields, onChange }: AirfieldDropdownPro
   return (
     <Dropdown
       placeholder="Lentoasema"
-      defaultSection={airfield?.name}
+      selectedSection={airfield?.name}
       sections={airfields.map((a) => a.name)}
       onChange={handleSelect}
+      error={error}
     />
   );
 }
 
 function Landing() {
+  const navigate = useNavigate();
+
   const { airport, setAirportICAO } = useAirportContext(); // TODO: get id from airfield selection
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
+
+  const [airportSelectError, setAirportSelectError] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,7 +49,7 @@ function Landing() {
 
   const onAirfieldChange = (new_airport: AirfieldEntry) => {
     setAirportICAO(new_airport.code);
-    console.log(`Selected airfield: ${airport?.name}`);
+    setAirportSelectError(false);
   };
 
   return (
@@ -58,20 +66,18 @@ function Landing() {
           airfield={airport}
           airfields={airfields}
           onChange={onAirfieldChange}
+          error={airportSelectError ? { message: 'Valitse ensin lentoasema' } : undefined}
         />
-        <NavLink
-          to="/varaukset"
-          className={({ isActive }) => (isActive
-            ? 'active font-bold'
-            : '')}
+        <button
+          type="button"
+          className="flex flex-row items-center hover:text-ft-text-300 font-bold"
+          onClick={() => (airport ? navigate('/varaukset') : setAirportSelectError(true))}
         >
-          <div className="flex flex-row items-center hover:text-ft-text-300 font-bold">
-            <div>
-              Varaa aika
-            </div>
-            <ChevronRight />
+          <div>
+            Tee varaus
           </div>
-        </NavLink>
+          <ChevronRight />
+        </button>
       </div>
     </div>
   );
