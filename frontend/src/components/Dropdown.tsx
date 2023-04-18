@@ -27,13 +27,13 @@ function Dropdown({
         <div className="place-self-end group-hover:text-ft-text-300">{isActive ? <ChevronUp /> : <ChevronDown /> }</div>
       </div>
 
-      <div className="absolute top-full w-full z-10 text-ft-primary-black bg-ft-primary-white">
+      <div className="absolute top-full w-full z-10 text-ft-primary-black bg-ft-primary-white divide-y divide-ft-neutral-200 shadow-lg max-h-72 overflow-y-auto">
         {isActive && Array.from(new Set(sections)).map((section) => ( // Sections must be unique
           <div
             key={section}
             role="button"
             tabIndex={0}
-            className="group border border-ft-neutral-200 bg-ft-neutral-100 bg-opacity-20 p-4"
+            className="group bg-ft-neutral-100 bg-opacity-20 p-4"
             onClick={() => {
               setIsActive(!isActive);
               onChange(section);

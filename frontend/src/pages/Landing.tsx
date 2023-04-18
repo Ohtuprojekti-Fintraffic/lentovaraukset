@@ -20,7 +20,7 @@ function AirfieldDropdown({ airfield, airfields, onChange }: AirfieldDropdownPro
 
   return (
     <Dropdown
-      placeholder="Valitse lentoasema:"
+      placeholder="Lentoasema"
       defaultSection={airfield?.name}
       sections={airfields.map((a) => a.name)}
       onChange={handleSelect}
@@ -65,7 +65,7 @@ function Landing() {
             ? 'active font-bold'
             : '')}
         >
-          <div className="flex flex-row items-center hover:text-ft-text-300">
+          <div className="flex flex-row items-center hover:text-ft-text-300 font-bold">
             <div>
               Varaa aika
             </div>

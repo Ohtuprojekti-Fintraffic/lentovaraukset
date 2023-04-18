@@ -38,7 +38,7 @@ function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { showPopup, clearPopup } = usePopupContext();
-  const { airport } = useAirportContext(); // TODO: get id from airfield selection
+  const { airport, setAirportICAO } = useAirportContext(); // TODO: get id from airfield selection
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
   const { data: configuration } = useConfiguration();
   const { addNewAlert } = useContext(AlertContext);
@@ -210,7 +210,7 @@ function ReservationCalendar() {
         <AirfieldAccordion
           airfield={airport}
           airfields={airfields}
-          onChange={(a:AirfieldEntry) => console.log(`${a.name} valittu`)}
+          onChange={(a:AirfieldEntry) => setAirportICAO(a.code)}
         />
         <div className="flex flex-col space-y-2 h-full w-full p-8">
           <div className="flex flex-row justify-between mt-0">

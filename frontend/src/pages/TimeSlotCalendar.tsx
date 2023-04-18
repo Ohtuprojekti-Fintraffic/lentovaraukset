@@ -28,7 +28,7 @@ import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
 
 function TimeSlotCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
-  const { airport } = useAirportContext(); // TODO: get id from airfield selection
+  const { airport, setAirportICAO } = useAirportContext(); // TODO: get id from airfield selection
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
   const { showPopup, clearPopup } = usePopupContext();
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -243,7 +243,7 @@ function TimeSlotCalendar() {
         <AirfieldAccordion
           airfield={airport}
           airfields={airfields}
-          onChange={(a:AirfieldEntry) => console.log(`${a.name} valittu`)}
+          onChange={(a:AirfieldEntry) => setAirportICAO(a.code)}
         />
         <div className="flex flex-col space-y-2 h-full w-full p-8">
           <div className="flex flex-row justify-between mt-0">
