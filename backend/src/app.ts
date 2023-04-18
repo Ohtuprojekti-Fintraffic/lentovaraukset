@@ -27,14 +27,9 @@ app.get('/api', async (_req: any, res: express.Response) => {
   res.send('Hello World');
 });
 
-// mergeParams required because otherwise the params won't be there as they're defined up here
-const aeRouter = express.Router({ mergeParams: true }).use(airfieldExtractor);
-app.use('/api/:airfieldCode/reservations', aeRouter);
+app.use('/api/:airfieldCode/*', airfieldExtractor);
 app.use('/api/:airfieldCode/reservations', reservationRouter);
-
-app.use('/api/:airfieldCode/timeslots', aeRouter);
 app.use('/api/:airfieldCode/timeslots', timeslotRouter);
-
 app.use('/api/airfields', airfieldRouter);
 app.use('/api/configurations', configurationRouter);
 

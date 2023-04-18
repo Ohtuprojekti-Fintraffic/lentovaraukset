@@ -10,7 +10,7 @@ import type {
   EventSourceInput,
 } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { isTimeInPast, isTimeAtMostInFuture } from '@lentovaraukset/shared/src/validation/validation';
+import { isTimeInPast, isTimeAtMostInFuture, isTimeFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
 import AlertContext from '../contexts/AlertContext';
 
@@ -51,6 +51,24 @@ function Calendar({
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
   const { addNewAlert } = React.useContext(AlertContext);
+  const [viewMode, setViewMode] = React.useState(window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek');
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      const newViewMode = window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek';
+      setViewMode(newViewMode);
+
+      if (calendarRef.current) {
+        calendarRef.current.getApi().changeView(newViewMode);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [calendarRef]);
 
   const isSameType = (
     stillEventType: string,
@@ -83,6 +101,12 @@ function Calendar({
     if (checkIfTimeInFuture && !isTimeAtMostInFuture(start, maxDaysInFuture)) {
       calendarRef.current?.getApi().unselect();
       addNewAlert(`Aikaa ei voi lisätä yli ${maxDaysInFuture} päivän päähän`, 'warning');
+      return false;
+    }
+    const daysToStart = configuration ? configuration.daysToStart : 0;
+    if (checkIfTimeInFuture && !isTimeFarEnoughInFuture(start, daysToStart)) {
+      calendarRef.current?.getApi().unselect();
+      addNewAlert(`Aika pitää varata vähintään ${daysToStart} päivää etukäteen`, 'warning');
       return false;
     }
     if (timeIsConsecutive(start, end, type)) {
@@ -176,6 +200,7 @@ function Calendar({
       ref={calendarRef}
       plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
       locale="fi"
+      timeZone="UTC"
       weekNumberCalculation="ISO"
       headerToolbar={{
         left: 'prev,next today',
@@ -183,7 +208,7 @@ function Calendar({
         right: 'dayGridMonth,timeGridWeek,listWeek',
       }}
       height="100%"
-      initialView="timeGridWeek"
+      initialView={viewMode}
       allDaySlot={false}
       nowIndicator
       scrollTime="08:00:00"

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
+import { type FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
-import { ReservationEntry } from '@lentovaraukset/shared/src';
+import { ConfigurationEntry, ReservationEntry } from '@lentovaraukset/shared/src';
 import { useAirfield } from '../../queries/airfields';
 import InputField from '../InputField';
 import DatePicker from '../DatePicker';
@@ -13,6 +13,7 @@ import ModalAlert from '../ModalAlert';
 
 type ReservationInfoProps = {
   reservation?: EventImpl
+  configuration?: ConfigurationEntry
   draggedTimes?: { start: Date, end: Date }
   onSubmit: (formData: Omit<ReservationEntry, 'id' | 'user'>) => void
   id?: string
@@ -28,26 +29,23 @@ type Inputs = {
 
 function ReservationInfoForm({
   reservation, draggedTimes,
+  configuration,
   onSubmit,
   id,
 }: ReservationInfoProps) {
   const { data: airfield } = useAirfield('EFHK');
   const reservationGranularity = airfield?.eventGranularityMinutes || 20;
-
-  const start = reservation?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
-  const end = reservation?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
+  const maxDaysInFuture = configuration?.maxDaysInFuture || 7;
+  const daysToStart = configuration?.daysToStart || 0;
 
   const {
     register, handleSubmit, reset, control, formState: { errors },
   } = useForm<Inputs>({
-    values: {
-      start,
-      end,
-      aircraftId: reservation?.extendedProps.aircraftId,
-      phone: reservation?.extendedProps.phone,
-      info: reservation?.extendedProps.info,
-    },
-    resolver: zodResolver(createReservationValidator(reservationGranularity, 7)),
+    resolver: zodResolver(createReservationValidator(
+      reservationGranularity,
+      maxDaysInFuture,
+      daysToStart,
+    )),
     mode: 'all',
   });
 
@@ -66,14 +64,21 @@ function ReservationInfoForm({
   };
 
   useEffect(() => {
-    reset();
-  }, [reservation]);
+    const start = reservation?.startStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.start) || '';
+    const end = reservation?.endStr.replace(/.{3}\+.*/, '') || HTMLDateTimeConvert(draggedTimes?.end) || '';
+    reset({
+      start,
+      end,
+      aircraftId: reservation?.extendedProps.aircraftId || '',
+      phone: reservation?.extendedProps.phone || '',
+      info: reservation?.extendedProps.info || '',
+    });
+  }, [reset, reservation, draggedTimes]);
 
   useEffect(() => {
     // field '' is added to allow access to zod errors not related to a specific field
-    setFormWarning((errors as FieldErrors<Inputs & { '': string }>)['']?.message);
+    setFormWarning((errors as FieldErrors<Inputs & { general?: string }>).general?.message);
   }, [errors]);
-
   // TODO: add max future time
   // const max =
 
@@ -90,19 +95,19 @@ function ReservationInfoForm({
           <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
             <DatePicker
               control={control}
-              labelText="Varaus alkaa:"
+              labelText="Varaus alkaa (UTC):"
               name="start"
               timeGranularityMinutes={reservationGranularity}
-              error={errors.start}
               showTimeSelect
+              errors={errors}
             />
             <DatePicker
               control={control}
-              labelText="Varaus päättyy:"
+              labelText="Varaus päättyy (UTC):"
               name="end"
               timeGranularityMinutes={reservationGranularity}
-              error={errors.end}
               showTimeSelect
+              errors={errors}
             />
           </div>
           <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
@@ -110,13 +115,13 @@ function ReservationInfoForm({
               labelText="Koneen rekisteritunnus:"
               type="text"
               registerReturn={register('aircraftId')}
-              error={errors.aircraftId}
+              errors={errors}
             />
             <InputField
               labelText="Puhelinnumero:"
               type="tel"
               registerReturn={register('phone')}
-              error={errors.phone}
+              errors={errors}
             />
           </div>
           <InputField
@@ -124,7 +129,7 @@ function ReservationInfoForm({
             type="text"
             registerReturn={register('info')}
             inputClassName="w-full"
-            error={errors.info}
+            errors={errors}
           />
         </form>
       </div>

@@ -2,6 +2,7 @@ import request from 'supertest';
 import app from '@lentovaraukset/backend/src/app';
 import { Timeslot } from '@lentovaraukset/backend/src/models';
 import { connectToDatabase, sequelize } from '../src/util/db';
+import airfieldService from '../src/services/airfieldService';
 
 const api = request(app);
 
@@ -45,8 +46,15 @@ describe('basic function tests', () => {
   });
 
   test('Adding timeslot just to db works', async () => {
+    await airfieldService.createTestAirfield();
+
     const date = new Date();
-    await Timeslot.create({ start: date, end: date, type: 'available' });
+    await Timeslot.create({
+      start: date,
+      end: date,
+      type: 'available',
+      airfieldCode: 'EFHK',
+    });
 
     // temporarily any. Models don't have types defined yet
     const slot: any = await Timeslot.findOne();

@@ -7,7 +7,12 @@ import Configuration from './configuration';
 User.hasMany(Reservation);
 Reservation.belongsTo(User);
 
-Airfield.hasMany(Timeslot);
+Airfield.hasMany(Timeslot, {
+  foreignKey: {
+    name: 'airfieldCode',
+    allowNull: false,
+  },
+});
 Timeslot.belongsTo(Airfield);
 
 Timeslot.hasMany(Reservation);

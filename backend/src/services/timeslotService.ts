@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import {
-  ServiceErrorCode, TimeslotEntry, TimeslotType, WeekInDays,
+  ServiceErrorCode, TimeslotEntry, WeekInDays,
 } from '@lentovaraukset/shared/src/index';
 import reservationService from '@lentovaraukset/backend/src/services/reservationService';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
@@ -8,6 +8,7 @@ import { Timeslot } from '../models';
 import ServiceError from '../util/errors';
 
 const getInTimeRanges = async (
+  airfieldCode: string,
   ranges: {
     rangeStartTime: Date,
     rangeEndTime: Date,
@@ -16,6 +17,7 @@ const getInTimeRanges = async (
 ): Promise<Timeslot[]> => {
   const timeslots: Timeslot[] = await Timeslot.findAll({
     where: {
+      airfieldCode,
       [Op.or]: ranges.map((range) => ({
         [Op.and]: [
           {
@@ -41,11 +43,12 @@ const getInTimeRanges = async (
 };
 
 const getInTimeRange = async (
+  airfieldCode: string,
   rangeStartTime: Date,
   rangeEndTime: Date,
   id: number | null = null,
 ): Promise<Timeslot[]> => {
-  const timeslots: Timeslot[] = await getInTimeRanges([{
+  const timeslots: Timeslot[] = await getInTimeRanges(airfieldCode, [{
     rangeStartTime,
     rangeEndTime,
     id,
@@ -55,9 +58,11 @@ const getInTimeRange = async (
 
 type TimeslotEntryOptionalId = Partial<TimeslotEntry> & Omit<TimeslotEntry, 'id'>;
 const errorIfLeadsToConsecutivesOrOverlaps = async (
+  airfieldCode: string,
   timeslots: TimeslotEntryOptionalId[],
 ): Promise<void> => {
   const timeslotsInRanges = await getInTimeRanges(
+    airfieldCode,
     timeslots.map((t) => {
       const newStart = new Date(t.start);
       const newEnd = new Date(t.end);
@@ -100,12 +105,13 @@ const deleteById = async (id: number) => {
 };
 
 const createPeriod = async (
+  airfieldCode: string,
   id: number,
   period: {
     periodEnd: Date,
     days: WeekInDays,
   },
-  timeslot: { start: Date, end: Date, type: TimeslotType, info: string | null },
+  timeslot: Omit<TimeslotEntry, 'id'>,
 ): Promise<Timeslot[]> => {
   const { periodEnd, days } = period;
   const dayInMillis = 24 * 60 * 60 * 1000;
@@ -128,6 +134,7 @@ const createPeriod = async (
       const startTime = new Date(currentDate.getTime());
       const endTime = new Date(currentDate.getTime() + (end.getTime() - start.getTime()));
       timeslotGroup.push({
+        airfieldCode,
         start: startTime,
         end: endTime,
         type,
@@ -138,7 +145,7 @@ const createPeriod = async (
     currentDate.setTime(currentDate.getTime() + dayInMillis);
   }
 
-  await errorIfLeadsToConsecutivesOrOverlaps(timeslotGroup);
+  await errorIfLeadsToConsecutivesOrOverlaps(timeslot.airfieldCode, timeslotGroup);
 
   const firstTimeslot: Timeslot | null = await Timeslot.findByPk(id);
   if (firstTimeslot) {
@@ -152,10 +159,10 @@ const createPeriod = async (
 
 const updateById = async (
   id: number,
-  timeslot: { start: Date, end: Date, type: TimeslotType, info: string | null },
+  timeslot: Omit<TimeslotEntry, 'id'>,
 ): Promise<void> => {
   const oldTimeslot: Timeslot | null = await Timeslot.findByPk(id);
-  await errorIfLeadsToConsecutivesOrOverlaps([{ ...timeslot, id }]);
+  await errorIfLeadsToConsecutivesOrOverlaps(timeslot.airfieldCode, [{ ...timeslot, id }]);
 
   if (oldTimeslot === null) {
     throw new ServiceError(ServiceErrorCode.TimeslotNotFound, 'No timeslot with id exists');
@@ -190,13 +197,8 @@ const updateById = async (
   await Timeslot.upsert({ ...timeslot, id });
 };
 
-const createTimeslot = async (newTimeSlot: {
-  start: Date;
-  end: Date;
-  type: TimeslotType;
-  info: string | null;
-}): Promise<TimeslotEntry> => {
-  await errorIfLeadsToConsecutivesOrOverlaps([newTimeSlot]);
+const createTimeslot = async (newTimeSlot: Omit<TimeslotEntry, 'id'>): Promise<TimeslotEntry> => {
+  await errorIfLeadsToConsecutivesOrOverlaps(newTimeSlot.airfieldCode, [newTimeSlot]);
 
   const timeslot: Timeslot = await Timeslot.create(newTimeSlot);
   const reservations = await reservationService
@@ -209,7 +211,7 @@ const createTimeslot = async (newTimeSlot: {
   return timeslot.dataValues;
 };
 
-const updateByGroup = async (group: string, updates: {
+const updateByGroup = async (airfieldCode: string, group: string, updates: {
   startingFrom: Date;
   startTimeOfDay: { hours: number, minutes: number };
   endTimeOfDay: { hours: number, minutes: number };
@@ -224,7 +226,7 @@ const updateByGroup = async (group: string, updates: {
     return timeslot;
   });
 
-  await errorIfLeadsToConsecutivesOrOverlaps(editedTimeslots);
+  await errorIfLeadsToConsecutivesOrOverlaps(airfieldCode, editedTimeslots);
 
   const updatedTimeslots = await Timeslot.bulkCreate(editedTimeslots, { updateOnDuplicate: ['start', 'end'] });
   return updatedTimeslots.map((ts) => ts.dataValues);

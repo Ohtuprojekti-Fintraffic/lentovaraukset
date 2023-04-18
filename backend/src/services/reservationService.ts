@@ -30,9 +30,9 @@ const deleteById = async (id: number) => {
   await reservation.destroy();
 };
 
-const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | 'user'>): Promise<ReservationEntry> => {
+const createReservation = async (airfieldCode: string, newReservation: Omit<ReservationEntry, 'id' | 'user'>): Promise<ReservationEntry> => {
   const timeslots = await timeslotService
-    .getInTimeRange(newReservation.start, newReservation.end);
+    .getInTimeRange(airfieldCode, newReservation.start, newReservation.end);
   if (timeslots.some((timeslot) => timeslot.type === 'blocked')) {
     throw new ServiceError(ServiceErrorCode.BlockedTimeslot, 'Reservation cannot be created on top of blocked timeslot');
   }
@@ -56,11 +56,12 @@ const createReservation = async (newReservation: Omit<ReservationEntry, 'id' | '
 };
 
 const updateById = async (
+  airfieldCode: string,
   id: number,
   reservation: Omit<ReservationEntry, 'id' | 'user'>,
 ): Promise<ReservationEntry> => {
   const newTimeslots = await timeslotService
-    .getInTimeRange(reservation.start, reservation.end);
+    .getInTimeRange(airfieldCode, reservation.start, reservation.end);
   if (newTimeslots.some((timeslot) => timeslot.type === 'blocked')) {
     throw new ServiceError(ServiceErrorCode.BlockedTimeslot, 'Reservation cannot be created on top of blocked timeslot');
   }

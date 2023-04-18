@@ -47,7 +47,7 @@ beforeAll(async () => {
   // so let's fake it as a specific date,
   // while keeping timers running
   jest.useFakeTimers({ advanceTimers: true });
-  jest.setSystemTime(new Date('2023-02-13T08:00:00.000Z'));
+  jest.setSystemTime(new Date('2023-02-13T07:00:00.000Z'));
 });
 
 beforeEach(async () => {
@@ -62,6 +62,7 @@ beforeEach(async () => {
     start: new Date('2023-02-12T08:00:00.000Z'),
     end: new Date('2023-02-15T08:00:00.000Z'),
     type: 'available',
+    airfieldCode: 'EFHK',
   });
 });
 
@@ -139,6 +140,7 @@ describe('Calls to api', () => {
       start: new Date('2023-02-12T08:00:00.000Z'),
       end: new Date('2023-02-12T16:00:00.000Z'),
       type: 'blocked',
+      airfieldCode: 'EFHK',
     });
     const result: any = await api.post('/api/EFHK/reservations/')
       .set('Content-type', 'application/json')
@@ -146,7 +148,7 @@ describe('Calls to api', () => {
         start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
       });
     expect(result.statusCode).toEqual(400);
-    expect(result.body.error.message).toContain('Varaus ei voi ajoittua menneisyyteen');
+    expect(result.body.error.message).toContain('Varaus tulee tehdä vähintään');
   });
 
   test('can delete a reservation', async () => {
@@ -187,14 +189,14 @@ describe('Calls to api', () => {
     await api.put(`/api/EFHK/reservations/${id}`)
       .set('Content-type', 'application/json')
       .send({
-        start: '2023-02-14T02:00:00.000Z', end: '2023-02-14T16:00:00.000Z', aircraftId, phone,
+        start: '2023-02-14T20:00:00.000Z', end: '2023-02-14T22:00:00.000Z', aircraftId, phone,
       });
 
     const updatedReservation: Reservation | null = await Reservation.findByPk(id);
 
     expect(updatedReservation).not.toEqual(null);
-    expect(updatedReservation?.dataValues.start).toEqual(new Date('2023-02-14T02:00:00.000Z'));
-    expect(updatedReservation?.dataValues.end).toEqual(new Date('2023-02-14T16:00:00.000Z'));
+    expect(updatedReservation?.dataValues.start).toEqual(new Date('2023-02-14T20:00:00.000Z'));
+    expect(updatedReservation?.dataValues.end).toEqual(new Date('2023-02-14T22:00:00.000Z'));
     expect(updatedReservation?.dataValues.aircraftId).toEqual(aircraftId);
     expect(updatedReservation?.dataValues.phone).toEqual(phone);
   });
@@ -223,6 +225,7 @@ describe('Calls to api', () => {
       start: new Date('2023-02-12T08:00:00.000Z'),
       end: new Date('2023-02-12T16:00:00.000Z'),
       type: 'blocked',
+      airfieldCode: 'EFHK',
     });
     const result: any = await api.put(`/api/EFHK/reservations/${id}`)
       .set('Content-type', 'application/json')
@@ -230,7 +233,7 @@ describe('Calls to api', () => {
         start: new Date('2023-02-12T12:00:00.000Z'), end: new Date('2023-02-12T14:00:00.000Z'), aircraftId: 'OH-QAA', info: 'Training flight', phone: '11104040',
       });
     expect(result.statusCode).toEqual(400);
-    expect(result.body.error.message).toContain('Varaus ei voi ajoittua menneisyyteen');
+    expect(result.body.error.message).toContain('Varaus tulee tehdä vähintään');
   });
 
   test('cannot modify a reservation to have an empty aircraft ID', async () => {
@@ -511,6 +514,7 @@ describe('Calls to api', () => {
       start: new Date('2023-02-14T12:00:00.000Z'),
       end: new Date('2023-02-14T14:00:00.000Z'),
       type: 'blocked',
+      airfieldCode: 'EFHK',
     });
 
     const newReservationData = {
@@ -542,11 +546,13 @@ describe('Calls to api', () => {
         start: new Date('2023-02-14T10:00:00.000Z'),
         end: new Date('2023-02-14T12:00:00.000Z'),
         type: 'available',
+        airfieldCode: 'EFHK',
       },
       {
         start: new Date('2023-02-14T12:00:00.000Z'),
         end: new Date('2023-02-14T14:00:00.000Z'),
         type: 'available',
+        airfieldCode: 'EFHK',
       },
     ]);
 
@@ -563,6 +569,7 @@ describe('Calls to api', () => {
       start: new Date('2023-02-14T12:00:00.000Z'),
       end: new Date('2023-02-14T14:00:00.000Z'),
       type: 'blocked',
+      airfieldCode: 'EFHK',
     });
 
     const newReservationData = {
@@ -594,11 +601,13 @@ describe('Calls to api', () => {
         start: new Date('2023-02-14T10:00:00.000Z'),
         end: new Date('2023-02-14T12:00:00.000Z'),
         type: 'available',
+        airfieldCode: 'EFHK',
       },
       {
         start: new Date('2023-02-14T12:00:00.000Z'),
         end: new Date('2023-02-14T14:00:00.000Z'),
         type: 'available',
+        airfieldCode: 'EFHK',
       },
     ]);
 
@@ -632,12 +641,14 @@ describe('Calls to api', () => {
       start: new Date('2023-02-15T10:00:00.000Z'),
       end: new Date('2023-02-15T12:00:00.000Z'),
       type: 'available',
+      airfieldCode: 'EFHK',
     });
 
     const availableTimeslot2 = await Timeslot.create({
       start: new Date('2023-02-15T12:00:00.000Z'),
       end: new Date('2023-02-15T14:00:00.000Z'),
       type: 'available',
+      airfieldCode: 'EFHK',
     });
 
     const newReservationData = {

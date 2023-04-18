@@ -21,7 +21,7 @@ function Accordion({ defaultSection, sections, onChange }: AccordionProps) {
         onKeyDown={(e) => e.key === 'Enter' && setIsActive(!isActive)}
       >
         <Subheader className="font-ft-emphasis group-hover:text-ft-text-300">{defaultSection}</Subheader>
-        <div className="place-self-end group-hover:text-ft-text-300">{isActive ? <Minus /> : <Plus />}</div>
+        <div className="place-self-end group-hover:text-ft-text-300">{isActive ? <Minus /> : <Plus /> }</div>
       </div>
 
       {isActive && Array.from(new Set(sections)).map((section) => ( // Sections must be unique
@@ -30,8 +30,16 @@ function Accordion({ defaultSection, sections, onChange }: AccordionProps) {
           role="button"
           tabIndex={0}
           className="group border-b border-ft-neutral-200 bg-ft-neutral-100 bg-opacity-20 p-4"
-          onClick={() => onChange(section)}
-          onKeyDown={(e) => e.key === 'Enter' && onChange(section)}
+          onClick={() => {
+            setIsActive(!isActive);
+            onChange(section);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              setIsActive(!isActive);
+              onChange(section);
+            }
+          }}
         >
           <Subheader className="group-hover:text-ft-text-300">{section}</Subheader>
         </div>
