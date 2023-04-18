@@ -200,6 +200,7 @@ function ReservationCalendar() {
         showInfoModal={showInfoModal}
         reservation={selectedReservationRef?.current || undefined}
         draggedTimes={draggedTimesRef?.current || undefined}
+        configuration={configuration}
         closeReservationModal={() => {
           closeReservationModalFn();
           calendarRef.current?.getApi().refetchEvents();

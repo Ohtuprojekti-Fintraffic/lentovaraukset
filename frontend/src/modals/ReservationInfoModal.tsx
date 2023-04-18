@@ -1,5 +1,5 @@
 import { EventImpl } from '@fullcalendar/core/internal';
-import { ReservationEntry, ServiceErrorCode } from '@lentovaraukset/shared/src';
+import { ConfigurationEntry, ReservationEntry, ServiceErrorCode } from '@lentovaraukset/shared/src';
 import React, { useContext } from 'react';
 import ActionSheet from '../components/ActionSheet';
 import Button from '../components/Button';
@@ -14,12 +14,15 @@ type InfoModalProps = {
   closeReservationModal: () => void
   reservation?: EventImpl
   draggedTimes?: { start: Date, end: Date }
+  configuration?: ConfigurationEntry
 };
 
 function ReservationInfoModal({
   showInfoModal,
   closeReservationModal,
-  reservation, draggedTimes,
+  reservation,
+  draggedTimes,
+  configuration,
 }: InfoModalProps) {
   const { addNewAlert } = useContext(AlertContext);
 
@@ -82,6 +85,7 @@ function ReservationInfoModal({
           <ReservationInfoForm
             id="reservation_info_form"
             reservation={reservation}
+            configuration={configuration}
             draggedTimes={draggedTimes}
             onSubmit={reservation ? onSubmitModifyHandler : onSubmitAddHandler}
           />

@@ -1,4 +1,5 @@
 import { z, type ZodTypeAny } from 'zod';
+import { DateTime } from 'luxon';
 import { ReservationEntry, TimeslotEntry } from '..';
 
 const minutesToMilliseconds = (minutes: number) => minutes * 1000 * 60;
@@ -9,12 +10,13 @@ const isMultipleOfMinutes = (minutes: number) => (dateToCheck: Date) => (
 
 const isTimeInPast = (time: Date): boolean => new Date(time) < new Date();
 
-const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => {
-  const max = new Date();
-  max.setDate(max.getDate() + maxDaysInFuture);
+const isTimeFarEnoughInFuture = (time: Date, offsetDays: number): boolean => (
+  DateTime.now().plus({ days: offsetDays }) < DateTime.fromJSDate(time)
+);
 
-  return time <= max;
-};
+const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => (
+  DateTime.fromJSDate(time) <= DateTime.now().plus({ days: maxDaysInFuture })
+);
 
 const createTimeSlotValidatorObject = (
   slotGranularityMinutes: number,
@@ -69,11 +71,16 @@ const createPeriodValidation = () => {
   return period;
 };
 
-const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFuture: number) => {
+const createReservationValidator = (
+  slotGranularityMinutes: number,
+  maxDaysInFuture: number,
+  daysToStart: number,
+) => {
   // Time must be a multiple of ${slotGranularityMinutes} minutes
   const minuteMultipleMessage = `Ajan tulee olla jokin ${slotGranularityMinutes} minuutin moninkerta`;
   // Reservation cannot be in past
   const pastErrorMessage = 'Varaus ei voi ajoittua menneisyyteen';
+  const farEnoughErrorMessage = 'Varaus tulee tehdä vähintään 1 päivää etukäteen';
   // Reservation start time cannot be further than ${maxDaysInFuture} days away
   const tooFarInFutureErrorMessage = `Voit tehdä varauksen korkeintaan ${maxDaysInFuture} päivän päähän`;
   // Reservation start time cannot be later than the end time
@@ -89,13 +96,21 @@ const createReservationValidator = (slotGranularityMinutes: number, maxDaysInFut
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
       .refine((value) => !isTimeInPast(value), { message: pastErrorMessage })
       .refine(
+        (value) => isTimeFarEnoughInFuture(value, daysToStart),
+        { message: farEnoughErrorMessage },
+      )
+      .refine(
         (value) => isTimeAtMostInFuture(value, maxDaysInFuture),
         { message: tooFarInFutureErrorMessage },
       ),
     end: z.coerce
       .date()
       .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
-      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage }),
+      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage })
+      .refine(
+        (value) => isTimeFarEnoughInFuture(value, daysToStart),
+        { message: farEnoughErrorMessage },
+      ),
     aircraftId: z.string().trim().min(1, { message: aircraftIdEmptyErrorMessage }),
     info: z.string().optional(),
     phone: z.string().trim().min(1, { message: phoneNumberEmptyErrorMessage }),
@@ -213,6 +228,7 @@ export {
   getTimeRangeValidator,
   isTimeInPast,
   isTimeAtMostInFuture,
+  isTimeFarEnoughInFuture,
   airfieldValidator,
   configurationValidator,
   createPeriodValidation,

@@ -3,7 +3,7 @@ import { EventImpl } from '@fullcalendar/core/internal';
 import { type FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
-import { ReservationEntry } from '@lentovaraukset/shared/src';
+import { ConfigurationEntry, ReservationEntry } from '@lentovaraukset/shared/src';
 import { useAirfield } from '../../queries/airfields';
 import InputField from '../InputField';
 import DatePicker from '../DatePicker';
@@ -13,6 +13,7 @@ import ModalAlert from '../ModalAlert';
 
 type ReservationInfoProps = {
   reservation?: EventImpl
+  configuration?: ConfigurationEntry
   draggedTimes?: { start: Date, end: Date }
   onSubmit: (formData: Omit<ReservationEntry, 'id' | 'user'>) => void
   id?: string
@@ -28,16 +29,23 @@ type Inputs = {
 
 function ReservationInfoForm({
   reservation, draggedTimes,
+  configuration,
   onSubmit,
   id,
 }: ReservationInfoProps) {
   const { data: airfield } = useAirfield('EFHK');
   const reservationGranularity = airfield?.eventGranularityMinutes || 20;
+  const maxDaysInFuture = configuration?.maxDaysInFuture || 7;
+  const daysToStart = configuration?.daysToStart || 0;
 
   const {
     register, handleSubmit, reset, control, formState: { errors },
   } = useForm<Inputs>({
-    resolver: zodResolver(createReservationValidator(reservationGranularity, 7)),
+    resolver: zodResolver(createReservationValidator(
+      reservationGranularity,
+      maxDaysInFuture,
+      daysToStart,
+    )),
     mode: 'all',
   });
 
