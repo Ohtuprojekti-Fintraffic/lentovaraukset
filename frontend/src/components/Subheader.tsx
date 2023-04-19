@@ -4,7 +4,7 @@ interface SubheaderProps {
   children: string;
   className?: string;
 }
-const subheaderBaseClass = 'font-sans text-ft-text-1000 text-left text-top leading-[137.5%]';
+const subheaderBaseClass = 'font-sans text-left text-top leading-[137.5%]';
 
 function Subheader({ children, className }: SubheaderProps) {
   return (

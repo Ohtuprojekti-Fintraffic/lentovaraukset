@@ -1,6 +1,7 @@
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 import { errorIfNotOk } from './util';
 
+// TODO: ICAO code should be passed on from the context in the calling component
 const airfieldCode = 'EFHK';
 
 const getReservations = async (from: Date, until: Date): Promise<ReservationEntry[]> => {

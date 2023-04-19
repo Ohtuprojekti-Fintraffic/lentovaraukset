@@ -11,6 +11,7 @@ import TimeSlotCalendar from './pages/TimeSlotCalendar';
 import Error from './pages/Error';
 import Management from './pages/Management';
 import Admin from './pages/Admin';
+import Landing from './pages/Landing';
 
 const router = createBrowserRouter(
   [
@@ -21,6 +22,10 @@ const router = createBrowserRouter(
       children: [
         {
           path: '/',
+          element: <Landing />,
+        },
+        {
+          path: '/varaukset',
           element: <ReservationCalendar />,
         },
         {

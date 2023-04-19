@@ -21,18 +21,18 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-col h-full">
-        <Navigation />
-        <PopupProvider>
-          <AlertContextProvider>
-            <AirportProvider>
+        <AirportProvider>
+          <Navigation />
+          <PopupProvider>
+            <AlertContextProvider>
               <AlertContainer />
               <Popup />
-              <main className="flex flex-row flex-grow p-10 overflow-y-auto">
+              <main className="flex flex-row flex-grow overflow-y-auto">
                 <Outlet />
               </main>
-            </AirportProvider>
-          </AlertContextProvider>
-        </PopupProvider>
+            </AlertContextProvider>
+          </PopupProvider>
+        </AirportProvider>
       </div>
     </QueryClientProvider>
   );

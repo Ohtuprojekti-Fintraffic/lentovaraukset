@@ -38,7 +38,7 @@ function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { showPopup, clearPopup } = usePopupContext();
-  const { airport } = useAirportContext(); // TODO: get id from airfield selection
+  const { airport, setAirportICAO } = useAirportContext(); // TODO: get id from airfield selection
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
   const { data: configuration } = useConfiguration();
   const { addNewAlert } = useContext(AlertContext);
@@ -207,30 +207,32 @@ function ReservationCalendar() {
           calendarRef.current?.getApi().refetchEvents();
         }}
       />
-      <div className="flex flex-col space-y-2 h-full w-full">
+      <div className="flex flex-col w-full">
         <AirfieldAccordion
           airfield={airport}
           airfields={airfields}
-          onChange={(a:AirfieldEntry) => console.log(`${a.name} valittu`)}
+          onChange={(a:AirfieldEntry) => setAirportICAO(a.code)}
         />
-        <div className="flex flex-row justify-between mt-0">
-          <h1 className="text-3xl">Varauskalenteri</h1>
-          <Button variant="primary" onClick={() => showReservationModalFn(null, null)}>Uusi varaus</Button>
+        <div className="flex flex-col space-y-2 h-full w-full p-8">
+          <div className="flex flex-row justify-between mt-0">
+            <h1 className="text-3xl">Varauskalenteri</h1>
+            <Button variant="primary" onClick={() => showReservationModalFn(null, null)}>Uusi varaus</Button>
+          </div>
+          <Calendar
+            calendarRef={calendarRef}
+            eventSources={eventsSourceRef.current}
+            addEventFn={showModalAfterDrag}
+            modifyEventFn={modifyReservationFn}
+            clickEventFn={clickReservation}
+            removeEventFn={removeReservation}
+            granularity={airport && { minutes: airport.eventGranularityMinutes }}
+            eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFFF' }}
+            selectConstraint="timeslots"
+            checkIfTimeInFuture
+            allowEventRef={allowEvent}
+            configuration={configuration}
+          />
         </div>
-        <Calendar
-          calendarRef={calendarRef}
-          eventSources={eventsSourceRef.current}
-          addEventFn={showModalAfterDrag}
-          modifyEventFn={modifyReservationFn}
-          clickEventFn={clickReservation}
-          removeEventFn={removeReservation}
-          granularity={airport && { minutes: airport.eventGranularityMinutes }}
-          eventColors={{ backgroundColor: '#000000', eventColor: '#FFFFFFF', textColor: '#FFFFFFF' }}
-          selectConstraint="timeslots"
-          checkIfTimeInFuture
-          allowEventRef={allowEvent}
-          configuration={configuration}
-        />
       </div>
     </>
   );
