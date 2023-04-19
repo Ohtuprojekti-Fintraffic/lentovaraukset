@@ -4,12 +4,12 @@ import { type FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry, ReservationEntry } from '@lentovaraukset/shared/src';
-import { useAirfield } from '../../queries/airfields';
 import InputField from '../InputField';
 import DatePicker from '../DatePicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { HTMLDateTimeConvert } from '../../util';
 import ModalAlert from '../ModalAlert';
+import { useAirportContext } from '../../contexts/AirportContext';
 
 type ReservationInfoProps = {
   reservation?: EventImpl
@@ -33,8 +33,8 @@ function ReservationInfoForm({
   onSubmit,
   id,
 }: ReservationInfoProps) {
-  const { data: airfield } = useAirfield('EFHK');
-  const reservationGranularity = airfield?.eventGranularityMinutes || 20;
+  const { airport } = useAirportContext();
+  const reservationGranularity = airport?.eventGranularityMinutes || 20;
   const maxDaysInFuture = configuration?.maxDaysInFuture || 7;
   const daysToStart = configuration?.daysToStart || 0;
 

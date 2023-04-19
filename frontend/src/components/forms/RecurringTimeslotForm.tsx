@@ -10,9 +10,9 @@ import { usePopupContext } from '../../contexts/PopupContext';
 import InputField from '../InputField';
 import DatePicker from '../DatePicker';
 import { HTMLDateTimeConvert } from '../../util';
-import { useAirfield } from '../../queries/airfields';
 import { getReservations } from '../../queries/reservations';
 import ModalAlert from '../ModalAlert';
+import { useAirportContext } from '../../contexts/AirportContext';
 
 type RecurringTimeslotProps = {
   timeslot?: EventImpl
@@ -51,13 +51,11 @@ function RecurringTimeslotForm({
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
-  // this should probably be asserted to be defined
-  // if the airfield isn't available where are we creating timeslots?
-  const { data: airfield } = useAirfield('EFHK');
+  const { airport } = useAirportContext();
   const [reservations, setReservations] = useState<ReservationEntry[]>([]);
   const [formWarning, setFormWarning] = useState<string | undefined>(undefined);
   const { showPopup, clearPopup } = usePopupContext();
-  const timeslotGranularity = airfield?.eventGranularityMinutes || 20;
+  const timeslotGranularity = airport?.eventGranularityMinutes || 20;
 
   const {
     register, handleSubmit, reset, watch, control, formState: { errors }, getValues,
