@@ -24,7 +24,7 @@ type AirportProviderProps = {
 };
 
 function AirportProvider({ children }: AirportProviderProps) {
-  const [icao, setIcao] = useState<string | undefined>(undefined);
+  const [icao, setIcao] = useState<string | undefined>('EFHK');
   const [airport, setAirport] = useState<AirfieldEntry | undefined>(undefined);
 
   if (!icao) {
