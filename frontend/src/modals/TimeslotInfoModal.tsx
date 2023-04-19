@@ -8,6 +8,7 @@ import RecurringTimeslotForm from '../components/forms/RecurringTimeslotForm';
 import AlertContext from '../contexts/AlertContext';
 import { addTimeSlot } from '../queries/timeSlots';
 import { ApiError } from '../queries/util';
+import { useAirportContext } from '../contexts/AirportContext';
 
 type InfoModalProps = {
   showInfoModal: boolean
@@ -32,6 +33,7 @@ function TimeslotInfoModal({
   modifyTimeslotFn,
 }: InfoModalProps) {
   const { addNewAlert } = useContext(AlertContext);
+  const { airport } = useAirportContext(); // TODO: get id from airfield selection
 
   const onModifySubmitHandler = async (
     updatedTimeslot: Omit<TimeslotEntry, 'id' | 'airfieldCode'>,
@@ -72,7 +74,7 @@ function TimeslotInfoModal({
 
   const onSubmitAddHandler = async (timeslotDetails: Omit<TimeslotEntry, 'id' | 'airfieldCode'>) => {
     try {
-      await addTimeSlot(timeslotDetails);
+      await addTimeSlot(timeslotDetails, airport?.code);
       addNewAlert('Aikaikkuna lisätty!', 'success');
     } catch (exception) {
       if (exception instanceof ApiError) {

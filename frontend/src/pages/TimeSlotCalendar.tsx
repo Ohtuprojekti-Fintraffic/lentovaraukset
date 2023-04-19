@@ -42,7 +42,7 @@ function TimeSlotCalendar() {
     failureCallback,
   ) => {
     try {
-      const timeslots = await getTimeSlots(start, end);
+      const timeslots = await getTimeSlots(start, end, airport?.code);
       const timeslotsMapped = timeslots.map((timeslot): EventInput => {
         const timeslotEvent: EventInput = {
           ...timeslot,
@@ -90,7 +90,6 @@ function TimeSlotCalendar() {
     draggedTimesRef.current = times;
     setShowInfoModal(true);
   }
-
   const closeTimeslotModalFn = () => setShowInfoModal(false);
 
   const clickTimeslot = async (event: EventImpl): Promise<void> => {
@@ -107,7 +106,7 @@ function TimeSlotCalendar() {
     const { event } = removeInfo;
 
     const onConfirmRemove = async () => {
-      await deleteTimeslot(Number(event.id));
+      await deleteTimeslot(Number(event.id), airport?.code);
       closeTimeslotModalFn();
       clearPopup();
       calendarRef.current?.getApi().refetchEvents();
@@ -171,6 +170,7 @@ function TimeSlotCalendar() {
             days: period.days,
           }
           : undefined,
+        airport?.code,
       );
       closeTimeslotModalFn();
       clearPopup();
@@ -181,15 +181,19 @@ function TimeSlotCalendar() {
       if (timeslot.extendedProps.group) {
         const startingFrom = new Date(start);
         startingFrom.setHours(0, 0, 0, 0);
-        await modifyGroup(timeslot.extendedProps.group, {
-          startingFrom,
-          startTimeOfDay: {
-            hours: start.getHours(), minutes: start.getMinutes(),
+        await modifyGroup(
+          timeslot.extendedProps.group,
+          {
+            startingFrom,
+            startTimeOfDay: {
+              hours: start.getHours(), minutes: start.getMinutes(),
+            },
+            endTimeOfDay: {
+              hours: end.getHours(), minutes: end.getMinutes(),
+            },
           },
-          endTimeOfDay: {
-            hours: end.getHours(), minutes: end.getMinutes(),
-          },
-        });
+          airport?.code,
+        );
       }
       closeTimeslotModalFn();
       clearPopup();
