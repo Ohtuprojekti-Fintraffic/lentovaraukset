@@ -187,7 +187,7 @@ const updateById = async (
     await oldTimeslot.addReservations(newReservations);
   } else {
     const reservations = await reservationService
-      .getInTimeRange(timeslot.start, timeslot.end);
+      .getInTimeRange(timeslot.start, timeslot.end, timeslot.airfieldCode);
     await Promise.all(reservations.map((r) => reservationService.deleteById(r.dataValues.id)));
   }
 
@@ -199,7 +199,7 @@ const createTimeslot = async (newTimeSlot: Omit<TimeslotEntry, 'id'>): Promise<T
 
   const timeslot: Timeslot = await Timeslot.create(newTimeSlot);
   const reservations = await reservationService
-    .getInTimeRange(newTimeSlot.start, newTimeSlot.end);
+    .getInTimeRange(newTimeSlot.start, newTimeSlot.end, timeslot.airfieldCode);
   if (newTimeSlot.type === 'available') {
     await timeslot.addReservations(reservations);
   } else {

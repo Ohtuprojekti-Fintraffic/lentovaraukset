@@ -8,6 +8,7 @@ import ReservationInfoForm from '../components/forms/ReservationInfoForm';
 import AlertContext from '../contexts/AlertContext';
 import { addReservation, modifyReservation } from '../queries/reservations';
 import { ApiError, isErrorForCode } from '../queries/util';
+import { useAirportContext } from '../contexts/AirportContext';
 
 type InfoModalProps = {
   showInfoModal: boolean
@@ -25,6 +26,7 @@ function ReservationInfoModal({
   configuration,
 }: InfoModalProps) {
   const { addNewAlert } = useContext(AlertContext);
+  const { airport } = useAirportContext(); // TODO: get id from airfield selection
 
   const onSubmitModifyHandler = async (updatedReservation: Omit<ReservationEntry, 'id' | 'user'>) => {
     try {
@@ -38,6 +40,7 @@ function ReservationInfoModal({
           phone: updatedReservation.phone,
           info: updatedReservation.info,
         },
+        airport?.code,
       );
       addNewAlert(`Varaus #${modifiedReservation.id} päivitetty!`, 'success');
     } catch (err) {
@@ -55,7 +58,7 @@ function ReservationInfoModal({
 
   const onSubmitAddHandler = async (reservationDetails: Omit<ReservationEntry, 'id' | 'user'>) => {
     try {
-      await addReservation(reservationDetails);
+      await addReservation(reservationDetails, airport?.code);
       addNewAlert('Varaus lisätty!', 'success');
     } catch (err) {
       if (await isErrorForCode(err, ServiceErrorCode.ReservationExceedsTimeslot)) {

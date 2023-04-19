@@ -65,7 +65,7 @@ function TimeSlotCalendar() {
     failureCallback,
   ) => {
     try {
-      const reservations = await getReservations(start, end);
+      const reservations = await getReservations(start, end, airport?.code);
 
       const reservationsMapped = reservations.map((reservation) => ({
         ...reservation, id: reservation.id.toString(), groupId: 'reservations', display: 'background', color: '#000000',

@@ -48,7 +48,7 @@ function ReservationCalendar() {
     failureCallback,
   ) => {
     try {
-      const reservations = await getReservations(start, end);
+      const reservations = await getReservations(start, end, airport?.code);
 
       const reservationsMapped = reservations.map((reservation) => ({
         ...reservation,
@@ -77,7 +77,7 @@ function ReservationCalendar() {
     failureCallback,
   ) => {
     try {
-      const timeslots = await getTimeSlots(start, end);
+      const timeslots = await getTimeSlots(start, end, airport?.code);
       const timeslotsMapped = timeslots.map((timeslot) => {
         const display = timeslot.type === 'available' ? 'inverse-background' : 'block';
         const color = timeslot.type === 'available' ? '#2C2C44' : '#B40000';
@@ -127,7 +127,7 @@ function ReservationCalendar() {
     const { event } = removeInfo;
 
     const onConfirmRemove = async () => {
-      const res = await deleteReservation(Number(event.id));
+      const res = await deleteReservation(Number(event.id), airport?.code);
       if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
         closeReservationModalFn();
         event.remove();
@@ -167,7 +167,7 @@ function ReservationCalendar() {
       phone,
       email,
       info,
-    });
+    }, airport?.code);
     if (modifiedReservation) {
       addNewAlert('Reservation modified', 'success');
     }
