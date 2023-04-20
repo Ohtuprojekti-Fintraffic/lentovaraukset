@@ -9,6 +9,11 @@ function Navigation() {
     return isActive ? `${baseStyle} active font-bold` : baseStyle;
   };
 
+  const dropDownLinkStyle = ({ isActive }: { isActive: boolean }) => {
+    const baseStyle = 'border-b border-ft-neutral-400 bg-black p-4 text-white';
+    return isActive ? `${baseStyle} active font-bold` : baseStyle;
+  };
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -38,7 +43,7 @@ function Navigation() {
             )}
           </button>
         </nav>
-        <nav className="flex flex-row space-x-10 text-l">
+        <nav className="hidden md:flex flex-row space-x-10 text-l">
           <NavLink to="/varaukset" className={navLinkStyle}>
             Varaukset
           </NavLink>
@@ -54,39 +59,31 @@ function Navigation() {
         </nav>
       </div>
       {menuOpen && (
-        <div className="md:hidden bg-black border-custom-gray z-10 shadow-lg w-full flex flex-col text-right">
+        <div className="md:hidden bg-black border-custom-gray shadow-lg w-full flex flex-col text-right">
           <NavLink
-            to="/"
-            className={({ isActive }) => `border-b border-ft-neutral-400 bg-black p-4 text-white ${
-              isActive ? 'active font-bold' : ''
-            }`}
+            to="/varaukset"
+            className={dropDownLinkStyle}
             onClick={toggleMenu}
           >
             Varaukset
           </NavLink>
           <NavLink
             to="/varausikkunat"
-            className={({ isActive }) => `border-b border-ft-neutral-400 bg-black p-4 text-white ${
-              isActive ? 'active font-bold' : ''
-            }`}
+            className={dropDownLinkStyle}
             onClick={toggleMenu}
           >
             Varausikkunat
           </NavLink>
           <NavLink
             to="/hallinta"
-            className={({ isActive }) => `border-b border-ft-neutral-400 bg-black p-4 text-white ${
-              isActive ? 'active font-bold' : ''
-            }`}
+            className={dropDownLinkStyle}
             onClick={toggleMenu}
           >
             Hallinta
           </NavLink>
           <NavLink
             to="/yllapito"
-            className={({ isActive }) => `border-b border-ft-neutral-400 bg-black p-4 text-white ${
-              isActive ? 'active font-bold' : ''
-            }`}
+            className={dropDownLinkStyle}
             onClick={toggleMenu}
           >
             Ylläpito
