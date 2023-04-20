@@ -13,6 +13,8 @@ import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast, isTimeAtMostInFuture, isTimeFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
 import AlertContext from '../contexts/AlertContext';
+import Button from './Button';
+import ButtonGroup from './ButtonGroup';
 
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>
@@ -196,47 +198,58 @@ function Calendar({
   };
 
   return (
-    <FullCalendar
-      ref={calendarRef}
-      plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
-      locale="fi"
-      timeZone="UTC"
-      weekNumberCalculation="ISO"
-      headerToolbar={{
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,listWeek',
-      }}
-      height="100%"
-      initialView={viewMode}
-      allDaySlot={false}
-      nowIndicator
-      scrollTime="08:00:00"
-      dayHeaderFormat={{ weekday: 'long' }}
-      slotDuration={granularity}
-      snapDuration={granularity}
-      slotLabelInterval={{ minutes: 30 }}
-      slotLabelFormat={{
-        hour: 'numeric', minute: '2-digit', hour12: false, meridiem: false,
-      }}
-      selectable
-      selectMirror
-      editable
-      eventResizableFromStart
-      eventStartEditable
-      eventBackgroundColor={eventColors?.backgroundColor || '#FFFFFF'}
-      eventColor={eventColors?.eventColor || '#000000'}
-      eventTextColor={eventColors?.textColor || '#000000'}
-      eventClick={handleEventClick}
-      eventChange={handleEventChange}
-      eventRemove={handleEventRemove}
-      select={handleEventCreate}
-      selectConstraint={selectConstraint}
-      eventSources={eventSources}
-      slotEventOverlap={false}
-      selectAllow={allowEventRef}
-      eventAllow={allowEventRef}
-    />
+    <div>
+      <div className="flex flex-row">
+        <Button variant="secondary">Today</Button>
+        <ButtonGroup>
+          <Button variant="secondary">asd</Button>
+          <Button variant="secondary">asd</Button>
+          <Button variant="secondary">asd</Button>
+          <Button variant="secondary">asd</Button>
+        </ButtonGroup>
+      </div>
+      <FullCalendar
+        ref={calendarRef}
+        plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
+        locale="fi"
+        timeZone="UTC"
+        weekNumberCalculation="ISO"
+        headerToolbar={{
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek',
+        }}
+        height="100%"
+        initialView={viewMode}
+        allDaySlot={false}
+        nowIndicator
+        scrollTime="08:00:00"
+        dayHeaderFormat={{ weekday: 'long' }}
+        slotDuration={granularity}
+        snapDuration={granularity}
+        slotLabelInterval={{ minutes: 30 }}
+        slotLabelFormat={{
+          hour: 'numeric', minute: '2-digit', hour12: false, meridiem: false,
+        }}
+        selectable
+        selectMirror
+        editable
+        eventResizableFromStart
+        eventStartEditable
+        eventBackgroundColor={eventColors?.backgroundColor || '#FFFFFF'}
+        eventColor={eventColors?.eventColor || '#000000'}
+        eventTextColor={eventColors?.textColor || '#000000'}
+        eventClick={handleEventClick}
+        eventChange={handleEventChange}
+        eventRemove={handleEventRemove}
+        select={handleEventCreate}
+        selectConstraint={selectConstraint}
+        eventSources={eventSources}
+        slotEventOverlap={false}
+        selectAllow={allowEventRef}
+        eventAllow={allowEventRef}
+      />
+    </div>
   );
 }
 
