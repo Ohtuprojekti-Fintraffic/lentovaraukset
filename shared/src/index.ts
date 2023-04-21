@@ -35,16 +35,16 @@ export interface ConfigurationEntry {
 }
 
 export enum ServiceErrorCode {
-  ReservationExceedsTimeslot = 400,
-  InvalidAirfield = 400,
-  RouteNotFound = 400,
-  ConcurrentReservations = 400,
-  BlockedTimeslot = 400,
-  ReservationInMultipleTimeslots = 400,
-  ConsecutiveTimeslots = 400,
-  OverlappingTimeslots = 400,
-  TimeslotNotFound = 400,
-  TimeslotNotEditable = 400,
+  ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
+  InvalidAirfield = 'InvalidAirfield',
+  RouteNotFound = 'RouteNotFound',
+  ConcurrentReservations = 'ConcurrentReservations',
+  BlockedTimeslot = 'BlockedTimeslot', 
+  ReservationInMultipleTimeslots = 'ReservationInMultipleTimeslots',
+  ConsecutiveTimeslots = 'ConsecutiveTimeslots',
+  OverlappingTimeslots = 'OverlappingTimeslots',
+  TimeslotNotFound = 'TimeslotNotFound',
+  TimeslotNotEditable = 'TimeslotNotEditable',
 }
 
 export interface WeekInDays {
