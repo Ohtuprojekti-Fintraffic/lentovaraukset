@@ -10,6 +10,7 @@ import FullCalendar from '@fullcalendar/react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
+import { useTranslation } from 'react-i18next';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -42,6 +43,8 @@ function ReservationCalendar() {
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
   const { data: configuration } = useConfiguration();
   const { addNewAlert } = useContext(AlertContext);
+  const { t } = useTranslation();
+
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
     successCallback,
@@ -215,7 +218,7 @@ function ReservationCalendar() {
         />
         <div className="flex flex-col space-y-2 h-full w-full p-8">
           <div className="flex flex-row justify-between mt-0">
-            <h1 className="text-3xl">Varauskalenteri</h1>
+            <h1 className="text-3xl">{t('common.test')}</h1>
             <Button variant="primary" onClick={() => showReservationModalFn(null, null)}>Uusi varaus</Button>
           </div>
           <Calendar

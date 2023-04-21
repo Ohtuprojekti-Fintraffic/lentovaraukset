@@ -1,0 +1,11 @@
+{
+  "common": {
+    "test": "testi",
+    "next": "seuraava",
+    "save": "tallenna",
+    "cancel": "peruuta",
+    "delete": "poista",
+    "yes": "kyllä",
+    "no": "ei"
+  }
+}
