@@ -1,11 +1,11 @@
 {
   "common": {
-    "next": "seuraava",
-    "save": "tallenna",
-    "cancel": "peruuta",
-    "delete": "poista",
-    "yes": "kyllä",
-    "no": "ei",
+    "next": "Seuraava",
+    "save": "Tallenna",
+    "cancel": "Peruuta",
+    "delete": "Poista",
+    "yes": "Kyllä",
+    "no": "Ei",
     "weekdays": {
       "monday": "maanantai",
       "tuesday": "tiistai",
@@ -14,26 +14,50 @@
       "friday": "perjantai",
       "saturday": "lauantai",
       "sunday": "sunnuntai"
-    },
-    "months": {
-      
     }
   },
   "navigation": {
+    "title":"Koululentovaraus",
     "reservations": "varaukset",
     "timeslots": "varausikkunat",
     "management": "hallinta",
-    "admin": "ylläpito"
+    "admin": "ylläpito",
+    "menu": "valikko"
+  },
+  "landing": {
+    "title": "Fintraffic Koululentovaraus",
+    "description": "Tältä sivulta voit varata aikoja koululennoille.",
+    "chooseAirport": "Valitse lentoasema:",
+    "airportDropdownPlaceholder": "lentoasema",
+    "continue": "Tee varaus",
+    "emptyAirportError": "Valitse ensin lentoasema"
   },
   "reservations": {
     "calendar": {
-      "title": "Varaukset"
+      "title": "Varaukset",
+      "newReservation": "Uusi varaus",
+      "reservationModified": "Varausta muokattu",
+      "reservationDeletionFailed": "Varauksen poisto epäonnistui",
+      "notReservable": "Ei varattavissa"
     },
     "modal": {
-      "deletion_popup": {
-        "title": "Varauksen poisto",
-        "text": "Haluatko varmasti poistaa varauksen?"
-      }
+      "reservation": "Varaus",
+      "newReservation": "Uusi varaus",
+      "form": {
+        "start": "Varaus alkaa (UTC)",
+        "end": "Varaus päättyy (UTC)",
+        "aircraftId": "Koneen rekisteritunnus",
+        "phone": "Puhelinnumero",
+        "details": "Lisätietoja"
+      },
+      "updated": "Varaus päivitetty!",
+      "updateFailed": "Virhe tapahtui varausta päivitettäessä!",
+      "created": "Varaus lisätty!",
+      "insideTimeslot": "Varaus täytyy olla varausikkunan sisällä"
+    },
+    "deletionPopup": {
+      "title": "Varauksen poisto",
+      "text": "Haluatko varmasti poistaa varauksen?"
     }
   },
   "timeslots": {
@@ -51,10 +75,10 @@
     }
   },
   "admin": {
-    "global_settings": {
+    "globalSettings": {
 
     },
-    "new_airfield": {
+    "newAirfield": {
 
     }
   }

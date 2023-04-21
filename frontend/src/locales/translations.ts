@@ -26,9 +26,9 @@ type Common<A, B> = {
  * The values may be of different types but this is not significant as
  * the translation objects only contain strings.
  */
-type CommonIntersection<T extends object[]> =
+type CommonAll<T extends object[]> =
   T extends [infer First, ...infer Rest]
-    ? Common<First, CommonIntersection<Extract<Rest, object[]>>>
+    ? Common<First, CommonAll<Extract<Rest, object[]>>>
     : never;
 
 /** Nested object type extended by the translation objects */
@@ -81,6 +81,10 @@ function constructTranslations<T extends NestedObject>(obj: T): T {
  * const text = t(translations.page.title);
  * ```
 */
-const translations = constructTranslations<CommonIntersection<TranslationTypes>>(fi);
+const translations = constructTranslations<CommonAll<TranslationTypes>>(fi);
 
+// Currently unused, may be useful in the future
+export type TranslationsType = typeof translations;
+
+// Currently unused, may be useful in the future
 export default translations;
