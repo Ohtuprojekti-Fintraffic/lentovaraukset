@@ -5,6 +5,7 @@ import type {
   UseFormRegisterReturn, FieldErrors,
 } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
+import { twMerge } from 'tailwind-merge';
 
 export type InputStates = 'default' | 'error' | 'disabled';
 
@@ -110,8 +111,8 @@ function InputField({
         disabled={state === 'disabled'}
         placeholder={placeholder}
         className={type === 'checkbox'
-          ? `${checkboxBaseClass} ${fieldStateClasses[fieldState]} ${fieldInvalidClass} ${inputClassName}`
-          : `${fieldBaseClass} ${fieldStateClasses[fieldState]} ${fieldInvalidClass} ${inputClassName}`}
+          ? twMerge(`${checkboxBaseClass} ${fieldStateClasses[fieldState]} ${fieldInvalidClass}`, inputClassName)
+          : twMerge(`${fieldBaseClass} ${fieldStateClasses[fieldState]} ${fieldInvalidClass}`, inputClassName)}
         defaultValue={defaultValue}
         step={step}
         min={min}

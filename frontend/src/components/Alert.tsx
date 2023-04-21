@@ -2,6 +2,7 @@ import React, {
   useEffect, useRef,
 } from 'react';
 import { X } from 'lucide-react';
+import { twMerge } from 'tailwind-merge';
 import type { AlertContextType } from '../contexts/AlertContext';
 import Button from './Button';
 
@@ -59,7 +60,7 @@ function Alert({
 
   return (
     <div
-      className={`${baseAlertClasses} ${alertVariantClasses[variant]}`}
+      className={twMerge(baseAlertClasses, alertVariantClasses[variant])}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

@@ -8,6 +8,7 @@ import ReactDatePicker, { registerLocale, setDefaultLocale } from 'react-datepic
 import fi from 'date-fns/locale/fi';
 import { Control, Controller, type FieldErrors } from 'react-hook-form';
 import { DateTime } from 'luxon';
+import { twMerge } from 'tailwind-merge';
 import { fieldBaseClass, fieldStateClasses, InputStates } from './InputField';
 
 // SUOMI
@@ -75,7 +76,7 @@ function DatePicker({
           return (
             <div className="flex flex-col items-start flex-wrap w-full">
               <ReactDatePicker
-                className={`${fieldBaseClass} ${fieldStateClasses[state]} ${inputClassName} ${value}`}
+                className={twMerge(`${fieldBaseClass} ${fieldStateClasses[state]}`, inputClassName)}
                 dateFormat={showTimeSelect ? 'dd.MM.yyyy HH:mm' : 'dd.MM.yyyy'}
                 dropdownMode="select"
                 minDate={DateTime.now().toJSDate()} // local tz
