@@ -24,9 +24,7 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
   if (err instanceof z.ZodError) {
     const { message, statusCode, validationIssues } = handleZodError(err);
     res.status(statusCode).json({ error: { message, validationIssues } });
-  } else if (isSpecificServiceError(err, ServiceErrorCode.ReservationExceedsTimeslot)) {
-    res.status(400).json({ error: { code: err.errorCode, message: err.message } });
-  } else if (isSpecificServiceError(err, ServiceErrorCode.InvalidAirfield)) {
+  } else if (Object.values(ServiceErrorCode).some((e) => isSpecificServiceError(err, e))) {
     res.status(400).json({ error: { code: err.errorCode, message: err.message } });
   } else if (err instanceof UniqueConstraintError) {
     const statusCode = 400;

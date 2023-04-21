@@ -38,6 +38,13 @@ export enum ServiceErrorCode {
   ReservationExceedsTimeslot = 'ReservationExceedsTimeslot',
   InvalidAirfield = 'InvalidAirfield',
   RouteNotFound = 'RouteNotFound',
+  ConcurrentReservations = 'ConcurrentReservations',
+  BlockedTimeslot = 'BlockedTimeslot',
+  ReservationInMultipleTimeslots = 'ReservationInMultipleTimeslots',
+  ConsecutiveTimeslots = 'ConsecutiveTimeslots',
+  OverlappingTimeslots = 'OverlappingTimeslots',
+  TimeslotNotFound = 'TimeslotNotFound',
+  TimeslotNotEditable = 'TimeslotNotEditable',
 }
 
 export interface WeekInDays {

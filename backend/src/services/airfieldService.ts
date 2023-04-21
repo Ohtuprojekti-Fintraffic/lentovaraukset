@@ -1,11 +1,12 @@
-import { AirfieldEntry } from '@lentovaraukset/shared/src';
+import { AirfieldEntry, ServiceErrorCode } from '@lentovaraukset/shared/src';
 import { Airfield } from '../models';
+import ServiceError from '../util/errors';
 
 const getAirfield = async (code: string): Promise<AirfieldEntry> => {
   const airfield = await Airfield.findByPk(code);
 
   if (!airfield) {
-    throw new Error('Airfield not found');
+    throw new ServiceError(ServiceErrorCode.InvalidAirfield, 'Supplied airfield code could not be found');
   }
 
   return airfield.dataValues;

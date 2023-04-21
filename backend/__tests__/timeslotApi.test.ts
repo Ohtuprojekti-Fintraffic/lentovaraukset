@@ -558,7 +558,7 @@ describe('Calls to api', () => {
         info: null,
       });
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
     expect(response.body.error.message).toEqual('Operation would result in consecutive timeslots');
 
     const updatedTimeslot1 = await Timeslot.findByPk(timeslot1.id);
@@ -580,7 +580,7 @@ describe('Calls to api', () => {
         info: null,
       });
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
     expect(response.body.error.message).toEqual('No timeslot with id exists');
   });
 
@@ -641,7 +641,7 @@ describe('Calls to api', () => {
         info: null,
       });
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
     expect(response.body.error.message).toEqual('Timeslot has reservations');
 
     const updatedTimeslot = await Timeslot.findByPk(timeslot.id);
@@ -697,7 +697,7 @@ describe('Calls to api', () => {
       .set('Content-type', 'application/json')
       .send(consecutiveTimeslot);
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
     expect(response.body.error.message).toEqual('Operation would result in consecutive timeslots');
 
     const createdTimeslot = await Timeslot.findOne({ where: { start: consecutiveTimeslot.start } });
@@ -733,7 +733,7 @@ describe('Calls to api', () => {
         },
       });
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
     expect(response.body.error.message).toEqual('Operation would result in overlapping timeslots');
 
     const createdPeriodTimeslots = await Timeslot
