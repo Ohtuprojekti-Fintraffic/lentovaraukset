@@ -8,6 +8,8 @@
     "jsx": "react",
     "moduleResolution": "node" ,
     "sourceMap": true,
-    "lib": ["es5", "es6", "dom"]           
+    "lib": ["es5", "es6", "dom"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
   }
 }

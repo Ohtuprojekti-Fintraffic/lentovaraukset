@@ -26,6 +26,7 @@ import AlertContext from '../contexts/AlertContext';
 import { usePopupContext } from '../contexts/PopupContext';
 import { useAirportContext } from '../contexts/AirportContext';
 import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
+import translations from '../locales/translations';
 
 type StartEndPair = {
   start: Date;
@@ -218,7 +219,7 @@ function ReservationCalendar() {
         />
         <div className="flex flex-col space-y-2 h-full w-full p-8">
           <div className="flex flex-row justify-between mt-0">
-            <h1 className="text-3xl">{t('common.test')}</h1>
+            <h1 className="text-3xl">{t(translations.reservations.calendar.title)}</h1>
             <Button variant="primary" onClick={() => showReservationModalFn(null, null)}>Uusi varaus</Button>
           </div>
           <Calendar

@@ -1,11 +1,61 @@
 {
   "common": {
-    "test": "testi",
     "next": "seuraava",
     "save": "tallenna",
     "cancel": "peruuta",
     "delete": "poista",
     "yes": "kyllä",
-    "no": "ei"
+    "no": "ei",
+    "weekdays": {
+      "monday": "maanantai",
+      "tuesday": "tiistai",
+      "wednesday": "keskiviikko",
+      "thursday": "torstai",
+      "friday": "perjantai",
+      "saturday": "lauantai",
+      "sunday": "sunnuntai"
+    },
+    "months": {
+      
+    }
+  },
+  "navigation": {
+    "reservations": "varaukset",
+    "timeslots": "varausikkunat",
+    "management": "hallinta",
+    "admin": "ylläpito"
+  },
+  "reservations": {
+    "calendar": {
+      "title": "Varaukset"
+    },
+    "modal": {
+      "deletion_popup": {
+        "title": "Varauksen poisto",
+        "text": "Haluatko varmasti poistaa varauksen?"
+      }
+    }
+  },
+  "timeslots": {
+    "calendar": {
+      
+    },
+    "modal": {
+      "repeating": {
+      }
+    }
+  },
+  "management": {
+    "airfield": {
+
+    }
+  },
+  "admin": {
+    "global_settings": {
+
+    },
+    "new_airfield": {
+
+    }
   }
 }
