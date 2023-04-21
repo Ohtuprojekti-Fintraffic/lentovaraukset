@@ -39,7 +39,7 @@ export enum ServiceErrorCode {
   InvalidAirfield = 'InvalidAirfield',
   RouteNotFound = 'RouteNotFound',
   ConcurrentReservations = 'ConcurrentReservations',
-  BlockedTimeslot = 'BlockedTimeslot', 
+  BlockedTimeslot = 'BlockedTimeslot',
   ReservationInMultipleTimeslots = 'ReservationInMultipleTimeslots',
   ConsecutiveTimeslots = 'ConsecutiveTimeslots',
   OverlappingTimeslots = 'OverlappingTimeslots',

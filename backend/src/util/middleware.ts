@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { UniqueConstraintError } from 'sequelize';
 import * as z from 'zod';
 import { Airfield } from '../models';
-import ServiceError, { isSpecificServiceError }  from './errors';
+import ServiceError, { isSpecificServiceError } from './errors';
 
 const handleZodError = (zodError: z.ZodError): {
   validationIssues: z.typeToFlattenedError<any, { message: string, code: z.ZodIssueCode }>,
