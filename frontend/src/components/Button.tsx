@@ -1,8 +1,10 @@
 import React from 'react';
+import { twMerge } from 'tailwind-merge';
 
 type DisableableVariants = 'secondary' | 'tertiary' | 'danger' | 'glyph';
 interface DisableableProps {
   variant: DisableableVariants;
+  active?: boolean;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
   children?: React.ReactNode;
@@ -12,27 +14,28 @@ interface DisableableProps {
 }
 
 type UndisableableVariants = 'primary';
-interface UndisableableProps extends Omit<DisableableProps, 'variant' | 'disabled'> {
+interface UndisableableProps extends Omit<DisableableProps, 'variant' | 'disabled' | 'active'> {
   variant: UndisableableVariants;
   disabled?: undefined;
+  active?: undefined;
 }
 // This is mostly to make it clear that
 // some button types can't be disabled
 type ButtonProps = DisableableProps | UndisableableProps;
 
 function Button({
-  variant, children, onClick, disabled, className, form, type = 'button',
+  variant, children, onClick, disabled, className, form, active, type = 'button',
 }: ButtonProps) {
   const buttonBaseClass = 'py-3 px-4 rounded-ft-large font-ft-button text-ft-button';
 
   const buttonVariantClasses = {
-    primary: 'bg-black text-white hover:bg-ft-interactive-200',
+    primary: `${active ? 'bg-ft-neutral-400' : 'bg-black'} text-white hover:bg-ft-interactive-200`,
 
     // odd size because border adds to size and
     // border- box doesnt work because of dynamic size:
-    secondary: disabled ? 'bg-transparent text-ft-text-300 border-2 px-[14px] py-[10px] border-ft-neutral-100'
-      : ('bg-white text-black border-2 px-[14px] py-[10px] border-black'
-      + ' hover:border-ft-interactive-200 hover:bg-ft-interactive-200 hover:border-ft-interactive-200 hover:text-white'),
+    secondary: disabled ? 'bg-transparent text-ft-text-300 border-ft-neutral-100'
+      : `${active ? 'bg-ft-neutral-100' : 'bg-white'} text-black border-black`
+        + ' px-[14px] py-[10px] border-2 hover:border-ft-interactive-200 hover:bg-ft-interactive-200  hover:border-ft-interactive-200 hover:text-white',
 
     tertiary: disabled ? 'bg-transparent text-ft-text-300'
       : 'bg-transparent text-ft-text-1000 hover:text-white hover:bg-ft-interactive-200',
@@ -48,7 +51,7 @@ function Button({
     <button
       // eslint-disable-next-line react/button-has-type
       type={type}
-      className={`${buttonBaseClass} ${buttonVariantClasses[variant]} ${className}`}
+      className={twMerge(buttonBaseClass, `${buttonVariantClasses[variant]} ${className}`)}
       onClick={onClick}
       form={form}
     >

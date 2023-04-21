@@ -12,6 +12,7 @@ import type {
 import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast, isTimeAtMostInFuture, isTimeFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
+import { X } from 'lucide-react';
 import AlertContext from '../contexts/AlertContext';
 import Button from './Button';
 import ButtonGroup from './ButtonGroup';
@@ -201,11 +202,29 @@ function Calendar({
     <div>
       <div className="flex flex-row">
         <Button variant="secondary">Today</Button>
-        <ButtonGroup>
-          <Button variant="secondary">asd</Button>
-          <Button variant="secondary">asd</Button>
-          <Button variant="secondary">asd</Button>
-          <Button variant="secondary">asd</Button>
+        <ButtonGroup activeIdx={1} className="ml-2">
+          <Button variant="secondary">Button</Button>
+          <Button variant="secondary">Button</Button>
+          <Button variant="secondary">Button</Button>
+          <Button variant="secondary">Button</Button>
+        </ButtonGroup>
+        <ButtonGroup activeIdx={1} className="ml-2">
+          <Button variant="primary">Button</Button>
+          <Button variant="primary">Button</Button>
+          <Button variant="primary">Button</Button>
+          <Button variant="primary">Button</Button>
+        </ButtonGroup>
+        <ButtonGroup className="ml-2" noBorder>
+          <Button variant="primary"><X strokeWidth="1.5" color="white" /></Button>
+          <Button variant="primary"><X strokeWidth="1.5" color="white" /></Button>
+          <Button variant="primary"><X strokeWidth="1.5" color="white" /></Button>
+          <Button variant="primary"><X strokeWidth="1.5" color="white" /></Button>
+        </ButtonGroup>
+        <ButtonGroup className="ml-2" noBorder>
+          <Button variant="secondary"><X strokeWidth="1.5" color="black" /></Button>
+          <Button variant="secondary"><X strokeWidth="1.5" color="black" /></Button>
+          <Button variant="secondary"><X strokeWidth="1.5" color="black" /></Button>
+          <Button variant="secondary"><X strokeWidth="1.5" color="black" /></Button>
         </ButtonGroup>
       </div>
       <FullCalendar
