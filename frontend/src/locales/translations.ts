@@ -1,13 +1,14 @@
 import fi from './fi.json';
+import se from './se.json';
+import en from './en.json';
 
 /**
  * Array of all translation objects used in the application.
 */
 type TranslationTypes = [
   typeof fi,
-  // uncomment the following lines when the corresponding translation objects are implemented
-  // typeof se,
-  // typeof en,
+  typeof se,
+  typeof en,
 ];
 
 /**

@@ -38,7 +38,7 @@
       "title": "Varaukset",
       "newReservation": "Uusi varaus",
       "reservationModified": "Varausta muokattu",
-      "reservationDeletionFailed": "Varauksen poisto epäonnistui",
+      "reservationDeletionFailed": "Varauksen poistaminen epäonnistui",
       "notReservable": "Ei varattavissa"
     },
     "modal": {
@@ -47,7 +47,7 @@
       "form": {
         "start": "Varaus alkaa (UTC)",
         "end": "Varaus päättyy (UTC)",
-        "aircraftId": "Koneen rekisteritunnus",
+        "aircraftId": "Lentokoneen rekisteritunnus",
         "phone": "Puhelinnumero",
         "details": "Lisätietoja"
       },
@@ -104,8 +104,8 @@
     },
     "repeatingPopup": {
       "title": "Toistuvan varausikkunan muokkaus",
-      "text": "Muokkasit toistuvaa varausikkuuna. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?",
-      "primary": "Muokkaa muokkaa kaikkia",
+      "text": "Muokkasit toistuvaa varausikkuna. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?",
+      "primary": "Muokkaa kaikkia",
       "secondary": "Muokkaa vain tätä"
     }
   },
