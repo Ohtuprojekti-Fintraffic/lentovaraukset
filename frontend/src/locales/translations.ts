@@ -3,7 +3,7 @@ import se from './se.json';
 import en from './en.json';
 
 /**
- * Array of all translation objects used in the application.
+ * Array of all locale objects used in the application.
 */
 type TranslationTypes = [
   typeof fi,
@@ -15,7 +15,7 @@ type TranslationTypes = [
  * Constructs a type that contains all keys that are common across the two supplied objects.
  *
  * The values may be of different types but this is not significant as
- * the translation objects only contain strings.
+ * the locale objects only contain strings.
 */
 type Common<A, B> = {
   [K in keyof A & keyof B]: A[K] | B[K];
@@ -25,26 +25,26 @@ type Common<A, B> = {
  * Constructs a type that contains all keys that are common across all objects in the array.
  *
  * The values may be of different types but this is not significant as
- * the translation objects only contain strings.
+ * the locale objects only contain strings.
  */
 type CommonAll<T extends object[]> =
   T extends [infer First, ...infer Rest]
     ? Common<First, CommonAll<Extract<Rest, object[]>>>
     : never;
 
-/** Nested object type extended by the translation objects */
+/** Nested object type extended by the locale objects */
 interface NestedObject {
   [key: string]: string | NestedObject;
 }
 
 /**
- * Constructs a typed object that maps i18next translation object keys to
- * the concatenated key strings used by the i18next `useTranslate` hook's `t` function.
+ * Constructs a typed object that maps i18next locale object keys to
+ * the concatenated key strings used by the i18next `useTranslation` hook's `t` function.
  *
  * This provides a way to type the `t` function's `key` parameter
  * and provide autocompletion in IDEs.
  *
- * @param obj Nested object with string values like ones accepted by i18next as translation objects
+ * @param obj Nested object with string values like ones accepted by i18next as locale objects
  * @returns Nested object with the same structure as the input object,
  * but with values replaced with their corresponding keys.
  * @example
@@ -87,5 +87,6 @@ const translations = constructTranslations<CommonAll<TranslationTypes>>(fi);
 // Currently unused, may be useful in the future
 export type TranslationsType = typeof translations;
 
+// resources type in i18next.d.ts must be removed in order to use this in t()
 // Currently unused, may be useful in the future
 export default translations;
