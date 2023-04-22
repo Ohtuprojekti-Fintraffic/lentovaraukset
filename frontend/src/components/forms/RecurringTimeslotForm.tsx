@@ -114,7 +114,7 @@ function RecurringTimeslotForm({
         clearPopup();
       };
       showPopup({
-        popupTitle: 'Oletko varma?',
+        popupTitle: t('timeslots.overlappingPopup.title'),
         popupText: `${t('timeslots.overlappingPopup.text.timeslot')}${timeslot ? t('timeslots.overlappingPopup.text.modifying') : t('timeslots.overlappingPopup.text.adding')} ${t('timeslots.overlappingPopup.text.removes')} ${reservations.map((r) => r.id).join()}`,
         primaryText: t('common.confirm'),
         primaryOnClick: onConfirmSubmit,
@@ -169,7 +169,7 @@ function RecurringTimeslotForm({
 
   useEffect(() => {
     if (reservations.length > 0) {
-      setFormWarning(`${'timeslots.modal.form.blocked.removes'} ${reservations.map((r) => r.id).join()}`);
+      setFormWarning(`${t('timeslots.modal.form.blocked.removes')} ${reservations.map((r) => r.id).join()}`);
     } else setFormWarning(undefined);
   }, [reservations]);
 
