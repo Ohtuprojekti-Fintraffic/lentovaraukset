@@ -90,7 +90,8 @@ function ReservationInfoForm({
         clearAlert={() => setFormWarning(undefined)}
         removalDelaySecs={10}
       />
-      <div className="p-8">
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+      <div className="p-8 outline-none" tabIndex={0} aria-label="press tab to enter the reservation form">
         <form
           id={id}
           className="flex flex-col w-full"
