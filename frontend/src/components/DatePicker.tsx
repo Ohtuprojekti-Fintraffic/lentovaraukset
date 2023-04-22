@@ -54,7 +54,7 @@ function DatePicker({
   }, [errorsExist]);
 
   return (
-    <div className="flex flex-col items-start flex-wrap">
+    <div className="flex flex-col items-start flex-wrap w-full">
       { labelText ? (
         <label
           htmlFor={id}
