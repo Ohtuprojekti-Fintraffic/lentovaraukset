@@ -1,9 +1,11 @@
 import express from 'express';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { createReservationValidator, getTimeRangeValidator } from '@lentovaraukset/shared/src/validation/validation';
+import { ServiceErrorCode } from '@lentovaraukset/shared/src';
 import reservationService from '../services/reservationService';
 import configurationService from '../services/configurationService';
 import { errorIfNoAirfield } from '../util/middleware';
+import ServiceError from '../util/errors';
 
 const allowReservation = async (
   startTime: Date,
@@ -59,7 +61,7 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
       undefined,
       airfield.maxConcurrentFlights,
     )) {
-      throw new Error('Too many concurrent reservations');
+      throw new ServiceError(ServiceErrorCode.ConcurrentReservations, 'Too many concurrent reservations');
     }
 
     const reservation = await reservationService.createReservation(airfield.code, newReservation);
@@ -87,7 +89,7 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
       id,
       airfield.maxConcurrentFlights,
     )) {
-      throw new Error('Too many concurrent reservations');
+      throw new ServiceError(ServiceErrorCode.ConcurrentReservations, 'Too many concurrent reservations');
     }
 
     const modifiedReservation = await reservationService.updateById(
