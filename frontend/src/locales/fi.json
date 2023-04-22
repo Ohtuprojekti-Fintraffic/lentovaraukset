@@ -109,6 +109,22 @@
       "secondary": "Muokkaa vain tätä"
     }
   },
+  "calendar": {
+    "notPast": "Aikaa ei voi lisätä menneisyyteen",
+    "notConsecutive": "Ajat eivät voi olla peräkkäin",
+    "cantModifyPast": "Alkanutta tai mennyttä varausikkunaa ei voi muokata",
+    "cantMovePast": "Alkanutta tai mennyttä varausikkunaa ei voi muokata",
+    "cantMoveToPast": "Alkamisaikaa ei voi siirtää menneisyyteen",
+    "modificationError": "Virhe tapahtui varausta muokatessa",
+    "notTooFarFuture": {
+      "begin": "Aikaa ei voi lisätä yli ",
+      "end": " päivän päähän"
+    },
+    "notTooSoon": {
+      "begin": "Aika pitää varata vähintään ",
+      "end": " päivää etukäteen"
+    }
+  },
   "management": {
     "airfield": {
       "title": "Lentoasemakohtaiset asetukset",
