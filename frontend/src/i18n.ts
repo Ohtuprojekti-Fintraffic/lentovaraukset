@@ -23,6 +23,7 @@ export const resources = {
 };
 
 i18n
+  // Disabled temporarily to test english translations
   // .use(LanguageDetector)
   .use(initReactI18next)
   .init({
