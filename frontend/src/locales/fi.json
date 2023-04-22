@@ -111,15 +111,25 @@
   },
   "management": {
     "airfield": {
-
+      "title": "Lentoasemakohtaiset asetukset",
+      "form": {
+        "icao": "Lentoaseman ICAO-tunnus:",
+        "name": "Lentoaseman nimi:",
+        "timeslotMinTime": "Varausikkunan minimikoko minuutteina:",
+        "maxConcurrentFlights": "Samanaikasten varausten maksimimäärä:"
+      }
     }
   },
   "admin": {
     "globalSettings": {
-
+      "title": "Globaalit asetukset",
+      "form": {
+        "minDaysToStart": "Kuinka monten päivän päähän varauksen voi aikasimmillaan tehdä:",
+        "maxDaysToStart": "Kuinka monen päivän päähän varauksen voi pisimmillään tehdä:"
+      }
     },
     "newAirfield": {
-
+      "title": "Lisää uusi lentoasema"
     }
   }
 }
