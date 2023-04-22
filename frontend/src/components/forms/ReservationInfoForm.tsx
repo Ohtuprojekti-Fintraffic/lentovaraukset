@@ -91,8 +91,12 @@ function ReservationInfoForm({
         removalDelaySecs={10}
       />
       <div className="p-8">
-        <form id={id} className="flex flex-col w-full" onSubmit={handleSubmit(submitHandler)}>
-          <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
+        <form
+          id={id}
+          className="flex flex-col w-full"
+          onSubmit={handleSubmit(submitHandler)}
+        >
+          <div className="flex flex-col sm:flex-row justify-between space-x-0 sm:space-x-6 w-full">
             <DatePicker
               control={control}
               labelText="Varaus alkaa (UTC):"
@@ -110,7 +114,7 @@ function ReservationInfoForm({
               errors={errors}
             />
           </div>
-          <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
+          <div className="flex flex-col sm:flex-row justify-between space-x-0 sm:space-x-6 w-full">
             <InputField
               labelText="Koneen rekisteritunnus:"
               type="text"
