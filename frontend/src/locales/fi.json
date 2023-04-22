@@ -4,6 +4,7 @@
     "save": "Tallenna",
     "cancel": "Peruuta",
     "delete": "Poista",
+    "confirm": "Vahvista",
     "yes": "Kyllä",
     "no": "Ei",
     "weekdays": {
@@ -18,11 +19,11 @@
   },
   "navigation": {
     "title":"Koululentovaraus",
-    "reservations": "varaukset",
-    "timeslots": "varausikkunat",
-    "management": "hallinta",
-    "admin": "ylläpito",
-    "menu": "valikko"
+    "reservations": "Varaukset",
+    "timeslots": "Varausikkunat",
+    "management": "Hallinta",
+    "admin": "Ylläpito",
+    "menu": "Valikko"
   },
   "landing": {
     "title": "Fintraffic Koululentovaraus",
@@ -62,11 +63,50 @@
   },
   "timeslots": {
     "calendar": {
-      
+      "free": "Vapaa",
+      "blocked": "Suljettu",
+      "timeslots": "Vapaat varausikkunat",
+      "newTimeslot": "Uusi varausikkuna",
+      "blockedTimeslot": "Lisää suljettuja vuoroja"
     },
     "modal": {
-      "repeating": {
+      "updated": "Varausikkuna päivitetty!",
+      "updateFailed": "Virhe tapahtui varausikkunaa päivitettäessä!",
+      "created": "Varausikkuna lisätty!",
+      "creationFailed": "Virhe tapahtui varausikkunaa lisättäessä!",
+      "timeslot": "Varausikkuna",
+      "newTimeslot": "Uusi varausikkuna",
+      "form": {
+        "start": "Varausikkuna alkaa (UTC)",
+        "end": "Varausikkuna päättyy (UTC)",
+        "details": "Lisätietoja",
+        "recurring": {
+          "repeat": "Määritä toistuvuus",
+          "ends": "Päättyy (UTC)"
+        },
+        "blocked": {
+          "removes": "Poistaa varaukset:"
+        }
       }
+    },
+    "overlappingPopup": {
+      "title": "Oletko varma?",
+      "text": {
+        "timeslot": "Vuoron ",
+        "modifying": "muokkaaminen",
+        "adding": "lisääminen",
+        "removes": "poistaa seuraavat varaukset:"
+      }
+    },
+    "deletionPopup": {
+      "title": "Varausikkunan poisto",
+      "text": "Haluatko varmasti poistaa varausikkunan?"
+    },
+    "repeatingPopup": {
+      "title": "Toistuvan varausikkunan muokkaus",
+      "text": "Muokkasit toistuvaa varausikkuuna. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?",
+      "primary": "Muokkaa muokkaa kaikkia",
+      "secondary": "Muokkaa vain tätä"
     }
   },
   "management": {

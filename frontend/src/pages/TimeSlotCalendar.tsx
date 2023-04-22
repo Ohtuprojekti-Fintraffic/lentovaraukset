@@ -6,6 +6,7 @@ import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef, useEffect } from 'react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import { AirfieldEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
+import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
@@ -27,6 +28,7 @@ import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
   };
 
 function TimeSlotCalendar() {
+  const { t } = useTranslation();
   const calendarRef = useRef<FullCalendar>(null);
   const { airport, setAirportICAO } = useAirportContext(); // TODO: get id from airfield selection
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
@@ -49,7 +51,7 @@ function TimeSlotCalendar() {
           id: timeslot.id.toString(),
           editable: !isTimeInPast(timeslot.end),
           color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
-          title: timeslot.type === 'available' ? 'Vapaa' : timeslot.info || 'Suljettu',
+          title: timeslot.type === 'available' ? t('timeslots.calendar.free') : timeslot.info || t('timeslots.calendar.blocked'),
         };
         return timeslotEvent;
       });
@@ -118,11 +120,11 @@ function TimeSlotCalendar() {
     };
 
     showPopup({
-      popupTitle: 'Varausikkunan Poisto',
-      popupText: 'Haluatko varmasti poistaa varausikkunan?',
-      dangerText: 'Poista',
+      popupTitle: t('timeslots.deletionPopup.title'),
+      popupText: t('timeslots.deletionPopup.text'),
+      dangerText: t('common.delete'),
       dangerOnClick: onConfirmRemove,
-      secondaryText: 'Peruuta',
+      secondaryText: t('common.cancel'),
       secondaryOnClick: onCancelRemove,
     });
   };
@@ -198,11 +200,11 @@ function TimeSlotCalendar() {
 
     if (timeslot.extendedProps.group) {
       showPopup({
-        popupTitle: 'Toistuvan varausikkunan muokkaus',
-        popupText: 'Muokkasit toistuvaa varausikkuuna. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?',
-        primaryText: 'Muokkaa kaikkia',
+        popupTitle: t('timeslots.repeatingPopup.title'),
+        popupText: t('timeslots.repeatingPopup.text'),
+        primaryText: t('timeslots.repeatingPopup.primary'),
         primaryOnClick: modifyAllFutureEvents,
-        secondaryText: 'Muokkaa vain tätä',
+        secondaryText: t('timeslots.repeatingPopup.secondary'),
         secondaryOnClick: modifyOneEvent,
       });
     } else {
@@ -247,12 +249,18 @@ function TimeSlotCalendar() {
         />
         <div className="flex flex-col space-y-2 h-full w-full p-8">
           <div className="flex flex-row justify-between mt-0">
-            <h1 className="text-3xl">Vapaat varausikkunat</h1>
-            <Button variant="primary" onClick={() => showTimeslotModalFn(null, null)}>Uusi varausikkuna</Button>
+            <h1 className="text-3xl">
+              {t('timeslots.calendar.timeslots')}
+            </h1>
+            <Button variant="primary" onClick={() => showTimeslotModalFn(null, null)}>
+              {t('timeslots.calendar.newTimeslot')}
+            </Button>
           </div>
           <div>
             <label htmlFor="checkbox" className="font-ft-label mb-1">
-              <span>Lisää suljettuja vuoroja</span>
+              <span>
+                {t('timeslots.calendar.blockedTimeslot')}
+              </span>
               <input
                 type="checkbox"
                 id="checkbox"
