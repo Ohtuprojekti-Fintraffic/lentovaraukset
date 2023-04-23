@@ -4,6 +4,7 @@ import {
   getTimeRangeValidator,
   createPeriodValidation,
   createGroupUpdateValidator,
+  deletePeriodValidation,
 } from '@lentovaraukset/shared/src/validation/validation';
 import timeslotService from '../services/timeslotService';
 import { errorIfNoAirfield } from '../util/middleware';
@@ -31,6 +32,20 @@ router.delete('/:id', async (req: express.Request, res: express.Response, next: 
     const id = Number(req.params.id);
     await timeslotService.deleteById(id);
     res.send(`Timeslot ${id} deleted`);
+  } catch (error: unknown) {
+    next(error);
+  }
+});
+
+router.delete('/group/:group', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    errorIfNoAirfield(req);
+    const { params: { group } } = req;
+    const period = deletePeriodValidation()
+      .parse(req.body);
+
+    const deleted = await timeslotService.deleteByGroup(group, period.startingFrom);
+    res.send(`${deleted} timeslots deleted`);
   } catch (error: unknown) {
     next(error);
   }

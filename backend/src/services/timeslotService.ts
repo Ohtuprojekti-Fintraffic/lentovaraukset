@@ -232,6 +232,17 @@ const updateByGroup = async (airfieldCode: string, group: string, updates: {
   return updatedTimeslots.map((ts) => ts.dataValues);
 };
 
+const deleteByGroup = async (
+  group: string,
+  startingFrom: Date,
+): Promise<Number> => {
+  const deletedTimeslots = await Timeslot.destroy({
+    where: { group, start: { [Op.gte]: startingFrom } },
+  });
+
+  return deletedTimeslots;
+};
+
 export default {
   getInTimeRange,
   deleteById,
@@ -239,4 +250,5 @@ export default {
   createTimeslot,
   createPeriod,
   updateByGroup,
+  deleteByGroup,
 };

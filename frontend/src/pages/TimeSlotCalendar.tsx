@@ -14,7 +14,7 @@ import {
   getReservations,
 } from '../queries/reservations';
 import {
-  getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup,
+  getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup, deleteGroup,
 } from '../queries/timeSlots';
 import { usePopupContext } from '../contexts/PopupContext';
 import { useAirportContext } from '../contexts/AirportContext';
@@ -106,7 +106,6 @@ function TimeSlotCalendar() {
     removeInfo.revert();
     const { event } = removeInfo;
     const start = event.start ?? new Date();
-    const end = event.end ?? new Date();
 
     const removeOneEvent = async () => {
       await deleteTimeslot(Number(event.id));
@@ -117,7 +116,8 @@ function TimeSlotCalendar() {
 
     const removeAllFutureEvents = async () => {
       if (event.extendedProps.group) {
-        console.log(event.extendedProps.group, start, end);
+        const startingFrom = new Date(start);
+        await deleteGroup(event.extendedProps.group, { startingFrom });
       }
       closeTimeslotModalFn();
       clearPopup();
