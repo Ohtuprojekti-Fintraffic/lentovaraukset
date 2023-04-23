@@ -105,9 +105,20 @@ function TimeSlotCalendar() {
     // fullcalendar removes the event early:
     removeInfo.revert();
     const { event } = removeInfo;
+    const start = event.start ?? new Date();
+    const end = event.end ?? new Date();
 
-    const onConfirmRemove = async () => {
+    const removeOneEvent = async () => {
       await deleteTimeslot(Number(event.id));
+      closeTimeslotModalFn();
+      clearPopup();
+      calendarRef.current?.getApi().refetchEvents();
+    };
+
+    const removeAllFutureEvents = async () => {
+      if (event.extendedProps.group) {
+        console.log(event.extendedProps.group, start, end);
+      }
       closeTimeslotModalFn();
       clearPopup();
       calendarRef.current?.getApi().refetchEvents();
@@ -117,14 +128,25 @@ function TimeSlotCalendar() {
       clearPopup();
     };
 
-    showPopup({
-      popupTitle: 'Varausikkunan Poisto',
-      popupText: 'Haluatko varmasti poistaa varausikkunan?',
-      dangerText: 'Poista',
-      dangerOnClick: onConfirmRemove,
-      secondaryText: 'Peruuta',
-      secondaryOnClick: onCancelRemove,
-    });
+    if (event.extendedProps.group) {
+      showPopup({
+        popupTitle: 'Toistuvan varausikkunan poisto',
+        popupText: 'Olet poistamassa toistuvaa varausikkuuna. Poistetaanko myös kaikki tulevat ryhmän varausikkunat?',
+        primaryText: 'Poista kaikki',
+        primaryOnClick: removeAllFutureEvents,
+        secondaryText: 'Poista vain tämä',
+        secondaryOnClick: removeOneEvent,
+      });
+    } else {
+      showPopup({
+        popupTitle: 'Varausikkunan Poisto',
+        popupText: 'Haluatko varmasti poistaa varausikkunan?',
+        dangerText: 'Poista',
+        dangerOnClick: removeOneEvent,
+        secondaryText: 'Peruuta',
+        secondaryOnClick: onCancelRemove,
+      });
+    }
   };
 
   const isSameType = (
