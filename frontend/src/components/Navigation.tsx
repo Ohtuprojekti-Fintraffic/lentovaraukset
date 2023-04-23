@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Logo from '../../assets/logos/Horizontal-White.png';
+import LanguagePicker from './dropdowns/LanguagePicker';
 
 function Navigation() {
   const { t } = useTranslation();
@@ -34,36 +35,39 @@ function Navigation() {
             {t('navigation.title')}
           </p>
         </div>
-        <nav className="md:hidden flex flex-row items-center py-2 h-full">
-          <button
-            type="button"
-            className="font-sans text-white text-md font-medium leading-7 focus:outline-none flex flex-row"
-            onClick={toggleMenu}
-          >
-            <p className="font-sans text-white text-md font-medium leading-7">
-              {t('navigation.menu')}
-            </p>
-            {menuOpen ? (
-              <ChevronUp strokeWidth="1.5" color="white" className="h-6 w-6 ml-2" />
-            ) : (
-              <ChevronDown strokeWidth="1.5" color="white" className="h-6 w-6 ml-2" />
-            )}
-          </button>
-        </nav>
-        <nav className="hidden md:flex flex-row space-x-10 text-l">
-          <NavLink to="/varaukset" className={navLinkStyle}>
-            {t('navigation.reservations')}
-          </NavLink>
-          <NavLink to="/varausikkunat" className={navLinkStyle}>
-            {t('navigation.timeslots')}
-          </NavLink>
-          <NavLink to="/hallinta" className={navLinkStyle}>
-            {t('navigation.management')}
-          </NavLink>
-          <NavLink to="/yllapito" className={navLinkStyle}>
-            {t('navigation.admin')}
-          </NavLink>
-        </nav>
+        <div className="flex flex-row items-center gap-x-10">
+          <LanguagePicker />
+          <nav className="md:hidden flex flex-row items-center py-2 h-full">
+            <button
+              type="button"
+              className="font-sans text-white text-md font-medium leading-7 focus:outline-none flex flex-row"
+              onClick={toggleMenu}
+            >
+              <p className="font-sans text-white text-md font-medium leading-7">
+                {t('navigation.menu')}
+              </p>
+              {menuOpen ? (
+                <ChevronUp strokeWidth="1.5" color="white" className="h-6 w-6 ml-2" />
+              ) : (
+                <ChevronDown strokeWidth="1.5" color="white" className="h-6 w-6 ml-2" />
+              )}
+            </button>
+          </nav>
+          <nav className="hidden md:flex flex-row space-x-10 text-l">
+            <NavLink to="/varaukset" className={navLinkStyle}>
+              {t('navigation.reservations')}
+            </NavLink>
+            <NavLink to="/varausikkunat" className={navLinkStyle}>
+              {t('navigation.timeslots')}
+            </NavLink>
+            <NavLink to="/hallinta" className={navLinkStyle}>
+              {t('navigation.management')}
+            </NavLink>
+            <NavLink to="/yllapito" className={navLinkStyle}>
+              {t('navigation.admin')}
+            </NavLink>
+          </nav>
+        </div>
       </div>
       {menuOpen && (
         <div className="md:hidden bg-black border-custom-gray shadow-lg w-full flex flex-col text-right">
