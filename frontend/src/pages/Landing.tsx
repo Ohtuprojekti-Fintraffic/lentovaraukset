@@ -31,6 +31,7 @@ function AirfieldDropdown({
       sections={airfields.map((a) => a.name)}
       onChange={handleSelect}
       error={error}
+      variant="secondary"
     />
   );
 }

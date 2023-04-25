@@ -2,16 +2,26 @@ import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import Subheader from './Subheader';
 
+type DropdownVariants = 'primary' | 'secondary' | 'tertiary';
+
 type DropdownProps = {
   placeholder: string,
   selectedSection?: string,
   sections: string[],
   onChange: (section: string) => void ;
   error?: { message: string }
+  variant?: DropdownVariants
+  glyph?: React.ReactNode
 };
 
 function Dropdown({
-  placeholder, selectedSection, sections, onChange, error,
+  placeholder,
+  selectedSection,
+  sections,
+  onChange,
+  error,
+  variant = 'primary',
+  glyph,
 }: DropdownProps) {
   const [isActive, setIsActive] = useState(false);
 
@@ -28,16 +38,33 @@ function Dropdown({
         className="flex flex-col relative max-w-md align-top"
         onBlur={() => setIsActive(false)}
       >
-        <div
-          role="button"
-          tabIndex={0}
-          className={`group flex flex-row justify-between gap-4 items-baseline ${borderStyle} p-4`}
-          onClick={() => setIsActive(!isActive)}
-          onKeyDown={(e) => e.key === 'Enter' && setIsActive(!isActive)}
-        >
-          <Subheader className={`font-ft-emphasis ${textStyle}`}>{selectedSection ?? placeholder}</Subheader>
-          <div className="place-self-end group-hover:text-ft-text-300">{isActive ? <ChevronUp /> : <ChevronDown /> }</div>
-        </div>
+        {
+          variant !== 'tertiary'
+            ? (
+              <div
+                role="button"
+                tabIndex={0}
+                className={`group flex flex-row justify-between gap-4 items-baseline ${borderStyle} p-4`}
+                onClick={() => setIsActive(!isActive)}
+                onKeyDown={(e) => e.key === 'Enter' && setIsActive(!isActive)}
+              >
+                <Subheader className={`font-ft-emphasis ${textStyle}`}>{selectedSection ?? placeholder}</Subheader>
+                <div className="place-self-end group-hover:text-ft-text-300">{isActive ? <ChevronUp /> : <ChevronDown /> }</div>
+              </div>
+            )
+            : (
+              <div
+                role="button"
+                tabIndex={0}
+                className={`group flex flex-row justify-between gap-4 items-baseline ${borderStyle} p-4`}
+                onClick={() => setIsActive(!isActive)}
+                onKeyDown={(e) => e.key === 'Enter' && setIsActive(!isActive)}
+              >
+                <Subheader className={`font-ft-emphasis ${textStyle}`}>{selectedSection ?? placeholder}</Subheader>
+                <div className="place-self-end group-hover:text-ft-text-300">{isActive ? <ChevronUp /> : <ChevronDown /> }</div>
+              </div>
+            )
+      }
 
         <div className="absolute top-full w-full z-10 text-ft-primary-black bg-ft-primary-white divide-y divide-ft-neutral-200 shadow-lg max-h-72 overflow-y-auto">
           {isActive && Array.from(new Set(sections)).map((section) => ( // Sections must be unique

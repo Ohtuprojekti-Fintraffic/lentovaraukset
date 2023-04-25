@@ -21,6 +21,7 @@ function LanguagePicker() {
         selectedSection={i18n.language}
         sections={[...i18n.languages]}
         onChange={handleSelect}
+        variant="tertiary"
       />
 
     </div>
