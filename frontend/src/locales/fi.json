@@ -1,0 +1,151 @@
+{
+  "common": {
+    "next": "Seuraava",
+    "save": "Tallenna",
+    "cancel": "Peruuta",
+    "delete": "Poista",
+    "confirm": "Vahvista",
+    "yes": "Kyllä",
+    "no": "Ei",
+    "weekdays": {
+      "monday": "maanantai",
+      "tuesday": "tiistai",
+      "wednesday": "keskiviikko",
+      "thursday": "torstai",
+      "friday": "perjantai",
+      "saturday": "lauantai",
+      "sunday": "sunnuntai"
+    }
+  },
+  "navigation": {
+    "title":"Koululentovaraus",
+    "reservations": "Varaukset",
+    "timeslots": "Varausikkunat",
+    "management": "Hallinta",
+    "admin": "Ylläpito",
+    "menu": "Valikko"
+  },
+  "landing": {
+    "title": "Fintraffic Koululentovaraus",
+    "description": "Tältä sivulta voit varata aikoja koululennoille.",
+    "chooseAirport": "Valitse lentoasema:",
+    "airportDropdownPlaceholder": "lentoasema",
+    "continue": "Tee varaus",
+    "emptyAirportError": "Valitse ensin lentoasema"
+  },
+  "reservations": {
+    "calendar": {
+      "title": "Varaukset",
+      "newReservation": "Uusi varaus",
+      "reservationModified": "Varausta muokattu",
+      "reservationDeletionFailed": "Varauksen poistaminen epäonnistui",
+      "notReservable": "Ei varattavissa"
+    },
+    "modal": {
+      "reservation": "Varaus",
+      "newReservation": "Uusi varaus",
+      "form": {
+        "start": "Varaus alkaa (UTC)",
+        "end": "Varaus päättyy (UTC)",
+        "aircraftId": "Lentokoneen rekisteritunnus",
+        "phone": "Puhelinnumero",
+        "details": "Lisätietoja"
+      },
+      "updated": "Varaus päivitetty!",
+      "updateFailed": "Virhe tapahtui varausta päivitettäessä!",
+      "created": "Varaus lisätty!",
+      "insideTimeslot": "Varaus täytyy olla varausikkunan sisällä"
+    },
+    "deletionPopup": {
+      "title": "Varauksen poisto",
+      "text": "Haluatko varmasti poistaa varauksen?"
+    }
+  },
+  "timeslots": {
+    "calendar": {
+      "free": "Vapaa",
+      "blocked": "Suljettu",
+      "timeslots": "Vapaat varausikkunat",
+      "newTimeslot": "Uusi varausikkuna",
+      "blockedTimeslot": "Lisää suljettuja vuoroja"
+    },
+    "modal": {
+      "updated": "Varausikkuna päivitetty!",
+      "updateFailed": "Virhe tapahtui varausikkunaa päivitettäessä!",
+      "created": "Varausikkuna lisätty!",
+      "creationFailed": "Virhe tapahtui varausikkunaa lisättäessä!",
+      "timeslot": "Varausikkuna",
+      "newTimeslot": "Uusi varausikkuna",
+      "form": {
+        "start": "Varausikkuna alkaa (UTC)",
+        "end": "Varausikkuna päättyy (UTC)",
+        "details": "Lisätietoja",
+        "recurring": {
+          "repeat": "Määritä toistuvuus",
+          "ends": "Päättyy (UTC)"
+        },
+        "blocked": {
+          "removes": "Poistaa varaukset:"
+        }
+      }
+    },
+    "overlappingPopup": {
+      "title": "Oletko varma?",
+      "text": {
+        "timeslot": "Vuoron ",
+        "modifying": "muokkaaminen",
+        "adding": "lisääminen",
+        "removes": "poistaa seuraavat varaukset:"
+      }
+    },
+    "deletionPopup": {
+      "title": "Varausikkunan poisto",
+      "text": "Haluatko varmasti poistaa varausikkunan?"
+    },
+    "repeatingPopup": {
+      "title": "Toistuvan varausikkunan muokkaus",
+      "text": "Muokkasit toistuvaa varausikkuna. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?",
+      "primary": "Muokkaa kaikkia",
+      "secondary": "Muokkaa vain tätä"
+    }
+  },
+  "calendar": {
+    "notPast": "Aikaa ei voi lisätä menneisyyteen",
+    "notConsecutive": "Ajat eivät voi olla peräkkäin",
+    "cantModifyPast": "Alkanutta tai mennyttä varausikkunaa ei voi muokata",
+    "cantMovePast": "Alkanutta tai mennyttä varausikkunaa ei voi muokata",
+    "cantMoveToPast": "Alkamisaikaa ei voi siirtää menneisyyteen",
+    "modificationError": "Virhe tapahtui varausta muokatessa",
+    "notTooFarFuture": {
+      "begin": "Aikaa ei voi lisätä yli ",
+      "end": " päivän päähän"
+    },
+    "notTooSoon": {
+      "begin": "Aika pitää varata vähintään ",
+      "end": " päivää etukäteen"
+    }
+  },
+  "management": {
+    "airfield": {
+      "title": "Lentoasemakohtaiset asetukset",
+      "form": {
+        "icao": "Lentoaseman ICAO-tunnus:",
+        "name": "Lentoaseman nimi:",
+        "timeslotMinTime": "Varausikkunan minimikoko minuutteina:",
+        "maxConcurrentFlights": "Samanaikasten varausten maksimimäärä:"
+      }
+    }
+  },
+  "admin": {
+    "globalSettings": {
+      "title": "Globaalit asetukset",
+      "form": {
+        "minDaysToStart": "Kuinka monten päivän päähän varauksen voi aikasimmillaan tehdä:",
+        "maxDaysToStart": "Kuinka monen päivän päähän varauksen voi pisimmillään tehdä:"
+      }
+    },
+    "newAirfield": {
+      "title": "Lisää uusi lentoasema"
+    }
+  }
+}

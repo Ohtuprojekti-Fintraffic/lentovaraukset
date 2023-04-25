@@ -3,6 +3,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ZodTypeAny } from 'zod';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
+import { useTranslation } from 'react-i18next';
 import Button from '../Button';
 import InputField from '../InputField';
 
@@ -28,6 +29,8 @@ function AirfieldForm({
   airfieldMutation,
   validator,
 }: FormProps) {
+  const { t } = useTranslation();
+
   const {
     register, handleSubmit, formState: { errors },
   } = useForm<Inputs>({
@@ -54,20 +57,20 @@ function AirfieldForm({
         <form className="flex flex-col w-full" onSubmit={handleSubmit(onSubmit)}>
           {showIdField && (
           <InputField
-            labelText="ICAO-tunnus:"
+            labelText={t('management.airfield.form.icao')}
             type="string"
             registerReturn={register('code')}
             errors={errors}
           />
           )}
           <InputField
-            labelText="Nimi:"
+            labelText={t('management.airfield.form.name')}
             type="string"
             registerReturn={register('name')}
             errors={errors}
           />
           <InputField
-            labelText="Varausikkunan minimikoko minuutteina:"
+            labelText={t('management.airfield.form.timeslotMinTime')}
             type="number"
             registerReturn={register('eventGranularityMinutes', {
               valueAsNumber: true,
@@ -77,7 +80,7 @@ function AirfieldForm({
             errors={errors}
           />
           <InputField
-            labelText="Samanaikaisten varausten maksimimäärä:"
+            labelText={t('management.airfield.form.maxConcurrentFlights')}
             type="number"
             registerReturn={register('maxConcurrentFlights', {
               valueAsNumber: true,
@@ -86,7 +89,7 @@ function AirfieldForm({
             min={1}
             errors={errors}
           />
-          <Button type="submit" variant="primary">Tallenna</Button>
+          <Button type="submit" variant="primary">{t('common.save')}</Button>
         </form>
       </div>
     </div>

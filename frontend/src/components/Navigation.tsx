@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Logo from '../../assets/logos/Horizontal-White.png';
 
 function Navigation() {
+  const { t } = useTranslation();
+
   const navLinkStyle = ({ isActive }: { isActive: boolean }) => {
     const baseStyle = 'hover:text-ft-text-300';
     return isActive ? `${baseStyle} active font-bold` : baseStyle;
@@ -27,7 +30,9 @@ function Navigation() {
           <NavLink to="/" className={navLinkStyle}>
             <img src={Logo} alt="" className="h-7" />
           </NavLink>
-          <p className="hidden lg:inline">Koululentovaraus</p>
+          <p className="hidden lg:inline">
+            {t('navigation.title')}
+          </p>
         </div>
         <nav className="md:hidden flex flex-row items-center py-2 h-full">
           <button
@@ -35,7 +40,9 @@ function Navigation() {
             className="font-sans text-white text-md font-medium leading-7 focus:outline-none flex flex-row"
             onClick={toggleMenu}
           >
-            <p className="font-sans text-white text-md font-medium leading-7">Valikko</p>
+            <p className="font-sans text-white text-md font-medium leading-7">
+              {t('navigation.menu')}
+            </p>
             {menuOpen ? (
               <ChevronUp strokeWidth="1.5" color="white" className="h-6 w-6 ml-2" />
             ) : (
@@ -45,16 +52,16 @@ function Navigation() {
         </nav>
         <nav className="hidden md:flex flex-row space-x-10 text-l">
           <NavLink to="/varaukset" className={navLinkStyle}>
-            Varaukset
+            {t('navigation.reservations')}
           </NavLink>
           <NavLink to="/varausikkunat" className={navLinkStyle}>
-            Varausikkunat
+            {t('navigation.timeslots')}
           </NavLink>
           <NavLink to="/hallinta" className={navLinkStyle}>
-            Hallinta
+            {t('navigation.management')}
           </NavLink>
           <NavLink to="/yllapito" className={navLinkStyle}>
-            Ylläpito
+            {t('navigation.admin')}
           </NavLink>
         </nav>
       </div>
@@ -65,28 +72,28 @@ function Navigation() {
             className={dropDownLinkStyle}
             onClick={toggleMenu}
           >
-            Varaukset
+            {t('navigation.reservations')}
           </NavLink>
           <NavLink
             to="/varausikkunat"
             className={dropDownLinkStyle}
             onClick={toggleMenu}
           >
-            Varausikkunat
+            {t('navigation.timeslots')}
           </NavLink>
           <NavLink
             to="/hallinta"
             className={dropDownLinkStyle}
             onClick={toggleMenu}
           >
-            Hallinta
+            {t('navigation.management')}
           </NavLink>
           <NavLink
             to="/yllapito"
             className={dropDownLinkStyle}
             onClick={toggleMenu}
           >
-            Ylläpito
+            {t('navigation.admin')}
           </NavLink>
         </div>
       )}

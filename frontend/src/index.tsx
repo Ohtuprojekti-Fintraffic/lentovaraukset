@@ -13,6 +13,8 @@ import Management from './pages/Management';
 import Admin from './pages/Admin';
 import Landing from './pages/Landing';
 
+import './i18n';
+
 const router = createBrowserRouter(
   [
     {
