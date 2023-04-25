@@ -1,9 +1,6 @@
 import { TimeslotEntry, WeekInDays } from '@lentovaraukset/shared/src';
 import { errorIfNotOk } from './util';
 
-// TODO: ICAO code should be passed on from the context in the calling component
-// const airfieldCode = 'EFHK';
-
 const getTimeSlots = async (from: Date, until: Date, airportCode?: string)
 : Promise<TimeslotEntry[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/${airportCode}/timeslots?from=${from.toISOString()}&until=${until.toISOString()}`);

@@ -52,7 +52,7 @@ function ReservationCalendar() {
       failureCallback,
     ) => {
       if (!airport) {
-        successCallback([]);
+        failureCallback(new Error('Airport is not set'));
         return;
       }
       try {
@@ -82,7 +82,7 @@ function ReservationCalendar() {
       failureCallback,
     ) => {
       if (!airport) {
-        successCallback([]);
+        failureCallback(new Error('Airport is not set'));
         return;
       }
       try {

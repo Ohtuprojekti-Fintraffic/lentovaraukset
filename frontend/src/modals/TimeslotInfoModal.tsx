@@ -33,7 +33,7 @@ function TimeslotInfoModal({
   modifyTimeslotFn,
 }: InfoModalProps) {
   const { addNewAlert } = useContext(AlertContext);
-  const { airport } = useAirportContext(); // TODO: get id from airfield selection
+  const { airport } = useAirportContext();
 
   const onModifySubmitHandler = async (
     updatedTimeslot: Omit<TimeslotEntry, 'id' | 'airfieldCode'>,

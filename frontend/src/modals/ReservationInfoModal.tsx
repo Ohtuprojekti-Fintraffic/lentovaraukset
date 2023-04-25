@@ -26,7 +26,7 @@ function ReservationInfoModal({
   configuration,
 }: InfoModalProps) {
   const { addNewAlert } = useContext(AlertContext);
-  const { airport } = useAirportContext(); // TODO: get id from airfield selection
+  const { airport } = useAirportContext();
 
   const onSubmitModifyHandler = async (updatedReservation: Omit<ReservationEntry, 'id' | 'user'>) => {
     try {
