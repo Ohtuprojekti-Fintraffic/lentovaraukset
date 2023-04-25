@@ -7,6 +7,7 @@
     "confirm": "Vahvista",
     "yes": "Kyllä",
     "no": "Ei",
+    "time": "Aika UTC",
     "weekdays": {
       "monday": "maanantai",
       "tuesday": "tiistai",
@@ -18,7 +19,7 @@
     }
   },
   "navigation": {
-    "title":"Koululentovaraus",
+    "title":"Koululentovaraukset",
     "reservations": "Varaukset",
     "timeslots": "Varausikkunat",
     "management": "Hallinta",
@@ -82,7 +83,7 @@
         "details": "Lisätietoja",
         "recurring": {
           "repeat": "Määritä toistuvuus",
-          "ends": "Päättyy (UTC)"
+          "ends": "Toistuvuus päättyy (UTC)"
         },
         "blocked": {
           "removes": "Poistaa varaukset:"
@@ -104,7 +105,7 @@
     },
     "repeatingPopup": {
       "title": "Toistuvan varausikkunan muokkaus",
-      "text": "Muokkasit toistuvaa varausikkuna. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?",
+      "text": "Muokkasit toistuvaa varausikkunaa. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?",
       "primary": "Muokkaa kaikkia",
       "secondary": "Muokkaa vain tätä"
     }
@@ -113,7 +114,7 @@
     "notPast": "Aikaa ei voi lisätä menneisyyteen",
     "notConsecutive": "Ajat eivät voi olla peräkkäin",
     "cantModifyPast": "Alkanutta tai mennyttä varausikkunaa ei voi muokata",
-    "cantMovePast": "Alkanutta tai mennyttä varausikkunaa ei voi muokata",
+    "cantMovePast": "Alkanutta tai mennyttä varausikkunaa ei voi siirtää",
     "cantMoveToPast": "Alkamisaikaa ei voi siirtää menneisyyteen",
     "modificationError": "Virhe tapahtui varausta muokatessa",
     "notTooFarFuture": {

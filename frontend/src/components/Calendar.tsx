@@ -9,6 +9,8 @@ import type {
   DateSelectArg, EventChangeArg, EventClickArg, EventRemoveArg,
   EventSourceInput,
 } from '@fullcalendar/core';
+import fiLocale from '@fullcalendar/core/locales/fi';
+import enLocale from '@fullcalendar/core/locales/en-gb';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast, isTimeAtMostInFuture, isTimeFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
@@ -52,7 +54,7 @@ function Calendar({
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { addNewAlert } = React.useContext(AlertContext);
   const [viewMode, setViewMode] = React.useState(window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek');
@@ -203,7 +205,9 @@ function Calendar({
     <FullCalendar
       ref={calendarRef}
       plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
-      locale="fi"
+      locale={
+        i18n.language === 'fi' ? fiLocale : enLocale
+      }
       timeZone="UTC"
       weekNumberCalculation="ISO"
       headerToolbar={{
