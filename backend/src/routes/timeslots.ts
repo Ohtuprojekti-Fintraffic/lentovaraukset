@@ -45,7 +45,7 @@ router.delete('/group/:group', async (req: express.Request, res: express.Respons
       .parse(req.body);
 
     const deleted = await timeslotService.deleteByGroup(group, period.startingFrom);
-    res.send(`${deleted} timeslots deleted`);
+    res.status(200).json(`${deleted} timeslots from period ${group} deleted`);
   } catch (error: unknown) {
     next(error);
   }
