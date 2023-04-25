@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ZodTypeAny } from 'zod';
@@ -29,13 +29,9 @@ function AirfieldForm({
   validator,
 }: FormProps) {
   const {
-    register, handleSubmit, formState: { errors },
+    register, handleSubmit, formState: { errors }, reset,
   } = useForm<Inputs>({
-    defaultValues: airfield || {
-      code: 'EF',
-      eventGranularityMinutes: 20,
-      maxConcurrentFlights: 1,
-    },
+    defaultValues: airfield,
     resolver: zodResolver(validator),
     mode: 'all',
   });
@@ -46,6 +42,10 @@ function AirfieldForm({
     const code = data.code ? data.code : airfield?.code;
     airfieldMutator.mutate({ ...data, code });
   };
+
+  useEffect(() => {
+    reset(airfield);
+  }, [airfield, reset]);
 
   return (
     <div>
