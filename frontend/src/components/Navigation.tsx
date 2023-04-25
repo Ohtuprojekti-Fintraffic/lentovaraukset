@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import Logo from '../../assets/logos/Horizontal-White.png';
+import LogInOutButton from './LogInOutButton';
 
 function Navigation() {
   const navLinkStyle = ({ isActive }: { isActive: boolean }) => {
@@ -38,6 +39,8 @@ function Navigation() {
         </NavLink>
 
       </nav>
+
+      <LogInOutButton />
 
     </div>
   );
