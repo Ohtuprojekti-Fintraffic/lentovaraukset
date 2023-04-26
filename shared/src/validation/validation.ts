@@ -71,6 +71,13 @@ const createPeriodValidation = () => {
   return period;
 };
 
+const deletePeriodValidation = () => {
+  const period = z.object({
+    startingFrom: z.coerce.date(),
+  });
+  return period;
+};
+
 const createReservationValidator = (
   slotGranularityMinutes: number,
   maxDaysInFuture: number,
@@ -232,4 +239,5 @@ export {
   airfieldValidator,
   configurationValidator,
   createPeriodValidation,
+  deletePeriodValidation,
 };

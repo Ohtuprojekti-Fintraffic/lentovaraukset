@@ -103,6 +103,12 @@
       "title": "Delete time window",
       "text": "Are you sure you want to delete the time window?"
     },
+    "repeatingDeletionPopup": {
+      "title": "Delete recurring time window",
+      "text": "You are deleting a recurring time window. Do you want to delete all following time windows in the same group?",
+      "primary": "Delete all",
+      "secondary": "Delete this one only"
+    },
     "repeatingPopup": {
       "title": "Modify recurring time window",
       "text": "You modified a recurring time window. Do you want to modify all following time windows in the same group?",

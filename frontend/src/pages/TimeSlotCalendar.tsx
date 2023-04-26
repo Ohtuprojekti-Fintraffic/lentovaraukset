@@ -15,7 +15,7 @@ import {
   getReservations,
 } from '../queries/reservations';
 import {
-  getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup,
+  getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup, deleteGroup,
 } from '../queries/timeSlots';
 import { usePopupContext } from '../contexts/PopupContext';
 import { useAirportContext } from '../contexts/AirportContext';
@@ -107,9 +107,20 @@ function TimeSlotCalendar() {
     // fullcalendar removes the event early:
     removeInfo.revert();
     const { event } = removeInfo;
+    const start = event.start ?? new Date();
 
-    const onConfirmRemove = async () => {
+    const removeOneEvent = async () => {
       await deleteTimeslot(Number(event.id));
+      closeTimeslotModalFn();
+      clearPopup();
+      calendarRef.current?.getApi().refetchEvents();
+    };
+
+    const removeAllFutureEvents = async () => {
+      if (event.extendedProps.group) {
+        const startingFrom = new Date(start);
+        await deleteGroup(event.extendedProps.group, { startingFrom });
+      }
       closeTimeslotModalFn();
       clearPopup();
       calendarRef.current?.getApi().refetchEvents();
@@ -119,14 +130,27 @@ function TimeSlotCalendar() {
       clearPopup();
     };
 
-    showPopup({
-      popupTitle: t('timeslots.deletionPopup.title'),
-      popupText: t('timeslots.deletionPopup.text'),
-      dangerText: t('common.delete'),
-      dangerOnClick: onConfirmRemove,
-      secondaryText: t('common.cancel'),
-      secondaryOnClick: onCancelRemove,
-    });
+    if (event.extendedProps.group) {
+      showPopup({
+        popupTitle: t('timeslots.repeatingDeletionPopup.title'),
+        popupText: t('timeslots.repeatingDeletionPopup.text'),
+        primaryText: t('timeslots.repeatingDeletionPopup.primary'),
+        primaryOnClick: removeAllFutureEvents,
+        secondaryText: t('timeslots.repeatingDeletionPopup.secondary'),
+        secondaryOnClick: removeOneEvent,
+        tertiaryText: t('common.cancel'),
+        tertiaryOnClick: onCancelRemove,
+      });
+    } else {
+      showPopup({
+        popupTitle: t('timeslots.deletionPopup.title'),
+        popupText: t('timeslots.deletionPopup.text'),
+        dangerText: t('common.delete'),
+        dangerOnClick: removeOneEvent,
+        secondaryText: t('common.cancel'),
+        secondaryOnClick: onCancelRemove,
+      });
+    }
   };
 
   const isSameType = (
