@@ -1,4 +1,5 @@
 import React, { ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
 import Button, { ButtonProps } from './Button';
 
 interface ActionSheetPropsWithoutCancel {
@@ -21,9 +22,11 @@ type ActionSheetProps = ActionSheetPropsWithCancel | ActionSheetPropsWithoutCanc
 function ActionSheet({
   children,
   cancelButton = true,
-  cancelButtonText = 'Peruuta',
+  cancelButtonText,
   handleClose,
 }: ActionSheetProps) {
+  const { t } = useTranslation();
+
   const filterChildrenByVariant = (variant: string) => React.Children.toArray(children)
     .filter((child) => React.isValidElement(child) && child.props.variant === variant);
 
@@ -41,7 +44,7 @@ function ActionSheet({
                 variant="tertiary"
                 onClick={() => handleClose!()}
               >
-                {cancelButtonText}
+                {cancelButtonText || t('common.cancel')}
               </Button>
             )
           }
@@ -62,7 +65,7 @@ function ActionSheet({
                 variant="tertiary"
                 onClick={() => handleClose!()}
               >
-                {cancelButtonText}
+                {cancelButtonText || t('common.cancel')}
               </Button>
             )
           }

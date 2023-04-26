@@ -6,6 +6,7 @@ import {
 } from '@lentovaraukset/shared/src';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createTimeslotFormGroupShape, createTimeSlotValidatorObject, refineTimeslotObject } from '@lentovaraukset/shared/src/validation/validation';
+import { useTranslation } from 'react-i18next';
 import { usePopupContext } from '../../contexts/PopupContext';
 import InputField from '../InputField';
 import DatePicker from '../DatePicker';
@@ -51,6 +52,8 @@ function RecurringTimeslotForm({
   onSubmit,
   id,
 }: RecurringTimeslotProps) {
+  const { t } = useTranslation();
+
   const { airport } = useAirportContext();
   const [reservations, setReservations] = useState<ReservationEntry[]>([]);
   const [formWarning, setFormWarning] = useState<string | undefined>(undefined);
@@ -111,11 +114,11 @@ function RecurringTimeslotForm({
         clearPopup();
       };
       showPopup({
-        popupTitle: 'Oletko varma?',
-        popupText: `Vuoron ${timeslot ? 'muokkaaminen' : 'lisääminen'} poistaa seuraavat varaukset: ${reservations.map((r) => r.id).join()}`,
-        primaryText: 'Vahvista',
+        popupTitle: t('timeslots.overlappingPopup.title'),
+        popupText: `${t('timeslots.overlappingPopup.text.timeslot')}${timeslot ? t('timeslots.overlappingPopup.text.modifying') : t('timeslots.overlappingPopup.text.adding')} ${t('timeslots.overlappingPopup.text.removes')} ${reservations.map((r) => r.id).join()}`,
+        primaryText: t('common.confirm'),
         primaryOnClick: onConfirmSubmit,
-        secondaryText: 'Peruuta',
+        secondaryText: t('common.cancel'),
         secondaryOnClick: () => clearPopup(),
       });
     } else submit();
@@ -166,7 +169,7 @@ function RecurringTimeslotForm({
 
   useEffect(() => {
     if (reservations.length > 0) {
-      setFormWarning(`Poistaa varaukset: ${reservations.map((r) => r.id).join()}`);
+      setFormWarning(`${t('timeslots.modal.form.blocked.removes')} ${reservations.map((r) => r.id).join()}`);
     } else setFormWarning(undefined);
   }, [reservations]);
 
@@ -186,7 +189,7 @@ function RecurringTimeslotForm({
           <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
             <DatePicker
               control={control}
-              labelText="Aikaikkuna alkaa (UTC):"
+              labelText={t('timeslots.modal.form.start')}
               name="start"
               timeGranularityMinutes={timeslotGranularity}
               showTimeSelect
@@ -194,7 +197,7 @@ function RecurringTimeslotForm({
             />
             <DatePicker
               control={control}
-              labelText="Aikaikkuna päättyy (UTC):"
+              labelText={t('timeslots.modal.form.end')}
               name="end"
               timeGranularityMinutes={timeslotGranularity}
               showTimeSelect
@@ -203,7 +206,7 @@ function RecurringTimeslotForm({
           </div>
           {isBlocked && (
             <InputField
-              labelText="Lisätietoja:"
+              labelText={t('timeslots.modal.form.details')}
               type="text"
               registerReturn={register('info')}
               inputClassName="w-full"
@@ -213,7 +216,7 @@ function RecurringTimeslotForm({
           {timeslot && (
             <div className="flex flex-col">
               <InputField
-                labelText="Määritä toistuvuus"
+                labelText={t('timeslots.modal.form.recurring.repeat')}
                 type="checkbox"
                 registerReturn={register('isRecurring')}
                 errors={errors}
@@ -237,7 +240,7 @@ function RecurringTimeslotForm({
               {showRecurring && (
                 <DatePicker
                   control={control}
-                  labelText="Päättyy (UTC):"
+                  labelText={t('timeslots.modal.form.recurring.ends')}
                   name="periodEnds"
                   timeGranularityMinutes={timeslotGranularity}
                   errors={errors}

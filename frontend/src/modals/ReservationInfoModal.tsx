@@ -1,6 +1,7 @@
 import { EventImpl } from '@fullcalendar/core/internal';
 import { ConfigurationEntry, ReservationEntry, ServiceErrorCode } from '@lentovaraukset/shared/src';
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import ActionSheet from '../components/ActionSheet';
 import Button from '../components/Button';
 import Card from '../components/Card';
@@ -25,12 +26,14 @@ function ReservationInfoModal({
   draggedTimes,
   configuration,
 }: InfoModalProps) {
+  const { t } = useTranslation();
+
   const { addNewAlert } = useContext(AlertContext);
   const { airport } = useAirportContext();
 
   const onSubmitModifyHandler = async (updatedReservation: Omit<ReservationEntry, 'id' | 'user'>) => {
     try {
-      const modifiedReservation = await modifyReservation(
+      await modifyReservation(
         {
           id: parseInt(reservation!.id, 10),
           start: updatedReservation.start,
@@ -42,12 +45,12 @@ function ReservationInfoModal({
         },
         airport?.code,
       );
-      addNewAlert(`Varaus #${modifiedReservation.id} päivitetty!`, 'success');
+      addNewAlert(t('reservations.modal.updated'), 'success');
     } catch (err) {
       if (await isErrorForCode(err, ServiceErrorCode.ReservationExceedsTimeslot)) {
-        addNewAlert('Aikavarauksen täytyy olla aikaikkunan sisällä', 'danger');
+        addNewAlert(t('reservations.modal.insideTimeslot'), 'danger');
       } else if (err instanceof ApiError) {
-        addNewAlert('Virhe tapahtui varausta päivittäessä', 'danger');
+        addNewAlert(t('reservations.modal.updateFailed'), 'danger');
       } else {
         throw err;
       }
@@ -59,12 +62,12 @@ function ReservationInfoModal({
   const onSubmitAddHandler = async (reservationDetails: Omit<ReservationEntry, 'id' | 'user'>) => {
     try {
       await addReservation(reservationDetails, airport?.code);
-      addNewAlert('Varaus lisätty!', 'success');
+      addNewAlert(t('reservations.modal.created'), 'success');
     } catch (err) {
       if (await isErrorForCode(err, ServiceErrorCode.ReservationExceedsTimeslot)) {
-        addNewAlert('Aikavarauksen täytyy olla aikaikkunan sisällä', 'danger');
+        addNewAlert(t('reservations.modal.insideTimeslot'), 'danger');
       } else if (err instanceof ApiError) {
-        addNewAlert('Virhe tapahtui varausta päivittäessä', 'danger');
+        addNewAlert(t('reservations.modal.updateFailed'), 'danger');
       } else {
         throw err;
       }
@@ -81,8 +84,8 @@ function ReservationInfoModal({
     (
       <Card
         title={reservation
-          ? `Varaus #${reservation.id}`
-          : 'Uusi varaus'}
+          ? `${t('reservations.modal.reservation')} #${reservation.id}`
+          : t('reservations.modal.newReservation')}
         escHandler={closeReservationModal}
         form={(
           <ReservationInfoForm
@@ -100,7 +103,7 @@ function ReservationInfoModal({
               type="submit"
               variant="primary"
             >
-              Tallenna
+              {t('common.save')}
             </Button>
             {reservation && (
             <Button
@@ -110,7 +113,7 @@ function ReservationInfoModal({
               // that only works in React?
               onClick={() => reservation.remove()}
             >
-              Poista
+              {t('common.delete')}
             </Button>
             )}
           </ActionSheet>

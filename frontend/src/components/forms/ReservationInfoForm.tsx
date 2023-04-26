@@ -4,6 +4,7 @@ import { type FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createReservationValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry, ReservationEntry } from '@lentovaraukset/shared/src';
+import { useTranslation } from 'react-i18next';
 import InputField from '../InputField';
 import DatePicker from '../DatePicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -33,6 +34,8 @@ function ReservationInfoForm({
   onSubmit,
   id,
 }: ReservationInfoProps) {
+  const { t } = useTranslation();
+
   const { airport } = useAirportContext();
   const reservationGranularity = airport?.eventGranularityMinutes || 20;
   const maxDaysInFuture = configuration?.maxDaysInFuture || 7;
@@ -100,7 +103,7 @@ function ReservationInfoForm({
           <div className="flex flex-col sm:flex-row justify-between space-x-0 sm:space-x-6 w-full">
             <DatePicker
               control={control}
-              labelText="Varaus alkaa (UTC):"
+              labelText={t('reservations.modal.form.start')}
               name="start"
               timeGranularityMinutes={reservationGranularity}
               showTimeSelect
@@ -108,7 +111,7 @@ function ReservationInfoForm({
             />
             <DatePicker
               control={control}
-              labelText="Varaus päättyy (UTC):"
+              labelText={t('reservations.modal.form.end')}
               name="end"
               timeGranularityMinutes={reservationGranularity}
               showTimeSelect
@@ -117,20 +120,20 @@ function ReservationInfoForm({
           </div>
           <div className="flex flex-col sm:flex-row justify-between space-x-0 sm:space-x-6 w-full">
             <InputField
-              labelText="Koneen rekisteritunnus:"
+              labelText={t('reservations.modal.form.aircraftId')}
               type="text"
               registerReturn={register('aircraftId')}
               errors={errors}
             />
             <InputField
-              labelText="Puhelinnumero:"
+              labelText={t('reservations.modal.form.phone')}
               type="tel"
               registerReturn={register('phone')}
               errors={errors}
             />
           </div>
           <InputField
-            labelText="Lisätietoja:"
+            labelText={t('reservations.modal.form.details')}
             type="text"
             registerReturn={register('info')}
             inputClassName="w-full"

@@ -1,0 +1,152 @@
+{
+  "common": {
+    "next": "Next",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "time": "Time UTC",
+    "weekdays": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    }
+  },
+  "navigation": {
+    "title":"School Flight Reservations",
+    "reservations": "Reservations",
+    "timeslots": "Timeslots",
+    "management": "Management",
+    "admin": "Admin",
+    "menu": "Menu"
+  },
+  "landing": {
+    "title": "Fintraffic School Flight Reservations",
+    "description": "On this page you can make reservations for school flights.",
+    "chooseAirport": "Choose an airport:",
+    "airportDropdownPlaceholder": "airport",
+    "continue": "Make a reservation",
+    "emptyAirportError": "Choose an airport first"
+  },
+  "reservations": {
+    "calendar": {
+      "title": "Reservations",
+      "newReservation": "New reservation",
+      "reservationModified": "Reservation modified",
+      "reservationDeletionFailed": "An error occurred while deleting the reservation",
+      "notReservable": "Not reservable"
+    },
+    "modal": {
+      "reservation": "Reservation",
+      "newReservation": "New reservation",
+      "form": {
+        "start": "Reservation begins (UTC)",
+        "end": "Reservation ends (UTC)",
+        "aircraftId": "Aircraft registration number",
+        "phone": "Phone",
+        "details": "Additional information"
+      },
+      "updated": "Reservation updated!",
+      "updateFailed": "An error occurred while updating the reservation!",
+      "created": "Reservation created!",
+      "insideTimeslot": "Reservation must be inside the available time window"
+    },
+    "deletionPopup": {
+      "title": "Delete reservation",
+      "text": "Are you sure you want to delete the reservation?"
+    }
+  },
+  "timeslots": {
+    "calendar": {
+      "free": "Available",
+      "blocked": "Unavailable",
+      "timeslots": "Available time windows",
+      "newTimeslot": "New time window",
+      "blockedTimeslot": "Add unavailable time window"
+    },
+    "modal": {
+      "updated": "Time window updated!",
+      "updateFailed": "An error occurred while updating the time window!",
+      "created": "Time window created!",
+      "creationFailed": "An error occurred while creating the time window!",
+      "timeslot": "Time window",
+      "newTimeslot": "New time window",
+      "form": {
+        "start": "Time window begins (UTC)",
+        "end": "Time window ends (UTC)",
+        "details": "Additional information",
+        "recurring": {
+          "repeat": "Set as recurring",
+          "ends": "Recurrence ends (UTC)"
+        },
+        "blocked": {
+          "removes": "Deletes reservations:"
+        }
+      }
+    },
+    "overlappingPopup": {
+      "title": "Are you sure?",
+      "text": {
+        "timeslot": "",
+        "modifying": "Modifying",
+        "adding": "Adding",
+        "removes": "the time windows will delete the following reservations:"
+      }
+    },
+    "deletionPopup": {
+      "title": "Delete time window",
+      "text": "Are you sure you want to delete the time window?"
+    },
+    "repeatingPopup": {
+      "title": "Modify recurring time window",
+      "text": "You modified a recurring time window. Do you want to modify all following time windows in the same group?",
+      "primary": "Modify all",
+      "secondary": "Modify this one only"
+    }
+  },
+  "calendar": {
+    "notPast": "Time window cannot be added in the past",
+    "notConsecutive": "Time windows must not be consecutive",
+    "cantModifyPast": "Ongoing or past time windows cannot be modified",
+    "cantMovePast": "Ongoing or past time windows cannot be moved",
+    "cantMoveToPast": "Time window cannot be moved to the past",
+    "modificationError": "An error occurred while modifying the reservation",
+    "notTooFarFuture": {
+      "begin": "Reservations can be made only up to",
+      "end": " days in advance"
+    },
+    "notTooSoon": {
+      "begin": "Reservation must be made at least ",
+      "end": " days in advance"
+    }
+  },
+  "management": {
+    "airfield": {
+      "title": "Airport specific settings",
+      "form": {
+        "icao": "Airport ICAO code:",
+        "name": "Airport name:",
+        "timeslotMinTime": "Timeslot minimum size in minutes:",
+        "maxConcurrentFlights": "Maximum concurrent flights:"
+      }
+    }
+  },
+  "admin": {
+    "globalSettings": {
+      "title": "Global settings",
+      "form": {
+        "minDaysToStart": "How many days in advance a reservation can be made at the earliest",
+        "maxDaysToStart": "How many days in advance a reservation can be made at the latest"
+      }
+    },
+    "newAirfield": {
+      "title": "Add a new airport"
+    }
+  }
+}
