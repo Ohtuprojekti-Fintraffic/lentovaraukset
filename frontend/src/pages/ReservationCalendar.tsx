@@ -10,6 +10,7 @@ import FullCalendar from '@fullcalendar/react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
+import { useTranslation } from 'react-i18next';
 import Calendar from '../components/Calendar';
 import {
   getReservations,
@@ -32,6 +33,8 @@ type StartEndPair = {
 };
 
 function ReservationCalendar() {
+  const { t } = useTranslation();
+
   const [showInfoModal, setShowInfoModal] = useState(false);
   const selectedReservationRef = useRef<EventImpl | null>(null);
   const draggedTimesRef = useRef<{ start: Date, end: Date } | null>(null);
@@ -42,6 +45,7 @@ function ReservationCalendar() {
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
   const { data: configuration } = useConfiguration();
   const { addNewAlert } = useContext(AlertContext);
+
   const reservationsSourceFn: EventSourceFunc = async (
     { start, end },
     successCallback,
@@ -81,14 +85,14 @@ function ReservationCalendar() {
       const timeslotsMapped = timeslots.map((timeslot) => {
         const display = timeslot.type === 'available' ? 'inverse-background' : 'block';
         const color = timeslot.type === 'available' ? '#2C2C44' : '#B40000';
-        const title = timeslot.type === 'available' ? '' : timeslot.info || 'Ei varattavissa';
+        const title = timeslot.type === 'available' ? '' : timeslot.info || t('reservations.calendar.notReservable');
         return {
           ...timeslot, id: timeslot.id.toString(), groupId: 'timeslots', display, color, title, editable: false,
         };
       });
 
       const notReservable = [{
-        title: 'ei varattavissa', start, end, display: 'background', color: '#2C2C44', overlap: false,
+        title: t('reservations.calendar.notReservable'), start, end, display: 'background', color: '#2C2C44', overlap: false,
       }];
 
       successCallback(timeslotsMapped.length ? timeslotsMapped : notReservable);
@@ -133,7 +137,7 @@ function ReservationCalendar() {
         event.remove();
       } else {
         removeInfo.revert();
-        throw new Error('Removing reservation failed');
+        throw new Error(t('reservations.calendar.reservationDeletionFailed'));
       }
       clearPopup();
     };
@@ -144,11 +148,11 @@ function ReservationCalendar() {
     };
 
     showPopup({
-      popupTitle: 'Varauksen Poisto',
-      popupText: 'Haluatko varmasti poistaa varauksen?',
-      dangerText: 'Poista',
+      popupTitle: t('reservations.deletionPopup.title'),
+      popupText: t('reservations.deletionPopup.text'),
+      dangerText: t('common.delete'),
       dangerOnClick: onConfirmRemove,
-      secondaryText: 'Peruuta',
+      secondaryText: t('common.cancel'),
       secondaryOnClick: onCancelRemove,
     });
   };
@@ -169,7 +173,7 @@ function ReservationCalendar() {
       info,
     });
     if (modifiedReservation) {
-      addNewAlert('Reservation modified', 'success');
+      addNewAlert(t('reservations.calendar.reservationModified'), 'success');
     }
   };
 
@@ -215,8 +219,10 @@ function ReservationCalendar() {
         />
         <div className="flex flex-col space-y-2 h-full w-full p-8">
           <div className="flex flex-row justify-between mt-0">
-            <h1 className="text-3xl">Varauskalenteri</h1>
-            <Button variant="primary" onClick={() => showReservationModalFn(null, null)}>Uusi varaus</Button>
+            <h1 className="text-3xl">{t('reservations.calendar.title')}</h1>
+            <Button variant="primary" onClick={() => showReservationModalFn(null, null)}>
+              {t('reservations.calendar.newReservation')}
+            </Button>
           </div>
           <Calendar
             calendarRef={calendarRef}
