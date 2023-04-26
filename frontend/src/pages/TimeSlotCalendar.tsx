@@ -138,6 +138,8 @@ function TimeSlotCalendar() {
         primaryOnClick: removeAllFutureEvents,
         secondaryText: t('timeslots.repeatingDeletionPopup.secondary'),
         secondaryOnClick: removeOneEvent,
+        tertiaryText: t('common.cancel'),
+        tertiaryOnClick: onCancelRemove,
       });
     } else {
       showPopup({
