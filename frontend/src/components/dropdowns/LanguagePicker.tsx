@@ -15,15 +15,14 @@ function LanguagePicker() {
 
   return (
     <div className="flex flex-row items-center">
-      <Globe />
       <Dropdown
         placeholder="FI"
         selectedSection={i18n.language}
         sections={[...i18n.languages]}
         onChange={handleSelect}
         variant="tertiary"
+        glyph={<Globe />}
       />
-
     </div>
   );
 }

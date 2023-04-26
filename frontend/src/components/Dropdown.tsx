@@ -44,24 +44,26 @@ function Dropdown({
               <div
                 role="button"
                 tabIndex={0}
-                className={`group flex flex-row justify-between gap-4 items-baseline ${borderStyle} p-4`}
+                className={`group flex flex-row justify-between gap-2 items-end ${borderStyle} p-4`}
                 onClick={() => setIsActive(!isActive)}
                 onKeyDown={(e) => e.key === 'Enter' && setIsActive(!isActive)}
               >
+                {glyph}
                 <Subheader className={`font-ft-emphasis ${textStyle}`}>{selectedSection ?? placeholder}</Subheader>
-                <div className="place-self-end group-hover:text-ft-text-300">{isActive ? <ChevronUp /> : <ChevronDown /> }</div>
+                <div className=" group-hover:text-ft-text-300">{isActive ? <ChevronUp /> : <ChevronDown /> }</div>
               </div>
             )
             : (
               <div
                 role="button"
                 tabIndex={0}
-                className={`group flex flex-row justify-between gap-4 items-baseline ${borderStyle} p-4`}
+                className="group flex flex-row justify-between items-center gap-2 flex-nowrap"
                 onClick={() => setIsActive(!isActive)}
                 onKeyDown={(e) => e.key === 'Enter' && setIsActive(!isActive)}
               >
-                <Subheader className={`font-ft-emphasis ${textStyle}`}>{selectedSection ?? placeholder}</Subheader>
-                <div className="place-self-end group-hover:text-ft-text-300">{isActive ? <ChevronUp /> : <ChevronDown /> }</div>
+                {glyph}
+                <p className={`font-ft-emphasis ${textStyle} whitespace-nowrap`}>{selectedSection ?? placeholder}</p>
+                <div className="group-hover:text-ft-text-300">{isActive ? <ChevronUp /> : <ChevronDown /> }</div>
               </div>
             )
       }
