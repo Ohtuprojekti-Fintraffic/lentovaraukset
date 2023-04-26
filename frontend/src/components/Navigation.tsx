@@ -27,19 +27,19 @@ function Navigation() {
   return (
     <>
       <div className="bg-black text-white p-6 flex flex-row items-center justify-between text-lg h-full max-h-20 top-0">
-        <div className="flex flex-row items-center space-x-10 w-fit">
+        <div className="flex flex-row items-center space-x-10 w-full">
           <NavLink to="/" className={navLinkStyle}>
             <img src={Logo} alt="" className="h-7" />
           </NavLink>
-          <p className="hidden sm:inline">
+          <p className="hidden md:inline w-fit">
             {t('navigation.title')}
           </p>
         </div>
         <div className="flex flex-row items-center gap-x-10">
-          <div className="hidden lg:block">
+          <div className="hidden sm:block">
             <LanguagePicker />
           </div>
-          <nav className="hidden lg:flex flex-row space-x-10 text-l">
+          <nav className="hidden xl:flex flex-row space-x-10 text-l">
             <NavLink to="/varaukset" className={navLinkStyle}>
               {t('navigation.reservations')}
             </NavLink>
@@ -53,7 +53,7 @@ function Navigation() {
               {t('navigation.admin')}
             </NavLink>
           </nav>
-          <nav className="lg:hidden flex flex-row items-center py-2 h-full">
+          <nav className="xl:hidden flex flex-row items-center py-2 h-full">
             <button
               type="button"
               className="font-sans text-white text-md font-medium leading-7 focus:outline-none flex flex-row"
@@ -72,7 +72,7 @@ function Navigation() {
         </div>
       </div>
       {menuOpen && (
-        <div className="lg:hidden bg-black border-custom-gray shadow-lg w-full flex flex-col text-right">
+        <div className="xl:hidden bg-black border-custom-gray shadow-lg w-full flex flex-col text-right">
           <NavLink
             to="/varaukset"
             className={dropDownLinkStyle}
@@ -101,7 +101,7 @@ function Navigation() {
           >
             {t('navigation.admin')}
           </NavLink>
-          <div className="flex justify-end bg-black p-4 text-white">
+          <div className="flex sm:hidden justify-end bg-black p-4 text-white">
             <LanguagePicker />
           </div>
         </div>
