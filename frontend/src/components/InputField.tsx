@@ -90,7 +90,7 @@ function InputField({
   return (
     <div className={type === 'checkbox'
       ? 'flex flex-row justify-start items-baseline gap-x-2'
-      : 'flex flex-col items-start flex-wrap gap-y-1'}
+      : 'flex flex-col items-start flex-wrap gap-y-1 w-full'}
     >
       {labelText ? (
         <label

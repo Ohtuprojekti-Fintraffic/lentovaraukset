@@ -183,7 +183,8 @@ function RecurringTimeslotForm({
         clearAlert={() => setFormWarning(undefined)}
         removalDelaySecs={10}
       />
-      <div className="p-8">
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+      <div className="p-8 outline-none" tabIndex={0} aria-label="press tab to enter the time window form">
         <form id={id} className="flex flex-col" onSubmit={handleSubmit(submitHandler, onError)}>
           <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
             <DatePicker

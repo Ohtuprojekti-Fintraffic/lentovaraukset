@@ -93,9 +93,14 @@ function ReservationInfoForm({
         clearAlert={() => setFormWarning(undefined)}
         removalDelaySecs={10}
       />
-      <div className="p-8">
-        <form id={id} className="flex flex-col w-full" onSubmit={handleSubmit(submitHandler)}>
-          <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+      <div className="p-8 outline-none" tabIndex={0} aria-label="press tab to enter the reservation form">
+        <form
+          id={id}
+          className="flex flex-col w-full"
+          onSubmit={handleSubmit(submitHandler)}
+        >
+          <div className="flex flex-col sm:flex-row justify-between space-x-0 sm:space-x-6 w-full">
             <DatePicker
               control={control}
               labelText={t('reservations.modal.form.start')}
@@ -113,7 +118,7 @@ function ReservationInfoForm({
               errors={errors}
             />
           </div>
-          <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-6 w-full">
+          <div className="flex flex-col sm:flex-row justify-between space-x-0 sm:space-x-6 w-full">
             <InputField
               labelText={t('reservations.modal.form.aircraftId')}
               type="text"
