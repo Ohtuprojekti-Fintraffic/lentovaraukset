@@ -32,6 +32,9 @@ function ReservationInfoModal({
   const { airport } = useAirportContext();
 
   const onSubmitModifyHandler = async (updatedReservation: Omit<ReservationEntry, 'id' | 'user'>) => {
+    if (!airport) {
+      return;
+    }
     try {
       await modifyReservation(
         {
@@ -43,7 +46,7 @@ function ReservationInfoModal({
           phone: updatedReservation.phone,
           info: updatedReservation.info,
         },
-        airport?.code,
+        airport.code,
       );
       addNewAlert(t('reservations.modal.updated'), 'success');
     } catch (err) {
@@ -60,8 +63,11 @@ function ReservationInfoModal({
   };
 
   const onSubmitAddHandler = async (reservationDetails: Omit<ReservationEntry, 'id' | 'user'>) => {
+    if (!airport) {
+      return;
+    }
     try {
-      await addReservation(reservationDetails, airport?.code);
+      await addReservation(reservationDetails, airport.code);
       addNewAlert(t('reservations.modal.created'), 'success');
     } catch (err) {
       if (await isErrorForCode(err, ServiceErrorCode.ReservationExceedsTimeslot)) {

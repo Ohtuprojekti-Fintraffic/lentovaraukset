@@ -135,10 +135,14 @@ function ReservationCalendar() {
   const removeReservation = async (removeInfo: EventRemoveArg) => {
     // fullcalendar removes the event early:
     removeInfo.revert();
+
+    if (!airport) {
+      return;
+    }
     const { event } = removeInfo;
 
     const onConfirmRemove = async () => {
-      const res = await deleteReservation(Number(event.id), airport?.code);
+      const res = await deleteReservation(Number(event.id), airport.code);
       if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
         closeReservationModalFn();
         event.remove();
@@ -165,6 +169,9 @@ function ReservationCalendar() {
   };
 
   const modifyReservationFn = async (event: EventImpl): Promise<void> => {
+    if (!airport) {
+      return;
+    }
     const {
       user, aircraftId, phone, email, info,
     } = event.extendedProps;
@@ -178,7 +185,7 @@ function ReservationCalendar() {
       phone,
       email,
       info,
-    }, airport?.code);
+    }, airport.code);
     if (modifiedReservation) {
       addNewAlert(t('reservations.calendar.reservationModified'), 'success');
     }

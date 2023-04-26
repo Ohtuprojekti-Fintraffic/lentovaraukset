@@ -1,14 +1,14 @@
 import { ReservationEntry } from '@lentovaraukset/shared/src';
 import { errorIfNotOk } from './util';
 
-const getReservations = async (from: Date, until: Date, airportCode?: string)
+const getReservations = async (from: Date, until: Date, airportCode: string)
 : Promise<ReservationEntry[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/${airportCode}/reservations?from=${from.toISOString()}&until=${until.toISOString()}`);
   errorIfNotOk(res);
   return res.json();
 };
 
-const addReservation = async (newReservation: any, airportCode?: string)
+const addReservation = async (newReservation: any, airportCode: string)
 : Promise<ReservationEntry> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/${airportCode}/reservations/`, {
     method: 'POST',
@@ -23,7 +23,7 @@ const addReservation = async (newReservation: any, airportCode?: string)
   return res.json();
 };
 
-const deleteReservation = async (id: Number, airportCode?: string): Promise<string> => {
+const deleteReservation = async (id: Number, airportCode: string): Promise<string> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/${airportCode}/reservations/${id}`, {
     method: 'DELETE',
     headers: {
@@ -34,7 +34,7 @@ const deleteReservation = async (id: Number, airportCode?: string): Promise<stri
   return res.text();
 };
 
-const modifyReservation = async (modifiedReservation: ReservationEntry, airportCode?: string)
+const modifyReservation = async (modifiedReservation: ReservationEntry, airportCode: string)
 : Promise<ReservationEntry> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/${airportCode}/reservations/${modifiedReservation.id}`, {
     method: 'PUT',

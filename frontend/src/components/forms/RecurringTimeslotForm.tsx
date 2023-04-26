@@ -158,7 +158,10 @@ function RecurringTimeslotForm({
   const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
   const getReservationsWithinTimeslot = async (startTime:Date, endTime: Date) => {
-    setReservations(await getReservations(startTime, endTime));
+    if (!airport) {
+      return;
+    }
+    setReservations(await getReservations(startTime, endTime, airport.code));
   };
 
   useEffect(() => {

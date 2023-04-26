@@ -118,10 +118,13 @@ function TimeSlotCalendar() {
   const removeTimeSlot = async (removeInfo: EventRemoveArg) => {
     // fullcalendar removes the event early:
     removeInfo.revert();
+    if (!airport) {
+      return;
+    }
     const { event } = removeInfo;
 
     const onConfirmRemove = async () => {
-      await deleteTimeslot(Number(event.id), airport?.code);
+      await deleteTimeslot(Number(event.id), airport.code);
       closeTimeslotModalFn();
       clearPopup();
       calendarRef.current?.getApi().refetchEvents();
@@ -168,6 +171,9 @@ function TimeSlotCalendar() {
       days: WeekInDays,
     },
   ) => {
+    if (!airport) {
+      return;
+    }
     const start = timeslot.start ?? new Date();
     const end = timeslot.end ?? new Date();
     const modifyOneEvent = async () => {
@@ -179,13 +185,13 @@ function TimeSlotCalendar() {
           type: timeslot.extendedProps.type,
           info: timeslot.extendedProps.info,
         },
+        airport.code,
         period
           ? {
             end: period.end,
             days: period.days,
           }
           : undefined,
-        airport?.code,
       );
       closeTimeslotModalFn();
       clearPopup();
@@ -207,7 +213,7 @@ function TimeSlotCalendar() {
               hours: end.getHours(), minutes: end.getMinutes(),
             },
           },
-          airport?.code,
+          airport.code,
         );
       }
       closeTimeslotModalFn();

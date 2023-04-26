@@ -1,7 +1,7 @@
 import { TimeslotEntry, WeekInDays } from '@lentovaraukset/shared/src';
 import { errorIfNotOk } from './util';
 
-const getTimeSlots = async (from: Date, until: Date, airportCode?: string)
+const getTimeSlots = async (from: Date, until: Date, airportCode: string)
 : Promise<TimeslotEntry[]> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/${airportCode}/timeslots?from=${from.toISOString()}&until=${until.toISOString()}`);
   errorIfNotOk(res);
@@ -21,11 +21,11 @@ const addTimeSlot = async (newTimeSlot: { start: Date, end: Date, type: 'availab
 
 const modifyTimeSlot = async (
   timeSlot: Omit<TimeslotEntry, 'airfieldCode'>,
+  airportCode: string,
   period?: {
     end: Date,
     days: WeekInDays
   },
-  airportCode?: string,
 ): Promise<void> => {
   const modifiedTimeSlot = {
     ...timeSlot,
@@ -43,7 +43,7 @@ const modifyTimeSlot = async (
   errorIfNotOk(res);
 };
 
-const deleteTimeslot = async (id: Number, airportCode?: string): Promise<string> => {
+const deleteTimeslot = async (id: Number, airportCode: string): Promise<string> => {
   const res = await fetch(`${process.env.BASE_PATH}/api/${airportCode}/timeslots/${id}`, {
     method: 'DELETE',
     headers: {
