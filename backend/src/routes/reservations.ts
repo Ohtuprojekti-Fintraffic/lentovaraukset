@@ -24,17 +24,21 @@ const allowReservation = async (
 
 const router = express.Router();
 
-router.get('/', async (req: express.Request, res: express.Response) => {
-  errorIfNoAirfield(req);
-  const { airfield } = req;
-  const { from } = req.query;
-  const { until } = req.query;
-  const { start, end } = getTimeRangeValidator().parse({
-    start: new Date(from as string),
-    end: new Date(until as string),
-  });
-  const reservations = await reservationService.getInTimeRange(start, end, airfield.code);
-  res.json(reservations);
+router.get('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    errorIfNoAirfield(req);
+    const { airfield } = req;
+    const { from } = req.query;
+    const { until } = req.query;
+    const { start, end } = getTimeRangeValidator().parse({
+      start: new Date(from as string),
+      end: new Date(until as string),
+    });
+    const reservations = await reservationService.getInTimeRange(start, end, airfield.code);
+    res.json(reservations);
+  } catch (error: unknown) {
+    next(error);
+  }
 });
 
 router.delete('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
