@@ -98,8 +98,8 @@ describe('Calls to api', () => {
   test('fails to get an airfield with wrong code', async () => {
     const res = await api.get('/api/airfields/WRONG_CODE');
 
-    expect(res.status).toEqual(500);
-    expect(res.body.error.message).toContain('Airfield not found');
+    expect(res.status).toEqual(400);
+    expect(res.body.error.message).toContain('Supplied airfield code could not be found');
   });
 
   test('can update an airfield by code', async () => {

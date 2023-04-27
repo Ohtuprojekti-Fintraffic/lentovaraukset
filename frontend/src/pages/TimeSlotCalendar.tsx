@@ -6,6 +6,7 @@ import FullCalendar from '@fullcalendar/react';
 import React, { useState, useRef, useEffect } from 'react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import { AirfieldEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
+import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
@@ -14,7 +15,7 @@ import {
   getReservations,
 } from '../queries/reservations';
 import {
-  getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup,
+  getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup, deleteGroup,
 } from '../queries/timeSlots';
 import { usePopupContext } from '../contexts/PopupContext';
 import { useAirportContext } from '../contexts/AirportContext';
@@ -27,6 +28,7 @@ import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
   };
 
 function TimeSlotCalendar() {
+  const { t } = useTranslation();
   const calendarRef = useRef<FullCalendar>(null);
   const { airport, setAirportICAO } = useAirportContext(); // TODO: get id from airfield selection
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
@@ -49,7 +51,7 @@ function TimeSlotCalendar() {
           id: timeslot.id.toString(),
           editable: !isTimeInPast(timeslot.end),
           color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
-          title: timeslot.type === 'available' ? 'Vapaa' : timeslot.info || 'Suljettu',
+          title: timeslot.type === 'available' ? t('timeslots.calendar.free') : timeslot.info || t('timeslots.calendar.blocked'),
         };
         return timeslotEvent;
       });
@@ -93,7 +95,11 @@ function TimeSlotCalendar() {
 
   const closeTimeslotModalFn = () => setShowInfoModal(false);
 
-  const clickTimeslot = async (event: EventImpl): Promise<void> => {
+  /**
+   * Opens timeslot modal, if event is not in past
+   * @param event Event that is clicked, dragged or moved
+   */
+  const clickOrDragTimeslot = async (event: EventImpl): Promise<void> => {
     if (event.end && isTimeInPast(event.end)) {
       return;
     }
@@ -105,9 +111,20 @@ function TimeSlotCalendar() {
     // fullcalendar removes the event early:
     removeInfo.revert();
     const { event } = removeInfo;
+    const start = event.start ?? new Date();
 
-    const onConfirmRemove = async () => {
+    const removeOneEvent = async () => {
       await deleteTimeslot(Number(event.id));
+      closeTimeslotModalFn();
+      clearPopup();
+      calendarRef.current?.getApi().refetchEvents();
+    };
+
+    const removeAllFutureEvents = async () => {
+      if (event.extendedProps.group) {
+        const startingFrom = new Date(start);
+        await deleteGroup(event.extendedProps.group, { startingFrom });
+      }
       closeTimeslotModalFn();
       clearPopup();
       calendarRef.current?.getApi().refetchEvents();
@@ -117,14 +134,27 @@ function TimeSlotCalendar() {
       clearPopup();
     };
 
-    showPopup({
-      popupTitle: 'Varausikkunan Poisto',
-      popupText: 'Haluatko varmasti poistaa varausikkunan?',
-      dangerText: 'Poista',
-      dangerOnClick: onConfirmRemove,
-      secondaryText: 'Peruuta',
-      secondaryOnClick: onCancelRemove,
-    });
+    if (event.extendedProps.group) {
+      showPopup({
+        popupTitle: t('timeslots.repeatingDeletionPopup.title'),
+        popupText: t('timeslots.repeatingDeletionPopup.text'),
+        primaryText: t('timeslots.repeatingDeletionPopup.primary'),
+        primaryOnClick: removeAllFutureEvents,
+        secondaryText: t('timeslots.repeatingDeletionPopup.secondary'),
+        secondaryOnClick: removeOneEvent,
+        tertiaryText: t('common.cancel'),
+        tertiaryOnClick: onCancelRemove,
+      });
+    } else {
+      showPopup({
+        popupTitle: t('timeslots.deletionPopup.title'),
+        popupText: t('timeslots.deletionPopup.text'),
+        dangerText: t('common.delete'),
+        dangerOnClick: removeOneEvent,
+        secondaryText: t('common.cancel'),
+        secondaryOnClick: onCancelRemove,
+      });
+    }
   };
 
   const isSameType = (
@@ -198,11 +228,11 @@ function TimeSlotCalendar() {
 
     if (timeslot.extendedProps.group) {
       showPopup({
-        popupTitle: 'Toistuvan varausikkunan muokkaus',
-        popupText: 'Muokkasit toistuvaa varausikkuuna. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?',
-        primaryText: 'Muokkaa kaikkia',
+        popupTitle: t('timeslots.repeatingPopup.title'),
+        popupText: t('timeslots.repeatingPopup.text'),
+        primaryText: t('timeslots.repeatingPopup.primary'),
         primaryOnClick: modifyAllFutureEvents,
-        secondaryText: 'Muokkaa vain tätä',
+        secondaryText: t('timeslots.repeatingPopup.secondary'),
         secondaryOnClick: modifyOneEvent,
       });
     } else {
@@ -247,12 +277,18 @@ function TimeSlotCalendar() {
         />
         <div className="flex flex-col space-y-2 h-full w-full p-8">
           <div className="flex flex-row justify-between mt-0">
-            <h1 className="text-3xl">Vapaat varausikkunat</h1>
-            <Button variant="primary" onClick={() => showTimeslotModalFn(null, null)}>Uusi varausikkuna</Button>
+            <h1 className="text-3xl">
+              {t('timeslots.calendar.timeslots')}
+            </h1>
+            <Button variant="primary" onClick={() => showTimeslotModalFn(null, null)}>
+              {t('timeslots.calendar.newTimeslot')}
+            </Button>
           </div>
           <div>
             <label htmlFor="checkbox" className="font-ft-label mb-1">
-              <span>Lisää suljettuja vuoroja</span>
+              <span>
+                {t('timeslots.calendar.blockedTimeslot')}
+              </span>
               <input
                 type="checkbox"
                 id="checkbox"
@@ -266,8 +302,8 @@ function TimeSlotCalendar() {
             calendarRef={calendarRef}
             eventSources={eventsSourceRef.current}
             addEventFn={showModalAfterDrag}
-            modifyEventFn={modifyTimeslotFn}
-            clickEventFn={clickTimeslot}
+            modifyEventFn={clickOrDragTimeslot}
+            clickEventFn={clickOrDragTimeslot}
             removeEventFn={removeTimeSlot}
             granularity={airport && { minutes: airport.eventGranularityMinutes }}
             eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}

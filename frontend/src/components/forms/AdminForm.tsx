@@ -3,6 +3,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { configurationValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
+import { useTranslation } from 'react-i18next';
 import Button from '../Button';
 import InputField from '../InputField';
 import { updateConfigurationMutation } from '../../queries/configurations';
@@ -18,6 +19,8 @@ type Inputs = {
 };
 
 function AdminForm({ title, configuration }: FormProps) {
+  const { t } = useTranslation();
+
   const {
     register, handleSubmit, formState: { errors },
   } = useForm<Inputs>({
@@ -38,7 +41,7 @@ function AdminForm({ title, configuration }: FormProps) {
         <h1 className="text-3xl">{title}</h1>
         <form className="flex flex-col w-full" onSubmit={handleSubmit(onSubmit)}>
           <InputField
-            labelText="Kuinka monta päivää vähintään pitää olla varauksen alkuun:"
+            labelText={t('admin.globalSettings.form.minDaysToStart')}
             type="number"
             registerReturn={register('daysToStart', {
               valueAsNumber: true,
@@ -48,7 +51,7 @@ function AdminForm({ title, configuration }: FormProps) {
             errors={errors}
           />
           <InputField
-            labelText="Kuinka monta päivää tulevaisuuteen varauksen voi tehdä:"
+            labelText={t('admin.globalSettings.form.maxDaysToStart')}
             type="number"
             registerReturn={register('maxDaysInFuture', {
               valueAsNumber: true,
@@ -57,7 +60,7 @@ function AdminForm({ title, configuration }: FormProps) {
             step={1}
             errors={errors}
           />
-          <Button type="submit" variant="primary">Tallenna</Button>
+          <Button type="submit" variant="primary">{t('common.save')}</Button>
         </form>
       </div>
     </div>

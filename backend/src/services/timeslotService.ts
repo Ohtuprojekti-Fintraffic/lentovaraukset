@@ -1,8 +1,11 @@
 import { Op } from 'sequelize';
-import type { TimeslotEntry, WeekInDays } from '@lentovaraukset/shared/src/index';
+import {
+  ServiceErrorCode, TimeslotEntry, WeekInDays,
+} from '@lentovaraukset/shared/src/index';
 import reservationService from '@lentovaraukset/backend/src/services/reservationService';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import { Timeslot } from '../models';
+import ServiceError from '../util/errors';
 
 const getInTimeRanges = async (
   airfieldCode: string,
@@ -80,13 +83,13 @@ const errorIfLeadsToConsecutivesOrOverlaps = async (
         && (timeslot.start.getTime() === otherTimeslot.end.getTime()
         || timeslot.end.getTime() === otherTimeslot.start.getTime())
       ) {
-        throw new Error('Operation would result in consecutive timeslots');
+        throw new ServiceError(ServiceErrorCode.ConsecutiveTimeslots, 'Operation would result in consecutive timeslots');
       }
     });
   });
 
   if (timeslotsInRanges.filter((ts) => ts.type === timeslots[0].type).length > 0) {
-    throw new Error('Operation would result in overlapping timeslots');
+    throw new ServiceError(ServiceErrorCode.OverlappingTimeslots, 'Operation would result in overlapping timeslots');
   }
 };
 
@@ -96,7 +99,7 @@ const deleteById = async (id: number) => {
   if (isTimeInPast(timeslot.start)) throw new Error('Timeslot in past cannot be deleted');
   const reservations = await timeslot?.getReservations();
   if (reservations?.length !== 0) {
-    throw new Error('Timeslot has reservations');
+    throw new ServiceError(ServiceErrorCode.TimeslotNotEditable, 'Timeslot has reservations');
   }
   await timeslot?.destroy();
 };
@@ -162,7 +165,7 @@ const updateById = async (
   await errorIfLeadsToConsecutivesOrOverlaps(timeslot.airfieldCode, [{ ...timeslot, id }]);
 
   if (oldTimeslot === null) {
-    throw new Error('No timeslot with id exists');
+    throw new ServiceError(ServiceErrorCode.TimeslotNotFound, 'No timeslot with id exists');
   }
 
   const slotHasMoved = oldTimeslot.start.getTime() !== timeslot.start.getTime();
@@ -181,7 +184,7 @@ const updateById = async (
       (reservation) => reservation.start >= timeslot.start && reservation.end <= timeslot.end,
     );
     if (oldReservations.length !== newReservations.length) {
-      throw new Error('Timeslot has reservations');
+      throw new ServiceError(ServiceErrorCode.TimeslotNotEditable, 'Timeslot has reservations');
     }
     await oldTimeslot.removeReservations(oldReservations);
     await oldTimeslot.addReservations(newReservations);
@@ -229,6 +232,17 @@ const updateByGroup = async (airfieldCode: string, group: string, updates: {
   return updatedTimeslots.map((ts) => ts.dataValues);
 };
 
+const deleteByGroup = async (
+  group: string,
+  startingFrom: Date,
+): Promise<Number> => {
+  const deletedTimeslots = await Timeslot.destroy({
+    where: { group, start: { [Op.gte]: startingFrom } },
+  });
+
+  return deletedTimeslots;
+};
+
 export default {
   getInTimeRange,
   deleteById,
@@ -236,4 +250,5 @@ export default {
   createTimeslot,
   createPeriod,
   updateByGroup,
+  deleteByGroup,
 };

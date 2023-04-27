@@ -558,7 +558,7 @@ describe('Calls to api', () => {
         info: null,
       });
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
     expect(response.body.error.message).toEqual('Operation would result in consecutive timeslots');
 
     const updatedTimeslot1 = await Timeslot.findByPk(timeslot1.id);
@@ -580,7 +580,7 @@ describe('Calls to api', () => {
         info: null,
       });
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
     expect(response.body.error.message).toEqual('No timeslot with id exists');
   });
 
@@ -641,7 +641,7 @@ describe('Calls to api', () => {
         info: null,
       });
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
     expect(response.body.error.message).toEqual('Timeslot has reservations');
 
     const updatedTimeslot = await Timeslot.findByPk(timeslot.id);
@@ -697,7 +697,7 @@ describe('Calls to api', () => {
       .set('Content-type', 'application/json')
       .send(consecutiveTimeslot);
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
     expect(response.body.error.message).toEqual('Operation would result in consecutive timeslots');
 
     const createdTimeslot = await Timeslot.findOne({ where: { start: consecutiveTimeslot.start } });
@@ -733,11 +733,39 @@ describe('Calls to api', () => {
         },
       });
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
     expect(response.body.error.message).toEqual('Operation would result in overlapping timeslots');
 
     const createdPeriodTimeslots = await Timeslot
       .findAll({ where: { group: 'Overlapping period' } });
     expect(createdPeriodTimeslots.length).toEqual(0);
+  });
+
+  test('delete times from the period', async () => {
+    const timeslotDataGroup: Omit<TimeslotEntry, 'id'>[] = [
+      {
+        start: new Date('2023-02-15T08:00:00.000Z'), end: new Date('2023-02-15T10:00:00.000Z'), type: 'available', info: null, airfieldCode: 'EFHK', group: 'group-1',
+      },
+      {
+        start: new Date('2023-02-16T08:00:00.000Z'), end: new Date('2023-02-16T10:00:00.000Z'), type: 'available', info: null, airfieldCode: 'EFHK', group: 'group-1',
+      },
+      {
+        start: new Date('2023-02-17T08:00:00.000Z'), end: new Date('2023-02-17T10:00:00.000Z'), type: 'available', info: null, airfieldCode: 'EFHK', group: 'group-1',
+      },
+    ];
+
+    await Timeslot.bulkCreate(timeslotDataGroup);
+
+    const response = await api.delete('/api/EFHK/timeslots/group/group-1')
+      .set('Content-type', 'application/json')
+      .send({
+        startingFrom: new Date('2023-02-16T08:00:00.000Z'),
+      });
+
+    expect(response.status).toEqual(200);
+    expect(response.body).toEqual('2 timeslots from period group-1 deleted');
+
+    const allTimeslots = await Timeslot.findAll();
+    expect(allTimeslots.length).toEqual(timeslotData.length + 1);
   });
 });

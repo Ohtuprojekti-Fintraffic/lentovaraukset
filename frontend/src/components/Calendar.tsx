@@ -9,10 +9,13 @@ import type {
   DateSelectArg, EventChangeArg, EventClickArg, EventRemoveArg,
   EventSourceInput,
 } from '@fullcalendar/core';
+import fiLocale from '@fullcalendar/core/locales/fi';
+import enLocale from '@fullcalendar/core/locales/en-gb';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast, isTimeAtMostInFuture, isTimeFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import AlertContext from '../contexts/AlertContext';
 import Button from './Button';
 import ButtonGroup from './ButtonGroup';
@@ -53,6 +56,9 @@ function Calendar({
   blocked = false,
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
+
+  const { t, i18n } = useTranslation();
+
   const { addNewAlert } = React.useContext(AlertContext);
   const viewIdxMap = {
     dayGridMonth: 0, timeGridWeek: 1, timeGridDay: 1, listWeek: 2,
@@ -102,24 +108,24 @@ function Calendar({
   const isTimeAllowed = (start: Date, end: Date, type?: string, ignoreStart?: boolean) => {
     if ((!ignoreStart && isTimeInPast(start)) || isTimeInPast(end)) {
       calendarRef.current?.getApi().unselect();
-      addNewAlert('Aikaa ei voi lisätä menneisyyteen', 'warning');
+      addNewAlert(t('calendar.notPast'), 'warning');
       return false;
     }
     const maxDaysInFuture = configuration ? configuration.maxDaysInFuture : 7;
     if (checkIfTimeInFuture && !isTimeAtMostInFuture(start, maxDaysInFuture)) {
       calendarRef.current?.getApi().unselect();
-      addNewAlert(`Aikaa ei voi lisätä yli ${maxDaysInFuture} päivän päähän`, 'warning');
+      addNewAlert(`${t('calendar.notTooFarFuture.begin')}${maxDaysInFuture}${t('calendar.notTooFarFuture.end')}$`, 'warning');
       return false;
     }
     const daysToStart = configuration ? configuration.daysToStart : 0;
     if (checkIfTimeInFuture && !isTimeFarEnoughInFuture(start, daysToStart)) {
       calendarRef.current?.getApi().unselect();
-      addNewAlert(`Aika pitää varata vähintään ${daysToStart} päivää etukäteen`, 'warning');
+      addNewAlert(`${t('calendar.notTooSoon.begin')}${daysToStart}${t('calendar.notTooSoon.end')}`, 'warning');
       return false;
     }
     if (timeIsConsecutive(start, end, type)) {
       calendarRef.current?.getApi().unselect();
-      addNewAlert('Ajat eivät voi olla peräkkäin', 'warning');
+      addNewAlert(t('calendar.notConsecutive'), 'warning');
       return false;
     }
     return true;
@@ -143,20 +149,20 @@ function Calendar({
     if (isReservation
       && oldEvent.start && isTimeInPast(oldEvent.start)) {
       changeData.revert();
-      addNewAlert('Alkanutta tai mennyttä varausta ei voi muokata', 'warning');
+      addNewAlert(t('calendar.cantModifyPast'), 'warning');
       return;
     }
 
     if (!isReservation && eventHasMoved
       && oldEvent.start && isTimeInPast(oldEvent.start)) {
       changeData.revert();
-      addNewAlert('Alkanutta tai mennyttä aikaikkunaa ei voi siirtää', 'warning');
+      addNewAlert(t('calendar.cantMovePast'), 'warning');
       return;
     }
 
     if (eventHasMoved && event.start && isTimeInPast(event.start)) {
       changeData.revert();
-      addNewAlert('Alkamisaikaa ei voi siirtää menneisyyteen', 'warning');
+      addNewAlert(t('calendar.cantMoveToPast'), 'warning');
       return;
     }
 
@@ -223,7 +229,9 @@ function Calendar({
       <FullCalendar
         ref={calendarRef}
         plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
-        locale="fi"
+        locale={
+        i18n.language === 'fi' ? fiLocale : enLocale
+      }
         timeZone="UTC"
         weekNumberCalculation="ISO"
         headerToolbar={false}

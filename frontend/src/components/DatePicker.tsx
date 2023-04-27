@@ -4,16 +4,19 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import ReactDatePicker, { registerLocale, setDefaultLocale } from 'react-datepicker';
+import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import fi from 'date-fns/locale/fi';
+import en from 'date-fns/locale/en-GB';
+import sv from 'date-fns/locale/sv';
 import { Control, Controller, type FieldErrors } from 'react-hook-form';
 import { DateTime } from 'luxon';
 import { twMerge } from 'tailwind-merge';
+import { useTranslation } from 'react-i18next';
 import { fieldBaseClass, fieldStateClasses, InputStates } from './InputField';
 
-// SUOMI
 registerLocale('fi', fi);
-setDefaultLocale('fi');
+registerLocale('en', en);
+registerLocale('sv', sv);
 
 type DatePickerProps = {
   control: Control<any>;
@@ -44,6 +47,8 @@ function DatePicker({
   timeGranularityMinutes,
   showTimeSelect,
 }: DatePickerProps) {
+  const { t, i18n } = useTranslation();
+
   const id = useId();
 
   const [state, setState] = useState<InputStates>('default');
@@ -55,7 +60,7 @@ function DatePicker({
   }, [errorsExist]);
 
   return (
-    <div className="flex flex-col items-start flex-wrap">
+    <div className="flex flex-col items-start flex-wrap w-full">
       { labelText ? (
         <label
           htmlFor={id}
@@ -91,7 +96,8 @@ function DatePicker({
                   onChange(time.toISO(), event);
                 }}
               // onChange={onChange}
-                timeCaption="Aika UTC"
+                timeCaption={t('common.time')}
+                locale={i18n.language.includes('en') ? 'en' : 'fi'}
                 placeholderText={placeholder}
                 // We apply the time zone difference so that the user chooses an UTC time
                 // even if ReactDatePicker only does local tz
