@@ -134,7 +134,7 @@ function TimeSlotCalendar() {
     const removeAllFutureEvents = async () => {
       if (event.extendedProps.group) {
         const startingFrom = new Date(start);
-        await deleteGroup(event.extendedProps.group, { startingFrom });
+        await deleteGroup(event.extendedProps.group, { startingFrom }, airport.code);
       }
       closeTimeslotModalFn();
       clearPopup();

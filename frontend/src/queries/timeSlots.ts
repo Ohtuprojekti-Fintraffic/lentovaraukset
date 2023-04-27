@@ -75,8 +75,8 @@ const modifyGroup = async (
 
 const deleteGroup = async (group: string, updates: {
   startingFrom: Date,
-}): Promise<void> => {
-  const res = await fetch(`${process.env.BASE_PATH}/api/${airfieldCode}/timeslots/group/${group}`, {
+}, airportCode: string): Promise<void> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/${airportCode}/timeslots/group/${group}`, {
     method: 'DELETE',
     body: JSON.stringify(updates),
     headers: {
