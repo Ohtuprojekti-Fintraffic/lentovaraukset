@@ -107,7 +107,11 @@ function TimeSlotCalendar() {
   }
   const closeTimeslotModalFn = () => setShowInfoModal(false);
 
-  const clickTimeslot = async (event: EventImpl): Promise<void> => {
+  /**
+   * Opens timeslot modal, if event is not in past
+   * @param event Event that is clicked, dragged or moved
+   */
+  const clickOrDragTimeslot = async (event: EventImpl): Promise<void> => {
     if (event.end && isTimeInPast(event.end)) {
       return;
     }
@@ -320,8 +324,8 @@ function TimeSlotCalendar() {
             calendarRef={calendarRef}
             eventSources={[reservationsSourceFn, timeSlotsSourceFn]}
             addEventFn={showModalAfterDrag}
-            modifyEventFn={modifyTimeslotFn}
-            clickEventFn={clickTimeslot}
+            modifyEventFn={clickOrDragTimeslot}
+            clickEventFn={clickOrDragTimeslot}
             removeEventFn={removeTimeSlot}
             granularity={airport && { minutes: airport.eventGranularityMinutes }}
             eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}
