@@ -73,6 +73,19 @@ const modifyGroup = async (
   errorIfNotOk(res);
 };
 
+const deleteGroup = async (group: string, updates: {
+  startingFrom: Date,
+}): Promise<void> => {
+  const res = await fetch(`${process.env.BASE_PATH}/api/${airfieldCode}/timeslots/group/${group}`, {
+    method: 'DELETE',
+    body: JSON.stringify(updates),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  errorIfNotOk(res);
+};
+
 export {
-  getTimeSlots, addTimeSlot, modifyTimeSlot, deleteTimeslot, modifyGroup,
+  getTimeSlots, addTimeSlot, modifyTimeSlot, deleteTimeslot, modifyGroup, deleteGroup,
 };

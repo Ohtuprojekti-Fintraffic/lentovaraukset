@@ -103,6 +103,12 @@
       "title": "Varausikkunan poisto",
       "text": "Haluatko varmasti poistaa varausikkunan?"
     },
+    "repeatingDeletionPopup": {
+      "title": "Toistuvan varausikkunan poisto",
+      "text": "Olet poistamassa toistuvaa varausikkuuna. Poistetaanko myös kaikki tulevat ryhmän varausikkunat?",
+      "primary": "Poista kaikki",
+      "secondary": "Poista vain tämä"
+    },
     "repeatingPopup": {
       "title": "Toistuvan varausikkunan muokkaus",
       "text": "Muokkasit toistuvaa varausikkunaa. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?",
