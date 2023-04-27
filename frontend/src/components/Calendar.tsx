@@ -217,13 +217,13 @@ function Calendar({
             <Button variant="secondary" onClick={() => calendarRef.current?.getApi().prev()}><ChevronLeft strokeWidth="1.5" color="black" /></Button>
             <Button variant="secondary" onClick={() => calendarRef.current?.getApi().next()}><ChevronRight strokeWidth="1.5" color="black" /></Button>
           </ButtonGroup>
-          <Button variant="secondary" className="ml-2" onClick={() => calendarRef.current?.getApi().today()}>Tänään</Button>
+          <Button variant="secondary" className="ml-2" onClick={() => calendarRef.current?.getApi().today()}>{t('calendar.buttons.today')}</Button>
         </div>
         <h2 className="text-ft-text-1000 text-ft-hs3 justify-self-center">{viewTitle}</h2>
         <ButtonGroup activeIdx={viewIdxMap[viewMode]} className="flex justify-self-end">
-          <Button variant="secondary" onClick={() => setViewMode('dayGridMonth')}>Kuukausi</Button>
-          <Button variant="secondary" onClick={() => setViewMode('timeGridWeek')}>Viikko</Button>
-          <Button variant="secondary" onClick={() => setViewMode('listWeek')}>Lista</Button>
+          <Button variant="secondary" onClick={() => setViewMode('dayGridMonth')}>{t('calendar.buttons.month')}</Button>
+          <Button variant="secondary" onClick={() => setViewMode('timeGridWeek')}>{t('calendar.buttons.week')}</Button>
+          <Button variant="secondary" onClick={() => setViewMode('listWeek')}>{t('calendar.buttons.list')}</Button>
         </ButtonGroup>
       </div>
       <FullCalendar
