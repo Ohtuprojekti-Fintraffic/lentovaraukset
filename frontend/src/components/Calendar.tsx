@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -12,7 +12,7 @@ import type {
 import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast, isTimeAtMostInFuture, isTimeFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
-import { X } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import AlertContext from '../contexts/AlertContext';
 import Button from './Button';
 import ButtonGroup from './ButtonGroup';
@@ -54,16 +54,16 @@ function Calendar({
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
   const { addNewAlert } = React.useContext(AlertContext);
-  const [viewMode, setViewMode] = React.useState(window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek');
+  const viewIdxMap = {
+    dayGridMonth: 0, timeGridWeek: 1, timeGridDay: 1, listWeek: 2,
+  } as const;
+  const [viewMode, setViewMode] = React.useState<keyof typeof viewIdxMap>(window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek');
+  const [viewTitle, setViewTitle] = useState('');
 
   React.useEffect(() => {
     const handleResize = () => {
       const newViewMode = window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek';
       setViewMode(newViewMode);
-
-      if (calendarRef.current) {
-        calendarRef.current.getApi().changeView(newViewMode);
-      }
     };
 
     window.addEventListener('resize', handleResize);
@@ -72,6 +72,11 @@ function Calendar({
       window.removeEventListener('resize', handleResize);
     };
   }, [calendarRef]);
+
+  useEffect(() => {
+    calendarRef.current?.getApi().changeView(viewMode);
+    setViewTitle(calendarRef.current?.getApi().view.title || '');
+  }, [viewMode]);
 
   const isSameType = (
     stillEventType: string,
@@ -199,32 +204,20 @@ function Calendar({
   };
 
   return (
-    <div>
-      <div className="flex flex-row">
-        <Button variant="secondary">Today</Button>
-        <ButtonGroup activeIdx={1} className="ml-2">
-          <Button variant="secondary">Button</Button>
-          <Button variant="secondary">Button</Button>
-          <Button variant="secondary">Button</Button>
-          <Button variant="secondary">Button</Button>
-        </ButtonGroup>
-        <ButtonGroup activeIdx={1} className="ml-2">
-          <Button variant="primary">Button</Button>
-          <Button variant="primary">Button</Button>
-          <Button variant="primary">Button</Button>
-          <Button variant="primary">Button</Button>
-        </ButtonGroup>
-        <ButtonGroup className="ml-2" noBorder>
-          <Button variant="primary"><X strokeWidth="1.5" color="white" /></Button>
-          <Button variant="primary"><X strokeWidth="1.5" color="white" /></Button>
-          <Button variant="primary"><X strokeWidth="1.5" color="white" /></Button>
-          <Button variant="primary"><X strokeWidth="1.5" color="white" /></Button>
-        </ButtonGroup>
-        <ButtonGroup className="ml-2" noBorder>
-          <Button variant="secondary"><X strokeWidth="1.5" color="black" /></Button>
-          <Button variant="secondary"><X strokeWidth="1.5" color="black" /></Button>
-          <Button variant="secondary"><X strokeWidth="1.5" color="black" /></Button>
-          <Button variant="secondary"><X strokeWidth="1.5" color="black" /></Button>
+    <div className="flex flex-col h-full w-full">
+      <div className="grid grid-cols-3 mb-4">
+        <div className="flex flex-grow">
+          <ButtonGroup>
+            <Button variant="secondary" onClick={() => calendarRef.current?.getApi().prev()}><ChevronLeft strokeWidth="1.5" color="black" /></Button>
+            <Button variant="secondary" onClick={() => calendarRef.current?.getApi().next()}><ChevronRight strokeWidth="1.5" color="black" /></Button>
+          </ButtonGroup>
+          <Button variant="secondary" className="ml-2" onClick={() => calendarRef.current?.getApi().today()}>Tänään</Button>
+        </div>
+        <h2 className="text-ft-text-1000 text-ft-hs3 justify-self-center">{viewTitle}</h2>
+        <ButtonGroup activeIdx={viewIdxMap[viewMode]} className="flex justify-self-end">
+          <Button variant="secondary" onClick={() => setViewMode('dayGridMonth')}>Kuukausi</Button>
+          <Button variant="secondary" onClick={() => setViewMode('timeGridWeek')}>Viikko</Button>
+          <Button variant="secondary" onClick={() => setViewMode('listWeek')}>Lista</Button>
         </ButtonGroup>
       </div>
       <FullCalendar
@@ -233,11 +226,7 @@ function Calendar({
         locale="fi"
         timeZone="UTC"
         weekNumberCalculation="ISO"
-        headerToolbar={{
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,listWeek',
-        }}
+        headerToolbar={false}
         height="100%"
         initialView={viewMode}
         allDaySlot={false}
