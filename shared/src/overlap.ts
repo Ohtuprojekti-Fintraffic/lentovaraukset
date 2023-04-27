@@ -1,3 +1,8 @@
+/**
+ * Counts the most concurrent events in a given list of events.
+ * @param events - An array of events with start and end times.
+ * @returns The highest number of concurrent events.
+ */
 const countMostConcurrent = (events: { start: Date, end: Date }[]) => {
   let mostConcurrent = 0;
   let currentConcurrent = 0;
