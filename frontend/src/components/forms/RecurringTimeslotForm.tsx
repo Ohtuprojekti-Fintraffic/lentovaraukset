@@ -63,13 +63,11 @@ function RecurringTimeslotForm({
   const {
     register, handleSubmit, reset, watch, control, formState: { errors }, getValues,
   } = useForm<Inputs>({
-    // TODO: Use Airfield context here from issue #256
-    // for now using default EFHK values
     // TODO: issue #242 could also remove the need to omit type
     // TODO: make this use the same validation as backend
     resolver: zodResolver(
       refineTimeslotObject(
-        createTimeSlotValidatorObject(20) // create object validation
+        createTimeSlotValidatorObject(timeslotGranularity) // create object validation
           .omit({ type: true }) // remove type
           .extend(createTimeslotFormGroupShape()), // add group things
         // add periods are not validated
