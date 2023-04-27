@@ -10,6 +10,7 @@ function LanguagePicker() {
   const languages = {
     suomi: 'fi',
     english: 'en',
+    svenska: 'sv',
   };
 
   const handleSelect = (language: string) => {

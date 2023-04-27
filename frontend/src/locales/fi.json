@@ -55,7 +55,7 @@
       "updated": "Varaus päivitetty!",
       "updateFailed": "Virhe tapahtui varausta päivitettäessä!",
       "created": "Varaus lisätty!",
-      "insideTimeslot": "Varaus täytyy olla varausikkunan sisällä"
+      "insideTimeslot": "Varaus täytyy olla vapaan varausikkunan sisällä"
     },
     "deletionPopup": {
       "title": "Varauksen poisto",

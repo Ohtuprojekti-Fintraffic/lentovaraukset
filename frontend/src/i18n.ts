@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import fi from './locales/fi.json';
 import en from './locales/en.json';
-import se from './locales/se.json';
+import sv from './locales/sv.json';
 
 export const resources = {
   fi: {
@@ -16,9 +16,9 @@ export const resources = {
     language: 'en',
     translation: en,
   },
-  se: {
-    language: 'se',
-    translation: se,
+  sv: {
+    language: 'sv',
+    translation: sv,
   },
 };
 
