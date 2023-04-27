@@ -4,9 +4,9 @@ import ServiceError from '../util/errors';
 
 /**
  * Retrieves an airfield by its code.
- * @param {string} code - The airfield code.
- * @returns {Promise<AirfieldEntry>} The AirfieldEntry object.
- * @throws {ServiceError} If the airfield code is not found.
+ * @param code - The airfield code.
+ * @returns The AirfieldEntry object.
+ * @throws If the airfield code is not found.
  */
 const getAirfield = async (code: string): Promise<AirfieldEntry> => {
   const airfield = await Airfield.findByPk(code);
@@ -20,7 +20,7 @@ const getAirfield = async (code: string): Promise<AirfieldEntry> => {
 
 /**
  * Retrieves all airfields.
- * @returns {Promise<AirfieldEntry[]>} An array of AirfieldEntry objects.
+ * @returns An array of AirfieldEntry objects.
  */
 const getAirfields = async (): Promise<AirfieldEntry[]> => {
   const airfields = await Airfield.findAll();
@@ -29,9 +29,9 @@ const getAirfields = async (): Promise<AirfieldEntry[]> => {
 
 /**
  * Updates an airfield by its code.
- * @param {string} code - The airfield code.
- * @param {Omit<AirfieldEntry, 'code'>} airfield - The updated airfield data without the code.
- * @returns {Promise<AirfieldEntry>} The updated AirfieldEntry object.
+ * @param code - The airfield code.
+ * @param airfield - The updated airfield data without the code.
+ * @returns The updated AirfieldEntry object.
  */
 const updateByCode = async (
   code: string,
@@ -45,8 +45,8 @@ const updateByCode = async (
 
 /**
  * Creates a new airfield.
- * @param {AirfieldEntry} newAirfield - The new airfield data.
- * @returns {Promise<AirfieldEntry>} The created AirfieldEntry object.
+ * @param newAirfield - The new airfield data.
+ * @returns The created AirfieldEntry object.
  */
 const createAirfield = async (
   newAirfield: AirfieldEntry,

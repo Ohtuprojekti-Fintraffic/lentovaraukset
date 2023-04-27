@@ -3,9 +3,9 @@ import { Configuration } from '../models';
 
 /**
  * Retrieves a configuration entry by its ID.
- * @param {number} id - The configuration entry ID.
- * @returns {Promise<ConfigurationEntry>} The ConfigurationEntry object.
- * @throws {Error} If the configuration entry is not found.
+ * @param id - The configuration entry ID.
+ * @returns The ConfigurationEntry object.
+ * @throws If the configuration entry is not found.
  */
 const getById = async (id: number): Promise<ConfigurationEntry> => {
   const configuration = await Configuration.findByPk(id);
@@ -15,10 +15,10 @@ const getById = async (id: number): Promise<ConfigurationEntry> => {
 
 /**
  * Updates a configuration entry by its ID.
- * @param {number} id - The configuration entry ID.
- * @param {Omit<ConfigurationEntry, 'id'>} newConfiguration - The updated
+ * @param id - The configuration entry ID.
+ * @param newConfiguration - The updated
  * configuration data without the ID.
- * @returns {Promise<ConfigurationEntry>} The updated ConfigurationEntry object.
+ * @returns The updated ConfigurationEntry object.
  */
 const updateById = async (
   id: number,

@@ -14,10 +14,9 @@ import ServiceError from '../util/errors';
  * Optionally, a timeslot ID can be excluded from the results, which can be
  * useful when updating a timeslot.
  *
- * @param {string} airfieldCode - The airfield code.
- * @param {Array<{ rangeStartTime: Date, rangeEndTime: Date, id: number | null }>}
- * ranges - An array of time ranges and optional timeslot IDs to exclude.
- * @returns {Promise<Timeslot[]>} An array of Timeslot objects.
+ * @param airfieldCode - The airfield code.
+ * @param ranges - An array of time ranges and optional timeslot IDs to exclude.
+ * @returns An array of Timeslot objects.
  */
 const getInTimeRanges = async (
   airfieldCode: string,
@@ -58,11 +57,11 @@ const getInTimeRanges = async (
  * Retrieves all timeslots within a specified time range.
  * The result is an array of Timeslot objects that overlap with the given
  * time range.
- * @param {string} airfieldCode - The airfield code.
- * @param {Date} rangeStartTime - The start time of the time range.
- * @param {Date} rangeEndTime - The end time of the time range.
- * @param {number | null} [id=null] - An optional timeslot ID to exclude.
- * @returns {Promise<Timeslot[]>} An array of Timeslot objects.
+ * @param airfieldCode - The airfield code.
+ * @param rangeStartTime - The start time of the time range.
+ * @param rangeEndTime - The end time of the time range.
+ * @param id - An optional timeslot ID to exclude.
+ * @returns An array of Timeslot objects.
  */
 const getInTimeRange = async (
   airfieldCode: string,
@@ -80,10 +79,9 @@ const getInTimeRange = async (
 
 /**
  * Throws an error if the provided timeslots lead to consecutive or overlapping timeslots.
- * @param {string} airfieldCode - The airfield code.
- * @param {TimeslotEntryOptionalId[]} timeslots - An array of timeslots.
- * @returns {Promise<void>}
- * @throws {ServiceError} If the operation would result in consecutive or overlapping timeslots.
+ * @param airfieldCode - The airfield code.
+ * @param timeslots - An array of timeslots.
+ * @throws If the operation would result in consecutive or overlapping timeslots.
  */
 type TimeslotEntryOptionalId = Partial<TimeslotEntry> & Omit<TimeslotEntry, 'id'>;
 const errorIfLeadsToConsecutivesOrOverlaps = async (
@@ -124,8 +122,8 @@ const errorIfLeadsToConsecutivesOrOverlaps = async (
 
 /**
  * Deletes a timeslot by its ID.
- * @param {number} id - The timeslot ID.
- * @throws {Error} If timeslot does not exist, timeslot
+ * @param id - The timeslot ID.
+ * @throws If timeslot does not exist, timeslot
  * is in the past, or timeslot has reservations.
  */
 const deleteById = async (id: number) => {
@@ -145,16 +143,16 @@ const deleteById = async (id: number) => {
  * creating timeslots based on the input configurations.
  * It also checks for any consecutive or overlapping timeslots and saves the timeslot group.
  *
- * @param {string} airfieldCode - The airfield code.
- * @param {number} id - The ID of the first timeslot in the period.
- * @param {Object} period - The period configuration.
- * @param {Date} period.periodEnd - The end date of the period.
- * @param {WeekInDays} period.days - An object representing the active days of the week.
- * @param {Omit<TimeslotEntry, 'id'>} timeslot - Timeslot configuration without the ID.
- * @returns {Promise<Timeslot[]>} An array of created Timeslot objects.
- * @throws {ServiceError} Throws error with code ServiceErrorCode.ConsecutiveTimeslotNotAllowed
+ * @param airfieldCode - The airfield code.
+ * @param id - The ID of the first timeslot in the period.
+ * @param period - The period configuration.
+ * @param period.periodEnd - The end date of the period.
+ * @param period.days - An object representing the active days of the week.
+ * @param timeslot - Timeslot configuration without the ID.
+ * @returns An array of created Timeslot objects.
+ * @throws Throws error with code ServiceErrorCode.ConsecutiveTimeslotNotAllowed
  * if the created timeslots lead to consecutive timeslots.
- * @throws {ServiceError} Throws error with code ServiceErrorCode.OverlappingTimeslotNotAllowed
+ * @throws Throws error with code ServiceErrorCode.OverlappingTimeslotNotAllowed
  * if the created timeslots lead to overlapping timeslots.
  *
  */
@@ -213,13 +211,13 @@ const createPeriod = async (
 
 /**
  * Updates a timeslot by its ID.
- * @param {number} id - The ID of the timeslot to update.
- * @param {Omit<TimeslotEntry, 'id'>} timeslot - Timeslot configuration without the ID.
- * @returns {Promise<void>}
- * @throws {ServiceError} Throws error with code ServiceErrorCode.TimeslotNotFound
+ * @param id - The ID of the timeslot to update.
+ * @param timeslot - Timeslot configuration without the ID.
+ *
+ * @throws Throws error with code ServiceErrorCode.TimeslotNotFound
  * if the timeslot with the specified ID is not found.
- * @throws {Error} Throws error if the timeslot is in the past and cannot be modified.
- * @throws {ServiceError} Throws error with code ServiceErrorCode.TimeslotNotEditable
+ * @throws Throws error if the timeslot is in the past and cannot be modified.
+ * @throws Throws error with code ServiceErrorCode.TimeslotNotEditable
  * if the timeslot has reservations.
 
  */
@@ -265,11 +263,11 @@ const updateById = async (
 
 /**
  * Creates a new timeslot.
- * @param {Omit<TimeslotEntry, 'id'>} newTimeSlot - Timeslot configuration without the ID.
- * @returns {Promise<TimeslotEntry>} The created TimeslotEntry object.
- * @throws {ServiceError} Throws error with code ServiceErrorCode.ConsecutiveTimeslotNotAllowed
+ * @param newTimeSlot - Timeslot configuration without the ID.
+ * @returns The created TimeslotEntry object.
+ * @throws Throws error with code ServiceErrorCode.ConsecutiveTimeslotNotAllowed
  * if the created timeslot leads to consecutive timeslots.
- * @throws {ServiceError} Throws error with code ServiceErrorCode.OverlappingTimeslotNotAllowed
+ * @throws Throws error with code ServiceErrorCode.OverlappingTimeslotNotAllowed
  * if the created timeslot leads to overlapping timeslots.
  */
 const createTimeslot = async (newTimeSlot: Omit<TimeslotEntry, 'id'>): Promise<TimeslotEntry> => {
@@ -293,18 +291,18 @@ const createTimeslot = async (newTimeSlot: Omit<TimeslotEntry, 'id'>): Promise<T
  * and end times according to the input configuration.
  * It also checks for any consecutive or overlapping timeslots before updating.
  *
- * @param {string} airfieldCode - The airfield code.
- * @param {string} group - The group name.
- * @param {Object} updates - The updates to apply to the timeslots.
- * @param {Date} updates.startingFrom - The starting date for the updates.
- * @param {Object} updates.startTimeOfDay - The new start time of the day.
- * @param {number} updates.startTimeOfDay.hours - The new start hour.
- * @param {number} updates.startTimeOfDay.minutes - The new start minute.
- * @param {Object} updates.endTimeOfDay - The new end time of the day.
- * @param {number} updates.endTimeOfDay.hours - The new end hour.
- * @param {number} updates.endTimeOfDay.minutes - The new end minute.
- * @returns {Promise<TimeslotEntry[]>} An array of updated TimeslotEntry objects.
- * @throws {Error} If consecutive or overlapping timeslots are found.
+ * @param airfieldCode - The airfield code.
+ * @param group - The group name.
+ * @param updates - The updates to apply to the timeslots.
+ * @param updates.startingFrom - The starting date for the updates.
+ * @param updates.startTimeOfDay - The new start time of the day.
+ * @param updates.startTimeOfDay.hours - The new start hour.
+ * @param updates.startTimeOfDay.minutes - The new start minute.
+ * @param updates.endTimeOfDay - The new end time of the day.
+ * @param updates.endTimeOfDay.hours - The new end hour.
+ * @param updates.endTimeOfDay.minutes - The new end minute.
+ * @returns An array of updated TimeslotEntry objects.
+ * @throws If consecutive or overlapping timeslots are found.
  */
 const updateByGroup = async (airfieldCode: string, group: string, updates: {
   startingFrom: Date;
@@ -332,9 +330,9 @@ const updateByGroup = async (airfieldCode: string, group: string, updates: {
  * It deletes all timeslots of the group with a start time greater than or
  * equal to the starting date and returns the number of deleted timeslots.
  *
- * @param {string} group - The group name.
- * @param {Date} startingFrom - The starting date for the deletion.
- * @returns {Promise<Number>} The number of deleted timeslots.
+ * @param group - The group name.
+ * @param startingFrom - The starting date for the deletion.
+ * @returns The number of deleted timeslots.
  */
 const deleteByGroup = async (
   group: string,

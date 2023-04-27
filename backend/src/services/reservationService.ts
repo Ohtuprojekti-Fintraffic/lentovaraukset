@@ -9,9 +9,9 @@ import ServiceError from '../util/errors';
  * Retrieves all reservations within a specified time range.
  * The result is an array of Reservation objects that overlap with the given
  * time range.
- * @param {Date} startTime - The start time of the time range.
- * @param {Date} endTime - The end time of the time range.
- * @returns {Promise<Reservation[]>} An array of Reservation objects.
+ * @param startTime - The start time of the time range.
+ * @param endTime - The end time of the time range.
+ * @returns An array of Reservation objects.
  */
 const getInTimeRange = async (startTime: Date, endTime: Date) => {
   const reservations: Reservation[] = await Reservation.findAll({
@@ -33,8 +33,8 @@ const getInTimeRange = async (startTime: Date, endTime: Date) => {
 
 /**
  * Deletes a reservation by its ID.
- * @param {number} id - The reservation ID.
- * @throws {Error} If the reservation does not exist or is in the past.
+ * @param id - The reservation ID.
+ * @throws If the reservation does not exist or is in the past.
  */
 const deleteById = async (id: number) => {
   const reservation = await Reservation.findByPk(id);
@@ -45,11 +45,11 @@ const deleteById = async (id: number) => {
 
 /**
  * Creates a new reservation.
- * @param {string} airfieldCode - The airfield code.
- * @param {Omit<ReservationEntry, 'id' | 'user'>} newReservation - The new
+ * @param airfieldCode - The airfield code.
+ * @param newReservation - The new
  * reservation data without ID and user.
- * @returns {Promise<ReservationEntry>} The created ReservationEntry object.
- * @throws {ServiceError} If reservation is created on top of a blocked timeslot
+ * @returns The created ReservationEntry object.
+ * @throws If reservation is created on top of a blocked timeslot
  * or doesn't fit within one timeslot.
  */
 const createReservation = async (airfieldCode: string, newReservation: Omit<ReservationEntry, 'id' | 'user'>): Promise<ReservationEntry> => {
@@ -79,12 +79,12 @@ const createReservation = async (airfieldCode: string, newReservation: Omit<Rese
 
 /**
  * Updates a reservation by its ID.
- * @param {string} airfieldCode - The airfield code.
- * @param {number} id - The reservation ID.
- * @param {Omit<ReservationEntry, 'id' | 'user'>} reservation - The updated
+ * @param airfieldCode - The airfield code.
+ * @param id - The reservation ID.
+ * @param reservation - The updated
  * reservation data without ID and user.
- * @returns {Promise<ReservationEntry>} The updated ReservationEntry object.
- * @throws {ServiceError} If reservation is created on top of a blocked
+ * @returns The updated ReservationEntry object.
+ * @throws If reservation is created on top of a blocked
  * timeslot, doesn't fit within one timeslot, or is in the past.
  */
 const updateById = async (
