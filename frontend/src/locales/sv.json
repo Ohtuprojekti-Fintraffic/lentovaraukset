@@ -103,6 +103,12 @@
       "title": "Radera bokningsfönstret",
       "text": "Är du säker att du vill radera bokningsfönstret?"
     },
+    "repeatingDeletionPopup": {
+      "title": "Radera återkommande bokningsfönster",
+      "text": "Du ska redera ett återkommande bokningsfönster. Vill du radera alla nästa bokningsfönster i samma grupp?",
+      "primary": "Radera alla",
+      "secondary": "Radera bara en"
+    },
     "repeatingPopup": {
       "title": "Modifiera återkommande bokningsfönster",
       "text": "Du har modifierat ett återkommande bokningsfönster. Vill du modifiera alla nästa bokningsfönster i samma grupp?",
