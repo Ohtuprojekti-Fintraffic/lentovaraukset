@@ -12,6 +12,7 @@ type DropdownProps = {
   error?: { message: string }
   variant?: DropdownVariants
   glyph?: React.ReactNode
+  leftAligned?: boolean
 };
 
 function Dropdown({
@@ -22,6 +23,7 @@ function Dropdown({
   error,
   variant = 'primary',
   glyph,
+  leftAligned = true,
 }: DropdownProps) {
   const [isActive, setIsActive] = useState(false);
 
@@ -49,7 +51,7 @@ function Dropdown({
                 onKeyDown={(e) => e.key === 'Enter' && setIsActive(!isActive)}
               >
                 {glyph}
-                <Subheader className={`font-ft-emphasis ${textStyle}`}>{selectedSection ?? placeholder}</Subheader>
+                <Subheader className={textStyle}>{selectedSection ?? placeholder}</Subheader>
                 <div className=" group-hover:text-ft-text-300">{isActive ? <ChevronUp /> : <ChevronDown /> }</div>
               </div>
             )
@@ -62,13 +64,13 @@ function Dropdown({
                 onKeyDown={(e) => e.key === 'Enter' && setIsActive(!isActive)}
               >
                 {glyph}
-                <p className={`font-ft-emphasis ${textStyle} whitespace-nowrap`}>{selectedSection ?? placeholder}</p>
+                <p className={`${textStyle} whitespace-nowrap`}>{selectedSection ?? placeholder}</p>
                 <div className="group-hover:text-ft-text-300">{isActive ? <ChevronUp /> : <ChevronDown /> }</div>
               </div>
             )
       }
 
-        <div className="absolute top-full w-fit z-10 text-ft-primary-black bg-ft-primary-white divide-y divide-ft-neutral-200 shadow-lg max-h-72 overflow-y-auto">
+        <div className={`absolute top-full ${!leftAligned && 'right-0'} w-fit z-10 text-ft-primary-black bg-ft-primary-white divide-y divide-ft-neutral-200 shadow-lg max-h-72 overflow-y-auto`}>
           {isActive && Array.from(new Set(sections)).map((section) => ( // Sections must be unique
             <div
               key={section}
@@ -89,7 +91,7 @@ function Dropdown({
                 }
               }}
             >
-              <Subheader className="group-hover:text-ft-text-300">{section}</Subheader>
+              <Subheader className="group-hover:text-ft-text-300 whitespace-nowrap">{section}</Subheader>
             </div>
           ))}
         </div>
