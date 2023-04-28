@@ -57,13 +57,17 @@ beforeEach(async () => {
   await airfieldService.createTestAirfield();
   await configurationService
     .updateById(1, { maxDaysInFuture: 7, daysToStart: 0 });
-  await Reservation.bulkCreate(reservations);
-  await Timeslot.create({
+  const timeslot = await Timeslot.create({
     start: new Date('2023-02-12T08:00:00.000Z'),
     end: new Date('2023-02-15T08:00:00.000Z'),
     type: 'available',
     airfieldCode: 'EFHK',
   });
+  const createdReservations = await Reservation.bulkCreate(reservations);
+  // reservations must be linked to timeslots
+  await createdReservations[0].setTimeslot(timeslot);
+  await createdReservations[1].setTimeslot(timeslot);
+  await createdReservations[2].setTimeslot(timeslot);
 });
 
 afterAll(async () => {
@@ -420,7 +424,7 @@ describe('Calls to api', () => {
 
     res.forEach((r) => { expect(r.status).toEqual(200); });
 
-    const reservationsInDB = await reservationService.getInTimeRange(start, end);
+    const reservationsInDB = await reservationService.getInTimeRange(start, end, 'EFHK');
     expect(reservationsInDB).toHaveLength(3);
   });
 
@@ -440,7 +444,7 @@ describe('Calls to api', () => {
     expect(res.body.error).toBeDefined();
     expect(res.body.error.message).toContain('Too many concurrent reservations');
 
-    const reservationsInDB = await reservationService.getInTimeRange(start, end);
+    const reservationsInDB = await reservationService.getInTimeRange(start, end, 'EFHK');
     expect(reservationsInDB).toHaveLength(3);
   });
 
@@ -463,7 +467,7 @@ describe('Calls to api', () => {
 
     expect(res.status).toEqual(200);
 
-    const reservationsInDB = await reservationService.getInTimeRange(new Date('2023-02-14T12:00:00.000Z'), new Date('2023-02-14T14:00:00.000Z'));
+    const reservationsInDB = await reservationService.getInTimeRange(new Date('2023-02-14T12:00:00.000Z'), new Date('2023-02-14T14:00:00.000Z'), 'EFHK');
     expect(reservationsInDB).toHaveLength(4);
   });
 
@@ -484,7 +488,10 @@ describe('Calls to api', () => {
         phone: '0404444444',
       },
     ];
-    await Reservation.bulkCreate(concurrentReservations);
+    const createdResevations = await Reservation.bulkCreate(concurrentReservations);
+    const timeslot = await Timeslot.findOne();
+    await createdResevations[0].setTimeslot(timeslot!);
+    await createdResevations[1].setTimeslot(timeslot!);
 
     const oldReservation = reservations[0];
     const oldReservationInDB = await Reservation.findOne(
@@ -536,7 +543,7 @@ describe('Calls to api', () => {
   test('throws an error if reservation overlaps multiple timeslots', async () => {
     const newReservation = {
       start: new Date('2023-02-14T10:00:00.000Z'),
-      end: new Date('2023-02-14T16:00:00.000Z'),
+      end: new Date('2023-02-14T14:00:00.000Z'),
       aircraftId: 'OH-QAA',
       phone: '11104040',
     };
@@ -544,7 +551,7 @@ describe('Calls to api', () => {
     await Timeslot.bulkCreate([
       {
         start: new Date('2023-02-14T10:00:00.000Z'),
-        end: new Date('2023-02-14T12:00:00.000Z'),
+        end: new Date('2023-02-14T11:00:00.000Z'),
         type: 'available',
         airfieldCode: 'EFHK',
       },
@@ -596,7 +603,7 @@ describe('Calls to api', () => {
   });
 
   test('throws error when updating reservation spanning more than one timeslot', async () => {
-    await Timeslot.bulkCreate([
+    const timeslots = await Timeslot.bulkCreate([
       {
         start: new Date('2023-02-14T10:00:00.000Z'),
         end: new Date('2023-02-14T12:00:00.000Z'),
@@ -619,7 +626,7 @@ describe('Calls to api', () => {
       phone: '11104040',
     };
     const createdReservation = await Reservation.create(newReservationData);
-
+    await createdReservation.setTimeslot(timeslots[0]);
     const updatedReservationData = {
       start: new Date('2023-02-14T10:20:00.000Z'),
       end: new Date('2023-02-14T13:20:00.000Z'),

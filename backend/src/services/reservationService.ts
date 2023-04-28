@@ -5,7 +5,7 @@ import { isTimeInPast, reservationIsWithinTimeslot } from '@lentovaraukset/share
 import { Reservation } from '../models';
 import ServiceError from '../util/errors';
 
-const getInTimeRange = async (startTime: Date, endTime: Date) => {
+const getInTimeRange = async (startTime: Date, endTime: Date, airportCode: string) => {
   const reservations: Reservation[] = await Reservation.findAll({
     where: {
       [Op.and]: [
@@ -20,7 +20,17 @@ const getInTimeRange = async (startTime: Date, endTime: Date) => {
       ],
     },
   });
-  return reservations;
+
+  /* Airport of reservation is found by using connection between timeslots and reservations */
+  const isInSameAirport = async (reservation: Reservation) => {
+    const timeslot = await reservation.getTimeslot();
+    return timeslot.airfieldCode === airportCode;
+  };
+
+  const reservationsInSameAirport = await (
+    Promise.all(reservations.map((r) => isInSameAirport(r)))
+  );
+  return reservations.filter((value, index) => reservationsInSameAirport[index]);
 };
 
 const deleteById = async (id: number) => {
