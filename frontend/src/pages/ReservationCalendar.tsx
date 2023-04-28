@@ -4,6 +4,7 @@ import React, {
   useRef,
   useContext,
   useEffect,
+  useCallback,
 } from 'react';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
@@ -41,67 +42,73 @@ function ReservationCalendar() {
   const calendarRef: React.RefObject<FullCalendar> = React.createRef();
 
   const { showPopup, clearPopup } = usePopupContext();
-  const { airport, setAirportICAO } = useAirportContext(); // TODO: get id from airfield selection
+  const {
+    airport, setAirportICAO,
+  } = useAirportContext();
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
   const { data: configuration } = useConfiguration();
   const { addNewAlert } = useContext(AlertContext);
-
-  const reservationsSourceFn: EventSourceFunc = async (
-    { start, end },
-    successCallback,
-    failureCallback,
-  ) => {
-    try {
-      const reservations = await getReservations(start, end);
-
-      const reservationsMapped = reservations.map((reservation) => ({
-        ...reservation,
-        id: reservation.id.toString(),
-        title: reservation.aircraftId,
-        constraint: 'timeslots',
-        extendedProps: {
-          user: reservation.user,
-          aircraftId: reservation.aircraftId,
-          phone: reservation.phone,
-          email: reservation.email,
-          info: reservation.info,
-        },
-        editable: !isTimeInPast(reservation.start),
-      }));
-
-      successCallback(reservationsMapped);
-    } catch (error) {
-      failureCallback(error as Error);
-    }
-  };
-
-  const timeSlotsSourceFn: EventSourceFunc = async (
-    { start, end },
-    successCallback,
-    failureCallback,
-  ) => {
-    try {
-      const timeslots = await getTimeSlots(start, end);
-      const timeslotsMapped = timeslots.map((timeslot) => {
-        const display = timeslot.type === 'available' ? 'inverse-background' : 'block';
-        const color = timeslot.type === 'available' ? '#2C2C44' : '#B40000';
-        const title = timeslot.type === 'available' ? '' : timeslot.info || t('reservations.calendar.notReservable');
-        return {
-          ...timeslot, id: timeslot.id.toString(), groupId: 'timeslots', display, color, title, editable: false,
-        };
-      });
-
-      const notReservable = [{
-        title: t('reservations.calendar.notReservable'), start, end, display: 'background', color: '#2C2C44', overlap: false,
-      }];
-
-      successCallback(timeslotsMapped.length ? timeslotsMapped : notReservable);
-    } catch (error) {
-      failureCallback(error as Error);
-    }
-  };
-
-  const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
+  function useEventSources() {
+    const reservationsSourceFn: EventSourceFunc = useCallback(async (
+      { start, end },
+      successCallback,
+      failureCallback,
+    ) => {
+      if (!airport) {
+        failureCallback(new Error('Airport is not set'));
+        return;
+      }
+      try {
+        const reservations = await getReservations(start, end, airport?.code);
+        const reservationsMapped = reservations.map((reservation) => ({
+          ...reservation,
+          id: reservation.id.toString(),
+          title: reservation.aircraftId,
+          constraint: 'timeslots',
+          extendedProps: {
+            user: reservation.user,
+            aircraftId: reservation.aircraftId,
+            phone: reservation.phone,
+            email: reservation.email,
+            info: reservation.info,
+          },
+          editable: !isTimeInPast(reservation.start),
+        }));
+        successCallback(reservationsMapped);
+      } catch (error) {
+        failureCallback(error as Error);
+      }
+    }, [airport]);
+    const timeSlotsSourceFn: EventSourceFunc = useCallback(async (
+      { start, end },
+      successCallback,
+      failureCallback,
+    ) => {
+      if (!airport) {
+        failureCallback(new Error('Airport is not set'));
+        return;
+      }
+      try {
+        const timeslots = await getTimeSlots(start, end, airport?.code);
+        const timeslotsMapped = timeslots.map((timeslot) => {
+          const display = timeslot.type === 'available' ? 'inverse-background' : 'block';
+          const color = timeslot.type === 'available' ? '#2C2C44' : '#B40000';
+          const title = timeslot.type === 'available' ? '' : timeslot.info || t('reservations.calendar.notReservable');
+          return {
+            ...timeslot, id: timeslot.id.toString(), groupId: 'timeslots', display, color, title, editable: false,
+          };
+        });
+        const notReservable = [{
+          title: t('reservations.calendar.notReservable'), start, end, display: 'background', color: '#2C2C44', overlap: false,
+        }];
+        successCallback(timeslotsMapped.length ? timeslotsMapped : notReservable);
+      } catch (error) {
+        failureCallback(error as Error);
+      }
+    }, [airport]);
+    return [reservationsSourceFn, timeSlotsSourceFn];
+  }
+  const [reservationsSourceFn, timeSlotsSourceFn] = useEventSources();
 
   // either or neither, but not both
   function showReservationModalFn(event: EventImpl, times: StartEndPair): never;
@@ -128,10 +135,14 @@ function ReservationCalendar() {
   const removeReservation = async (removeInfo: EventRemoveArg) => {
     // fullcalendar removes the event early:
     removeInfo.revert();
+
+    if (!airport) {
+      return;
+    }
     const { event } = removeInfo;
 
     const onConfirmRemove = async () => {
-      const res = await deleteReservation(Number(event.id));
+      const res = await deleteReservation(Number(event.id), airport.code);
       if (res === `Reservation ${selectedReservationRef.current?.id} deleted`) {
         closeReservationModalFn();
         event.remove();
@@ -158,6 +169,9 @@ function ReservationCalendar() {
   };
 
   const modifyReservationFn = async (event: EventImpl): Promise<void> => {
+    if (!airport) {
+      return;
+    }
     const {
       user, aircraftId, phone, email, info,
     } = event.extendedProps;
@@ -171,7 +185,7 @@ function ReservationCalendar() {
       phone,
       email,
       info,
-    });
+    }, airport.code);
     if (modifiedReservation) {
       addNewAlert(t('reservations.calendar.reservationModified'), 'success');
     }
@@ -226,7 +240,7 @@ function ReservationCalendar() {
           </div>
           <Calendar
             calendarRef={calendarRef}
-            eventSources={eventsSourceRef.current}
+            eventSources={[reservationsSourceFn, timeSlotsSourceFn]}
             addEventFn={showModalAfterDrag}
             modifyEventFn={modifyReservationFn}
             clickEventFn={clickReservation}

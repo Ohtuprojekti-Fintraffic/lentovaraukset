@@ -1,16 +1,31 @@
 /* eslint-disable react/jsx-one-expression-per-line */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { airfieldValidator } from '@lentovaraukset/shared/src/validation/validation';
 import { useTranslation } from 'react-i18next';
+import { AirfieldEntry } from '@lentovaraukset/shared/src';
 import AirfieldForm from '../components/forms/AirfieldForm';
-import { modifyAirfieldMutation } from '../queries/airfields';
+import { getAirfields, modifyAirfieldMutation } from '../queries/airfields';
 import { useAirportContext } from '../contexts/AirportContext';
+import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
 
 function Management() {
   const { t } = useTranslation();
-  const { airport } = useAirportContext(); // TODO: get id from airfield selection
+  const { airport, setAirportICAO } = useAirportContext();
+  const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      setAirfields(await getAirfields());
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="flex flex-col space-y-2">
+      <AirfieldAccordion
+        airfield={airport}
+        airfields={airfields}
+        onChange={(a:AirfieldEntry) => setAirportICAO(a.code)}
+      />
       <AirfieldForm
         title={t('management.airfield.title')}
         airfield={airport}

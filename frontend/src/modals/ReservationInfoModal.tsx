@@ -9,6 +9,7 @@ import ReservationInfoForm from '../components/forms/ReservationInfoForm';
 import AlertContext from '../contexts/AlertContext';
 import { addReservation, modifyReservation } from '../queries/reservations';
 import { ApiError, isErrorForCode } from '../queries/util';
+import { useAirportContext } from '../contexts/AirportContext';
 
 type InfoModalProps = {
   showInfoModal: boolean
@@ -28,8 +29,12 @@ function ReservationInfoModal({
   const { t } = useTranslation();
 
   const { addNewAlert } = useContext(AlertContext);
+  const { airport } = useAirportContext();
 
   const onSubmitModifyHandler = async (updatedReservation: Omit<ReservationEntry, 'id' | 'user'>) => {
+    if (!airport) {
+      return;
+    }
     try {
       await modifyReservation(
         {
@@ -41,6 +46,7 @@ function ReservationInfoModal({
           phone: updatedReservation.phone,
           info: updatedReservation.info,
         },
+        airport.code,
       );
       addNewAlert(t('reservations.modal.updated'), 'success');
     } catch (err) {
@@ -57,8 +63,11 @@ function ReservationInfoModal({
   };
 
   const onSubmitAddHandler = async (reservationDetails: Omit<ReservationEntry, 'id' | 'user'>) => {
+    if (!airport) {
+      return;
+    }
     try {
-      await addReservation(reservationDetails);
+      await addReservation(reservationDetails, airport.code);
       addNewAlert(t('reservations.modal.created'), 'success');
     } catch (err) {
       if (await isErrorForCode(err, ServiceErrorCode.ReservationExceedsTimeslot)) {

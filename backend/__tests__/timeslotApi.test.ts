@@ -91,12 +91,19 @@ describe('Calls to api', () => {
   });
 
   test('creating blocked timeslot removes reservations on same time range', async () => {
+    const timeslot: Timeslot = await Timeslot.create({
+      start: new Date('2023-02-16T12:00:00.000Z'),
+      end: new Date('2023-02-16T14:00:00.000Z'),
+      type: 'available',
+      airfieldCode: 'EFHK',
+    });
     const reservation: Reservation = await Reservation.create({
       start: new Date('2023-02-16T12:00:00.000Z'),
       end: new Date('2023-02-16T13:00:00.000Z'),
       aircraftId: 'ESA-111',
       phone: '0501102323',
     });
+    await reservation.setTimeslot(timeslot);
     await api.post('/api/EFHK/timeslots/')
       .set('Content-type', 'application/json')
       .send({
@@ -106,7 +113,7 @@ describe('Calls to api', () => {
     const createdReservation: Reservation | null = await Reservation.findByPk(
       reservation.dataValues.id,
     );
-    expect(numberOfTimeslots).toEqual(timeslotData.length + 1);
+    expect(numberOfTimeslots).toEqual(timeslotData.length + 2);
     expect(createdReservation).toEqual(null);
   });
 
@@ -124,6 +131,7 @@ describe('Calls to api', () => {
       aircraftId: 'ESA-111',
       phone: '0501102323',
     });
+    await reservation.setTimeslot(timeslot);
     await api.put(`/api/EFHK/timeslots/${timeslot.dataValues.id}`)
       .set('Content-type', 'application/json')
       .send({

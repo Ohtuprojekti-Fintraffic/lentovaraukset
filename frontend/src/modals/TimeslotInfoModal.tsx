@@ -9,6 +9,7 @@ import RecurringTimeslotForm from '../components/forms/RecurringTimeslotForm';
 import AlertContext from '../contexts/AlertContext';
 import { addTimeSlot } from '../queries/timeSlots';
 import { ApiError } from '../queries/util';
+import { useAirportContext } from '../contexts/AirportContext';
 
 type InfoModalProps = {
   showInfoModal: boolean
@@ -35,6 +36,7 @@ function TimeslotInfoModal({
   const { t } = useTranslation();
 
   const { addNewAlert } = useContext(AlertContext);
+  const { airport } = useAirportContext();
 
   const onModifySubmitHandler = async (
     updatedTimeslot: Omit<TimeslotEntry, 'id' | 'airfieldCode'>,
@@ -75,7 +77,7 @@ function TimeslotInfoModal({
 
   const onSubmitAddHandler = async (timeslotDetails: Omit<TimeslotEntry, 'id' | 'airfieldCode'>) => {
     try {
-      await addTimeSlot(timeslotDetails);
+      await addTimeSlot(timeslotDetails, airport?.code);
       addNewAlert(t('timeslots.modal.created'), 'success');
     } catch (exception) {
       if (exception instanceof ApiError) {

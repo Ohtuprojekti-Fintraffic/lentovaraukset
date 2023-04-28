@@ -21,7 +21,7 @@
   "navigation": {
     "title": "School Flight Reservations",
     "reservations": "Reservations",
-    "timeslots": "Timeslots",
+    "timeslots": "Reservation windows",
     "management": "Management",
     "admin": "Admin",
     "menu": "Menu"
@@ -55,7 +55,7 @@
       "updated": "Reservation updated!",
       "updateFailed": "An error occurred while updating the reservation!",
       "created": "Reservation created!",
-      "insideTimeslot": "Reservation must be inside the available time window"
+      "insideTimeslot": "Reservation must be inside an available reservation window"
     },
     "deletionPopup": {
       "title": "Delete reservation",
@@ -66,20 +66,20 @@
     "calendar": {
       "free": "Available",
       "blocked": "Unavailable",
-      "timeslots": "Available time windows",
-      "newTimeslot": "New time window",
-      "blockedTimeslot": "Add unavailable time window"
+      "timeslots": "Available reservation windows",
+      "newTimeslot": "New reservation window",
+      "blockedTimeslot": "Add unavailable reservation window"
     },
     "modal": {
-      "updated": "Time window updated!",
-      "updateFailed": "An error occurred while updating the time window!",
-      "created": "Time window created!",
-      "creationFailed": "An error occurred while creating the time window!",
-      "timeslot": "Time window",
-      "newTimeslot": "New time window",
+      "updated": "Reservation window updated!",
+      "updateFailed": "An error occurred while updating the reservation window!",
+      "created": "Reservation window created!",
+      "creationFailed": "An error occurred while creating the reservation window!",
+      "timeslot": "Reservation window",
+      "newTimeslot": "New reservation window",
       "form": {
-        "start": "Time window begins (UTC)",
-        "end": "Time window ends (UTC)",
+        "start": "Reservation window begins (UTC)",
+        "end": "Reservation window ends (UTC)",
         "details": "Additional information",
         "recurring": {
           "repeat": "Set as recurring",
@@ -96,12 +96,12 @@
         "timeslot": "",
         "modifying": "Modifying",
         "adding": "Adding",
-        "removes": "the time windows will delete the following reservations:"
+        "removes": "the reservation window will delete the following reservations:"
       }
     },
     "deletionPopup": {
-      "title": "Delete time window",
-      "text": "Are you sure you want to delete the time window?"
+      "title": "Delete reservation window",
+      "text": "Are you sure you want to delete the reservation window?"
     },
     "repeatingDeletionPopup": {
       "title": "Delete recurring time window",
@@ -110,18 +110,18 @@
       "secondary": "Delete this one only"
     },
     "repeatingPopup": {
-      "title": "Modify recurring time window",
-      "text": "You modified a recurring time window. Do you want to modify all following time windows in the same group?",
+      "title": "Modify recurring reservation window",
+      "text": "You modified a recurring reservation window. Do you want to modify all following reservation windows in the same group?",
       "primary": "Modify all",
       "secondary": "Modify this one only"
     }
   },
   "calendar": {
-    "notPast": "Time window cannot be added in the past",
-    "notConsecutive": "Time windows must not be consecutive",
-    "cantModifyPast": "Ongoing or past time windows cannot be modified",
-    "cantMovePast": "Ongoing or past time windows cannot be moved",
-    "cantMoveToPast": "Time window cannot be moved to the past",
+    "notPast": "Reservation window cannot be added in the past",
+    "notConsecutive": "Reservation windows must not be consecutive",
+    "cantModifyPast": "Ongoing or past reservation windows cannot be modified",
+    "cantMovePast": "Ongoing or past reservation windows cannot be moved",
+    "cantMoveToPast": "Reservation window cannot be moved to the past",
     "modificationError": "An error occurred while modifying the reservation",
     "notTooFarFuture": {
       "begin": "Reservations can be made only up to",
