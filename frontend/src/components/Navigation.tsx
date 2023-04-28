@@ -36,9 +36,6 @@ function Navigation() {
           </p>
         </div>
         <div className="flex flex-row items-center gap-x-10">
-          <div className="hidden sm:block">
-            <LanguagePicker />
-          </div>
           <nav className="hidden xl:flex flex-row space-x-10 text-l">
             <NavLink to="/varaukset" className={navLinkStyle}>
               {t('navigation.reservations')}
@@ -69,6 +66,9 @@ function Navigation() {
               )}
             </button>
           </nav>
+          <div className="hidden sm:block">
+            <LanguagePicker />
+          </div>
         </div>
       </div>
       {menuOpen && (
