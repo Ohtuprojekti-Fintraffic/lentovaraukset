@@ -130,6 +130,12 @@
     "notTooSoon": {
       "begin": "Man måste göra bokningen minst",
       "end": " dagar från nu"
+    },
+    "buttons": {
+      "today": "Idag",
+      "month": "Månad",
+      "week": "Vecka",
+      "list": "Lista"
     }
   },
   "management": {

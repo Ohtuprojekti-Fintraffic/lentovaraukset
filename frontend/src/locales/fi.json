@@ -19,7 +19,7 @@
     }
   },
   "navigation": {
-    "title":"Koululentovaraukset",
+    "title": "Koululentovaraukset",
     "reservations": "Varaukset",
     "timeslots": "Varausikkunat",
     "management": "Hallinta",
@@ -130,6 +130,12 @@
     "notTooSoon": {
       "begin": "Aika pitää varata vähintään ",
       "end": " päivää etukäteen"
+    },
+    "buttons": {
+      "today": "Tänään",
+      "month": "Kuukausi",
+      "week": "Viikko",
+      "list": "Lista"
     }
   },
   "management": {

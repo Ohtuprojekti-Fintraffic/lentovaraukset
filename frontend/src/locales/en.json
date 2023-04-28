@@ -130,6 +130,12 @@
     "notTooSoon": {
       "begin": "Reservation must be made at least ",
       "end": " days in advance"
+    },
+    "buttons": {
+      "today": "Today",
+      "month": "Month",
+      "week": "Week",
+      "list": "List"
     }
   },
   "management": {
