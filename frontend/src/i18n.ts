@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-// import LanguageDetector from 'i18next-browser-languagedetector';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
 import fi from './locales/fi.json';
 import en from './locales/en.json';
@@ -23,13 +23,11 @@ export const resources = {
 };
 
 i18n
-  // Disabled temporarily to test english translations
-  // .use(LanguageDetector)
+  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'en',
-    debug: true,
+    fallbackLng: 'fi',
     interpolation: {
       escapeValue: false,
     },
