@@ -70,7 +70,7 @@ function Dropdown({
             )
       }
 
-        <div className={`absolute top-full ${!leftAligned && 'right-0'} w-fit z-10 text-ft-primary-black bg-ft-primary-white divide-y divide-ft-neutral-200 shadow-lg max-h-72 overflow-y-auto`}>
+        <div className={`absolute top-full ${!leftAligned && 'right-0'} w-fit min-w-full z-10 text-ft-primary-black bg-ft-primary-white divide-y divide-ft-neutral-200 shadow-lg max-h-72 overflow-y-auto`}>
           {isActive && Array.from(new Set(sections)).map((section) => ( // Sections must be unique
             <div
               key={section}

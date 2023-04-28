@@ -9,7 +9,7 @@ function Navigation() {
   const { t } = useTranslation();
 
   const navLinkStyle = ({ isActive }: { isActive: boolean }) => {
-    const baseStyle = 'hover:text-ft-text-300';
+    const baseStyle = 'hover:text-ft-text-300 whitespace-nowrap';
     return isActive ? `${baseStyle} active font-bold` : baseStyle;
   };
 

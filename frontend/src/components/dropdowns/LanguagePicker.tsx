@@ -7,7 +7,7 @@ import Dropdown from '../Dropdown';
 function LanguagePicker() {
   const { i18n } = useTranslation();
 
-  const languages: any = {};
+  const languages: Record<string, string> = {};
   languages.Suomeksi = 'fi';
   languages['In English'] = 'en';
   languages['På Svenska'] = 'sv';
