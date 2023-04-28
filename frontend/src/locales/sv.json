@@ -121,7 +121,7 @@
     "notConsecutive": "Bokningsfönster kan inte vara genast efter varandra",
     "cantModifyPast": "Pågående eller förflutna bokningsfönster kan inte modifieras",
     "cantMovePast": "Pågående eller förflutna bokningsfönster kan inte flyttas",
-    "cantMoveToPast": "Man kan inte flytta Bokningsfönster till det förflutna",
+    "cantMoveToPast": "Man kan inte flytta bokningsfönster till det förflutna",
     "modificationError": "Det uppstod ett fel när bokningen ändrades",
     "notTooFarFuture": {
       "begin": "Man kan göra bokningar upp till",
@@ -138,7 +138,7 @@
       "form": {
         "icao": "Flygplatsens ICAO-kod:",
         "name": "Flygplatsens namn:",
-        "timeslotMinTime": "boknings minst längd i minuter:",
+        "timeslotMinTime": "Boknings minst längd i minuter:",
         "maxConcurrentFlights": "Maximalt antal av samtidiga bokningar:"
       }
     }
