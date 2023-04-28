@@ -1,5 +1,5 @@
 import fi from './fi.json';
-import se from './se.json';
+import sv from './sv.json';
 import en from './en.json';
 
 /**
@@ -7,7 +7,7 @@ import en from './en.json';
 */
 type TranslationTypes = [
   typeof fi,
-  typeof se,
+  typeof sv,
   typeof en,
 ];
 

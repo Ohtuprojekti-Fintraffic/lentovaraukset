@@ -11,6 +11,7 @@ import type {
 } from '@fullcalendar/core';
 import fiLocale from '@fullcalendar/core/locales/fi';
 import enLocale from '@fullcalendar/core/locales/en-gb';
+import svLocale from '@fullcalendar/core/locales/sv';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast, isTimeAtMostInFuture, isTimeFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
@@ -55,6 +56,19 @@ function Calendar({
   const calendarRef = forwardedCalendarRef || React.createRef();
 
   const { t, i18n } = useTranslation();
+  // set locale for calendar based on i18n language
+  // use a switch statement to avoid typescript errors
+  let calendarLocale;
+  switch (i18n.language) {
+    case 'en':
+      calendarLocale = enLocale;
+      break;
+    case 'sv':
+      calendarLocale = svLocale;
+      break;
+    default:
+      calendarLocale = fiLocale;
+  }
 
   const { addNewAlert } = React.useContext(AlertContext);
   const [viewMode, setViewMode] = React.useState(window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek');
@@ -205,9 +219,7 @@ function Calendar({
     <FullCalendar
       ref={calendarRef}
       plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
-      locale={
-        i18n.language === 'fi' ? fiLocale : enLocale
-      }
+      locale={calendarLocale}
       timeZone="UTC"
       weekNumberCalculation="ISO"
       headerToolbar={{

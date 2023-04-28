@@ -6,14 +6,15 @@ import { Reservation } from '../models';
 import ServiceError from '../util/errors';
 
 /**
- * Retrieves all reservations within a specified time range.
+ * Retrieves all reservations within a specified time range and airport code.
  * The result is an array of Reservation objects that overlap with the given
- * time range.
+ * time range and have the specified airport code.
  * @param startTime - The start time of the time range.
  * @param endTime - The end time of the time range.
+ * @param airportCode - The airport code for which reservations are to be fetched.
  * @returns An array of Reservation objects.
  */
-const getInTimeRange = async (startTime: Date, endTime: Date) => {
+const getInTimeRange = async (startTime: Date, endTime: Date, airportCode: string) => {
   const reservations: Reservation[] = await Reservation.findAll({
     where: {
       [Op.and]: [
@@ -28,7 +29,17 @@ const getInTimeRange = async (startTime: Date, endTime: Date) => {
       ],
     },
   });
-  return reservations;
+
+  /* Airport of reservation is found by using connection between timeslots and reservations */
+  const isInSameAirport = async (reservation: Reservation) => {
+    const timeslot = await reservation.getTimeslot();
+    return timeslot.airfieldCode === airportCode;
+  };
+
+  const reservationsInSameAirport = await (
+    Promise.all(reservations.map((r) => isInSameAirport(r)))
+  );
+  return reservations.filter((value, index) => reservationsInSameAirport[index]);
 };
 
 /**

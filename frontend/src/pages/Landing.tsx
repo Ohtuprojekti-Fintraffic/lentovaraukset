@@ -31,6 +31,7 @@ function AirfieldDropdown({
       sections={airfields.map((a) => a.name)}
       onChange={handleSelect}
       error={error}
+      variant="secondary"
     />
   );
 }
@@ -58,14 +59,16 @@ function Landing() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center pt-16 gap-12">
-      <div className="text-ft-h4">
-        {t('landing.title')}
+    <div className="w-full h-full flex flex-col items-center pt-12 gap-12">
+      <div className="w-full max-w-2xl flex flex-col items-center gap-12 px-8">
+        <div className="text-ft-h4">
+          {t('landing.title')}
+        </div>
+        <div className="max-w-md">
+          {t('landing.description')}
+        </div>
       </div>
-      <div className="max-w-md">
-        {t('landing.description')}
-      </div>
-      <div className="w-full flex flex-row justify-center items-center gap-4 bg-black p-8 text-white">
+      <div className="w-full flex flex-col sm:flex-row justify-center items-start sm:items-center gap-4 bg-black p-8 text-white">
         <div>
           {t('landing.chooseAirport')}
         </div>

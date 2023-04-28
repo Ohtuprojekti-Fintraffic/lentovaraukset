@@ -1,0 +1,164 @@
+{
+  "common": {
+    "next": "Nästa",
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "delete": "Radera",
+    "confirm": "Bekräfta",
+    "yes": "Ja",
+    "no": "Nej",
+    "time": "Tid UTC",
+    "weekdays": {
+      "monday": "Måndag",
+      "tuesday": "Tisdag",
+      "wednesday": "Onsdag",
+      "thursday": "Torsdag",
+      "friday": "Fredag",
+      "saturday": "Lördag",
+      "sunday": "Söndag"
+    }
+  },
+  "navigation": {
+    "title": "Skolflygsbokningar",
+    "reservations": "Bokningar",
+    "timeslots": "Bokningsfönster",
+    "management": "Hantering",
+    "admin": "Administration",
+    "menu": "Meny"
+  },
+  "landing": {
+    "title": "Fintraffic Skolflygsbokningar",
+    "description": "På den här sajt kan du boka skolflygningar.",
+    "chooseAirport": "Välj en flygplats:",
+    "airportDropdownPlaceholder": "flygplats",
+    "continue": "Gör en bokning",
+    "emptyAirportError": "Välj först en flygplats"
+  },
+  "reservations": {
+    "calendar": {
+      "title": "Bokningar",
+      "newReservation": "Ny bokning",
+      "reservationModified": "Bokning modifierad",
+      "reservationDeletionFailed": "Det uppstod ett fel när bokningen raderades",
+      "notReservable": "Ej bokningsbart"
+    },
+    "modal": {
+      "reservation": "Bokning",
+      "newReservation": "Ny bokning",
+      "form": {
+        "start": "Bokningen börjar (UTC)",
+        "end": "Bokningen slutar (UTC)",
+        "aircraftId": "Flygplans registreringskod",
+        "phone": "Telefonnummer",
+        "details": "Ytterligare information"
+      },
+      "updated": "Bokning uppdaterad!",
+      "updateFailed": "Det uppstod ett fel när bokningen uppdaterades!",
+      "created": "Bokning skapad!",
+      "insideTimeslot": "Bokningen måste vara inom ett ledigt bokningsfönster"
+    },
+    "deletionPopup": {
+      "title": "Radera bokning",
+      "text": "Är du säker att du vill radera bokningen?"
+    }
+  },
+  "timeslots": {
+    "calendar": {
+      "free": "Ledig",
+      "blocked": "Upptagen",
+      "timeslots": "Lediga bokningsfönster",
+      "newTimeslot": "Nytt bokningsfönster",
+      "blockedTimeslot": "Skapa upptaget bokningsfönster"
+    },
+    "modal": {
+      "updated": "Bokningsfönster uppdaterad!",
+      "updateFailed": "Det uppstod ett fel när bokningsfönstret uppdaterades!",
+      "created": "Bokningsfönster skapat!",
+      "creationFailed": "Det uppstod ett fel när bokningsfönstret skapades!",
+      "timeslot": "Bokningsfönster",
+      "newTimeslot": "Nytt bokningsfönster",
+      "form": {
+        "start": "Bokningsfönstret börjar (UTC)",
+        "end": "Bokningsfönstret slutar (UTC)",
+        "details": "Ytterligare information",
+        "recurring": {
+          "repeat": "Sätt som återkommande",
+          "ends": "Återkomstid avslutas (UTC)"
+        },
+        "blocked": {
+          "removes": "Raderar bokningar:"
+        }
+      }
+    },
+    "overlappingPopup": {
+      "title": "Är du säker?",
+      "text": {
+        "timeslot": "",
+        "modifying": "Att modifiera",
+        "adding": "Att skapa",
+        "removes": "bokningsfönstret kommer att radera nästa bokningar:"
+      }
+    },
+    "deletionPopup": {
+      "title": "Radera bokningsfönstret",
+      "text": "Är du säker att du vill radera bokningsfönstret?"
+    },
+    "repeatingDeletionPopup": {
+      "title": "Radera återkommande bokningsfönster",
+      "text": "Du ska redera ett återkommande bokningsfönster. Vill du radera alla nästa bokningsfönster i samma grupp?",
+      "primary": "Radera alla",
+      "secondary": "Radera bara en"
+    },
+    "repeatingPopup": {
+      "title": "Modifiera återkommande bokningsfönster",
+      "text": "Du har modifierat ett återkommande bokningsfönster. Vill du modifiera alla nästa bokningsfönster i samma grupp?",
+      "primary": "Modifiera alla",
+      "secondary": "Modifiera bara en"
+    }
+  },
+  "calendar": {
+    "notPast": "Bokningsfönster kan inte skapas i det förlutet",
+    "notConsecutive": "Bokningsfönster kan inte vara genast efter varandra",
+    "cantModifyPast": "Pågående eller förflutna bokningsfönster kan inte modifieras",
+    "cantMovePast": "Pågående eller förflutna bokningsfönster kan inte flyttas",
+    "cantMoveToPast": "Man kan inte flytta bokningsfönster till det förflutna",
+    "modificationError": "Det uppstod ett fel när bokningen ändrades",
+    "notTooFarFuture": {
+      "begin": "Man kan göra bokningar upp till",
+      "end": " dagar från nu"
+    },
+    "notTooSoon": {
+      "begin": "Man måste göra bokningen minst",
+      "end": " dagar från nu"
+    },
+    "buttons": {
+      "today": "Idag",
+      "month": "Månad",
+      "week": "Vecka",
+      "list": "Lista"
+    }
+  },
+  "management": {
+    "airfield": {
+      "title": "Flygplatsens inställningar",
+      "form": {
+        "icao": "Flygplatsens ICAO-kod:",
+        "name": "Flygplatsens namn:",
+        "timeslotMinTime": "Boknings minst längd i minuter:",
+        "maxConcurrentFlights": "Maximalt antal av samtidiga bokningar:"
+      }
+    }
+  },
+  "admin": {
+    "globalSettings": {
+      "title": "Globala inställningar",
+      "form": {
+        "minDaysToStart": "Hur många dagar i förväg kan man göra en bokning tidigast",
+        "maxDaysToStart": "Hur många dagar i förväg kan man göra en bokning senast"
+      }
+    },
+    "newAirfield": {
+      "title": "Skapa en ny flygplats"
+    }
+  }
+}

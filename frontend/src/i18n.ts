@@ -1,11 +1,11 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-// import LanguageDetector from 'i18next-browser-languagedetector';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
 import fi from './locales/fi.json';
 import en from './locales/en.json';
-import se from './locales/se.json';
+import sv from './locales/sv.json';
 
 export const resources = {
   fi: {
@@ -16,20 +16,18 @@ export const resources = {
     language: 'en',
     translation: en,
   },
-  se: {
-    language: 'se',
-    translation: se,
+  sv: {
+    language: 'sv',
+    translation: sv,
   },
 };
 
 i18n
-  // Disabled temporarily to test english translations
-  // .use(LanguageDetector)
+  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'en',
-    debug: true,
+    fallbackLng: 'fi',
     interpolation: {
       escapeValue: false,
     },
