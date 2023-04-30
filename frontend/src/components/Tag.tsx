@@ -20,6 +20,7 @@ function Tag({
   const badgeTagClassName = 'font-sans font-ft-emphasis text-ft-tag text-white';
 
   const className = styleName === 'id' ? idTagClassName : badgeTagClassName;
+  // TODO: use twMerge
   return <span className={`${baseClassName} ${className}`}>{children}</span>;
 }
 
