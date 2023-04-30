@@ -6,7 +6,7 @@ import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import type {
   AllowFunc,
-  DateSelectArg, EventChangeArg, EventClickArg, EventRemoveArg,
+  DateSelectArg, EventContentArg, EventChangeArg, EventClickArg, EventRemoveArg,
   EventSourceInput,
 } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
@@ -34,6 +34,46 @@ type CalendarProps = {
   checkIfTimeInFuture?: boolean;
   blocked?: boolean;
 };
+
+function EventComponent({ arg }: { arg: EventContentArg }) {
+  const isReservation = !!arg.event.extendedProps.aircraftId;
+  if (isReservation && arg.textColor === '#000000') {
+    // somewhat hacky way to detect this but
+    // when the event is e.g. rendered as
+    // a background element we dont want text on it
+    return null;
+  }
+
+  const startHour = arg.event.start?.getHours().toString().padStart(2, '0');
+  const startMins = arg.event.start?.getMinutes().toString().padStart(2, '0');
+  const endHour = arg.event.end?.getHours().toString().padStart(2, '0');
+  const endMins = arg.event.end?.getMinutes().toString().padStart(2, '0');
+
+  const timeText = `${startHour}:${startMins} - ${endHour}:${endMins}`;
+
+  return (
+    <div className="p-1 ">
+      <p className="mb-1">
+        {timeText}
+      </p>
+      {isReservation && (
+      <Tag
+        styleName="id"
+        bgColorClassName="bg-ft-neutral-100"
+        textColorClassName="text-ft-text-600"
+      >
+        {arg.event.extendedProps?.aircraftId}
+      </Tag>
+      )}
+      {/* Additional info: */}
+      {/* {event.extendedProps?.info && <p>{ event.extendedProps.info }</p>} */}
+      {/* Commented out because this is probably not something the average user is
+          supposed to see, which also brings up the question why the client
+          gets everyone's phone number and these infos.
+          TODO: look into */}
+    </div>
+  );
+}
 
 function Calendar({
   calendarRef: forwardedCalendarRef,
@@ -229,32 +269,9 @@ function Calendar({
       eventColor={eventColors?.eventColor || '#000000'}
       eventTextColor={eventColors?.textColor || '#000000'}
       eventClick={handleEventClick}
+      // eslint complains only because the prop name doesn't start with "render"
       // eslint-disable-next-line react/no-unstable-nested-components
-      eventContent={(arg) => arg.event.extendedProps?.aircraftId
-        && (
-        <div>
-          {/* this eslint formatting is so bad it's actually funny */}
-          <p>
-            {arg.event.start?.getHours()}
-            :
-            {arg.event.start?.getMinutes()}
-            {' '}
-            -
-            {' '}
-            {arg.event.end?.getHours()}
-            :
-            {arg.event.end?.getMinutes()}
-          </p>
-          <Tag
-            styleName="id"
-            bgColorClassName="bg-ft-neutral-100"
-            textColorClassName="text-ft-text-600"
-          >
-            {arg.event.extendedProps?.aircraftId}
-          </Tag>
-
-        </div>
-        )}
+      eventContent={(arg) => (<EventComponent arg={arg} />)}
       eventChange={handleEventChange}
       eventRemove={handleEventRemove}
       select={handleEventCreate}

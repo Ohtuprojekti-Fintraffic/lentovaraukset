@@ -6,6 +6,7 @@ import { Reservation } from '../models';
 import ServiceError from '../util/errors';
 
 const getInTimeRange = async (startTime: Date, endTime: Date) => {
+  // TODO: filter out phone numbers and other sensitive stuff?
   const reservations: Reservation[] = await Reservation.findAll({
     where: {
       [Op.and]: [
