@@ -37,6 +37,8 @@ type CalendarProps = {
 
 function EventComponent({ arg }: { arg: EventContentArg }) {
   const isReservation = !!arg.event.extendedProps.aircraftId;
+  const isBlocked = arg.event.extendedProps.type === 'blocked';
+
   if (isReservation && arg.textColor === '#000000') {
     // somewhat hacky way to detect this but
     // when the event is e.g. rendered as
@@ -65,9 +67,8 @@ function EventComponent({ arg }: { arg: EventContentArg }) {
         {arg.event.extendedProps?.aircraftId}
       </Tag>
       )}
-      {/* Additional info: */}
-      {/* {event.extendedProps?.info && <p>{ event.extendedProps.info }</p>} */}
-      {/* Commented out because this is probably not something the average user is
+      {isBlocked && <p>{ arg.event.extendedProps.info }</p>}
+      {/* Not used for reservations because this is probably not something the average user is
           supposed to see, which also brings up the question why the client
           gets everyone's phone number and these infos.
           TODO: look into */}
