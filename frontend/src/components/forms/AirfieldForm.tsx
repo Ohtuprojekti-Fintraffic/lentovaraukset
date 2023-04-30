@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ZodTypeAny } from 'zod';
 import { AirfieldEntry } from '@lentovaraukset/shared/src';
+import { useTranslation } from 'react-i18next';
 import Button from '../Button';
 import InputField from '../InputField';
 
@@ -28,14 +29,12 @@ function AirfieldForm({
   airfieldMutation,
   validator,
 }: FormProps) {
+  const { t } = useTranslation();
+
   const {
-    register, handleSubmit, formState: { errors },
+    register, handleSubmit, formState: { errors }, reset,
   } = useForm<Inputs>({
-    defaultValues: airfield || {
-      code: 'EF',
-      eventGranularityMinutes: 20,
-      maxConcurrentFlights: 1,
-    },
+    defaultValues: airfield,
     resolver: zodResolver(validator),
     mode: 'all',
   });
@@ -47,6 +46,10 @@ function AirfieldForm({
     airfieldMutator.mutate({ ...data, code });
   };
 
+  useEffect(() => {
+    reset(airfield);
+  }, [airfield, reset]);
+
   return (
     <div>
       <div className="p-8 space-y-4">
@@ -54,20 +57,20 @@ function AirfieldForm({
         <form className="flex flex-col w-full" onSubmit={handleSubmit(onSubmit)}>
           {showIdField && (
           <InputField
-            labelText="ICAO-tunnus:"
+            labelText={t('management.airfield.form.icao')}
             type="string"
             registerReturn={register('code')}
             errors={errors}
           />
           )}
           <InputField
-            labelText="Nimi:"
+            labelText={t('management.airfield.form.name')}
             type="string"
             registerReturn={register('name')}
             errors={errors}
           />
           <InputField
-            labelText="Varausikkunan minimikoko minuutteina:"
+            labelText={t('management.airfield.form.timeslotMinTime')}
             type="number"
             registerReturn={register('eventGranularityMinutes', {
               valueAsNumber: true,
@@ -77,7 +80,7 @@ function AirfieldForm({
             errors={errors}
           />
           <InputField
-            labelText="Samanaikaisten varausten maksimimäärä:"
+            labelText={t('management.airfield.form.maxConcurrentFlights')}
             type="number"
             registerReturn={register('maxConcurrentFlights', {
               valueAsNumber: true,
@@ -86,7 +89,7 @@ function AirfieldForm({
             min={1}
             errors={errors}
           />
-          <Button type="submit" variant="primary">Tallenna</Button>
+          <Button type="submit" variant="primary">{t('common.save')}</Button>
         </form>
       </div>
     </div>

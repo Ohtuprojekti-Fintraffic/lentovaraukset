@@ -1,17 +1,20 @@
 import express from 'express';
 import countMostConcurrent from '@lentovaraukset/shared/src/overlap';
 import { createReservationValidator, getTimeRangeValidator } from '@lentovaraukset/shared/src/validation/validation';
+import { ServiceErrorCode } from '@lentovaraukset/shared/src';
 import reservationService from '../services/reservationService';
 import configurationService from '../services/configurationService';
 import { errorIfNoAirfield } from '../util/middleware';
+import ServiceError from '../util/errors';
 
 const allowReservation = async (
   startTime: Date,
   endTime: Date,
   id: number | undefined,
   maxConcurrentReservations: number,
+  airportCode: string,
 ): Promise<boolean> => {
-  const reservations = (await reservationService.getInTimeRange(startTime, endTime))
+  const reservations = (await reservationService.getInTimeRange(startTime, endTime, airportCode))
     .filter((e) => e.id !== id);
 
   const mostConcurrentReservations = countMostConcurrent(reservations);
@@ -21,15 +24,21 @@ const allowReservation = async (
 
 const router = express.Router();
 
-router.get('/', async (req: express.Request, res: express.Response) => {
-  const { from } = req.query;
-  const { until } = req.query;
-  const { start, end } = getTimeRangeValidator().parse({
-    start: new Date(from as string),
-    end: new Date(until as string),
-  });
-  const reservations = await reservationService.getInTimeRange(start, end);
-  res.json(reservations);
+router.get('/', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    errorIfNoAirfield(req);
+    const { airfield } = req;
+    const { from } = req.query;
+    const { until } = req.query;
+    const { start, end } = getTimeRangeValidator().parse({
+      start: new Date(from as string),
+      end: new Date(until as string),
+    });
+    const reservations = await reservationService.getInTimeRange(start, end, airfield.code);
+    res.json(reservations);
+  } catch (error: unknown) {
+    next(error);
+  }
 });
 
 router.delete('/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -58,8 +67,9 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
       newReservation.end,
       undefined,
       airfield.maxConcurrentFlights,
+      airfield.code,
     )) {
-      throw new Error('Too many concurrent reservations');
+      throw new ServiceError(ServiceErrorCode.ConcurrentReservations, 'Too many concurrent reservations');
     }
 
     const reservation = await reservationService.createReservation(airfield.code, newReservation);
@@ -86,8 +96,9 @@ router.put('/:id', async (req: express.Request, res: express.Response, next: exp
       validReservationUpdate.end,
       id,
       airfield.maxConcurrentFlights,
+      airfield.code,
     )) {
-      throw new Error('Too many concurrent reservations');
+      throw new ServiceError(ServiceErrorCode.ConcurrentReservations, 'Too many concurrent reservations');
     }
 
     const modifiedReservation = await reservationService.updateById(

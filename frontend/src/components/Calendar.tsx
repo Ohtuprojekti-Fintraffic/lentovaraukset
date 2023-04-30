@@ -9,9 +9,13 @@ import type {
   DateSelectArg, EventContentArg, EventChangeArg, EventClickArg, EventRemoveArg,
   EventSourceInput,
 } from '@fullcalendar/core';
+import fiLocale from '@fullcalendar/core/locales/fi';
+import enLocale from '@fullcalendar/core/locales/en-gb';
+import svLocale from '@fullcalendar/core/locales/sv';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast, isTimeAtMostInFuture, isTimeFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
+import { useTranslation } from 'react-i18next';
 import AlertContext from '../contexts/AlertContext';
 import Tag from './Tag';
 
@@ -92,6 +96,22 @@ function Calendar({
   blocked = false,
 }: CalendarProps) {
   const calendarRef = forwardedCalendarRef || React.createRef();
+
+  const { t, i18n } = useTranslation();
+  // set locale for calendar based on i18n language
+  // use a switch statement to avoid typescript errors
+  let calendarLocale;
+  switch (i18n.language) {
+    case 'en':
+      calendarLocale = enLocale;
+      break;
+    case 'sv':
+      calendarLocale = svLocale;
+      break;
+    default:
+      calendarLocale = fiLocale;
+  }
+
   const { addNewAlert } = React.useContext(AlertContext);
   const [viewMode, setViewMode] = React.useState(window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek');
 
@@ -136,24 +156,24 @@ function Calendar({
   const isTimeAllowed = (start: Date, end: Date, type?: string, ignoreStart?: boolean) => {
     if ((!ignoreStart && isTimeInPast(start)) || isTimeInPast(end)) {
       calendarRef.current?.getApi().unselect();
-      addNewAlert('Aikaa ei voi lisätä menneisyyteen', 'warning');
+      addNewAlert(t('calendar.notPast'), 'warning');
       return false;
     }
     const maxDaysInFuture = configuration ? configuration.maxDaysInFuture : 7;
     if (checkIfTimeInFuture && !isTimeAtMostInFuture(start, maxDaysInFuture)) {
       calendarRef.current?.getApi().unselect();
-      addNewAlert(`Aikaa ei voi lisätä yli ${maxDaysInFuture} päivän päähän`, 'warning');
+      addNewAlert(`${t('calendar.notTooFarFuture.begin')}${maxDaysInFuture}${t('calendar.notTooFarFuture.end')}$`, 'warning');
       return false;
     }
     const daysToStart = configuration ? configuration.daysToStart : 0;
     if (checkIfTimeInFuture && !isTimeFarEnoughInFuture(start, daysToStart)) {
       calendarRef.current?.getApi().unselect();
-      addNewAlert(`Aika pitää varata vähintään ${daysToStart} päivää etukäteen`, 'warning');
+      addNewAlert(`${t('calendar.notTooSoon.begin')}${daysToStart}${t('calendar.notTooSoon.end')}`, 'warning');
       return false;
     }
     if (timeIsConsecutive(start, end, type)) {
       calendarRef.current?.getApi().unselect();
-      addNewAlert('Ajat eivät voi olla peräkkäin', 'warning');
+      addNewAlert(t('calendar.notConsecutive'), 'warning');
       return false;
     }
     return true;
@@ -177,20 +197,20 @@ function Calendar({
     if (isReservation
       && oldEvent.start && isTimeInPast(oldEvent.start)) {
       changeData.revert();
-      addNewAlert('Alkanutta tai mennyttä varausta ei voi muokata', 'warning');
+      addNewAlert(t('calendar.cantModifyPast'), 'warning');
       return;
     }
 
     if (!isReservation && eventHasMoved
       && oldEvent.start && isTimeInPast(oldEvent.start)) {
       changeData.revert();
-      addNewAlert('Alkanutta tai mennyttä aikaikkunaa ei voi siirtää', 'warning');
+      addNewAlert(t('calendar.cantMovePast'), 'warning');
       return;
     }
 
     if (eventHasMoved && event.start && isTimeInPast(event.start)) {
       changeData.revert();
-      addNewAlert('Alkamisaikaa ei voi siirtää menneisyyteen', 'warning');
+      addNewAlert(t('calendar.cantMoveToPast'), 'warning');
       return;
     }
 
@@ -241,7 +261,7 @@ function Calendar({
     <FullCalendar
       ref={calendarRef}
       plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
-      locale="fi"
+      locale={calendarLocale}
       timeZone="UTC"
       weekNumberCalculation="ISO"
       headerToolbar={{

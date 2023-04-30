@@ -57,13 +57,17 @@ beforeEach(async () => {
   await airfieldService.createTestAirfield();
   await configurationService
     .updateById(1, { maxDaysInFuture: 7, daysToStart: 0 });
-  await Reservation.bulkCreate(reservations);
-  await Timeslot.create({
+  const timeslot = await Timeslot.create({
     start: new Date('2023-02-12T08:00:00.000Z'),
     end: new Date('2023-02-15T08:00:00.000Z'),
     type: 'available',
     airfieldCode: 'EFHK',
   });
+  const createdReservations = await Reservation.bulkCreate(reservations);
+  // reservations must be linked to timeslots
+  await createdReservations[0].setTimeslot(timeslot);
+  await createdReservations[1].setTimeslot(timeslot);
+  await createdReservations[2].setTimeslot(timeslot);
 });
 
 afterAll(async () => {
@@ -135,7 +139,7 @@ describe('Calls to api', () => {
     expect(result.body.error.message).toContain('vaaditaan');
   });
 
-  test('cannot create a reservation on top of blocked timeslot', async () => {
+  test('cannot create a reservation to past', async () => {
     await Timeslot.create({
       start: new Date('2023-02-12T08:00:00.000Z'),
       end: new Date('2023-02-12T16:00:00.000Z'),
@@ -218,7 +222,7 @@ describe('Calls to api', () => {
     expect(reservationAfterUpdate?.dataValues.phone).not.toEqual('');
   });
 
-  test('cannot update a reservation on top of blocked timeslot', async () => {
+  test('cannot update a reservation in past', async () => {
     const createdReservation: Reservation | null = await Reservation.findOne();
     const id = createdReservation?.dataValues.id;
     await Timeslot.create({
@@ -420,7 +424,7 @@ describe('Calls to api', () => {
 
     res.forEach((r) => { expect(r.status).toEqual(200); });
 
-    const reservationsInDB = await reservationService.getInTimeRange(start, end);
+    const reservationsInDB = await reservationService.getInTimeRange(start, end, 'EFHK');
     expect(reservationsInDB).toHaveLength(3);
   });
 
@@ -436,11 +440,11 @@ describe('Calls to api', () => {
       start, end, aircraftId: 'OH-ASD', phone: '+358494678748',
     });
 
-    // expect(res.status).toEqual(400);
+    expect(res.status).toEqual(400);
     expect(res.body.error).toBeDefined();
     expect(res.body.error.message).toContain('Too many concurrent reservations');
 
-    const reservationsInDB = await reservationService.getInTimeRange(start, end);
+    const reservationsInDB = await reservationService.getInTimeRange(start, end, 'EFHK');
     expect(reservationsInDB).toHaveLength(3);
   });
 
@@ -463,7 +467,7 @@ describe('Calls to api', () => {
 
     expect(res.status).toEqual(200);
 
-    const reservationsInDB = await reservationService.getInTimeRange(new Date('2023-02-14T12:00:00.000Z'), new Date('2023-02-14T14:00:00.000Z'));
+    const reservationsInDB = await reservationService.getInTimeRange(new Date('2023-02-14T12:00:00.000Z'), new Date('2023-02-14T14:00:00.000Z'), 'EFHK');
     expect(reservationsInDB).toHaveLength(4);
   });
 
@@ -484,7 +488,10 @@ describe('Calls to api', () => {
         phone: '0404444444',
       },
     ];
-    await Reservation.bulkCreate(concurrentReservations);
+    const createdResevations = await Reservation.bulkCreate(concurrentReservations);
+    const timeslot = await Timeslot.findOne();
+    await createdResevations[0].setTimeslot(timeslot!);
+    await createdResevations[1].setTimeslot(timeslot!);
 
     const oldReservation = reservations[0];
     const oldReservationInDB = await Reservation.findOne(
@@ -504,7 +511,7 @@ describe('Calls to api', () => {
     const response = await api.put(`/api/EFHK/reservations/${id}`)
       .set('Content-type', 'application/json')
       .send(updatedReservationData)
-      .expect(500);
+      .expect(400);
 
     expect(response.body.error.message).toEqual('Too many concurrent reservations');
   });
@@ -528,7 +535,7 @@ describe('Calls to api', () => {
     const response = await api.post('/api/EFHK/reservations/')
       .set('Content-type', 'application/json')
       .send(newReservationData)
-      .expect(500);
+      .expect(400);
 
     expect(response.body.error.message).toEqual('Reservation cannot be created on top of blocked timeslot');
   });
@@ -536,7 +543,7 @@ describe('Calls to api', () => {
   test('throws an error if reservation overlaps multiple timeslots', async () => {
     const newReservation = {
       start: new Date('2023-02-14T10:00:00.000Z'),
-      end: new Date('2023-02-14T16:00:00.000Z'),
+      end: new Date('2023-02-14T14:00:00.000Z'),
       aircraftId: 'OH-QAA',
       phone: '11104040',
     };
@@ -544,7 +551,7 @@ describe('Calls to api', () => {
     await Timeslot.bulkCreate([
       {
         start: new Date('2023-02-14T10:00:00.000Z'),
-        end: new Date('2023-02-14T12:00:00.000Z'),
+        end: new Date('2023-02-14T11:00:00.000Z'),
         type: 'available',
         airfieldCode: 'EFHK',
       },
@@ -560,7 +567,7 @@ describe('Calls to api', () => {
       .set('Content-type', 'application/json')
       .send(newReservation);
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(400);
     expect(response.body.error.message).toEqual('Reservation should be created for one timeslot');
   });
 
@@ -590,13 +597,13 @@ describe('Calls to api', () => {
     const response = await api.put(`/api/EFHK/reservations/${id}`)
       .set('Content-type', 'application/json')
       .send(newReservationData)
-      .expect(500);
+      .expect(400);
 
     expect(response.body.error.message).toEqual('Reservation cannot be created on top of blocked timeslot');
   });
 
   test('throws error when updating reservation spanning more than one timeslot', async () => {
-    await Timeslot.bulkCreate([
+    const timeslots = await Timeslot.bulkCreate([
       {
         start: new Date('2023-02-14T10:00:00.000Z'),
         end: new Date('2023-02-14T12:00:00.000Z'),
@@ -619,7 +626,7 @@ describe('Calls to api', () => {
       phone: '11104040',
     };
     const createdReservation = await Reservation.create(newReservationData);
-
+    await createdReservation.setTimeslot(timeslots[0]);
     const updatedReservationData = {
       start: new Date('2023-02-14T10:20:00.000Z'),
       end: new Date('2023-02-14T13:20:00.000Z'),
@@ -631,7 +638,7 @@ describe('Calls to api', () => {
     const response = await api.put(`/api/EFHK/reservations/${createdReservation.id}`)
       .set('Content-type', 'application/json')
       .send(updatedReservationData)
-      .expect(500);
+      .expect(400);
 
     expect(response.body.error.message).toEqual('Reservation should be created for one timeslot');
   });
