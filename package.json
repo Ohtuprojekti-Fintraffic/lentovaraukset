@@ -29,7 +29,8 @@
     "i18next-browser-languagedetector": "^7.0.1",
     "luxon": "^3.3.0",
     "react-hook-form": "^7.43.3",
-    "react-i18next": "^12.2.0"
+    "react-i18next": "^12.2.0",
+    "react-responsive": "^9.0.2"
   },
   "devDependencies": {
     "@types/jest": "^29.2.6",
