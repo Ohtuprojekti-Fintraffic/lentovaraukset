@@ -19,7 +19,7 @@ router.get('/login', (req, res, next) => {
 });
 
 router.post(
-  '/callback',
+  '/redirect',
   (req, res, next) => {
     passport.authenticate(
       'azuread-openidconnect',

@@ -17,7 +17,7 @@ function LogInOutButton() {
           <div>
             {' '}
             {user.displayName}
-            {' '}
+            {' - '}
             <a href="/api/auth/logout">Kirjaudu ulos</a>
           </div>
         )
