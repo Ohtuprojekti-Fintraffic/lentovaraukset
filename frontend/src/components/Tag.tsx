@@ -1,4 +1,5 @@
 import React from 'react';
+import { twMerge } from 'tailwind-merge';
 
 interface TagProps {
   children: React.ReactNode;
@@ -20,8 +21,7 @@ function Tag({
   const badgeTagClassName = 'font-sans font-ft-emphasis text-ft-tag text-white';
 
   const className = styleName === 'id' ? idTagClassName : badgeTagClassName;
-  // TODO: use twMerge
-  return <span className={`${baseClassName} ${className}`}>{children}</span>;
+  return <span className={twMerge(baseClassName, className)}>{children}</span>;
 }
 
 export default Tag;
