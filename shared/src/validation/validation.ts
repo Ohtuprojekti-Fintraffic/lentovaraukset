@@ -2,6 +2,8 @@ import { z, type ZodTypeAny } from 'zod';
 import { DateTime } from 'luxon';
 import { ReservationEntry, TimeslotEntry } from '..';
 
+type TranslationFunc = Function | undefined;
+
 const minutesToMilliseconds = (minutes: number) => minutes * 1000 * 60;
 
 const isMultipleOfMinutes = (minutes: number) => (dateToCheck: Date) => (
@@ -21,10 +23,15 @@ const isTimeAtMostInFuture = (time: Date, maxDaysInFuture: number): boolean => (
 const createTimeSlotValidatorObject = (
   slotGranularityMinutes: number,
   ignoreStartInPast: boolean = false,
+  t: TranslationFunc = undefined,
 ) => {
   // Time must be a multiple of ${slotGranularityMinutes} minutes
-  const minuteMultipleMessage = `Ajan tulee olla jokin ${slotGranularityMinutes} minuutin moninkerta`;
-  const pastErrorMessage = 'Timeslot cannot be in past';
+  const minuteMultipleMessage = t
+    ? t('validation.minuteMultiple', { slotGranularityMinutes })
+    : `Ajan tulee olla jokin ${slotGranularityMinutes} minuutin moninkerta`;
+  const pastErrorMessage = t
+    ? t('validation.notInPast')
+    : 'Timeslot cannot be in past';
 
   return z.object({
     start: z.coerce
@@ -40,8 +47,13 @@ const createTimeSlotValidatorObject = (
   });
 };
 
-function refineTimeslotObject<T extends ZodTypeAny>(tsValidationObject: T) {
-  const startNotLessThanEndErrorMessage = 'Timeslot start time cannot be later than the end time';
+function refineTimeslotObject<T extends ZodTypeAny>(
+  tsValidationObject: T,
+  t: TranslationFunc = undefined,
+) {
+  const startNotLessThanEndErrorMessage = t
+    ? t('validation.timeslotStartLaterThanEnd')
+    : 'Timeslot start time cannot be later than the end time';
   return tsValidationObject.refine((res) => res.start < res.end, {
     message: startNotLessThanEndErrorMessage,
     path: ['general'],
@@ -51,7 +63,11 @@ function refineTimeslotObject<T extends ZodTypeAny>(tsValidationObject: T) {
 const createTimeSlotValidator = (
   slotGranularityMinutes: number,
   ignoreStartInPast: boolean = false,
-) => refineTimeslotObject(createTimeSlotValidatorObject(slotGranularityMinutes, ignoreStartInPast));
+  t: TranslationFunc = undefined,
+) => refineTimeslotObject(
+  createTimeSlotValidatorObject(slotGranularityMinutes, ignoreStartInPast, t),
+  t,
+);
 
 const daysValidation = z.object({
   monday: z.coerce.boolean(),
@@ -82,48 +98,60 @@ const createReservationValidator = (
   slotGranularityMinutes: number,
   maxDaysInFuture: number,
   daysToStart: number,
+  t: TranslationFunc = undefined,
 ) => {
   // Time must be a multiple of ${slotGranularityMinutes} minutes
-  const minuteMultipleMessage = `Ajan tulee olla jokin ${slotGranularityMinutes} minuutin moninkerta`;
-  // Reservation cannot be in past
-  const pastErrorMessage = 'Varaus ei voi ajoittua menneisyyteen';
-  const farEnoughErrorMessage = 'Varaus tulee tehdä vähintään 1 päivää etukäteen';
-  // Reservation start time cannot be further than ${maxDaysInFuture} days away
-  const tooFarInFutureErrorMessage = `Voit tehdä varauksen korkeintaan ${maxDaysInFuture} päivän päähän`;
-  // Reservation start time cannot be later than the end time
-  const startNotLessThanEndErrorMessage = 'Varauksen alkuaika ei voi olla myöhempi kuin loppuaika';
-  // Aircraft ID cannot be empty
-  const aircraftIdEmptyErrorMessage = 'Lentokentän tunnus vaaditaan';
-  // Phone number cannot be empty
-  const phoneNumberEmptyErrorMessage = 'Puhelinnumero vaaditaan';
+  const messages = t
+    ? {
+      minuteMultiple: t('validation.minuteMultiple', { slotGranularityMinutes }),
+      // Reservation cannot be in past
+      pastError: t('validation.pastError'),
+      farEnoughError: t('validation.farEnoughError', { daysToStart }),
+      // Reservation start time cannot be further than ${maxDaysInFuture} days away
+      tooFarInFutureError: t('validation.tooFarInFutureError', { maxDaysInFuture }),
+      // Reservation start time cannot be later than the end time
+      startNotLessThanEndError: t('validation.reservationStartLaterThanEnd'),
+      // Aircraft ID cannot be empty
+      aircraftIdEmptyError: t('validation.aircraftIdEmptyError'),
+      // Phone number cannot be empty
+      phoneNumberEmptyError: t('validation.phoneNumberEmptyError'),
+    } : {
+      minuteMultiple: `Ajan tulee olla jokin ${slotGranularityMinutes} minuutin moninkerta`,
+      pastError: 'Varaus ei voi ajoittua menneisyyteen',
+      farEnoughError: `Varaus tulee tehdä vähintään ${daysToStart} päivää etukäteen`,
+      tooFarInFutureError: `Voit tehdä varauksen korkeintaan ${maxDaysInFuture} päivän päähän`,
+      startNotLessThanEndError: 'Varauksen alkuaika ei voi olla myöhempi kuin loppuaika',
+      aircraftIdEmptyError: 'Lentokentän tunnus vaaditaan',
+      phoneNumberEmptyError: 'Puhelinnumero vaaditaan',
+    };
 
   const Reservation = z.object({
     start: z.coerce
       .date()
-      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
-      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage })
+      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: messages.minuteMultiple })
+      .refine((value) => !isTimeInPast(value), { message: messages.pastError })
       .refine(
         (value) => isTimeFarEnoughInFuture(value, daysToStart),
-        { message: farEnoughErrorMessage },
+        { message: messages.farEnoughError },
       )
       .refine(
         (value) => isTimeAtMostInFuture(value, maxDaysInFuture),
-        { message: tooFarInFutureErrorMessage },
+        { message: messages.tooFarInFutureError },
       ),
     end: z.coerce
       .date()
-      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: minuteMultipleMessage })
-      .refine((value) => !isTimeInPast(value), { message: pastErrorMessage })
+      .refine(isMultipleOfMinutes(slotGranularityMinutes), { message: messages.minuteMultiple })
+      .refine((value) => !isTimeInPast(value), { message: messages.pastError })
       .refine(
         (value) => isTimeFarEnoughInFuture(value, daysToStart),
-        { message: farEnoughErrorMessage },
+        { message: messages.farEnoughError },
       ),
-    aircraftId: z.string().trim().min(1, { message: aircraftIdEmptyErrorMessage }),
+    aircraftId: z.string().trim().min(1, { message: messages.aircraftIdEmptyError }),
     info: z.string().optional(),
-    phone: z.string().trim().min(1, { message: phoneNumberEmptyErrorMessage }),
+    phone: z.string().trim().min(1, { message: messages.phoneNumberEmptyError }),
   })
     .refine((res) => res.start < res.end, {
-      message: startNotLessThanEndErrorMessage,
+      message: messages.startNotLessThanEndError,
       path: ['general'],
     });
 
@@ -145,10 +173,18 @@ const getTimeRangeValidator = () => {
   return TimeRange;
 };
 
-const createAirfieldWithoutCodeObject = () => {
-  const nameEmptyErrorMessage = 'Airfield name cannot be empty';
-  const concurrentFlightsMessage = 'Concurrent flights must be minimum 1';
-  const multipleErrorMessage = 'Time must be multiple of 10';
+const createAirfieldWithoutCodeObject = (
+  t: TranslationFunc = undefined,
+) => {
+  const nameEmptyErrorMessage = t
+    ? t('validation.airfieldNameEmpty')
+    : 'Airfield name cannot be empty';
+  const concurrentFlightsMessage = t
+    ? t('validation.concurrentFlightsMinimum')
+    : 'Concurrent flights must be at least 1';
+  const multipleErrorMessage = t
+    ? t('validation.timeMultipleOfTen')
+    : 'Time must be multiple of 10';
 
   return z.object({
     name: z.string().min(1, { message: nameEmptyErrorMessage }),
@@ -161,8 +197,11 @@ const createAirfieldWithoutCodeObject = () => {
 
 function extendAirfieldWithCode(
   airfieldObject: ReturnType<typeof createAirfieldWithoutCodeObject>,
+  t: TranslationFunc = undefined,
 ) {
-  const idErrorMessage = 'Id must be ICAO airport code';
+  const idErrorMessage = t
+    ? t('validation.airfieldICAOInvalid')
+    : 'Id must be an ICAO airport code';
   const regex = /^[A-Z]{4}$/;
 
   return airfieldObject.extend({
@@ -174,8 +213,11 @@ function extendAirfieldWithCode(
 // Typescript can't automatically infer if code is there or not
 function airfieldValidator(validateId: false): ReturnType<typeof createAirfieldWithoutCodeObject>;
 function airfieldValidator(validateId: true): ReturnType<typeof extendAirfieldWithCode>;
-function airfieldValidator(validateId: boolean = true) {
-  const base = createAirfieldWithoutCodeObject();
+function airfieldValidator(
+  validateId: boolean = true,
+  t: TranslationFunc = undefined,
+) {
+  const base = createAirfieldWithoutCodeObject(t);
 
   const validateWithId = extendAirfieldWithCode(base);
 

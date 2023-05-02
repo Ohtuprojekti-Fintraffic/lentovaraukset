@@ -67,10 +67,11 @@ function RecurringTimeslotForm({
     // TODO: make this use the same validation as backend
     resolver: zodResolver(
       refineTimeslotObject(
-        createTimeSlotValidatorObject(timeslotGranularity) // create object validation
+        createTimeSlotValidatorObject(timeslotGranularity, t) // create object validation
           .omit({ type: true }) // remove type
           .extend(createTimeslotFormGroupShape()), // add group things
         // add periods are not validated
+        t,
       ), // refine the object which confirms start < end
     ),
     mode: 'all',

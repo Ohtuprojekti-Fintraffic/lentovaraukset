@@ -60,6 +60,7 @@ router.post('/', async (req: express.Request, res: express.Response, next: expre
       airfield.eventGranularityMinutes,
       configuration.maxDaysInFuture,
       configuration.daysToStart,
+      t,
     ).parse(req.body);
 
     if (!await allowReservation(

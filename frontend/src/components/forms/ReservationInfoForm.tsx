@@ -48,6 +48,7 @@ function ReservationInfoForm({
       reservationGranularity,
       maxDaysInFuture,
       daysToStart,
+      t,
     )),
     mode: 'all',
   });

@@ -30,7 +30,7 @@ function Management() {
         title={t('management.airfield.title')}
         airfield={airport}
         airfieldMutation={modifyAirfieldMutation}
-        validator={airfieldValidator(false)}
+        validator={airfieldValidator(false, t)}
       />
     </div>
   );

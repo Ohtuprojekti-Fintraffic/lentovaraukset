@@ -18,7 +18,7 @@ function Admin() {
         title={t('admin.newAirfield.title')}
         airfield={undefined}
         airfieldMutation={createAirfieldMutation}
-        validator={airfieldValidator(true)}
+        validator={airfieldValidator(true, t)}
         showIdField
       />
     </div>

@@ -160,6 +160,21 @@
     },
     "newAirfield": {
       "title": "Add a new airport"
+    },
+    "validation": {
+      "minuteMultiple": "Time must be some multiple of {{slotGranularityMinutes}} minutes",
+      "notInPast": "Timeslot cannot be in the past",
+      "timeslotStartLaterThanEnd": "Timeslot start time cannot be later than the end time",
+      "pastError": "Reservation can not be in the past",
+      "farEnoughError": "Reservation must be made at least {{daysToStart}} days in advance",
+      "tooFarInFutureError": "Reservation can be made {{maxDaysInFuture}} days from now at the latest",
+      "reservationStartLaterThanEnd": "Reservation start time cannot be later than the end time",
+      "aircraftIdEmptyError": "Aircraft registration number is required",
+      "phoneNumberEmptyError": "Phone number is required",
+      "airfieldNameEmpty": "Airport name can't be empty",
+      "concurrentFlightsMinimum": "concurrent flights must be at least 1",
+      "timeMultipleOfTen": "Time must be a multiple of 10 minutes",
+      "airfieldICAOInvalid": "Id must be an ICAO airport code"
     }
   }
 }

@@ -161,5 +161,16 @@
     "newAirfield": {
       "title": "Lisää uusi lentoasema"
     }
+  },
+  "validation": {
+    "minuteMultiple": "Ajan tulee olla jokin {{slotGranularityMinutes}} minuutin monikerta",
+    "notInPast": "Aika ei voi lisätä menneisyyteen",
+    "timeslotStartLaterThanEnd": "Varausikkunan alkuajan täytyy olla ennen loppuaikaa",
+    "pastError": "Varaus ei voi ajoittua menneisyyteen",
+    "farEnoughError": "Varaus tulee tehdä vähintään {{daysToStart}} päivää etukäteen",
+    "tooFarInFutureError": "Voit tehdä varauksen korkeintaan {{maxDaysInFuture}} päivän päähän",
+    "reservationStartLaterThanEnd": "Varauksen alkuaika ei voi olla myöhempi kuin loppuaika",
+    "aircraftIdEmptyError": "Lentokentän tunnus vaaditaan",
+    "phoneNumberEmptyError": "Puhelinnumero vaaditaan"
   }
 }
