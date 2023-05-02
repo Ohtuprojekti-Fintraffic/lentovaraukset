@@ -43,25 +43,30 @@ function EventComponent({ arg }: { arg: EventContentArg }) {
   const isReservation = !!arg.event.extendedProps.aircraftId;
   const isBlocked = arg.event.extendedProps.type === 'blocked';
 
-  if (isReservation && arg.textColor === '#000000') {
+  if ((isReservation && arg.textColor === '#000000') || !arg.event.start || !arg.event.end) {
     // somewhat hacky way to detect this but
     // when the event is e.g. rendered as
     // a background element we dont want text on it
     return null;
   }
 
-  const startHour = arg.event.start?.getHours().toString().padStart(2, '0');
-  const startMins = arg.event.start?.getMinutes().toString().padStart(2, '0');
-  const endHour = arg.event.end?.getHours().toString().padStart(2, '0');
-  const endMins = arg.event.end?.getMinutes().toString().padStart(2, '0');
+  const minutesDiff = (arg.event.end.getTime() - arg.event.start.getTime()) / (1000 * 60);
+
+  const startHour = arg.event.start?.getUTCHours().toString().padStart(2, '0');
+  const startMins = arg.event.start?.getUTCMinutes().toString().padStart(2, '0');
+  const endHour = arg.event.end?.getUTCHours().toString().padStart(2, '0');
+  const endMins = arg.event.end?.getUTCMinutes().toString().padStart(2, '0');
 
   const timeText = `${startHour}:${startMins} - ${endHour}:${endMins}`;
 
+  const isTiny = (minutesDiff - 1) <= 20; // "round" down
+  const containerClassName = isReservation ? `${isTiny ? 'px-1' : 'p-1'} flex justify-between` : 'h-full overflow-hidden';
+
   return (
-    <div className="p-1 ">
-      <p className="mb-1">
+    <div className={containerClassName}>
+      <span className="mb-1 mr-1">
         {timeText}
-      </p>
+      </span>
       {isReservation && (
       <Tag
         styleName="id"
