@@ -24,7 +24,9 @@
     "timeslots": "Bokningsfönster",
     "management": "Hantering",
     "admin": "Administration",
-    "menu": "Meny"
+    "menu": "Meny",
+    "login": "Logga in",
+    "logout": "Logga ut"
   },
   "landing": {
     "title": "Fintraffic Skolflygsbokningar",

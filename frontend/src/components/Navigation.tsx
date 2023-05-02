@@ -70,6 +70,9 @@ function Navigation() {
           <div className="hidden sm:block">
             <LanguagePicker />
           </div>
+          <div className="hidden sm:block whitespace-nowrap">
+            <LogInOutButton />
+          </div>
         </div>
       </div>
       {menuOpen && (
@@ -102,10 +105,12 @@ function Navigation() {
           >
             {t('navigation.admin')}
           </NavLink>
-          <div className="flex sm:hidden justify-end bg-black p-4 text-white">
+          <div className="flex sm:hidden justify-end bg-black p-4 text-white border-b border-ft-neutral-400">
             <LanguagePicker />
           </div>
-          <LogInOutButton />
+          <div className="flex sm:hidden justify-end bg-black p-4 text-white">
+            <LogInOutButton />
+          </div>
         </div>
       )}
     </>
