@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -15,8 +15,12 @@ import svLocale from '@fullcalendar/core/locales/sv';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { isTimeInPast, isTimeAtMostInFuture, isTimeFarEnoughInFuture } from '@lentovaraukset/shared/src/validation/validation';
 import { ConfigurationEntry } from '@lentovaraukset/shared/src';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AlertContext from '../contexts/AlertContext';
+import Button from './Button';
+import ButtonGroup from './ButtonGroup';
+import { usetwBreakpoint } from '../util';
 
 type CalendarProps = {
   calendarRef?: React.RefObject<FullCalendar>
@@ -71,24 +75,31 @@ function Calendar({
   }
 
   const { addNewAlert } = React.useContext(AlertContext);
-  const [viewMode, setViewMode] = React.useState(window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek');
+  const viewIdxMap = {
+    dayGridMonth: 0, timeGridWeek: 1, timeGridDay: 2, listWeek: 3,
+  } as const;
+  const [viewMode, setViewMode] = React.useState<keyof typeof viewIdxMap>(window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek');
+  const [viewTitle, setViewTitle] = useState('');
+  const updateViewTitle = () => { setViewTitle(calendarRef.current?.getApi().view.title || ''); };
+  const { md } = usetwBreakpoint('md');
 
-  React.useEffect(() => {
-    const handleResize = () => {
-      const newViewMode = window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek';
-      setViewMode(newViewMode);
+  useEffect(() => {
+    const currentViewType = calendarRef.current?.getApi().view.type;
+    if (currentViewType === 'timeGridDay') {
+      setViewMode('timeGridWeek');
+    } else if (currentViewType === 'timeGridWeek') {
+      setViewMode('timeGridDay');
+    }
+  }, [md]);
 
-      if (calendarRef.current) {
-        calendarRef.current.getApi().changeView(newViewMode);
-      }
-    };
+  useEffect(() => {
+    calendarRef.current?.getApi().changeView(viewMode);
+    updateViewTitle();
+  }, [viewMode]);
 
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [calendarRef]);
+  useEffect(() => {
+    updateViewTitle();
+  }, [i18n.language]);
 
   const isSameType = (
     stillEventType: string,
@@ -216,47 +227,88 @@ function Calendar({
   };
 
   return (
-    <FullCalendar
-      ref={calendarRef}
-      plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
-      locale={calendarLocale}
-      timeZone="UTC"
-      weekNumberCalculation="ISO"
-      headerToolbar={{
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,listWeek',
-      }}
-      height="100%"
-      initialView={viewMode}
-      allDaySlot={false}
-      nowIndicator
-      scrollTime="08:00:00"
-      dayHeaderFormat={{ weekday: 'long' }}
-      slotDuration={granularity}
-      snapDuration={granularity}
-      slotLabelInterval={{ minutes: 30 }}
-      slotLabelFormat={{
-        hour: 'numeric', minute: '2-digit', hour12: false, meridiem: false,
-      }}
-      selectable
-      selectMirror
-      editable
-      eventResizableFromStart
-      eventStartEditable
-      eventBackgroundColor={eventColors?.backgroundColor || '#FFFFFF'}
-      eventColor={eventColors?.eventColor || '#000000'}
-      eventTextColor={eventColors?.textColor || '#000000'}
-      eventClick={handleEventClick}
-      eventChange={handleEventChange}
-      eventRemove={handleEventRemove}
-      select={handleEventCreate}
-      selectConstraint={selectConstraint}
-      eventSources={eventSources}
-      slotEventOverlap={false}
-      selectAllow={allowEventRef}
-      eventAllow={allowEventRef}
-    />
+    <div className="flex flex-col h-full w-full gap-y-4">
+      <div className="flex justify-between items-center gap-x-2">
+        <div className="flex flex-col md:flex-row gap-2 w-fit">
+          <ButtonGroup className="flex flex-nowrap">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                calendarRef.current?.getApi().prev();
+                updateViewTitle();
+              }}
+            >
+              <ChevronLeft strokeWidth="1.5" color="black" />
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                calendarRef.current?.getApi().next();
+                updateViewTitle();
+              }}
+            >
+              <ChevronRight strokeWidth="1.5" color="black" />
+            </Button>
+          </ButtonGroup>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              calendarRef.current?.getApi().today();
+              updateViewTitle();
+            }}
+          >
+            {t('calendar.buttons.today')}
+          </Button>
+        </div>
+        <h2 className="hidden md:block text-ft-text-1000 text-ft-hs4 justify-self-center whitespace-nowrap">{viewTitle}</h2>
+        <div className="h-full flex flex-col justify-between md:flex-row items-end md:items-center gap-2 w-fit">
+          <h2 className="block md:hidden text-ft-text-1000 text-ft-hs4 justify-self-center whitespace-nowrap mt-3">{viewTitle}</h2>
+          <ButtonGroup activeIdx={viewIdxMap[viewMode]} className="flex justify-self-end">
+            <Button variant="secondary" onClick={() => setViewMode('dayGridMonth')}>{t('calendar.buttons.month')}</Button>
+            <Button variant="secondary" className="hidden md:block" onClick={() => setViewMode('timeGridWeek')}>{t('calendar.buttons.week')}</Button>
+            <Button variant="secondary" className="block md:hidden" onClick={() => setViewMode('timeGridDay')}>{t('calendar.buttons.day')}</Button>
+            <Button variant="secondary" onClick={() => setViewMode('listWeek')}>{t('calendar.buttons.list')}</Button>
+          </ButtonGroup>
+        </div>
+      </div>
+      <FullCalendar
+        ref={calendarRef}
+        plugins={[timeGridPlugin, dayGridPlugin, listPlugin, interactionPlugin]}
+        locale={calendarLocale}
+        timeZone="UTC"
+        weekNumberCalculation="ISO"
+        headerToolbar={false}
+        height="100%"
+        initialView={md ? 'timeGridDay' : 'timeGridWeek'}
+        allDaySlot={false}
+        nowIndicator
+        scrollTime="08:00:00"
+        dayHeaderFormat={!md && (viewMode === 'dayGridMonth') ? { weekday: 'short' } : { weekday: 'long' }}
+        slotDuration={granularity}
+        snapDuration={granularity}
+        slotLabelInterval={{ minutes: 30 }}
+        slotLabelFormat={{
+          hour: 'numeric', minute: '2-digit', hour12: false, meridiem: false,
+        }}
+        selectable
+        selectMirror
+        editable
+        eventResizableFromStart
+        eventStartEditable
+        eventBackgroundColor={eventColors?.backgroundColor || '#FFFFFF'}
+        eventColor={eventColors?.eventColor || '#000000'}
+        eventTextColor={eventColors?.textColor || '#000000'}
+        eventClick={handleEventClick}
+        eventChange={handleEventChange}
+        eventRemove={handleEventRemove}
+        select={handleEventCreate}
+        selectConstraint={selectConstraint}
+        eventSources={eventSources}
+        slotEventOverlap={false}
+        selectAllow={allowEventRef}
+        eventAllow={allowEventRef}
+      />
+    </div>
   );
 }
 

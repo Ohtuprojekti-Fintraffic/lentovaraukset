@@ -10,6 +10,7 @@ import en from 'date-fns/locale/en-GB';
 import sv from 'date-fns/locale/sv';
 import { Control, Controller, type FieldErrors } from 'react-hook-form';
 import { DateTime } from 'luxon';
+import { twMerge } from 'tailwind-merge';
 import { useTranslation } from 'react-i18next';
 import { fieldBaseClass, fieldStateClasses, InputStates } from './InputField';
 
@@ -80,7 +81,7 @@ function DatePicker({
           return (
             <div className="flex flex-col items-start flex-wrap w-full">
               <ReactDatePicker
-                className={`${fieldBaseClass} ${fieldStateClasses[state]} ${inputClassName} ${value}`}
+                className={twMerge(`${fieldBaseClass} ${fieldStateClasses[state]}`, inputClassName)}
                 dateFormat={showTimeSelect ? 'dd.MM.yyyy HH:mm' : 'dd.MM.yyyy'}
                 dropdownMode="select"
                 minDate={DateTime.now().toJSDate()} // local tz
