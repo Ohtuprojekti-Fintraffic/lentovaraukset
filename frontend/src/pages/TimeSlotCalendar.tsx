@@ -3,9 +3,12 @@ import {
 } from '@fullcalendar/core';
 import { EventImpl } from '@fullcalendar/core/internal';
 import FullCalendar from '@fullcalendar/react';
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useState, useRef, useCallback, useEffect,
+} from 'react';
 import { isTimeInPast } from '@lentovaraukset/shared/src/validation/validation';
 import { AirfieldEntry, TimeslotType, WeekInDays } from '@lentovaraukset/shared/src';
+import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
 import Calendar from '../components/Calendar';
 import TimeslotInfoModal from '../modals/TimeslotInfoModal';
@@ -14,7 +17,7 @@ import {
   getReservations,
 } from '../queries/reservations';
 import {
-  getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup,
+  getTimeSlots, modifyTimeSlot, deleteTimeslot, modifyGroup, deleteGroup,
 } from '../queries/timeSlots';
 import { usePopupContext } from '../contexts/PopupContext';
 import { useAirportContext } from '../contexts/AirportContext';
@@ -27,8 +30,11 @@ import AirfieldAccordion from '../components/accordions/AirfieldAccordion';
   };
 
 function TimeSlotCalendar() {
+  const { t } = useTranslation();
   const calendarRef = useRef<FullCalendar>(null);
-  const { airport, setAirportICAO } = useAirportContext(); // TODO: get id from airfield selection
+  const {
+    airport, setAirportICAO,
+  } = useAirportContext();
   const [airfields, setAirfields] = useState<AirfieldEntry[]>([]);
   const { showPopup, clearPopup } = usePopupContext();
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -36,49 +42,58 @@ function TimeSlotCalendar() {
   const selectedTimeslotRef = useRef<EventImpl | null>(null);
   const draggedTimesRef = useRef<{ start: Date, end: Date } | null>(null);
 
-  const timeSlotsSourceFn: EventSourceFunc = async (
-    { start, end },
-    successCallback,
-    failureCallback,
-  ) => {
-    try {
-      const timeslots = await getTimeSlots(start, end);
-      const timeslotsMapped = timeslots.map((timeslot): EventInput => {
-        const timeslotEvent: EventInput = {
-          ...timeslot,
-          id: timeslot.id.toString(),
-          editable: !isTimeInPast(timeslot.end),
-          color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
-          title: timeslot.type === 'available' ? 'Vapaa' : timeslot.info || 'Suljettu',
-        };
-        return timeslotEvent;
-      });
-      successCallback(timeslotsMapped);
-    } catch (error) {
-      failureCallback(error as Error);
-    }
-  };
+  function useEventSources() {
+    const timeSlotsSourceFn: EventSourceFunc = useCallback(async (
+      { start, end },
+      successCallback,
+      failureCallback,
+    ) => {
+      if (!airport) {
+        failureCallback(new Error('Airport is not set'));
+        return;
+      }
+      try {
+        const timeslots = await getTimeSlots(start, end, airport.code);
+        const timeslotsMapped = timeslots.map((timeslot): EventInput => {
+          const timeslotEvent: EventInput = {
+            ...timeslot,
+            id: timeslot.id.toString(),
+            editable: !isTimeInPast(timeslot.end),
+            color: timeslot.type === 'available' ? '#84cc1680' : '#eec200',
+            title: timeslot.type === 'available' ? t('timeslots.calendar.free') : timeslot.info || t('timeslots.calendar.blocked'),
+          };
+          return timeslotEvent;
+        });
+        successCallback(timeslotsMapped);
+      } catch (error) {
+        failureCallback(error as Error);
+      }
+    }, [airport]);
 
-  const reservationsSourceFn: EventSourceFunc = async (
-    { start, end },
-    successCallback,
-    failureCallback,
-  ) => {
-    try {
-      const reservations = await getReservations(start, end);
+    const reservationsSourceFn: EventSourceFunc = useCallback(async (
+      { start, end },
+      successCallback,
+      failureCallback,
+    ) => {
+      if (!airport) {
+        failureCallback(new Error('Airport is not set'));
+        return;
+      }
+      try {
+        const reservations = await getReservations(start, end, airport?.code);
 
-      const reservationsMapped = reservations.map((reservation) => ({
-        ...reservation, id: reservation.id.toString(), groupId: 'reservations', display: 'background', color: '#000000',
-      }));
+        const reservationsMapped = reservations.map((reservation) => ({
+          ...reservation, id: reservation.id.toString(), groupId: 'reservations', display: 'background', color: '#000000',
+        }));
 
-      successCallback(reservationsMapped);
-    } catch (error) {
-      failureCallback(error as Error);
-    }
-  };
-
-  const eventsSourceRef = useRef([reservationsSourceFn, timeSlotsSourceFn]);
-
+        successCallback(reservationsMapped);
+      } catch (error) {
+        failureCallback(error as Error);
+      }
+    }, [airport]);
+    return [reservationsSourceFn, timeSlotsSourceFn];
+  }
+  const [reservationsSourceFn, timeSlotsSourceFn] = useEventSources();
   // either or neither, but not both
   function showTimeslotModalFn(event: EventImpl, times: StartEndPair): never;
   function showTimeslotModalFn(event: EventImpl | null, times: StartEndPair | null): void;
@@ -90,10 +105,13 @@ function TimeSlotCalendar() {
     draggedTimesRef.current = times;
     setShowInfoModal(true);
   }
-
   const closeTimeslotModalFn = () => setShowInfoModal(false);
 
-  const clickTimeslot = async (event: EventImpl): Promise<void> => {
+  /**
+   * Opens timeslot modal, if event is not in past
+   * @param event Event that is clicked, dragged or moved
+   */
+  const clickOrDragTimeslot = async (event: EventImpl): Promise<void> => {
     if (event.end && isTimeInPast(event.end)) {
       return;
     }
@@ -104,10 +122,24 @@ function TimeSlotCalendar() {
   const removeTimeSlot = async (removeInfo: EventRemoveArg) => {
     // fullcalendar removes the event early:
     removeInfo.revert();
+    if (!airport) {
+      return;
+    }
     const { event } = removeInfo;
+    const start = event.start ?? new Date();
 
-    const onConfirmRemove = async () => {
-      await deleteTimeslot(Number(event.id));
+    const removeOneEvent = async () => {
+      await deleteTimeslot(Number(event.id), airport.code);
+      closeTimeslotModalFn();
+      clearPopup();
+      calendarRef.current?.getApi().refetchEvents();
+    };
+
+    const removeAllFutureEvents = async () => {
+      if (event.extendedProps.group) {
+        const startingFrom = new Date(start);
+        await deleteGroup(event.extendedProps.group, { startingFrom }, airport.code);
+      }
       closeTimeslotModalFn();
       clearPopup();
       calendarRef.current?.getApi().refetchEvents();
@@ -117,14 +149,27 @@ function TimeSlotCalendar() {
       clearPopup();
     };
 
-    showPopup({
-      popupTitle: 'Varausikkunan Poisto',
-      popupText: 'Haluatko varmasti poistaa varausikkunan?',
-      dangerText: 'Poista',
-      dangerOnClick: onConfirmRemove,
-      secondaryText: 'Peruuta',
-      secondaryOnClick: onCancelRemove,
-    });
+    if (event.extendedProps.group) {
+      showPopup({
+        popupTitle: t('timeslots.repeatingDeletionPopup.title'),
+        popupText: t('timeslots.repeatingDeletionPopup.text'),
+        primaryText: t('timeslots.repeatingDeletionPopup.primary'),
+        primaryOnClick: removeAllFutureEvents,
+        secondaryText: t('timeslots.repeatingDeletionPopup.secondary'),
+        secondaryOnClick: removeOneEvent,
+        tertiaryText: t('common.cancel'),
+        tertiaryOnClick: onCancelRemove,
+      });
+    } else {
+      showPopup({
+        popupTitle: t('timeslots.deletionPopup.title'),
+        popupText: t('timeslots.deletionPopup.text'),
+        dangerText: t('common.delete'),
+        dangerOnClick: removeOneEvent,
+        secondaryText: t('common.cancel'),
+        secondaryOnClick: onCancelRemove,
+      });
+    }
   };
 
   const isSameType = (
@@ -154,6 +199,9 @@ function TimeSlotCalendar() {
       days: WeekInDays,
     },
   ) => {
+    if (!airport) {
+      return;
+    }
     const start = timeslot.start ?? new Date();
     const end = timeslot.end ?? new Date();
     const modifyOneEvent = async () => {
@@ -165,6 +213,7 @@ function TimeSlotCalendar() {
           type: timeslot.extendedProps.type,
           info: timeslot.extendedProps.info,
         },
+        airport.code,
         period
           ? {
             end: period.end,
@@ -181,15 +230,19 @@ function TimeSlotCalendar() {
       if (timeslot.extendedProps.group) {
         const startingFrom = new Date(start);
         startingFrom.setHours(0, 0, 0, 0);
-        await modifyGroup(timeslot.extendedProps.group, {
-          startingFrom,
-          startTimeOfDay: {
-            hours: start.getHours(), minutes: start.getMinutes(),
+        await modifyGroup(
+          timeslot.extendedProps.group,
+          {
+            startingFrom,
+            startTimeOfDay: {
+              hours: start.getHours(), minutes: start.getMinutes(),
+            },
+            endTimeOfDay: {
+              hours: end.getHours(), minutes: end.getMinutes(),
+            },
           },
-          endTimeOfDay: {
-            hours: end.getHours(), minutes: end.getMinutes(),
-          },
-        });
+          airport.code,
+        );
       }
       closeTimeslotModalFn();
       clearPopup();
@@ -198,11 +251,11 @@ function TimeSlotCalendar() {
 
     if (timeslot.extendedProps.group) {
       showPopup({
-        popupTitle: 'Toistuvan varausikkunan muokkaus',
-        popupText: 'Muokkasit toistuvaa varausikkuuna. Muokataanko myös kaikkia tulevia ryhmän varausikkunoita?',
-        primaryText: 'Muokkaa kaikkia',
+        popupTitle: t('timeslots.repeatingPopup.title'),
+        popupText: t('timeslots.repeatingPopup.text'),
+        primaryText: t('timeslots.repeatingPopup.primary'),
         primaryOnClick: modifyAllFutureEvents,
-        secondaryText: 'Muokkaa vain tätä',
+        secondaryText: t('timeslots.repeatingPopup.secondary'),
         secondaryOnClick: modifyOneEvent,
       });
     } else {
@@ -239,7 +292,6 @@ function TimeSlotCalendar() {
         }}
       />
       <div className="flex flex-col w-full">
-
         <AirfieldAccordion
           airfield={airport}
           airfields={airfields}
@@ -247,12 +299,18 @@ function TimeSlotCalendar() {
         />
         <div className="flex flex-col space-y-2 h-full w-full p-8">
           <div className="flex flex-row justify-between mt-0">
-            <h1 className="text-3xl">Vapaat varausikkunat</h1>
-            <Button variant="primary" onClick={() => showTimeslotModalFn(null, null)}>Uusi varausikkuna</Button>
+            <h1 className="text-3xl">
+              {t('timeslots.calendar.timeslots')}
+            </h1>
+            <Button variant="primary" onClick={() => showTimeslotModalFn(null, null)}>
+              {t('timeslots.calendar.newTimeslot')}
+            </Button>
           </div>
           <div>
             <label htmlFor="checkbox" className="font-ft-label mb-1">
-              <span>Lisää suljettuja vuoroja</span>
+              <span>
+                {t('timeslots.calendar.blockedTimeslot')}
+              </span>
               <input
                 type="checkbox"
                 id="checkbox"
@@ -264,10 +322,10 @@ function TimeSlotCalendar() {
           </div>
           <Calendar
             calendarRef={calendarRef}
-            eventSources={eventsSourceRef.current}
+            eventSources={[reservationsSourceFn, timeSlotsSourceFn]}
             addEventFn={showModalAfterDrag}
-            modifyEventFn={modifyTimeslotFn}
-            clickEventFn={clickTimeslot}
+            modifyEventFn={clickOrDragTimeslot}
+            clickEventFn={clickOrDragTimeslot}
             removeEventFn={removeTimeSlot}
             granularity={airport && { minutes: airport.eventGranularityMinutes }}
             eventColors={{ backgroundColor: blocked ? '#eec200' : '#bef264', eventColor: blocked ? '#b47324' : '#84cc1680', textColor: '#000000' }}

@@ -1,6 +1,7 @@
 import { EventImpl } from '@fullcalendar/core/internal';
 import { TimeslotEntry, WeekInDays } from '@lentovaraukset/shared/src';
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import ActionSheet from '../components/ActionSheet';
 import Button from '../components/Button';
 import Card from '../components/Card';
@@ -8,6 +9,7 @@ import RecurringTimeslotForm from '../components/forms/RecurringTimeslotForm';
 import AlertContext from '../contexts/AlertContext';
 import { addTimeSlot } from '../queries/timeSlots';
 import { ApiError } from '../queries/util';
+import { useAirportContext } from '../contexts/AirportContext';
 
 type InfoModalProps = {
   showInfoModal: boolean
@@ -31,7 +33,10 @@ function TimeslotInfoModal({
   timeslot, draggedTimes,
   modifyTimeslotFn,
 }: InfoModalProps) {
+  const { t } = useTranslation();
+
   const { addNewAlert } = useContext(AlertContext);
+  const { airport } = useAirportContext();
 
   const onModifySubmitHandler = async (
     updatedTimeslot: Omit<TimeslotEntry, 'id' | 'airfieldCode'>,
@@ -57,11 +62,11 @@ function TimeslotInfoModal({
         } as unknown as EventImpl,
         period,
       );
-      addNewAlert('Aikaikkuna päivitetty!', 'success');
+      addNewAlert(t('timeslots.modal.updated'), 'success');
     } catch (exception) {
       if (exception instanceof ApiError) {
         // TODO: communicate the error itself
-        addNewAlert('Virhe tapahtui varausta päivittäessä', 'danger');
+        addNewAlert(t('timeslots.modal.updateFailed'), 'danger');
       } else {
         throw exception;
       }
@@ -72,12 +77,12 @@ function TimeslotInfoModal({
 
   const onSubmitAddHandler = async (timeslotDetails: Omit<TimeslotEntry, 'id' | 'airfieldCode'>) => {
     try {
-      await addTimeSlot(timeslotDetails);
-      addNewAlert('Aikaikkuna lisätty!', 'success');
+      await addTimeSlot(timeslotDetails, airport?.code);
+      addNewAlert(t('timeslots.modal.created'), 'success');
     } catch (exception) {
       if (exception instanceof ApiError) {
         // TODO: communicate the error itself
-        addNewAlert('Virhe tapahtui aikaikkunaa lisätessä', 'danger');
+        addNewAlert(t('timeslots.modal.creationFailed'), 'danger');
       } else {
         throw exception;
       }
@@ -93,8 +98,8 @@ function TimeslotInfoModal({
   return (
     <Card
       title={timeslot
-        ? `Aikaikkuna #${timeslot.id}`
-        : 'Uusi aikaikkuna'}
+        ? `${t('timeslots.modal.timeslot')} #${timeslot.id}`
+        : t('timeslots.modal.newTimeslot')}
       escHandler={closeTimeslotModal}
       form={(
         <RecurringTimeslotForm
@@ -112,7 +117,7 @@ function TimeslotInfoModal({
             type="submit"
             variant="primary"
           >
-            Tallenna
+            {t('common.save')}
           </Button>
           {timeslot && (
             <Button
@@ -122,7 +127,7 @@ function TimeslotInfoModal({
               // that only works in React?
               onClick={() => timeslot.remove()}
             >
-              Poista
+              {t('common.delete')}
             </Button>
           )}
         </ActionSheet>
