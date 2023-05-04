@@ -24,7 +24,9 @@
     "timeslots": "Reservation windows",
     "management": "Management",
     "admin": "Admin",
-    "menu": "Menu"
+    "menu": "Menu",
+    "login": "Log in",
+    "logout": "Log out"
   },
   "landing": {
     "title": "Fintraffic School Flight Reservations",

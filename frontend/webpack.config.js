@@ -32,6 +32,7 @@ const config = (env, argv) => ({
     historyApiFallback: true,
     proxy: {
       '/api': 'http://localhost:8080',
+      '/auth': 'http://localhost:8080/api',
     },
   },
   module: {

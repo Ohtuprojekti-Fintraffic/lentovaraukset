@@ -3,6 +3,8 @@ import app from '@lentovaraukset/backend/src/app';
 import { Configuration } from '@lentovaraukset/backend/src/models';
 import { connectToDatabase, sequelize } from '../src/util/db';
 
+jest.mock('@lentovaraukset/backend/src/auth/passport.ts');
+
 const api = request(app);
 
 const configurations = [

@@ -24,7 +24,9 @@
     "timeslots": "Varausikkunat",
     "management": "Hallinta",
     "admin": "Ylläpito",
-    "menu": "Valikko"
+    "menu": "Valikko",
+    "login": "Kirjaudu sisään",
+    "logout": "Kirjaudu ulos"
   },
   "landing": {
     "title": "Fintraffic Koululentovaraus",

@@ -7,6 +7,7 @@ import airfieldService from '../src/services/airfieldService';
 import reservationService from '../src/services/reservationService';
 import configurationService from '../src/services/configurationService';
 
+jest.mock('@lentovaraukset/backend/src/auth/passport.ts');
 const api = request(app);
 
 const reservations = [
