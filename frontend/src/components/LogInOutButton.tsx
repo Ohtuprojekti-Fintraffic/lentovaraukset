@@ -6,7 +6,7 @@ function LogInOutButton() {
   const [user, setUser] = useState<{ displayName: string } | null>(null);
   useEffect(() => {
     const getUser = async () => {
-      const fetchedUser = await fetch('/api/auth/user');
+      const fetchedUser = await fetch(`${process.env.BASE_PATH}/api/auth/user`);
       setUser(await fetchedUser.json());
     };
     getUser();
@@ -17,7 +17,7 @@ function LogInOutButton() {
       {user
         ? (
           <div>
-            <a href="/api/auth/logout">
+            <a href={`${process.env.BASE_PATH}/api/auth/logout`}>
               {' '}
               {user.displayName}
               {' — '}
@@ -26,7 +26,7 @@ function LogInOutButton() {
           </div>
         )
         : (
-          <a href="/api/auth/login">
+          <a href={`${process.env.BASE_PATH}/api/auth/login`}>
             {t('navigation.login')}
           </a>
         )}
