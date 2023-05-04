@@ -22,7 +22,15 @@ services:
     depends_on:
       - db
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - DATABASE_URL=${DATABASE_URL}
+      - CLOUD_INSTANCE=${CLOUD_INSTANCE}
+      - TENANT_ID=${TENANT_ID}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - REDIRECT_URI=${REDIRECT_URI}
+      - POST_LOGOUT_REDIRECT_URI=${POST_LOGOUT_REDIRECT_URI}
+      - EXPRESS_SESSION_SECRET=${EXPRESS_SESSION_SECRET}
+      - BASE_PATH=${BASE_PATH}
 
   db:
     image: postgres:15.1-alpine

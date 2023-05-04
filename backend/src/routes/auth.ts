@@ -13,7 +13,7 @@ router.get('/login', (req, res, next) => {
     'azuread-openidconnect',
     // 'oauth-bearer',
     {
-      failureRedirect: '/',
+      failureRedirect: `${process.env.BASE_PATH}/`,
     },
   )(req, res, next);
 });
@@ -24,12 +24,12 @@ router.post(
     passport.authenticate(
       'azuread-openidconnect',
       {
-        failureRedirect: '/',
+        failureRedirect: `${process.env.BASE_PATH}/`,
       },
     )(req, res, next);
   },
   (_req, res) => {
-    res.redirect('/');
+    res.redirect(`${process.env.BASE_PATH}/`);
   },
 );
 
@@ -37,7 +37,7 @@ router.post(
 router.get('/logout', (req, res) => {
   req.session.destroy(() => {
     req.logOut({}, () => {});
-    res.redirect('/');
+    res.redirect(`${process.env.BASE_PATH}/`);
   });
 });
 
