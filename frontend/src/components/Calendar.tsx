@@ -6,7 +6,7 @@ import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import type {
   AllowFunc,
-  DateSelectArg, EventChangeArg, EventClickArg, EventRemoveArg,
+  DateSelectArg, EventContentArg, EventChangeArg, EventClickArg, EventRemoveArg,
   EventSourceInput,
 } from '@fullcalendar/core';
 import fiLocale from '@fullcalendar/core/locales/fi';
@@ -18,6 +18,7 @@ import { ConfigurationEntry } from '@lentovaraukset/shared/src';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AlertContext from '../contexts/AlertContext';
+import Tag from './Tag';
 import Button from './Button';
 import ButtonGroup from './ButtonGroup';
 import { usetwBreakpoint } from '../util';
@@ -41,6 +42,52 @@ type CalendarProps = {
   checkIfTimeInFuture?: boolean;
   blocked?: boolean;
 };
+
+function EventComponent({ arg }: { arg: EventContentArg }) {
+  const isReservation = !!arg.event.extendedProps.aircraftId;
+  const isBlocked = arg.event.extendedProps.type === 'blocked';
+
+  if ((isReservation && arg.textColor === '#000000') || !arg.event.start || !arg.event.end) {
+    // somewhat hacky way to detect this but
+    // when the event is e.g. rendered as
+    // a background element we dont want text on it
+    return null;
+  }
+
+  const minutesDiff = (arg.event.end.getTime() - arg.event.start.getTime()) / (1000 * 60);
+
+  const startHour = arg.event.start?.getUTCHours().toString().padStart(2, '0');
+  const startMins = arg.event.start?.getUTCMinutes().toString().padStart(2, '0');
+  const endHour = arg.event.end?.getUTCHours().toString().padStart(2, '0');
+  const endMins = arg.event.end?.getUTCMinutes().toString().padStart(2, '0');
+
+  const timeText = `${startHour}:${startMins} - ${endHour}:${endMins}`;
+
+  const isTiny = (minutesDiff - 1) <= 20; // "round" down
+  const containerClassName = isReservation ? `${isTiny ? 'px-1' : 'p-1'} flex justify-between` : 'h-full overflow-hidden';
+
+  return (
+    <div className={containerClassName}>
+      <span className="mb-1 mr-1">
+        {timeText}
+      </span>
+      {isReservation && (
+      <Tag
+        styleName="id"
+        bgColorClassName="bg-ft-neutral-100"
+        textColorClassName="text-ft-text-600"
+      >
+        {arg.event.extendedProps?.aircraftId}
+      </Tag>
+      )}
+      {isBlocked && <p>{ arg.event.extendedProps.info }</p>}
+      {/* Not used for reservations because this is probably not something the average user is
+          supposed to see, which also brings up the question why the client
+          gets everyone's phone number and these infos.
+          TODO: look into */}
+    </div>
+  );
+}
 
 function Calendar({
   calendarRef: forwardedCalendarRef,
@@ -299,6 +346,9 @@ function Calendar({
         eventColor={eventColors?.eventColor || '#000000'}
         eventTextColor={eventColors?.textColor || '#000000'}
         eventClick={handleEventClick}
+        // eslint complains only because the prop name doesn't start with "render"
+        // eslint-disable-next-line react/no-unstable-nested-components
+        eventContent={(arg) => (<EventComponent arg={arg} />)}
         eventChange={handleEventChange}
         eventRemove={handleEventRemove}
         select={handleEventCreate}

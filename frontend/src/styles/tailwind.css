@@ -6,3 +6,8 @@
   font-family: "Public Sans";
   src: url("../../assets/fonts/PublicSans-VariableFont_wght.ttf");
 }
+
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("../../assets/fonts/RobotoMono-VariableFont_wght.ttf");
+}

@@ -15,6 +15,7 @@ import ServiceError from '../util/errors';
  * @returns An array of Reservation objects.
  */
 const getInTimeRange = async (startTime: Date, endTime: Date, airportCode: string) => {
+  // TODO: filter out phone numbers and other sensitive stuff?
   const reservations: Reservation[] = await Reservation.findAll({
     where: {
       [Op.and]: [

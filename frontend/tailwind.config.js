@@ -444,6 +444,7 @@ module.exports = {
       ],
       serif: ['ui-serif', 'Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
       mono: [
+        'Roboto Mono',
         'ui-monospace',
         'SFMono-Regular',
         'Menlo',
@@ -493,6 +494,7 @@ module.exports = {
       'ft-popup-message': ['1rem', { lineHeight: '1' }],
       'ft-placeholder': ['1rem', { lineHeight: '1' }],
       'ft-tag': ['1rem', { lineHeight: '1' }],
+      'ft-id': ['0.8125rem', { lineHeight: '1' }],
 
       // Body
       'ft-body-default': ['1rem', { lineHeight: '1.5' }],
