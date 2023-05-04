@@ -4,6 +4,7 @@ import { Timeslot } from '@lentovaraukset/backend/src/models';
 import { connectToDatabase, sequelize } from '../src/util/db';
 import airfieldService from '../src/services/airfieldService';
 
+jest.mock('@lentovaraukset/backend/src/auth/passport.ts');
 const api = request(app);
 
 // https://github.com/sequelize/sequelize/issues/14807

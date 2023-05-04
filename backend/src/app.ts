@@ -1,11 +1,15 @@
 import express from 'express';
 import cors from 'cors';
+import expressSession from 'express-session';
+import cookieParser from 'cookie-parser';
+import passport from './auth/passport';
 import timeslotRouter from './routes/timeslots';
 import reservationRouter from './routes/reservations';
 import airfieldRouter from './routes/airfields';
 import configurationRouter from './routes/configurations';
 import { errorHandler, airfieldExtractor, notFoundHandler } from './util/middleware';
 import { Airfield } from './models';
+import authRouter from './routes/auth';
 
 const app = express();
 
@@ -18,14 +22,27 @@ declare global {
       airfield: Airfield | null
     }
   }
-}
 
+}
+app.use(cookieParser());
 app.use(express.json());
 app.use(cors());
+
+app.use(expressSession({
+  secret: process.env.EXPRESS_SESSION_SECRET!,
+  resave: true,
+  saveUninitialized: false,
+}));
+app.use(express.urlencoded({ extended: true }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get('/api', async (_req: any, res: express.Response) => {
   res.send('Hello World');
 });
+
+app.use('/api/auth', authRouter);
 
 app.use('/api/:airfieldCode/*', airfieldExtractor);
 app.use('/api/:airfieldCode/reservations', reservationRouter);
