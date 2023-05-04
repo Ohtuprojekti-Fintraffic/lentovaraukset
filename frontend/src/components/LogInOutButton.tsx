@@ -7,7 +7,7 @@ function LogInOutButton() {
   useEffect(() => {
     const getUser = async () => {
       const fetchedUser = await fetch(`${process.env.BASE_PATH}/api/auth/user`);
-      setUser(await fetchedUser.json());
+      if (fetchedUser.ok) setUser(await fetchedUser.json());
     };
     getUser();
   }, []);

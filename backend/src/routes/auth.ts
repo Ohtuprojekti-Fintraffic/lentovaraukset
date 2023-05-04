@@ -3,7 +3,7 @@ import passport from '../auth/passport';
 
 const ensureAuthenticated = (req: any, res: any, next: any) => {
   if (req.isAuthenticated()) next();
-  res.sendStatus(401);
+  else res.sendStatus(401);
 };
 
 const router = express.Router();
