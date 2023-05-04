@@ -19,18 +19,11 @@ const findByOid = (
   oid: string | undefined,
   fn: (err: Error | null, user: IProfile | null) => void,
 ) => {
-  for (let i = 0, len = users.length; i < len; i += 1) {
-    const user = users[i];
-    console.log('we are using user: ', user);
-    if (user.oid === oid) {
-      return fn(null, user);
-    }
-  }
-  return fn(null, null);
+  const user = users.find((u) => u.oid === oid);
+  return fn(null, user || null);
 };
 
 passport.serializeUser((user: IProfile, done) => {
-  console.log('serializing user: ', user);
   done(null, user.oid);
 });
 
