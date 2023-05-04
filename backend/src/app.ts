@@ -46,7 +46,7 @@ app.use('/api/auth', authRouter);
 
 app.use('/api/:airfieldCode/*', airfieldExtractor);
 app.use('/api/:airfieldCode/reservations', reservationRouter);
-app.use('/api/:airfieldCode/timeslots', passport.authenticate('azuread-openidconnect'), timeslotRouter);
+app.use('/api/:airfieldCode/timeslots', timeslotRouter);
 app.use('/api/airfields', airfieldRouter);
 app.use('/api/configurations', configurationRouter);
 
