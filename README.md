@@ -4,6 +4,8 @@
 
 An online calendar for reserving times for school flights at airports. Project made during the University of Helsinki course "Software Engineering Lab" for Fintraffic Lennonvarmistus
 
+![image](https://user-images.githubusercontent.com/56773501/236443182-af539c43-6a40-4b3b-b746-6bdc99e621d4.png)
+
 ## Installation
 
 1. Install packages
