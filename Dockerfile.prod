@@ -1,0 +1,27 @@
+FROM node:19-alpine as build-stage
+
+WORKDIR /usr/src/app
+
+COPY ./package.json .
+COPY ./package-lock.json .
+COPY ./shared ./shared
+COPY ./backend ./backend
+COPY ./frontend ./frontend
+COPY ./tsconfig.json .
+
+RUN npm ci
+
+RUN npm run build && npm run build:frontend
+
+
+FROM node:19-alpine
+WORKDIR /usr/src/app
+ENV NODE_ENV=production
+
+COPY --from=build-stage /usr/src/app/build .
+COPY --from=build-stage /usr/src/app/frontend/dist ./front_dist
+
+RUN npm ci
+
+EXPOSE 8080
+CMD node ./backend/src/index.js

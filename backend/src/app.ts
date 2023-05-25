@@ -53,4 +53,6 @@ app.use('/api/configurations', configurationRouter);
 app.use(errorHandler);
 app.use('*', notFoundHandler);
 
+app.use('/', express.static('front_dist'));
+
 export default app;
